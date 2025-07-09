@@ -1,0 +1,405 @@
+//context
+import Modal from "@modules/common/components/modal";
+import { usePopup } from "@contexts/UsePopup";
+import Webcam from "react-webcam";
+import { useCallback, useEffect, useRef, useState } from "react";
+import ActionButton from "@modules/common/components/ActionButton";
+import { base64ToArrayBuffer, getBase64 } from "@lib/utils/image";
+import FileInput from "@modules/common/components/FileInput";
+import Paragraph from "@modules/common/components/typography/Paragraph";
+import { headingVariants, paragraphVariants } from "@resources/variants";
+import Image from "@modules/common/components/Image";
+import { ImageRawData } from "@resources/types/ocr";
+import Heading from "@modules/common/components/typography/Heading";
+import { buttonActionTypes } from "@resources/types/button";
+import { cn } from "@lib/utils/style";
+import { handleImageCompress } from "@lib/utils/ImageCompressor";
+import Spinner from "../Spinner";
+import { convertNumberToWords } from "@lib/utils/number";
+import useWindowDimensions from "@modules/common/hooks/useWindowDimensions";
+
+const ImageScanPopup = () => {
+  //context
+  const webcamRef = useRef<any>(null);
+  const { width: windowWidth } = useWindowDimensions();
+  const { messagePopupObj, imageScanPopupObj } = usePopup();
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [uncompressedImages, setUncompressedImages] = useState<
+    {
+      id: number;
+      url: string;
+      progress: number;
+    }[]
+  >([]);
+  const [images, setImages] = useState<ImageRawData[]>([]);
+  const [openCamera, setOpenCamera] = useState<boolean>(false);
+
+  const { popupAction, popupData } = imageScanPopupObj.data;
+
+  const { fileLimit } = popupData;
+
+  useEffect(() => {
+    if (!imageScanPopupObj.show) {
+      setImages([]);
+      setUncompressedImages([]);
+      setOpenCamera(false);
+    }
+  }, [imageScanPopupObj.show]);
+
+  const captureHandler = () => {
+    if (webcamRef?.current) {
+      setLoading(true);
+      const imageSrc = webcamRef.current.getScreenshot();
+      handleFileInput(imageSrc, null, new Date().getTime());
+    }
+  };
+
+  const videoConstraints = {
+    width: 414,
+    height: 720,
+    facingMode: { exact: "environment" },
+  };
+
+  useEffect(() => {
+    if (fileLimit && images.length === fileLimit) {
+      setOpenCamera(false);
+      return;
+    }
+  }, [images]);
+
+  const readImageHandler = () => {
+    if (popupAction) {
+      popupAction(images);
+      imageScanPopupObj.close();
+    }
+  };
+
+  const handleDrop = (e: any) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      setLoading(true);
+      getBase64(file).then((result: string) => {
+        handleFileInput(result, file);
+      });
+      e.target.value = "";
+    }
+  };
+  const preventDefaultHandler = (e: any) => {
+    e.preventDefault();
+  };
+  const handleFileInput = async (url: string, file: File | null, id?: number) => {
+    let filteData;
+    setLoading(true);
+
+    if (windowWidth! <= 450) {
+      setOpenCamera(false);
+    }
+    setUncompressedImages((prev) =>
+      prev.concat({ id: id ?? prev.length + 1, url: url, progress: 0 })
+    );
+
+    const updateProgress = (progress: number) => {
+      setUncompressedImages((prev) =>
+        prev.map((img) => {
+          if (img.id === id) {
+            return { ...img, progress: progress };
+          }
+          return img;
+        })
+      );
+    };
+
+    if (file) {
+      const compressedFile = await handleImageCompress(file, updateProgress);
+      const compressedUrl = await getBase64(compressedFile);
+      const arrBuffer = await compressedFile.arrayBuffer();
+      const buffer = Buffer.from(arrBuffer);
+      filteData = {
+        url: compressedUrl,
+        file: buffer,
+        name: file?.name ?? new Date().getTime(),
+        contentType: file?.type,
+      };
+    } else {
+      const fileData = base64ToArrayBuffer(url);
+      const compressedFile = await handleImageCompress(fileData.blobFile);
+      const compressedUrl = await getBase64(compressedFile);
+      const arrBuffer = await compressedFile.arrayBuffer();
+      const buffer = Buffer.from(arrBuffer);
+      filteData = {
+        url: compressedUrl,
+        file: buffer,
+        name: compressedFile?.name ?? new Date().getTime(),
+        contentType: compressedFile?.type,
+      };
+    }
+    setUncompressedImages((prev) => prev.filter((img) => img.id !== id));
+    setImages((prev) => prev.concat({ id: prev.length + 1, ...filteData }));
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (fileLimit && images && images?.length > fileLimit) {
+      messagePopupObj.open({
+        popupData: {
+          heading: "Too many images",
+          description: `Please select only ${fileLimit} images.`,
+        },
+      });
+      setImages((prev) => (prev = []));
+      setUncompressedImages((prev) => (prev = []));
+      setLoading(false);
+    }
+  }, [images]);
+  if (!imageScanPopupObj.show) return null;
+
+  return (
+    <Modal open={imageScanPopupObj.show} onClose={imageScanPopupObj.close}>
+      <section
+        className={cn(
+          "flex gap-[30px] flex-col mx-auto pb-[150px] sm:pb-[30px] p-[30px] w-screen sm:max-w-[95vw] md:w-[730px] h-screen sm:h-auto sm:max-h-[95vh] overflow-auto bg-bkg-light rounded",
+          { "bg-bkg-dark !w-max p-0 gap-0": openCamera && windowWidth! > 450 }
+        )}
+      >
+        {openCamera && images.length < fileLimit && windowWidth! > 450 ? (
+          <div className="relative flex gap-5 mx-auto w-max">
+            <Webcam
+              ref={webcamRef}
+              audio={false}
+              height={720}
+              screenshotFormat="image/jpeg"
+              width={414}
+              className="min-h-[720px] rounded-[6px]"
+              videoConstraints={videoConstraints}
+            />
+            <i
+              className="gng-close text-[18px] text-content-light absolute top-4 right-4 cursor-pointer"
+              onClick={() => setOpenCamera(false)}
+            />
+            {images.length > 0 && (
+              <div className="grid grid-cols-2 gap-[10px] h-max pt-12">
+                {images.map((imgObj, index) => (
+                  <ImageViewer
+                    key={index}
+                    id={imgObj.id!}
+                    image={imgObj.url!}
+                    onDelete={(id) => {
+                      setImages(images.filter((img) => img.id !== id));
+                    }}
+                    sx="h-[100px] w-auto"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-col gap-[10px]">
+              <div className="flex justify-between">
+                <Heading variant={headingVariants.cardHeading} sx="font-bold">
+                  Add Pages to Scan
+                </Heading>
+                <i
+                  className="gng-close text-[18px] cursor-pointer"
+                  onClick={imageScanPopupObj.close}
+                />
+              </div>
+              <Paragraph
+                content={
+                  "Take a photo of the relevant page from your physical Date ZERO journal. If there are two pages, you may include two photos. For the best results, please ensure the photos are sharp and taken under sufficient lighting."
+                }
+                variant={paragraphVariants.regular}
+                sx="text-content-dark-secondary"
+              />
+            </div>
+
+            <div
+              className={cn(
+                "relative w-full rounded-[10px] overflow-hidden shrink-0 md:shrink h-[270px]",
+                {
+                  "h-max": openCamera,
+                }
+              )}
+              onDrop={handleDrop}
+              onDragOver={preventDefaultHandler}
+              onDragEnter={preventDefaultHandler}
+              onDragLeave={preventDefaultHandler}
+            >
+              <div className={cn("grid grid-cols-4 md:flex gap-[10px] h-full w-full")}>
+                {images.map((imgObj, index) => (
+                  <ImageViewer
+                    key={index}
+                    id={imgObj.id!}
+                    image={imgObj.url!}
+                    onDelete={(id) => {
+                      setImages(images.filter((img) => img.id !== id));
+                    }}
+                    sx="w-full md:max-w-[210px] h-[100px] md:h-full"
+                  />
+                ))}
+                {loading ? (
+                  <>
+                    {uncompressedImages &&
+                      uncompressedImages.map((img, index) => (
+                        <div
+                          key={index}
+                          className={cn(
+                            "relative rounded h-[100px] max-w-[250px] max-h-[270px] flex gap-[10px] overflow-hidden w-full md:max-w-[210px] md:h-full"
+                          )}
+                        >
+                          <Image src={img.url} className="h-auto w-full object-cover" />
+                          <div className="flex flex-col gap-[5px] h-full w-full justify-center items-center bg-bkg-dark/70 absolute top-0 left-0">
+                            <Paragraph
+                              content={`${img.progress}%`}
+                              variant={paragraphVariants.meta}
+                              sx="text-content-light"
+                            />
+                            <Spinner />
+                          </div>
+                        </div>
+                      ))}
+                  </>
+                ) : (
+                  <>
+                    {images.length < fileLimit && (
+                      <FileInput
+                        isMultiple
+                        limit={fileLimit}
+                        isOpenCamera={openCamera}
+                        onFileInputClose={() => setOpenCamera(false)}
+                        onFileInput={(url, file) => {
+                          if (file) {
+                            handleFileInput(url!, file, new Date().getTime());
+                          }
+                        }}
+                      >
+                        <div
+                          className={cn(
+                            "md:h-full border-[4px] w-[210px] border-dashed border-border-light rounded-[10px] flex flex-col gap-[20px] justify-center p-[10px]",
+                            {
+                              "h-[100px] md:h-full w-full md:w-[210px]":
+                                images.length > 0 && windowWidth! < 768,
+                            }
+                          )}
+                        >
+                          <div
+                            className={cn(
+                              "flex justify-center items-center mx-auto cursor-pointer border-border-light rounded-full shrink-0",
+                              {
+                                "md:border md:size-[70px]":
+                                  images.length > 0 && windowWidth! <= 450,
+                                "border size-[70px]": images.length === 0 || windowWidth! > 450,
+                              }
+                            )}
+                          >
+                            <i className="gng-add-thin text-center text-[25px] text-content-dark" />
+                          </div>
+
+                          <div
+                            className={cn("flex-col gap-[5px] flex", {
+                              "md:flex hidden": images.length > 0 && windowWidth! < 768,
+                            })}
+                          >
+                            <Paragraph
+                              content={`Add ${images.length > 0 ? "Another" : "First"} Page`}
+                              variant={paragraphVariants.regular}
+                              sx={"text-center"}
+                            />
+                            <Paragraph
+                              content={
+                                images.length > 0
+                                  ? "Only if your entry is more than one page"
+                                  : "The starting page of your entry "
+                              }
+                              variant={paragraphVariants.regular}
+                              sx={"text-content-dark-secondary text-center"}
+                            />
+                          </div>
+                        </div>
+                      </FileInput>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+
+        <div className="flex flex-col gap-5">
+          {!openCamera && (
+            <div className="flex gap-[10px] items-center">
+              <i className="gng-Info text-[18px] text-content-dark-secondary" />
+              <Paragraph
+                content={`For this instance, you can upload ${fileLimit > 1 ? `up to ${convertNumberToWords(fileLimit)} images` : `${convertNumberToWords(fileLimit)} image`} at once.`}
+                variant={paragraphVariants.regular}
+                sx="text-content-dark-secondary"
+              />
+            </div>
+          )}
+          <div className="flex justify-between border-t border-border-light gap-[10px] pt-5">
+            {!openCamera && (
+              <ActionButton
+                label={openCamera && windowWidth! > 450 ? "Close Camera" : "Take Photo"}
+                onClick={() => setOpenCamera(!openCamera)}
+                icon={openCamera && windowWidth! > 450 ? "" : "camera-filled"}
+                disabled={images.length >= fileLimit}
+                sx={cn("w-max [&>p,&>i]:text-content-light", {
+                  "hover:bg-gray-700 bg-gray-900": images.length < fileLimit,
+                  "bg-gray-400": images.length >= fileLimit,
+                })}
+              />
+            )}
+            {images.length > 0 && !openCamera && (
+              <ActionButton
+                label={openCamera && windowWidth! > 450 ? "Capture" : "Scan"}
+                onClick={openCamera && windowWidth! > 450 ? captureHandler : readImageHandler}
+                sx="w-max"
+              />
+            )}
+            {openCamera && windowWidth! > 450 && (
+              <div
+                className="flex size-[60px] justify-center items-center rounded-full mx-auto bg-bkg-light cursor-pointer"
+                onClick={captureHandler}
+              >
+                <div className="flex size-[54px] rounded-full bg-bkg-light border-4 border-dark-pure"></div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    </Modal>
+  );
+};
+
+const ImageViewer = ({
+  id,
+  image,
+  onDelete,
+  sx,
+}: {
+  id: number;
+  image: string;
+  onDelete: (id: number) => void;
+  sx?: string;
+}) => {
+  return (
+    <div
+      className={cn(
+        "relative rounded h-full max-w-[250px] max-h-[270px] flex gap-[10px] overflow-hidden w-full",
+        sx
+      )}
+    >
+      <button
+        onClick={() => onDelete(id)}
+        className="absolute top-2 right-2 h-[20px] w-[20px] flex items-center justify-center z-10 !bg-dark-900/60 rounded-[10px] cursor-pointer"
+      >
+        <i className="gng-trash text-danger text-body" />
+      </button>
+      <Image src={image} className="h-auto w-full object-cover" />
+    </div>
+  );
+};
+
+export default ImageScanPopup;

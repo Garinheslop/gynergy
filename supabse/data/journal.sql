@@ -1,0 +1,40 @@
+INSERT INTO user_visions (
+    id,
+    user_id,
+    session_id,
+
+    name,
+
+    abilities,
+    purpose,
+    traits,
+    symbols,
+
+    mantra,
+
+    creed,
+
+    qualities,
+    achievements,
+    importance,
+    self_values,
+    lifestyle,
+    foreseen,
+    relationships,
+    legacy,
+    improvement,
+    self_evaluation,
+    interests,
+    triggers,
+    envision,
+    milestones,
+    contributions,
+
+    vision_type,
+    created_at,
+    updated_at
+) VALUES
+('7756144c-8a07-45ed-8beb-babddcc3467a', '9e9534df-be8b-4496-af67-d24ca0e674a0', '3ae42bc9-1f98-4aa3-8304-6bb75844bfd0', 'My Highest Self', 'Inspiration, Leadership', 'Self-actualization and growth', 'Resilient, Determined', 'Mountain, Eagle', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'highest-self', '2025-02-25T17:31:27.580082+00:00', '2025-02-25T17:31:27.580082+00:00'),
+('fcb49157-1c55-482c-a180-14a0c9244fba', '9e9534df-be8b-4496-af67-d24ca0e674a0', '3ae42bc9-1f98-4aa3-8304-6bb75844bfd0', 'Daily Mantra', NULL, NULL, NULL, NULL, 'I am strong and capable!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'mantra', '2025-02-25T17:31:27.580082+00:00', '2025-02-25T17:31:27.580082+00:00'),
+('c15e1b93-737e-4601-9a24-f26cedaa6274', '9e9534df-be8b-4496-af67-d24ca0e674a0', '3ae42bc9-1f98-4aa3-8304-6bb75844bfd0', 'Personal Creed', NULL, NULL, NULL, NULL, NULL, 'Community and equality for all.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'creed', '2025-02-25T17:31:27.580082+00:00', '2025-02-25T17:31:27.580082+00:00'),
+('731638b4-d423-4831-8912-cf70b01e2bbf', '9e9534df-be8b-4496-af67-d24ca0e674a0', '3ae42bc9-1f98-4aa3-8304-6bb75844bfd0', 'Discovery of Self', 'Curiosity, Adaptability', 'Explore new dimensions of personality', 'Adventurous, Insightful', 'Compass, Telescope', NULL, NULL, 'Open-minded, Reflective', 'Completed a challenging journey', 'High', 'Integrity, Passion', 'Dynamic, Evolving', 'Continuous evolution', 'Diverse network', 'Empower future generations', 'Constant learning', 'Balanced', 'Philosophy, Science', 'Inspiration, New ideas', 'A better, more connected world', 'Graduated, got promoted', 'Mentorship and guidance', 'discovery', '2025-02-25T17:31:27.580082+00:00', '2025-02-25T17:31:27.580082+00:00');

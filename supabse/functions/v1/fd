@@ -1,0 +1,101 @@
+CREATE OR REPLACE FUNCTION submit_morning_journal(
+  p_user_id UUID,
+  p_date DATE,
+  p_mood_score INTEGER,
+  p_mood_factors TEXT[],
+  p_reflection TEXT,
+  p_affirmations TEXT[],
+  p_gratitude_items JSONB,
+  p_excitement_items JSONB
+)
+RETURNS journal_entries AS $$
+DECLARE
+  new_journal journal_entries%ROWTYPE;
+  parsed_gratitude JSONB;
+  parsed_excitement JSONB;
+BEGIN
+  parsed_gratitude := COALESCE(p_gratitude_items::JSONB, '[]'::JSONB);
+  parsed_excitement := COALESCE(p_excitement_items::JSONB, '[]'::JSONB);
+
+  INSERT INTO journal_entries (user_id, date, morning_completed, morning_mood_score, morning_mood_factors, morning_reflection, morning_points)
+  VALUES (p_user_id, p_date, true, p_mood_score, p_mood_factors, p_reflection, 5)
+  ON CONFLICT (user_id, date) DO UPDATE SET
+    morning_completed = EXCLUDED.morning_completed,
+    morning_mood_score = EXCLUDED.morning_mood_score,
+    morning_mood_factors = EXCLUDED.morning_mood_factors,
+    morning_reflection = EXCLUDED.morning_reflection,
+    morning_points = EXCLUDED.morning_points
+  RETURNING * INTO new_journal;
+  
+  IF p_affirmations IS NOT NULL THEN
+    INSERT INTO affirmations (journal_entry_id, affirmation)
+    SELECT new_journal.id, unnest(p_affirmations);
+  END IF;
+
+  IF parsed_gratitude IS NOT NULL THEN
+    INSERT INTO gratitude_excitement (journal_entry_id, type, content)
+    SELECT new_journal.id, item->>'type', item->>'content'
+    FROM jsonb_array_elements(parsed_gratitude) AS item;
+  END IF;
+
+  IF parsed_excitement IS NOT NULL THEN
+    INSERT INTO gratitude_excitement (journal_entry_id, type, content)
+    SELECT new_journal.id, item->>'type', item->>'content'
+    FROM jsonb_array_elements(parsed_excitement) AS item;
+  END IF;
+
+  RETURN new_journal;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION submit_evening_journal(
+  p_user_id UUID,
+  p_date DATE,
+  p_mood_score INTEGER,
+  p_mood_factors TEXT[],
+  p_reflection TEXT,
+  p_tomorrow_plan TEXT
+)
+RETURNS journal_entries AS $$
+DECLARE
+  new_journal journal_entries%ROWTYPE;
+BEGIN
+
+  INSERT INTO journal_entries (user_id, date, evening_completed, evening_mood_score, evening_mood_factors, evening_reflection, evening_points, tomorrow_plan)
+  VALUES (p_user_id, p_date, true, p_mood_score, p_mood_factors, p_reflection, 5, p_tomorrow_plan)
+  ON CONFLICT (user_id, date) DO UPDATE SET
+    evening_completed = EXCLUDED.evening_completed,
+    evening_mood_score = EXCLUDED.evening_mood_score,
+    evening_mood_factors = EXCLUDED.evening_mood_factors,
+    evening_reflection = EXCLUDED.evening_reflection,
+    evening_points = EXCLUDED.evening_points,
+    tomorrow_plan = EXCLUDED.tomorrow_plan
+  RETURNING * INTO new_journal;
+  RETURN new_journal;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION submit_daily_action(
+  p_date DATE,
+  p_action_id INTEGER,
+  p_reflection TEXT,
+  p_obstacles TEXT,
+  p_action_type TEXT
+)
+RETURNS daily_actions AS $$
+DECLARE
+  user_id_val UUID;
+  new_action daily_actions%ROWTYPE;
+BEGIN
+  user_id_val := auth.uid()::uuid;
+  -- Insert or update the daily_actions record.
+  -- If p_tomorrow_plan is provided, include it in the INSERT/UPDATE.
+    INSERT INTO daily_actions (user_id, action_id, date, is_completed, reflection, obstacles, action_type)
+    VALUES (user_id_val, p_action_id, p_date, true, p_reflection, p_obstacles, p_action_type::dailyActionType)
+    RETURNING * INTO new_action;
+
+  RETURN new_action;
+END;
+$$ LANGUAGE plpgsql;
+

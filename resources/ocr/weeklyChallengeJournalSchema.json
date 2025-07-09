@@ -1,0 +1,77 @@
+{
+  "title": "Journal",
+  "description": "A simple journal format which is three type. Morning, evening or daily action.",
+  "type": "object",
+  "properties": {
+    "dream": {
+      "isDreamed": {
+        "description": "answer of DID YOU DREAM? question.",
+        "type": "boolean"
+      },
+      "essence": {
+        "description": "answer of captured essence paragraph.",
+        "type": "string"
+      }
+    },
+    "moodScore": {
+      "description": "The circled face icon. If first its 1 if last its 5. In the MOOD TRACKER: section",
+      "type": "number"
+    },
+    "moodFactor": {
+      "description": "answer of What do you think contributed to your mood today? question.",
+      "type": "string"
+    },
+    "dayliThought": {
+      "description": "answer of What is one unique thought or insight you had today? question. In the THOUGHT FOR THE DAY section",
+      "type": "string"
+    },
+    "impacts": {
+      "description": "answer of How can this insight change your perspective or actions? question. In the THOUGHT FOR THE DAY section",
+      "type": "string"
+    },
+    "wentWell": {
+      "description": "answer of Reflect on why these things went well? question. In the WHAT WENT WELL section",
+      "type": "string"
+    },
+    "changes": {
+      "description": "answer of What steps can you take to make this change happen? question. In the CHANGES FOR TOMORROW section",
+      "type": "string"
+    },
+    "affirmations": [
+      {
+        "description": "the text after I AM. which is in the POSITIVE AFFIRMATIONS block",
+        "type": "string"
+      }
+    ],
+    "gratefulFor": [
+      {
+        "description": "the text after I AM GRATEFUL FOR: numeric",
+        "type": "string"
+      }
+    ],
+    "excitedAbout": [
+      {
+        "description": "the text after I AM EXCITED ABOUT: numeric",
+        "type": "string"
+      }
+    ],
+    "mantra": {
+      "description": "paragraph after MY MANTRA heading",
+      "type": "string"
+    },
+    "isDailyActionCompleted": {
+      "description": "answer of Did you complete today’s daily gratitude action?",
+      "type": "boolean"
+    },
+    "dscription": {
+      "description": "paragraph after If yes, how did it make you feel to express gratitude? question. In Daily Action TRACKING section",
+      "type": "string"
+    },
+    "dreamMagics": [
+      {
+        "description": "the text after I AM. which is in the DREAM MAGIC block",
+        "type": "string"
+      }
+    ]
+  }
+}
