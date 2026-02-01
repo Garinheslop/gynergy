@@ -11,8 +11,8 @@ export const cropImageFromArrayBuffer = async (
 ): Promise<{ blob: Blob; arrayBuffer: ArrayBuffer }> => {
   return new Promise((resolve, reject) => {
     // Convert Buffer to ArrayBuffer if needed
-    const buffer = arrayBuffer instanceof Buffer
-      ? arrayBuffer.buffer.slice(arrayBuffer.byteOffset, arrayBuffer.byteOffset + arrayBuffer.byteLength)
+    const buffer: ArrayBuffer = arrayBuffer instanceof Buffer
+      ? (arrayBuffer.buffer.slice(arrayBuffer.byteOffset, arrayBuffer.byteOffset + arrayBuffer.byteLength) as ArrayBuffer)
       : arrayBuffer;
 
     // Convert the ArrayBuffer to a Blob (set MIME type accordingly)
