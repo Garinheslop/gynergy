@@ -10,10 +10,8 @@ export const cropImageFromArrayBuffer = async (
   crop: Crop
 ): Promise<{ blob: Blob; arrayBuffer: ArrayBuffer }> => {
   return new Promise((resolve, reject) => {
-    // Convert Buffer to Uint8Array which is compatible with Blob
-    const uint8Array = arrayBuffer instanceof Buffer
-      ? new Uint8Array(arrayBuffer)
-      : new Uint8Array(arrayBuffer);
+    // Convert to Uint8Array which is compatible with Blob
+    const uint8Array = new Uint8Array(arrayBuffer);
 
     // Convert to a Blob (set MIME type accordingly)
     const blob = new Blob([uint8Array], { type: "image/png" });
