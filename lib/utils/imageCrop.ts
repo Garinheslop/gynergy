@@ -6,7 +6,7 @@ type Crop = {
   index: number;
 };
 export const cropImageFromArrayBuffer = async (
-  arrayBuffer: Buffer,
+  arrayBuffer: ArrayBuffer | Buffer,
   crop: Crop
 ): Promise<{ blob: Blob; arrayBuffer: ArrayBuffer }> => {
   return new Promise((resolve, reject) => {
