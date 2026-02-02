@@ -1,5 +1,6 @@
-import { visionRequestTypes } from "@resources/types/vision";
 import { z } from "zod";
+
+import { visionRequestTypes } from "@resources/types/vision";
 
 export const userVisionSchema = z.object({
   name: z.string().nullable().optional(),

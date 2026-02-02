@@ -1,6 +1,16 @@
 "force-dynamic";
 import { NextResponse } from "next/server";
+
+import camelcaseKeys from "camelcase-keys";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+import { pick } from "lodash";
+import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
+
 import { createClient, createServiceClient } from "@lib/supabase-server";
+import { serverErrorTypes } from "@resources/types/error";
 import {
   JournalData,
   journalEntryTypes,
@@ -8,16 +18,10 @@ import {
   journalTypes,
 } from "@resources/types/journal";
 import { ImageRawData } from "@resources/types/ocr";
-import { serverErrorTypes } from "@resources/types/error";
-import { v4 as uuidv4 } from "uuid";
 import { uploadFileToStorage } from "app/api/upload/controller";
+
 import { validateJournalSchema } from "./validation";
-import { z } from "zod";
-import { pick } from "lodash";
-import camelcaseKeys from "camelcase-keys";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -108,7 +112,7 @@ export async function POST(request: Request, { params }: { params: { requestType
 
   let fetcherHandler: ((args: any) => Promise<any>) | null = null;
   let args: any | {} = {};
-  let responseName = "journal";
+  const responseName = "journal";
 
   if (
     [
@@ -200,7 +204,7 @@ const createJournal = async ({
 
     const journalId = journal?.id ?? uuidv4();
 
-    let uploadedImages = [];
+    const uploadedImages = [];
     if (images?.length) {
       for (let index = 0; index < images.length; index++) {
         const path = await uploadFileToStorage({

@@ -1,24 +1,26 @@
 import { NextResponse } from "next/server";
-import { createClient, createServiceClient } from "@lib/supabase-server";
-import { actionRequestTypes, ActionLogData, actionLogTypes } from "@resources/types/action";
+
 import camelcaseKeys from "camelcase-keys";
 import dayjs from "dayjs";
-import { ImageRawData } from "@resources/types/ocr";
-import { serverErrorTypes } from "@resources/types/error";
-import { validateActionSchema } from "./validation";
-import { v4 as uuidv4 } from "uuid";
-import { uploadFileToStorage } from "app/api/upload/controller";
-import { pick } from "lodash";
-import { z } from "zod";
-import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+import { pick } from "lodash";
+import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
+
+import { createClient, createServiceClient } from "@lib/supabase-server";
+import { actionRequestTypes, ActionLogData, actionLogTypes } from "@resources/types/action";
+import { serverErrorTypes } from "@resources/types/error";
+import { ImageRawData } from "@resources/types/ocr";
+import { uploadFileToStorage } from "app/api/upload/controller";
+
+import { validateActionSchema } from "./validation";
+
+
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-type ActionRequestDataTypes = {
-  userId: string;
-  enrollmentId: string;
-};
 type PostRequestJson = {
   actionId: string;
   sessionId: string;
@@ -50,8 +52,10 @@ export async function GET(request: Request, { params }: { params: { requestType:
   const enrollmentId = new URL(request.url).searchParams.get("enrollmentId");
   const timezone = request.headers.get("x-user-timezone");
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let fetcherHandler: ((args: any) => Promise<any>) | null = null;
-  let args: any | {} = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let args: any = {};
   let responseName;
 
   if (requestType === actionRequestTypes.userActions) {
@@ -120,9 +124,11 @@ export async function POST(request: Request, { params }: { params: { requestType
     return NextResponse.json({ error: serverErrorTypes.invalidRequest }, { status: 400 });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let fetcherHandler: ((args: any) => Promise<any>) | null = null;
-  let args: any | {} = {};
-  let responseName = "action";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let args: any = {};
+  const responseName = "action";
 
   if (
     [actionRequestTypes.completeDailyAction, actionRequestTypes.completeWeeklyChallenge].includes(
@@ -251,7 +257,6 @@ const createUserActionLog = async ({
   images: ImageRawData[];
 }>) => {
   try {
-    const supabase = createClient();
     const supabaseAdmin = createServiceClient();
     if (!actionId || !sessionId || !userId || !actionLog) {
       return { error: "invalid-body" };
@@ -269,7 +274,7 @@ const createUserActionLog = async ({
 
     const actionLogId = actionLog?.id ?? uuidv4();
 
-    let uploadedImages = [];
+    const uploadedImages = [];
     if (images?.length) {
       for (let index = 0; index < images.length; index++) {
         const path = await uploadFileToStorage({
@@ -336,7 +341,7 @@ const createUserActionLog = async ({
     }
 
     if (parsedActionLog?.journey) {
-      const { data: journeyData, error: journeyError } = await supabaseAdmin
+      const { error: journeyError } = await supabaseAdmin
         .from("journey")
         .insert({
           session_id: sessionData.id,

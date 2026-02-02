@@ -1,5 +1,6 @@
-import { journalRequestTypes, journalTypes } from "@resources/types/journal";
 import { z } from "zod";
+
+import { journalRequestTypes, journalTypes } from "@resources/types/journal";
 
 const journalAndActionSchema = z.object({
   // morning and evening

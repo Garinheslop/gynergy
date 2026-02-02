@@ -1,5 +1,6 @@
-import { createClient } from "@lib/supabase-server";
 import { User } from "@supabase/supabase-js";
+
+import { createClient } from "@lib/supabase-server";
 
 export const uploadToStorage = async ({
   user,

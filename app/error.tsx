@@ -1,14 +1,18 @@
 "use client";
+import { useEffect } from "react";
+
+import { useRouter } from "next/navigation";
+
+import { useDispatch } from "react-redux";
+
 import { usePopup } from "@contexts/UsePopup";
 import { pagePaths } from "@resources/paths";
 import { signOutAndReset } from "@store/modules/profile";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+
 
 export default function Error({
   error,
-  reset,
+  reset: _reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
@@ -34,13 +38,6 @@ export default function Error({
         },
       },
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error]);
-
-  const reloadHandler = () => {
-    dispatch(signOutAndReset());
-    router.push(`${pagePaths.home}`);
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
-  };
 }

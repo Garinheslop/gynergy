@@ -1,5 +1,6 @@
-import { actionRequestTypes } from "@resources/types/action";
 import { z } from "zod";
+
+import { actionRequestTypes } from "@resources/types/action";
 
 const actionSchema = z.object({
   // daily action

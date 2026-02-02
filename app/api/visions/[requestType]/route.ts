@@ -1,16 +1,19 @@
 "force-dynamic";
 import { NextResponse } from "next/server";
-import { createClient, createServiceClient } from "@lib/supabase-server";
-import { visionRequestTypes, UserVision, visionTypes } from "@resources/types/vision";
-import camelcaseKeys from "camelcase-keys";
 
-import { ImageRawData } from "@resources/types/ocr";
-import { serverErrorTypes } from "@resources/types/error";
-import { v4 as uuidv4 } from "uuid";
-import { uploadFileToStorage } from "app/api/upload/controller";
-import { validateVisionSchema } from "./validation";
-import { z } from "zod";
+import camelcaseKeys from "camelcase-keys";
 import { pick } from "lodash";
+import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
+
+import { createClient, createServiceClient } from "@lib/supabase-server";
+import { serverErrorTypes } from "@resources/types/error";
+import { ImageRawData } from "@resources/types/ocr";
+import { visionRequestTypes, UserVision, visionTypes } from "@resources/types/vision";
+import { uploadFileToStorage } from "app/api/upload/controller";
+
+import { validateVisionSchema } from "./validation";
+
 
 type UserVisionRequestDataTypes = {
   userId: string;
@@ -96,7 +99,7 @@ export async function PUT(request: Request, { params }: { params: { requestType:
 
   let fetcherHandler: ((args: any) => Promise<any>) | null = null;
   let args: any | {} = {};
-  let responseName = "vision";
+  const responseName = "vision";
   if (
     [
       visionRequestTypes.updateVisionHighestSelf,
@@ -152,7 +155,7 @@ const upsertVision = async ({
 
     const visionId = vision?.id ?? uuidv4();
 
-    let uploadedImages = [];
+    const uploadedImages = [];
     if (images?.length) {
       for (let index = 0; index < images.length; index++) {
         const path = await uploadFileToStorage({

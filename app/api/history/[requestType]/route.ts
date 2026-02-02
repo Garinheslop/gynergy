@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
-import { createClient, createServiceClient } from "@lib/supabase-server";
-import { historyRequestTypes, historyTypes } from "@resources/types/history";
+
 import camelcaseKeys from "camelcase-keys";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
+import { createClient, createServiceClient } from "@lib/supabase-server";
+import { historyRequestTypes, historyTypes } from "@resources/types/history";
 import { journalTypes } from "@resources/types/journal";
 dayjs.extend(utc);
 dayjs.extend(timezone);

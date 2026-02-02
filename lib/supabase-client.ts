@@ -1,8 +1,8 @@
 import { createBrowserClient } from "@supabase/ssr";
-import { User, AuthChangeEvent, Session } from "@supabase/supabase-js";
+import { User } from "@supabase/supabase-js";
 
 // For development only - remove in production
-const DEV_USER: User = {
+const _DEV_USER: User = {
   id: "a1b2c3d4-e5f6-4321-8901-abcdef123456", // Valid UUID format
   app_metadata: {},
   user_metadata: {

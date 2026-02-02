@@ -75,3 +75,32 @@ export const meditations = "meditations";
 ////////////Request structure////////////////
 //get meditations =  /meditations/:requestType
 ////////////////////////////////////////////
+
+//
+//  @desc gamification
+//
+export const gamification = "gamification";
+////////////Request structure////////////////
+//get gamification =  /gamification/:requestType
+//post gamification =  /gamification/:requestType
+////////////////////////////////////////////
+
+//
+//  @desc ai
+//
+export const ai = "ai";
+////////////Request structure////////////////
+//get ai =  /ai/:requestType
+//post ai =  /ai/:requestType
+//post ai/chat-stream = streaming chat
+////////////////////////////////////////////
+
+//
+//  @desc video
+//
+export const video = "video";
+////////////Request structure////////////////
+//get video =  /video/:requestType
+//post video =  /video/:requestType
+//delete video =  /video/:requestType
+////////////////////////////////////////////

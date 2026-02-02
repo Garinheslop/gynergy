@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
+
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
 import { createClient, createServiceClient } from "@lib/supabase-server";
 import { quotesRequestTypes } from "@resources/types/quote";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 

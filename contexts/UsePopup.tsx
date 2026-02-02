@@ -1,5 +1,31 @@
 "use client";
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useCallback } from "react";
+
+// Celebration event types for the queue system
+export type CelebrationEventType =
+  | "badge"
+  | "milestone"
+  | "streak"
+  | "feature_unlock"
+  | "share"
+  | "achievement";
+
+export type CelebrationEvent = {
+  id: string;
+  type: CelebrationEventType;
+  priority: number; // Higher = more important, shown first
+  data: any;
+  onDismiss?: () => void;
+};
+
+type CelebrationQueueObj = {
+  queue: CelebrationEvent[];
+  current: CelebrationEvent | null;
+  add: (event: Omit<CelebrationEvent, "id">) => void;
+  addMultiple: (events: Omit<CelebrationEvent, "id">[]) => void;
+  dismiss: () => void;
+  clear: () => void;
+};
 
 export type PopupContextType = {
   messagePopupObj: contextRetrunObjType;
@@ -7,13 +33,17 @@ export type PopupContextType = {
   journalCompletionPopupObj: contextRetrunObjType;
   journalPopupObj: contextRetrunObjType;
   meditationPopupObj: contextRetrunObjType;
+  // New queue-based celebration system
+  celebrationQueue: CelebrationQueueObj;
 };
+
 type contextRetrunObjType = {
   data: popupDataStateType;
   show: boolean;
   open: (args: popupDataStateType) => void;
   close: () => void;
 };
+
 type popupDataStateType = {
   popupData?: any;
   popupAction?: any;
@@ -106,6 +136,66 @@ const UsePopupContextProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setShowMeditationPopupState(false);
   };
 
+  //
+  // Celebration Queue System
+  const [celebrationQueueState, setCelebrationQueueState] = useState<CelebrationEvent[]>([]);
+  const [currentCelebration, setCurrentCelebration] = useState<CelebrationEvent | null>(null);
+
+  const generateCelebrationId = () => `celebration_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+
+  const addCelebration = useCallback((event: Omit<CelebrationEvent, "id">) => {
+    const newEvent: CelebrationEvent = {
+      ...event,
+      id: generateCelebrationId(),
+    };
+
+    setCelebrationQueueState((prev) => {
+      const updated = [...prev, newEvent].sort((a, b) => b.priority - a.priority);
+      // If nothing is currently showing, show the highest priority item
+      if (!currentCelebration) {
+        setCurrentCelebration(updated[0]);
+        return updated.slice(1);
+      }
+      return updated;
+    });
+  }, [currentCelebration]);
+
+  const addMultipleCelebrations = useCallback((events: Omit<CelebrationEvent, "id">[]) => {
+    const newEvents: CelebrationEvent[] = events.map((event) => ({
+      ...event,
+      id: generateCelebrationId(),
+    }));
+
+    setCelebrationQueueState((prev) => {
+      const updated = [...prev, ...newEvents].sort((a, b) => b.priority - a.priority);
+      if (!currentCelebration) {
+        setCurrentCelebration(updated[0]);
+        return updated.slice(1);
+      }
+      return updated;
+    });
+  }, [currentCelebration]);
+
+  const dismissCelebration = useCallback(() => {
+    if (currentCelebration?.onDismiss) {
+      currentCelebration.onDismiss();
+    }
+
+    setCelebrationQueueState((prev) => {
+      if (prev.length > 0) {
+        setCurrentCelebration(prev[0]);
+        return prev.slice(1);
+      }
+      setCurrentCelebration(null);
+      return [];
+    });
+  }, [currentCelebration]);
+
+  const clearCelebrations = useCallback(() => {
+    setCelebrationQueueState([]);
+    setCurrentCelebration(null);
+  }, []);
+
   return (
     <UsePopupContext.Provider
       value={{
@@ -138,6 +228,14 @@ const UsePopupContextProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           show: showMeditationPopupState,
           open: openMeditationPopup,
           close: closeMeditationPopup,
+        },
+        celebrationQueue: {
+          queue: celebrationQueueState,
+          current: currentCelebration,
+          add: addCelebration,
+          addMultiple: addMultipleCelebrations,
+          dismiss: dismissCelebration,
+          clear: clearCelebrations,
         },
       }}
     >

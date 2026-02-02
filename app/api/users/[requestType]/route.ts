@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+
 import { createClient, createServiceClient } from "@lib/supabase-server";
 import { profileRequestTypes } from "@resources/types/profile";
 import { uploadTypes } from "@resources/types/uploads";
@@ -47,7 +48,7 @@ export async function GET(request: Request, { params }: { params: { requestType:
 
   let fetcherHandler: ((args: Partial<UserProfileData>) => Promise<any>) | null = null;
   let args: Partial<UserProfileData> | {} = {};
-  let responseName = "user";
+  const responseName = "user";
 
   if (requestType === profileRequestTypes.userProfile) {
     fetcherHandler = getUserData;
@@ -89,7 +90,7 @@ export async function PUT(request: Request, { params }: { params: { requestType:
 
   let fetcherHandler: ((args: Partial<UserProfileData>) => Promise<any>) | null = null;
   let args: Partial<UserProfileData> | {} = {};
-  let responseName = "user";
+  const responseName = "user";
 
   if (requestType === profileRequestTypes.updateUserData) {
     if (!firstName && !lastName && !fileStr && !fileName && !contentType) {

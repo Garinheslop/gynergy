@@ -1,20 +1,25 @@
 import { combineReducers } from "redux";
+
+import { persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+
 import actionReducer from "@store/modules/action";
+import aiReducer from "@store/modules/ai/reducers";
 import bookReducer from "@store/modules/book";
 import editorReducer from "@store/modules/editor";
 import enrollmentReducer from "@store/modules/enrollment";
-import visionReducer from "@store/modules/vision";
-import globalStatesReducer from "./modules/global/globalStateReducers";
-import journalReducer from "@store/modules/journal";
+import gamificationReducer from "@store/modules/gamification";
 import historyReducer from "@store/modules/history";
-import profileReducer from "@store/modules/profile";
-import quoteReducer from "@store/modules/quote";
+import journalReducer from "@store/modules/journal";
 import leaderboardReducer from "@store/modules/leaderboard";
 import meditationReducer from "@store/modules/meditation";
+import profileReducer from "@store/modules/profile";
+import quoteReducer from "@store/modules/quote";
+import videoReducer from "@store/modules/video/reducers";
+import visionReducer from "@store/modules/vision";
+
+import globalStatesReducer from "./modules/global/globalStateReducers";
 import { successReducerTypes } from "./resources/reducerActionTypes";
-import { PersistConfig, persistReducer } from "redux-persist";
-import { RootState } from "./configureStore";
-import storage from "redux-persist/lib/storage";
 
 const persistBooksConfig = {
   key: "books",
@@ -51,6 +56,44 @@ const persistHistoriesConfig = {
   blacklist: ["lastFetched", "current", "fetched", "loading"],
 };
 
+const persistGamificationConfig = {
+  key: "gamification",
+  storage,
+  blacklist: [
+    "badges.loading",
+    "userBadges.loading",
+    "multipliers.loading",
+    "points.loading",
+    "operations",
+    "celebrations",
+  ],
+};
+
+const persistAIConfig = {
+  key: "ai",
+  storage,
+  blacklist: [
+    "characters.loading",
+    "chat.loading",
+    "chat.isStreaming",
+    "chat.streamingContent",
+    "chat.error",
+  ],
+};
+
+const persistVideoConfig = {
+  key: "video",
+  storage,
+  blacklist: [
+    "rooms.loading",
+    "currentRoom.loading",
+    "upcoming.loading",
+    "invitations.loading",
+    "templates.loading",
+    "connection",
+  ],
+};
+
 const appReducer = combineReducers({
   actions: actionReducer,
   books: persistReducer(persistBooksConfig, bookReducer),
@@ -64,6 +107,9 @@ const appReducer = combineReducers({
   quotes: quoteReducer,
   leaderboard: persistReducer(persistLeaderboardConfig, leaderboardReducer),
   meditations: meditationReducer,
+  gamification: persistReducer(persistGamificationConfig, gamificationReducer),
+  ai: persistReducer(persistAIConfig, aiReducer),
+  video: persistReducer(persistVideoConfig, videoReducer.reducer),
 });
 const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: any) => {
   if (

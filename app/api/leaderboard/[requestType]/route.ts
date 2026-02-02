@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
-import { createClient, createServiceClient } from "@lib/supabase-server";
-import { historyRequestTypes, historyTypes } from "@resources/types/history";
+
 import camelcaseKeys from "camelcase-keys";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
+import { createClient, createServiceClient } from "@lib/supabase-server";
+import { historyRequestTypes, historyTypes } from "@resources/types/history";
 import { journalTypes } from "@resources/types/journal";
 import { leaderboardFilterTypes, leaderboardRequestTypes } from "@resources/types/leaderboard";
 dayjs.extend(utc);
@@ -33,9 +35,9 @@ export async function GET(request: Request, { params }: { params: { requestType:
   const timezone = request.headers.get("x-user-timezone");
   const sessionId = new URL(request.url).searchParams.get("sessionId");
   const filter = new URL(request.url).searchParams.get("filter");
-  let skip = new URL(request.url).searchParams.get("skip");
-  let limit = new URL(request.url).searchParams.get("limit");
-  let initial = new URL(request.url).searchParams.get("initial") ? true : false;
+  const skip = new URL(request.url).searchParams.get("skip");
+  const limit = new URL(request.url).searchParams.get("limit");
+  const initial = new URL(request.url).searchParams.get("initial") ? true : false;
 
   let fetcherHandler: ((args: any) => Promise<any>) | null = null;
   let args: any = {};

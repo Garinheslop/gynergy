@@ -1,21 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@lib/supabase-client";
+
 import Image from "next/image";
-import icons from "@resources/icons";
-import Heading from "@modules/common/components/typography/Heading";
-import { headingVariants, paragraphVariants } from "@resources/variants";
-import Paragraph from "@modules/common/components/typography/Paragraph";
-import ActionButton from "@modules/common/components/ActionButton";
-import images from "@resources/images";
-import Input from "@modules/common/components/Input";
+import { useRouter, useSearchParams } from "next/navigation";
+
 import { useSession } from "@contexts/UseSession";
+import { createClient } from "@lib/supabase-client";
 import { cn } from "@lib/utils/style";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { pagePaths } from "@resources/paths";
-import { updateUserProfileData } from "@store/modules/profile";
+import ActionButton from "@modules/common/components/ActionButton";
+import Input from "@modules/common/components/Input";
+import Heading from "@modules/common/components/typography/Heading";
+import Paragraph from "@modules/common/components/typography/Paragraph";
+import icons from "@resources/icons";
+import images from "@resources/images";
+import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
+import { updateUserProfileData } from "@store/modules/profile";
 
 const formTypes = {
   signIn: "sign-in",
@@ -81,7 +82,7 @@ export default function LandingPage() {
       dispatch(updateUserProfileData({ firstName, lastName }));
     } else if (formType === formTypes.signIn) {
       try {
-        const { data, error } = await supabase.auth.signInWithOtp({
+        const { error } = await supabase.auth.signInWithOtp({
           email: email.trim(),
           // options: {
           //   emailRedirectTo: "http://localhost:3000",

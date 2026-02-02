@@ -1,6 +1,7 @@
 "use server";
-import journalSchemas from "@resources/ocr/journalSchemas";
 import OpenAI from "openai";
+
+import journalSchemas from "@resources/ocr/journalSchemas";
 import { journalTypes } from "@resources/types/journal";
 import { visionTypes } from "@resources/types/vision";
 const openai = new OpenAI({

@@ -1,21 +1,23 @@
 import { NextResponse } from "next/server";
+
+import camelcaseKeys from "camelcase-keys";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
 import { createClient, createServiceClient } from "@lib/supabase-server";
 import { booksRequestTypes } from "@resources/types/book";
 import { errorTypes, serverErrorTypes } from "@resources/types/error";
-import camelcaseKeys from "camelcase-keys";
 
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-type UserBookSessionsRequestDataTypes = {
+type _UserBookSessionsRequestDataTypes = {
   date: string;
   userId: string;
   bookId: string;
 };
-type GetBookRequestDataTypes = {
+type _GetBookRequestDataTypes = {
   bookId: string;
 };
 export async function GET(request: Request, { params }: { params: { requestType: string } }) {
@@ -353,19 +355,18 @@ const createUserBookEnrollment = async ({
 const resetBookSession = async ({
   userId,
   sessionId,
-  userTimezone,
+  userTimezone: _userTimezone,
 }: {
   userId: string;
   sessionId: string;
   userTimezone: string;
 }) => {
-  const supabase = createClient();
   const supabaseAdmin = createServiceClient();
   if (!userId || !sessionId) {
     return { error: "bad-request" };
   }
   try {
-    const { data: sessionData, error: sessionError } = await supabaseAdmin
+    const { error: sessionError } = await supabaseAdmin
       .from("session_enrollments")
       .delete()
       .eq("user_id", userId)
@@ -374,7 +375,7 @@ const resetBookSession = async ({
     if (sessionError) {
       return { error: serverErrorTypes.serverError };
     }
-    const { data: actionLogData, error: actionLogDataError } = await supabaseAdmin
+    const { error: actionLogDataError } = await supabaseAdmin
       .from("action_logs")
       .delete()
       .eq("user_id", userId)
@@ -383,7 +384,7 @@ const resetBookSession = async ({
     if (actionLogDataError) {
       return { error: serverErrorTypes.serverError };
     }
-    const { data: journalLogData, error: journalLogDataError } = await supabaseAdmin
+    const { error: journalLogDataError } = await supabaseAdmin
       .from("journals")
       .delete()
       .eq("user_id", userId)
@@ -392,7 +393,7 @@ const resetBookSession = async ({
     if (journalLogDataError) {
       return { error: serverErrorTypes.serverError };
     }
-    const { data: visionData, error: visionDataError } = await supabaseAdmin
+    const { error: visionDataError } = await supabaseAdmin
       .from("user_visions")
       .delete()
       .eq("user_id", userId)
@@ -402,7 +403,7 @@ const resetBookSession = async ({
       return { error: serverErrorTypes.serverError };
     }
 
-    const { data: meditationData, error: meditationDataError } = await supabaseAdmin
+    const { error: meditationDataError } = await supabaseAdmin
       .from("meditations")
       .delete()
       .eq("user_id", userId)
@@ -412,7 +413,7 @@ const resetBookSession = async ({
       return { error: serverErrorTypes.serverError };
     }
 
-    const { data: journeyData, error: journeyDataError } = await supabaseAdmin
+    const { error: journeyDataError } = await supabaseAdmin
       .from("journey")
       .delete()
       .eq("user_id", userId)

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+
 import { createClient } from "@lib/supabase-server";
 import { uploadTypes } from "@resources/types/uploads";
+
 import { uploadToStorage } from "./controller";
 
 export async function POST(request: Request) {

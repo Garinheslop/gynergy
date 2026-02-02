@@ -1,13 +1,16 @@
 "force-dynamic";
 
 import { NextResponse } from "next/server";
+
+import OpenAI from "openai";
+import { ChatCompletionMessageParam } from "openai/resources";
+
+import { journalOcrFileLimit } from "@configs/app";
 import { createClient } from "@lib/supabase-server";
 import journalSchemas from "@resources/ocr/journalSchemas";
-import OpenAI from "openai";
 import { journalTypes } from "@resources/types/journal";
 import { visionTypes } from "@resources/types/vision";
-import { journalOcrFileLimit } from "@configs/app";
-import { ChatCompletionMessageParam } from "openai/resources";
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });

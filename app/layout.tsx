@@ -4,8 +4,9 @@ import "@public/iconfonts/style.css";
 // This file defines the global layout for the application.
 
 import type { Metadata } from "next";
-import Navbar from "@modules/layouts/Navbar";
+
 import DefaultLayout from "@modules/layouts/Default";
+import Navbar from "@modules/layouts/Navbar";
 import Providers from "@modules/providers";
 
 // Global layout that wraps the entire application.

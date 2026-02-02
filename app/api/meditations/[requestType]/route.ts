@@ -1,18 +1,22 @@
 "force-dynamic";
 import { NextResponse } from "next/server";
-import { createClient, createServiceClient } from "@lib/supabase-server";
-import camelcaseKeys from "camelcase-keys";
 
-import { ImageRawData } from "@resources/types/ocr";
-import { serverErrorTypes } from "@resources/types/error";
-import { v4 as uuidv4 } from "uuid";
-import { uploadFileToStorage } from "app/api/upload/controller";
-import { z } from "zod";
-import { pick } from "lodash";
-import { meditationRequestTypes } from "@resources/types/meditation";
+import camelcaseKeys from "camelcase-keys";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+import { pick } from "lodash";
+import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
+
+import { createClient, createServiceClient } from "@lib/supabase-server";
+import { serverErrorTypes } from "@resources/types/error";
+import { meditationRequestTypes } from "@resources/types/meditation";
+import { ImageRawData } from "@resources/types/ocr";
+import { uploadFileToStorage } from "app/api/upload/controller";
+
+
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -109,7 +113,7 @@ export async function POST(request: Request, { params }: { params: { requestType
 
   let fetcherHandler: ((args: any) => Promise<any>) | null = null;
   let args: any | {} = {};
-  let responseName = "meditation";
+  const responseName = "meditation";
   if (requestType === meditationRequestTypes.createUserMeditations) {
     fetcherHandler = createMeditation;
     args = { sessionId, userId: user.id, reflection };

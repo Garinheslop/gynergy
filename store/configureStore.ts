@@ -25,11 +25,48 @@ const migrations = {
       },
     };
   },
+  1: (state: any) => {
+    // Migration v1: Add gamification, cohort, and notifications modules
+    return {
+      ...state,
+      gamification: {
+        badges: {
+          all: [],
+          unlocked: [],
+          loading: false,
+          error: "",
+        },
+        multipliers: {
+          current: null,
+          loading: false,
+        },
+        points: {
+          transactions: [],
+          loading: false,
+        },
+        pendingCelebrations: [],
+      },
+      cohort: {
+        current: null,
+        list: [],
+        members: [],
+        loading: false,
+        error: "",
+      },
+      notifications: {
+        preferences: null,
+        items: [],
+        unreadCount: 0,
+        loading: false,
+        error: "",
+      },
+    };
+  },
 };
 
 const persistConfig: PersistConfig<RootState> = {
   key: "root",
-  version: 0, //default or previous version -1
+  version: 1, // Bumped from 0 to 1 for new modules
   storage,
   debug: true,
   stateReconciler: autoMergeLevel2,
@@ -44,6 +81,10 @@ const persistConfig: PersistConfig<RootState> = {
     "quotes",
     "meditations",
     "histories",
+    // New modules (v1) - will have their own persist configs
+    "gamification",
+    "cohort",
+    "notifications",
   ],
 };
 
