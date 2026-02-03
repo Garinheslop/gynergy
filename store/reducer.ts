@@ -1,5 +1,4 @@
 import { combineReducers } from "redux";
-
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
@@ -13,6 +12,7 @@ import historyReducer from "@store/modules/history";
 import journalReducer from "@store/modules/journal";
 import leaderboardReducer from "@store/modules/leaderboard";
 import meditationReducer from "@store/modules/meditation";
+import { paymentReducer } from "@store/modules/payment";
 import profileReducer from "@store/modules/profile";
 import quoteReducer from "@store/modules/quote";
 import videoReducer from "@store/modules/video/reducers";
@@ -94,6 +94,12 @@ const persistVideoConfig = {
   ],
 };
 
+const persistPaymentConfig = {
+  key: "payment",
+  storage,
+  blacklist: ["loading", "redeemingCode", "redeemError", "redeemSuccess"],
+};
+
 const appReducer = combineReducers({
   actions: actionReducer,
   books: persistReducer(persistBooksConfig, bookReducer),
@@ -110,6 +116,7 @@ const appReducer = combineReducers({
   gamification: persistReducer(persistGamificationConfig, gamificationReducer),
   ai: persistReducer(persistAIConfig, aiReducer),
   video: persistReducer(persistVideoConfig, videoReducer.reducer),
+  payment: persistReducer(persistPaymentConfig, paymentReducer),
 });
 const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: any) => {
   if (

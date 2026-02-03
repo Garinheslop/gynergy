@@ -5,12 +5,14 @@ import {
   ThunkAction,
   ThunkDispatch,
 } from "@reduxjs/toolkit";
-import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore, PersistConfig, createMigrate } from "redux-persist";
+import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
+import storage from "redux-persist/lib/storage";
+
+import reducer from "@store/reducer";
+
 import api from "./middleware/api";
 import resetDataMiddleware from "./middleware/reset";
-import reducer from "@store/reducer";
-import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 import { streakDefaultStates } from "./modules/enrollment/reducers";
 
 export type RootState = ReturnType<typeof reducer>;
@@ -85,6 +87,7 @@ const persistConfig: PersistConfig<RootState> = {
     "gamification",
     "cohort",
     "notifications",
+    "payment",
   ],
 };
 

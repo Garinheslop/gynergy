@@ -31,8 +31,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Bypass auth check on the login page, auth routes, and image routes
-  if (pathname === "/" || pathname.startsWith("/auth") || pathname.startsWith("/image")) {
+  // Bypass auth check on public routes
+  const publicRoutes = [
+    "/", // Login page
+    "/auth", // Auth callbacks
+    "/image", // Image routes
+    "/pricing", // Marketing/pricing page
+    "/payment/success", // Post-checkout success page
+  ];
+
+  if (publicRoutes.some((route) => pathname === route || pathname.startsWith(route + "/"))) {
     return NextResponse.next();
   }
 
