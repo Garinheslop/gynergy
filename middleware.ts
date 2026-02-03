@@ -31,8 +31,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Bypass auth check on the login page and image routes
-  if (pathname === "/" || pathname.startsWith("/image")) {
+  // Bypass auth check on the login page, auth routes, and image routes
+  if (pathname === "/" || pathname.startsWith("/auth") || pathname.startsWith("/image")) {
     return NextResponse.next();
   }
 
