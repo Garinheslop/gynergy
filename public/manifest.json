@@ -1,0 +1,98 @@
+{
+  "name": "Gynergy - 45 Day Transformation",
+  "short_name": "Gynergy",
+  "description": "Transform your life in 45 days with gratitude, AI coaching, and community support",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "categories": ["lifestyle", "health", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Home Screen"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Morning Journal",
+      "short_name": "Morning",
+      "description": "Start your morning gratitude journal",
+      "url": "/journal/morning",
+      "icons": [{ "src": "/icons/shortcut-morning.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Evening Journal",
+      "short_name": "Evening",
+      "description": "Complete your evening reflection",
+      "url": "/journal/evening",
+      "icons": [{ "src": "/icons/shortcut-evening.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Chat with Yesi",
+      "short_name": "Yesi",
+      "description": "Talk to your AI coach Yesi",
+      "url": "/chat/yesi",
+      "icons": [{ "src": "/icons/shortcut-chat.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

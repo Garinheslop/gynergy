@@ -1,6 +1,7 @@
+import { forwardRef } from "react";
+
 import useGetParagraphVariant from "@modules/common/hooks/variants/useGetParagraphVariant";
 import { paragraphVariants } from "@resources/variants";
-import { forwardRef } from "react";
 
 interface ParagraphProps {
   content?: string | number;
@@ -19,7 +20,7 @@ const Paragraph = forwardRef<HTMLParagraphElement | HTMLDivElement, ParagraphPro
           ref={ref}
           onClick={onClick}
           className={componentStyle}
-          dangerouslySetInnerHTML={{ __html: content }}
+          dangerouslySetInnerHTML={{ __html: String(content) }}
         />
       );
     return (
@@ -29,5 +30,7 @@ const Paragraph = forwardRef<HTMLParagraphElement | HTMLDivElement, ParagraphPro
     );
   }
 );
+
+Paragraph.displayName = "Paragraph";
 
 export default Paragraph;

@@ -1,10 +1,38 @@
-import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
+import { createServerClient } from "@supabase/ssr";
+
+// Static files and PWA assets that should bypass auth
+const PUBLIC_FILE_PATTERNS = [
+  /^\/manifest\.json$/,
+  /^\/sw\.js$/,
+  /^\/workbox-.*\.js$/,
+  /^\/icons\//,
+  /^\/screenshots\//,
+  /^\/favicon/,
+  /^\/apple-touch-icon/,
+  /^\/android-chrome/,
+  /\.png$/,
+  /\.ico$/,
+  /\.webmanifest$/,
+];
+
 export async function middleware(request: NextRequest) {
-  // Bypass auth check on the login page
-  if (request.nextUrl.pathname === "/" || request.nextUrl.pathname.startsWith("/image")) {
+  const { pathname } = request.nextUrl;
+
+  // Bypass auth for static files (anything with a file extension)
+  if (pathname.includes(".")) {
+    return NextResponse.next();
+  }
+
+  // Bypass auth check for public files and PWA assets
+  if (PUBLIC_FILE_PATTERNS.some((pattern) => pattern.test(pathname))) {
+    return NextResponse.next();
+  }
+
+  // Bypass auth check on the login page and image routes
+  if (pathname === "/" || pathname.startsWith("/image")) {
     return NextResponse.next();
   }
 
@@ -41,7 +69,7 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Use a matcher that excludes Next.js internals (like _next, api, static) so middleware runs only on your app pages
+// Middleware runs on all non-internal paths
 export const config = {
-  matcher: ["/((?!_next|api|static|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|api).*)"],
 };
