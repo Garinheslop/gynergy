@@ -6,8 +6,6 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 
 import { createClient, createServiceClient } from "@lib/supabase-server";
-import { historyRequestTypes, historyTypes } from "@resources/types/history";
-import { journalTypes } from "@resources/types/journal";
 import { leaderboardFilterTypes, leaderboardRequestTypes } from "@resources/types/leaderboard";
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -132,7 +130,7 @@ const getLeaderboardData = async ({
   limit: number;
 }) => {
   try {
-    const supabase = createClient();
+    const _supabase = createClient();
     const supabaseAdmin = createServiceClient();
 
     if (
@@ -314,7 +312,11 @@ const getTotalSessionUsers = async ({
       endDate = dayjs().tz(userTimezone).endOf("day").utc().toISOString();
     }
 
-    const { data, count, error } = await supabaseAdmin
+    const {
+      data: _data,
+      count,
+      error,
+    } = await supabaseAdmin
       .from("session_enrollments")
       .select("*", { count: "exact", head: true })
       .eq("session_id", sessionId)

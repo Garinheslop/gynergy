@@ -293,7 +293,7 @@ const createJournal = async ({
         entry_type: key,
       }));
 
-      const { data: journalEntryData, error: journalEntryError } = await supabase
+      const { data: _journalEntryData, error: journalEntryError } = await supabase
         .from("journal_entries")
         .insert(journalEntries);
 
@@ -316,7 +316,7 @@ const createJournal = async ({
         entry_type: key,
       }));
 
-      const { data: journalEntryData, error: journalEntryError } = await supabase
+      const { data: _journalEntryData, error: journalEntryError } = await supabase
         .from("journal_entries")
         .insert(journalEntries);
 

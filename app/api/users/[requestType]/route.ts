@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 
 import { createClient, createServiceClient } from "@lib/supabase-server";
 import { profileRequestTypes } from "@resources/types/profile";
-import { uploadTypes } from "@resources/types/uploads";
 import { uploadFileToStorage } from "app/api/upload/controller";
 
 type UserProfileData = {
@@ -236,7 +235,7 @@ const updateUserProfileImage = async ({
     if (!userId || !fileStr || !name || !contentType) {
       return { error: "No file data provided" };
     }
-    const { data, error } = await supabase.storage
+    const { data, error: _listError } = await supabase.storage
       .from(`${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME}`)
       .list(`profiles/${userId}`, {
         limit: 10,
@@ -246,11 +245,11 @@ const updateUserProfileImage = async ({
 
     if (data && data?.length > 0) {
       for (let i = 0; i < data.length; i++) {
-        const { data: deleteImageData, error } = await supabase.storage
+        const { data: _deleteImageData, error: deleteError } = await supabase.storage
           .from(`${process.env.NEXT_PUBLIC_SUPABASE_BUCKET_NAME}`)
           .remove([`profiles/${userId}/${data[i]?.name}`]);
 
-        if (error) {
+        if (deleteError) {
           return { error: "Error deleting file" };
         }
       }

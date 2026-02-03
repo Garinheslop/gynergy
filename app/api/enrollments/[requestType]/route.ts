@@ -59,7 +59,7 @@ export async function PUT(request: Request, { params }: { params: { requestType:
     });
   }
 }
-const getUserEnrolledBookSession = async ({
+const _getUserEnrolledBookSession = async ({
   userId,
   bookId,
 }: {
@@ -120,7 +120,7 @@ const getUserEnrolledBookSession = async ({
     return { error: err.message };
   }
 };
-const getBookData = async ({ slug, date }: { slug: string; date: string }) => {
+const _getBookData = async ({ slug, date }: { slug: string; date: string }) => {
   const supabase = createClient();
   if (!slug) {
     return { error: "bad-request" };
@@ -162,7 +162,13 @@ const getBookData = async ({ slug, date }: { slug: string; date: string }) => {
   }
 };
 
-const createUserBookEnrollment = async ({ userId, bookId }: { userId: string; bookId: string }) => {
+const _createUserBookEnrollment = async ({
+  userId,
+  bookId,
+}: {
+  userId: string;
+  bookId: string;
+}) => {
   const supabase = createClient();
   const date = new Date().toISOString().split("T")[0];
   try {
@@ -218,7 +224,7 @@ const createUserBookEnrollment = async ({ userId, bookId }: { userId: string; bo
   }
 };
 
-const resetBookSession = async ({
+const _resetBookSession = async ({
   userId,
   sessionId,
   userTimezone,
@@ -227,13 +233,13 @@ const resetBookSession = async ({
   sessionId: string;
   userTimezone: string;
 }) => {
-  const supabase = createClient();
+  const _supabase = createClient();
   const supabaseAdmin = createServiceClient();
   if (!userId || !sessionId) {
     return { error: "bad-request" };
   }
   try {
-    const { data: sessionData, error: sessionError } = await supabaseAdmin
+    const { data: _sessionData, error: sessionError } = await supabaseAdmin
       .from("session_enrollments")
       .update({
         enrollment_date: dayjs().tz(userTimezone).utc().toISOString(),
@@ -254,7 +260,7 @@ const resetBookSession = async ({
     if (sessionError) {
       return { error: serverErrorTypes.serverError };
     }
-    const { data: actionLogData, error: actionLogDataError } = await supabaseAdmin
+    const { data: _actionLogData, error: actionLogDataError } = await supabaseAdmin
       .from("action_logs")
       .delete()
       .eq("user_id", userId)
@@ -263,7 +269,7 @@ const resetBookSession = async ({
     if (actionLogDataError) {
       return { error: serverErrorTypes.serverError };
     }
-    const { data: journalLogData, error: journalLogDataError } = await supabaseAdmin
+    const { data: _journalLogData, error: journalLogDataError } = await supabaseAdmin
       .from("journals")
       .delete()
       .eq("user_id", userId)
@@ -285,7 +291,7 @@ const recalculateStreak = async ({ userId, sessionId }: { userId: string; sessio
     return { error: "bad-request" };
   }
   try {
-    const { data, error } = await supabaseAdmin.rpc("check_user_streak", {
+    const { data: _data, error } = await supabaseAdmin.rpc("check_user_streak", {
       p_user_id: userId,
       p_session_id: sessionId,
     });

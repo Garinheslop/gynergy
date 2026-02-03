@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 import { createServerClient } from "@supabase/ssr";
@@ -16,6 +15,12 @@ const PUBLIC_FILE_PATTERNS = [
   /\.png$/,
   /\.ico$/,
   /\.webmanifest$/,
+];
+
+// Routes that require challenge access (purchase or friend code redemption)
+const CHALLENGE_PROTECTED_PATTERNS = [
+  /^\/date-zero-gratitude/, // Main challenge routes
+  /^\/video\//, // Video call routes (cohort calls)
 ];
 
 export async function middleware(request: NextRequest) {
@@ -44,37 +49,67 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const cookieStore = cookies();
+  // Create response to pass through (for cookie handling)
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll: () => cookieStore.getAll(),
-        setAll: (cookiesToSet: Array<{ name: string; value: string; options: any }>) => {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Ignore errors from Server Component context
-          }
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(
+          cookiesToSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>
+        ) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = NextResponse.next({
+            request,
+          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
         },
       },
     }
   );
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  // If there is no session, redirect any protected route to the login page ("/")
-  if (!session) {
+  // If there is no user, redirect any protected route to the login page ("/")
+  if (!user) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  return NextResponse.next();
+  // Check if route requires challenge access
+  const requiresChallengeAccess = CHALLENGE_PROTECTED_PATTERNS.some((pattern) =>
+    pattern.test(pathname)
+  );
+
+  if (requiresChallengeAccess) {
+    // Check user entitlements
+    const { data: entitlements } = await supabase
+      .from("user_entitlements")
+      .select("has_challenge_access")
+      .eq("user_id", user.id)
+      .single();
+
+    // If no entitlements or no challenge access, redirect to pricing
+    if (!entitlements?.has_challenge_access) {
+      const pricingUrl = new URL("/pricing", request.url);
+      pricingUrl.searchParams.set("access_required", "true");
+      return NextResponse.redirect(pricingUrl);
+    }
+  }
+
+  return response;
 }
 
 // Middleware runs on all non-internal paths

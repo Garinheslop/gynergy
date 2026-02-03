@@ -41,7 +41,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { ocrSchemaStr, messages } = buildOcrMessages(contentType, images, journalSchemas);
+    const { ocrSchemaStr: _ocrSchemaStr, messages } = buildOcrMessages(
+      contentType,
+      images,
+      journalSchemas
+    );
 
     const { choices } = await openai.chat.completions.create({
       model: "gpt-4o-mini",

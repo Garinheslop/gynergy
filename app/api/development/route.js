@@ -5,22 +5,21 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 
-import { createClient, createServiceClient } from "@lib/supabase-server";
-import { booksRequestTypes } from "@resources/types/book";
-import { journalTypes } from "@resources/types/journal";
+import { createServiceClient } from "@lib/supabase-server";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-export async function GET(request) {
+export async function GET(_request) {
   const supabase = createServiceClient();
-  const sessionId = "3ae42bc9-1f98-4aa3-8304-6bb75844bfd0";
-  const userId = "59b3fc84-8ce8-4cb7-80e0-47f8bd4dffe8";
-  const bookId = "7215727d-cefa-460e-a5a0-478ec1002d08";
-  const userTimeZone = "Asia/Dhaka";
-  const entryDate = "2025-03-15T08:01:09.575Z";
-  const startDate = "2025-03-01T08:01:09.575028+00:00";
-  const slug = "date-zero-gratitude";
+  // Development test variables - prefixed with _ to indicate intentionally unused
+  const _sessionId = "3ae42bc9-1f98-4aa3-8304-6bb75844bfd0";
+  const _userId = "59b3fc84-8ce8-4cb7-80e0-47f8bd4dffe8";
+  const _bookId = "7215727d-cefa-460e-a5a0-478ec1002d08";
+  const _userTimeZone = "Asia/Dhaka";
+  const _entryDate = "2025-03-15T08:01:09.575Z";
+  const _startDate = "2025-03-01T08:01:09.575028+00:00";
+  const _slug = "date-zero-gratitude";
 
   // const { data, error } = await supabase.rpc("check_user_streak", {
   //   p_user_id: userId,

@@ -5,17 +5,10 @@ import camelcaseKeys from "camelcase-keys";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { pick } from "lodash";
-import { v4 as uuidv4 } from "uuid";
-import { z } from "zod";
 
 import { createClient, createServiceClient } from "@lib/supabase-server";
 import { serverErrorTypes } from "@resources/types/error";
 import { meditationRequestTypes } from "@resources/types/meditation";
-import { ImageRawData } from "@resources/types/ocr";
-import { uploadFileToStorage } from "app/api/upload/controller";
-
-
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -180,8 +173,8 @@ const getUserMeditations = async ({
 }: Partial<UserMeditationRequestDataTypes>) => {
   const supabase = createClient();
 
-  const startOfDay = dayjs().tz(userTimezone).startOf("day").utc().toISOString();
-  const endOfDay = dayjs().tz(userTimezone).endOf("day").utc().toISOString();
+  const _startOfDay = dayjs().tz(userTimezone).startOf("day").utc().toISOString();
+  const _endOfDay = dayjs().tz(userTimezone).endOf("day").utc().toISOString();
 
   try {
     if (!userId || !sessionId) {
@@ -213,7 +206,11 @@ const getUserTotalMeditations = async ({
     if (!userId || !sessionId) {
       return { error: "bad-request" };
     }
-    const { data, count, error } = await supabase
+    const {
+      data: _data,
+      count,
+      error,
+    } = await supabase
       .from("meditations")
       .select("*", { count: "exact", head: true })
       .eq("user_id", userId)

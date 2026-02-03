@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 
-import { createClient, createServiceClient } from "@lib/supabase-server";
+import { createClient } from "@lib/supabase-server";
 import { quotesRequestTypes } from "@resources/types/quote";
 
 dayjs.extend(utc);
