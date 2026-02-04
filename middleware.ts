@@ -38,10 +38,11 @@ export async function middleware(request: NextRequest) {
 
   // Bypass auth check on public routes
   const publicRoutes = [
-    "/", // Login page
+    "/", // Marketing/landing page
+    "/login", // Login page
     "/auth", // Auth callbacks
     "/image", // Image routes
-    "/pricing", // Marketing/pricing page
+    "/pricing", // Legacy pricing route (redirects to /)
     "/payment/success", // Post-checkout success page
   ];
 
@@ -83,9 +84,11 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // If there is no user, redirect any protected route to the login page ("/")
+  // If there is no user, redirect any protected route to the login page
   if (!user) {
-    return NextResponse.redirect(new URL("/", request.url));
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   // Check if route requires challenge access

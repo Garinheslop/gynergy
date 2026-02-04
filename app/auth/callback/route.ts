@@ -8,12 +8,13 @@ export async function GET(request: NextRequest) {
   const code = requestUrl.searchParams.get("code");
   const error = requestUrl.searchParams.get("error");
   const errorDescription = requestUrl.searchParams.get("error_description");
+  const redirectTo = requestUrl.searchParams.get("redirect") || "/date-zero-gratitude";
 
   // Handle error from Supabase
   if (error) {
     return NextResponse.redirect(
       new URL(
-        `/?error_description=${encodeURIComponent(errorDescription || error)}`,
+        `/login?error_description=${encodeURIComponent(errorDescription || error)}`,
         requestUrl.origin
       )
     );
@@ -50,14 +51,14 @@ export async function GET(request: NextRequest) {
       console.error("Auth callback error:", exchangeError);
       return NextResponse.redirect(
         new URL(
-          `/?error_description=${encodeURIComponent(exchangeError.message)}`,
+          `/login?error_description=${encodeURIComponent(exchangeError.message)}`,
           requestUrl.origin
         )
       );
     }
   }
 
-  // Redirect to the home page after successful authentication
-  // The UseSession context will detect the session and redirect appropriately
-  return NextResponse.redirect(new URL("/", requestUrl.origin));
+  // Redirect to the specified destination or default dashboard
+  // The UseSession context will handle profile completion if needed
+  return NextResponse.redirect(new URL(redirectTo, requestUrl.origin));
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -11,7 +11,7 @@ import icons from "@resources/icons";
 import { useDispatch, useSelector } from "@store/hooks";
 import { fetchEntitlements } from "@store/modules/payment";
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { session } = useSession();
@@ -185,5 +185,20 @@ export default function PaymentSuccessPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+// Wrap with Suspense for useSearchParams
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-green-50 to-white">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-green-600" />
+        </div>
+      }
+    >
+      <PaymentSuccessContent />
+    </Suspense>
   );
 }

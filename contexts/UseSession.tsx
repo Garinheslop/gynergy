@@ -1,15 +1,17 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
+
+import { usePathname, useRouter } from "next/navigation";
+
 import { Session } from "@supabase/supabase-js";
+import dayjs from "dayjs";
+
 import { createClient } from "@lib/supabase-client";
-import { useDispatch, useSelector } from "@store/hooks";
-import { getUserProfile, signOutAndReset } from "@store/modules/profile";
-import { RootState } from "@store/configureStore";
-import { getUserBookSessionData, updateUserStreak } from "@store/modules/enrollment";
 import useCheckEnrollmentSession from "@modules/book/hooks/useCheckEnrollmentSession";
 import { BookSessionData } from "@resources/types/book";
-import { usePathname, useRouter } from "next/navigation";
-import dayjs from "dayjs";
+import { useDispatch, useSelector } from "@store/hooks";
+import { getUserBookSessionData, updateUserStreak } from "@store/modules/enrollment";
+import { getUserProfile, signOutAndReset } from "@store/modules/profile";
 
 export type SessionContextType = {
   session: {
@@ -70,7 +72,8 @@ const UseSessionContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       const { data: sessionData } = await supabase.auth.getUser();
       if (!sessionData?.user) {
         setAuthenticating(false);
-        logout();
+        // Don't redirect - just clear session state for anonymous visitors
+        setSession(null);
       }
     };
     checkAuth();
@@ -104,13 +107,18 @@ const UseSessionContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   useEffect(() => {
     if (session && profile?.current) {
       setAuthenticating(false);
+      // If user needs to complete profile, redirect to login page (which has the name form)
       if (!profile.current?.firstName && !profile.current?.lastName) {
-        router.push("/");
-      } else if (pathName === "/") {
+        if (pathName !== "/login") {
+          router.push("/login");
+        }
+      } else if (pathName === "/login") {
+        // If user is fully logged in and on login page, redirect to dashboard
         router.push("/date-zero-gratitude");
       }
+      // Don't redirect from "/" - the landing page handles its own redirect logic
     }
-  }, [session, profile.current, pathName]);
+  }, [session, profile.current, pathName, router]);
 
   useEffect(() => {
     if (
