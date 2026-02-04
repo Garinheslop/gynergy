@@ -268,8 +268,9 @@ const getBookData = async ({ slug, date }: { slug: string; date: string }) => {
     };
 
     return camelcaseKeys(bookWithLatestSession, { deep: true });
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
 
@@ -332,8 +333,9 @@ const createUserBookEnrollment = async ({
 
       createdAt: sessionEnrollment.created_at,
     };
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
 
@@ -409,7 +411,8 @@ const resetBookSession = async ({
     }
 
     return true;
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };

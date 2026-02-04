@@ -14,6 +14,14 @@ import { errorTypes, serverErrorTypes } from "@resources/types/error";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+// ============================================================================
+// Type Definitions for Type Safety
+// ============================================================================
+
+interface FetcherErrorResponse {
+  error: string;
+}
+
 export async function PUT(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
@@ -34,30 +42,25 @@ export async function PUT(request: Request, { params }: { params: { requestType:
   }
   const { sessionId } = await request.json();
 
-  let fetcherHandler: ((args: any) => Promise<any>) | null = null;
-  let args: any | {} = {};
-  let responseName;
+  let data: FetcherErrorResponse | boolean;
 
   if (requestType === booksRequestTypes.recalculateUserStreak) {
     if (!sessionId) {
       return NextResponse.json({ error: "Session id is requried" }, { status: 400 });
     }
-    fetcherHandler = recalculateStreak;
-    args = {
+    data = await recalculateStreak({
       userId: user.id,
       sessionId,
-    };
-    responseName = "enrollment";
-  }
-  if (!fetcherHandler || !responseName) {
+    });
+  } else {
     return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
   }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
+
+  if (typeof data === "object" && "error" in data) {
+    return NextResponse.json({ error: { message: data.error } }, { status: 500 });
   } else {
     return NextResponse.json({
-      [responseName]: data,
+      enrollment: data,
     });
   }
 }
@@ -118,8 +121,9 @@ const _getUserEnrolledBookSession = async ({
 
       createdAt: sessionEnrollmentData.created_at,
     };
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
 const _getBookData = async ({ slug, date }: { slug: string; date: string }) => {
@@ -159,8 +163,9 @@ const _getBookData = async ({ slug, date }: { slug: string; date: string }) => {
     };
 
     return camelcaseKeys(bookWithLatestSession, { deep: true });
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
 
@@ -221,8 +226,9 @@ const _createUserBookEnrollment = async ({
 
       createdAt: sessionEnrollment.created_at,
     };
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
 
@@ -282,8 +288,9 @@ const _resetBookSession = async ({
     }
 
     return true;
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
 
@@ -303,7 +310,8 @@ const recalculateStreak = async ({ userId, sessionId }: { userId: string; sessio
     if (error) return { error: error.message };
 
     return true;
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };

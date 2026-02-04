@@ -299,16 +299,18 @@ const createJournal: CreateJournalHandler = async ({
         is_completed: true,
       };
     } else if (requestType === journalRequestTypes.createEveningJournal) {
-      let freeflow = null;
+      let freeflow: string | null = null;
       if (parsedJournal?.freeflow?.file) {
-        freeflow = await uploadFileToStorage({
+        const freeflowResult = await uploadFileToStorage({
           file: parsedJournal?.freeflow?.file,
           path: `drawings/${userId}/${journalId}`,
           name: parsedJournal?.freeflow?.name,
           contentType: parsedJournal?.freeflow?.contentType,
         });
-        if ((freeflow as { error: string })?.error) {
-          return { error: (freeflow as { error: string }).error };
+        if (typeof freeflowResult === "string") {
+          freeflow = freeflowResult;
+        } else if (freeflowResult?.error) {
+          return { error: freeflowResult.error };
         }
       } else if (typeof parsedJournal?.freeflow === "string") {
         freeflow = parsedJournal?.freeflow;

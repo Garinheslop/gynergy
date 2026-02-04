@@ -46,11 +46,12 @@ export const uploadFileToStorage = async ({
   path,
   contentType,
 }: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   file: any;
   name?: string;
   path: string;
   contentType: string | null;
-}) => {
+}): Promise<string | { error: string }> => {
   const supabase = createClient();
 
   if (!file || !path) {

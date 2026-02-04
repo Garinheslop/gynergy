@@ -7,6 +7,33 @@ import Stripe from "stripe";
 import { verifyWebhookSignature } from "@lib/stripe";
 import { createServiceClient } from "@lib/supabase-server";
 
+// ============================================================================
+// Type Definitions for Webhook Event Data
+// ============================================================================
+
+// Webhook invoice data (differs from strict Stripe.Invoice type)
+interface WebhookInvoice {
+  subscription?: string | { id?: string } | null;
+  subscription_details?: { metadata?: { userId?: string } };
+  period_start?: number;
+  period_end?: number;
+  customer?: string | { id?: string };
+  lines?: { data?: Array<{ price?: { id?: string; recurring?: { interval?: string } } }> };
+  amount_paid?: number;
+  currency?: string;
+}
+
+// Webhook subscription data
+interface WebhookSubscription {
+  id: string;
+  status: string;
+  cancel_at_period_end?: boolean;
+  canceled_at?: number | null;
+  current_period_start?: number;
+  current_period_end?: number;
+  metadata?: { userId?: string };
+}
+
 // Disable body parsing - we need raw body for signature verification
 export const runtime = "nodejs";
 
@@ -38,25 +65,25 @@ export async function POST(request: NextRequest) {
       }
 
       case "invoice.paid": {
-        const invoice = event.data.object;
+        const invoice = event.data.object as unknown as WebhookInvoice;
         await handleInvoicePaid(supabase, invoice);
         break;
       }
 
       case "invoice.payment_failed": {
-        const invoice = event.data.object;
+        const invoice = event.data.object as unknown as WebhookInvoice;
         await handleInvoicePaymentFailed(supabase, invoice);
         break;
       }
 
       case "customer.subscription.updated": {
-        const subscription = event.data.object;
+        const subscription = event.data.object as unknown as WebhookSubscription;
         await handleSubscriptionUpdated(supabase, subscription);
         break;
       }
 
       case "customer.subscription.deleted": {
-        const subscription = event.data.object;
+        const subscription = event.data.object as unknown as WebhookSubscription;
         await handleSubscriptionDeleted(supabase, subscription);
         break;
       }
@@ -117,8 +144,10 @@ async function handleCheckoutCompleted(
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function handleInvoicePaid(supabase: ReturnType<typeof createServiceClient>, invoice: any) {
+async function handleInvoicePaid(
+  supabase: ReturnType<typeof createServiceClient>,
+  invoice: WebhookInvoice
+) {
   // Access subscription from the invoice object
   const subscriptionId =
     typeof invoice.subscription === "string" ? invoice.subscription : invoice.subscription?.id;
@@ -182,11 +211,9 @@ async function handleInvoicePaid(supabase: ReturnType<typeof createServiceClient
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function handleInvoicePaymentFailed(
   supabase: ReturnType<typeof createServiceClient>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  invoice: any
+  invoice: WebhookInvoice
 ) {
   const subscriptionId =
     typeof invoice.subscription === "string" ? invoice.subscription : invoice.subscription?.id;
@@ -204,8 +231,7 @@ async function handleInvoicePaymentFailed(
 
 async function handleSubscriptionUpdated(
   supabase: ReturnType<typeof createServiceClient>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  subscription: any
+  subscription: WebhookSubscription
 ) {
   const status = mapStripeStatus(subscription.status);
 
@@ -230,8 +256,7 @@ async function handleSubscriptionUpdated(
 
 async function handleSubscriptionDeleted(
   supabase: ReturnType<typeof createServiceClient>,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  subscription: any
+  subscription: WebhookSubscription
 ) {
   await supabase
     .from("subscriptions")
