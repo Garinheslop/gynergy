@@ -50,9 +50,9 @@ function LandingPageContent() {
 
   // Smart redirect: if logged in with challenge access, go to dashboard
   useEffect(() => {
-    if (session && !authenticating && !payment.loading && payment.entitlements) {
+    if (session && !authenticating && !payment.loading) {
       setHasCheckedAccess(true);
-      if (payment.entitlements.hasChallengeAccess && profile.current?.firstName) {
+      if (payment.entitlements?.hasChallengeAccess && profile.current?.firstName) {
         router.push("/date-zero-gratitude");
       }
     } else if (!session && !authenticating) {

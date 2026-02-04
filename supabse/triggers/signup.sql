@@ -11,15 +11,31 @@ BEGIN
   VALUES (
     NEW.id,
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data ->> 'first_name', ''), 
-    COALESCE(NEW.raw_user_meta_data ->> 'last_name', ''),  
+    -- Check for Google OAuth (given_name) or regular signup (first_name)
+    COALESCE(
+      NULLIF(NEW.raw_user_meta_data ->> 'first_name', ''),
+      NULLIF(NEW.raw_user_meta_data ->> 'given_name', ''),
+      ''
+    ),
+    -- Check for Google OAuth (family_name) or regular signup (last_name)
+    COALESCE(
+      NULLIF(NEW.raw_user_meta_data ->> 'last_name', ''),
+      NULLIF(NEW.raw_user_meta_data ->> 'family_name', ''),
+      ''
+    ),
     NEW.email,
-    COALESCE(NEW.raw_user_meta_data ->> 'profile_image', NULL),  
-    COALESCE(NEW.is_anonymous, false) 
+    -- Check for Google OAuth (picture/avatar_url) or regular signup (profile_image)
+    COALESCE(
+      NEW.raw_user_meta_data ->> 'profile_image',
+      NEW.raw_user_meta_data ->> 'picture',
+      NEW.raw_user_meta_data ->> 'avatar_url',
+      NULL
+    ),
+    COALESCE(NEW.is_anonymous, false)
   )
-  ON CONFLICT (id) DO UPDATE 
-    SET first_name = COALESCE(EXCLUDED.first_name, users.first_name),
-        last_name = COALESCE(EXCLUDED.last_name, users.last_name),
+  ON CONFLICT (id) DO UPDATE
+    SET first_name = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),
+        last_name = COALESCE(NULLIF(EXCLUDED.last_name, ''), users.last_name),
         profile_image = COALESCE(EXCLUDED.profile_image, users.profile_image),
         email = COALESCE(EXCLUDED.email, users.email);
 
