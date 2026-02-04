@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 
 import camelcaseKeys from "camelcase-keys";
@@ -19,12 +21,69 @@ import { validateActionSchema } from "./validation";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+// ============================================================================
+// Type Definitions for Type Safety
+// ============================================================================
+
 type PostRequestJson = {
   actionId: string;
   sessionId: string;
   actionLog: ActionLogData;
   images: ImageRawData[];
 };
+
+interface FetcherErrorResponse {
+  error: string;
+  details?: Array<{ message: string; path: (string | number)[] }>;
+}
+
+// POST handler types
+interface CreateActionLogArgs {
+  requestType: string;
+  sessionId: string;
+  actionId: string;
+  userId: string;
+  actionLog: ActionLogData & { id?: string };
+  images: ImageRawData[];
+}
+
+type _CreateActionLogHandler = (
+  args: Partial<CreateActionLogArgs>
+) => Promise<FetcherErrorResponse | Record<string, unknown>>;
+
+// Enrollment data type for proper typing (arrays due to Supabase join)
+interface EnrollmentDataRow {
+  enrollment_date: string;
+  session: Array<{
+    id: string;
+    book: Array<{
+      id: string;
+    }>;
+  }>;
+}
+
+// Action log database record type - allows null for optional fields
+interface ActionLogDbRecord {
+  id: string;
+  session_id: string;
+  action_id: string;
+  user_id: string;
+  images?: string[];
+  is_completed?: boolean | null;
+  note?: string | null;
+  reflection?: string | null;
+  obstacles?: string | null;
+  draw?: string | null;
+  list?: string | null;
+  action_type?: string;
+  eulogy?: string | null;
+  reward?: string | null;
+  motivation?: string | null;
+  purpose?: string | null;
+  success?: string | null;
+  focus?: string | null;
+  freeflow?: string | null;
+}
 
 export async function GET(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
@@ -50,11 +109,7 @@ export async function GET(request: Request, { params }: { params: { requestType:
   const enrollmentId = new URL(request.url).searchParams.get("enrollmentId");
   const timezone = request.headers.get("x-user-timezone");
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let fetcherHandler: ((args: any) => Promise<any>) | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let args: any = {};
-  let responseName;
+  let data: FetcherErrorResponse | Record<string, unknown>[];
 
   if (requestType === actionRequestTypes.userActions) {
     if (!enrollmentId) {
@@ -64,13 +119,11 @@ export async function GET(request: Request, { params }: { params: { requestType:
       return NextResponse.json({ error: "Timezone is requried" }, { status: 400 });
     }
 
-    fetcherHandler = getUserActions;
-    args = {
+    data = await getUserActions({
       userId: user.id,
       enrollmentId,
       timezone,
-    };
-    responseName = "actions";
+    });
   } else if (requestType === actionRequestTypes.userDailyActionLogs) {
     if (!sessionId) {
       return NextResponse.json({ error: "Session id is requried" }, { status: 400 });
@@ -78,23 +131,20 @@ export async function GET(request: Request, { params }: { params: { requestType:
     if (!timezone) {
       return NextResponse.json({ error: "User Time zone is required." }, { status: 400 });
     }
-    fetcherHandler = getUserActionLogs;
-    args = {
+    data = await getUserActionLogs({
       userId: user.id,
       sessionId,
       userTimezone: timezone,
-    };
-    responseName = "actions";
-  }
-  if (!fetcherHandler || !responseName) {
+    });
+  } else {
     return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
   }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
+
+  if ("error" in data) {
+    return NextResponse.json({ error: { message: data.error } }, { status: 500 });
   } else {
     return NextResponse.json({
-      [responseName]: data,
+      actions: data,
     });
   }
 }
@@ -122,36 +172,30 @@ export async function POST(request: Request, { params }: { params: { requestType
     return NextResponse.json({ error: serverErrorTypes.invalidRequest }, { status: 400 });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let fetcherHandler: ((args: any) => Promise<any>) | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let args: any = {};
-  const responseName = "action";
+  let data: FetcherErrorResponse | Record<string, unknown>;
 
   if (
     [actionRequestTypes.completeDailyAction, actionRequestTypes.completeWeeklyChallenge].includes(
       requestType
     )
   ) {
-    fetcherHandler = createUserActionLog;
-    args = {
+    data = await createUserActionLog({
       requestType,
       sessionId,
       actionId: actionId,
       userId: user.id,
       actionLog: actionLog,
       images,
-    };
-  }
-  if (!fetcherHandler || !responseName) {
+    });
+  } else {
     return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
   }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
+
+  if ("error" in data) {
+    return NextResponse.json({ error: { message: data.error } }, { status: 500 });
   } else {
     return NextResponse.json({
-      [responseName]: data,
+      action: data,
     });
   }
 }
@@ -191,18 +235,23 @@ const getUserActions = async ({
         .diff(dayjs(enrollmentData[0].enrollment_date).tz(timezone).startOf("d").add(7, "d"), "w") +
       1;
 
+    const enrollmentRow = enrollmentData[0] as EnrollmentDataRow;
+    const bookId = enrollmentRow.session[0]?.book[0]?.id;
+    if (!bookId) return { error: "no-book-found" };
+
     const { data, error } = await supabase
       .from("actions")
       .select("*")
-      .eq("book_id", (enrollmentData[0] as any).session.book.id)
+      .eq("book_id", bookId)
       .or(
         `and(period.eq.${currentSessionDay},action_type.eq.daily),and(period.eq.${currentSessionWeek},action_type.eq.weekly)`
       );
 
     if (error || !data) return { error: "no-action" };
     else return camelcaseKeys(data);
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
 const getUserActionLogs = async ({
@@ -235,8 +284,9 @@ const getUserActionLogs = async ({
     if (error) return { error: error.message };
 
     return camelcaseKeys(data);
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
 const createUserActionLog = async ({
@@ -272,20 +322,23 @@ const createUserActionLog = async ({
 
     const actionLogId = actionLog?.id ?? uuidv4();
 
-    const uploadedImages = [];
+    const uploadedImages: string[] = [];
     if (images?.length) {
-      for (let index = 0; index < images.length; index++) {
+      for (const image of images) {
         const path = await uploadFileToStorage({
-          file: images[index].file,
+          file: image.file,
           path: `action-logs/${userId}/${actionLogId}`,
-          name: images[index]?.name,
-          contentType: images[index]?.contentType,
+          name: image?.name,
+          contentType: image?.contentType,
         });
 
-        uploadedImages.push(path);
+        // Only add successful uploads (string paths, not error objects)
+        if (typeof path === "string") {
+          uploadedImages.push(path);
+        }
       }
     }
-    let data: any = {
+    let data: ActionLogDbRecord = {
       id: actionLogId,
       session_id: sessionData.id,
       action_id: actionId,
@@ -293,38 +346,43 @@ const createUserActionLog = async ({
       images: uploadedImages,
     };
     if (requestType === actionRequestTypes.completeDailyAction) {
-      let draw;
+      let draw: string | null = null;
       if (parsedActionLog?.draw?.file) {
-        draw = await uploadFileToStorage({
+        const drawResult = await uploadFileToStorage({
           file: parsedActionLog?.draw?.file,
           path: `drawings/${userId}/${actionLogId}`,
           name: parsedActionLog?.draw?.name,
           contentType: parsedActionLog?.draw?.contentType,
         });
-      } else {
-        draw = null;
+        if (typeof drawResult === "string") {
+          draw = drawResult;
+        } else if (drawResult?.error) {
+          return { error: drawResult.error };
+        }
       }
       data = {
         ...data,
-        is_completed: parsedActionLog.isCompleted,
+        is_completed: parsedActionLog.isCompleted ?? false,
         note: parsedActionLog?.note ?? null,
         reflection: parsedActionLog?.reflection ?? null,
         obstacles: parsedActionLog?.obstacles ?? null,
         draw: draw,
-        list: parsedActionLog?.list ?? null,
+        list: parsedActionLog?.list ? JSON.stringify(parsedActionLog.list) : null,
         action_type: actionLogTypes.gratitude,
       };
     } else if (requestType === actionRequestTypes.completeWeeklyChallenge) {
-      let freeflow = null;
+      let freeflow: string | null = null;
       if (parsedActionLog?.freeflow?.file) {
-        freeflow = await uploadFileToStorage({
+        const freeflowResult = await uploadFileToStorage({
           file: parsedActionLog?.freeflow?.file,
           path: `drawings/${userId}/${actionLogId}`,
           name: parsedActionLog?.freeflow?.name,
           contentType: parsedActionLog?.freeflow?.contentType,
         });
-        if ((freeflow as { error: string })?.error) {
-          return { error: (freeflow as { error: string }).error };
+        if (typeof freeflowResult === "string") {
+          freeflow = freeflowResult;
+        } else if (freeflowResult?.error) {
+          return { error: freeflowResult.error };
         }
       } else if (typeof parsedActionLog?.freeflow === "string") {
         freeflow = parsedActionLog?.freeflow;
@@ -334,7 +392,7 @@ const createUserActionLog = async ({
         ...pick(parsedActionLog, ["eulogy", "reward", "motivation", "purpose", "success", "focus"]),
         freeflow,
         action_type: actionLogTypes.weeklyChallenge,
-        is_completed: parsedActionLog.isCompleted,
+        is_completed: parsedActionLog.isCompleted ?? false,
       };
     }
 
@@ -398,8 +456,7 @@ const createUserActionLog = async ({
     if (actionLogError || !actionLogData) return { error: serverErrorTypes.serverError };
 
     return camelcaseKeys(actionLogData);
-  } catch (error: any) {
-    console.log(error.errors);
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return {
         error: serverErrorTypes.invalidRequest,
@@ -407,6 +464,7 @@ const createUserActionLog = async ({
       };
     }
 
-    return { error: error.message };
+    const message = error instanceof Error ? error.message : "Unknown error occurred";
+    return { error: message };
   }
 };

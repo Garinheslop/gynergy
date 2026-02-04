@@ -1,4 +1,4 @@
-"force-dynamic";
+export const dynamic = "force-dynamic";
 
 import { chatStream } from "@lib/ai";
 import { createClient } from "@lib/supabase-server";

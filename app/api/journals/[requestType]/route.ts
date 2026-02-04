@@ -1,4 +1,5 @@
-"force-dynamic";
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 
 import camelcaseKeys from "camelcase-keys";
@@ -25,12 +26,72 @@ import { validateJournalSchema } from "./validation";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+// ============================================================================
+// Type Definitions for Type Safety
+// ============================================================================
+
 type PostRequestJson = {
   actionId: string;
   sessionId: string;
   journal: JournalData;
   images: ImageRawData[];
 };
+
+// GET handler types
+interface GetFetcherArgs {
+  userId: string;
+  sessionId: string;
+  userTimezone: string;
+}
+
+interface FetcherErrorResponse {
+  error: string;
+}
+
+type GetFetcherHandler = (
+  args: GetFetcherArgs
+) => Promise<FetcherErrorResponse | Record<string, unknown>[]>;
+
+// POST handler types
+interface CreateJournalArgs {
+  requestType: string;
+  sessionId: string;
+  userId: string;
+  journal: JournalData & { id?: string };
+  images: ImageRawData[];
+}
+
+interface CreateJournalErrorResponse {
+  error: string;
+  details?: Array<{ message: string; path: (string | number)[] }>;
+}
+
+type CreateJournalHandler = (
+  args: Partial<CreateJournalArgs>
+) => Promise<CreateJournalErrorResponse | Record<string, unknown>>;
+
+// Journal database record type - allows null for optional fields from parsed journal
+interface JournalDbRecord {
+  id: string;
+  session_id: string;
+  book_id: string;
+  user_id: string;
+  images?: string[];
+  mood_score?: number | null;
+  captured_essence?: string | null;
+  mood_contribution?: string | null;
+  mantra?: string | null;
+  journal_type?: string;
+  is_completed?: boolean;
+  insight_impact?: string | null;
+  insight?: string | null;
+  success?: string | null;
+  changes?: string | null;
+  freeflow?: string | null;
+  wins?: string | null;
+  challenges?: string | null;
+  lessons?: string | null;
+}
 
 export async function GET(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
@@ -55,9 +116,9 @@ export async function GET(request: Request, { params }: { params: { requestType:
   const sessionId = new URL(request.url).searchParams.get("sessionId");
   const timezone = request.headers.get("x-user-timezone");
 
-  let fetcherHandler: ((args: any) => Promise<any>) | null = null;
-  let args: any | {} = {};
-  let responseName;
+  let fetcherHandler: GetFetcherHandler | null = null;
+  let args: GetFetcherArgs | null = null;
+  let responseName: string | undefined;
 
   if (requestType === journalRequestTypes.userDailyJournals) {
     if (!sessionId) {
@@ -74,12 +135,12 @@ export async function GET(request: Request, { params }: { params: { requestType:
     };
     responseName = "journals";
   }
-  if (!fetcherHandler || !responseName) {
+  if (!fetcherHandler || !responseName || !args) {
     return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
   }
   const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
+  if ("error" in data) {
+    return NextResponse.json({ error: { message: data.error } }, { status: 500 });
   } else {
     return NextResponse.json({
       [responseName]: data,
@@ -110,8 +171,8 @@ export async function POST(request: Request, { params }: { params: { requestType
     return NextResponse.json({ error: serverErrorTypes.invalidRequest }, { status: 400 });
   }
 
-  let fetcherHandler: ((args: any) => Promise<any>) | null = null;
-  let args: any | {} = {};
+  let fetcherHandler: CreateJournalHandler | null = null;
+  let args: Partial<CreateJournalArgs> | null = null;
   const responseName = "journal";
 
   if (
@@ -124,12 +185,12 @@ export async function POST(request: Request, { params }: { params: { requestType
     fetcherHandler = createJournal;
     args = { requestType, sessionId, userId: user.id, journal: journal, images };
   }
-  if (!fetcherHandler || !responseName) {
+  if (!fetcherHandler || !responseName || !args) {
     return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
   }
   const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
+  if ("error" in data) {
+    return NextResponse.json({ error: { message: data.error } }, { status: 500 });
   } else {
     return NextResponse.json({
       [responseName]: data,
@@ -167,24 +228,19 @@ const getUserDailyJournals = async ({
     if (error) return { error: error.message };
 
     return camelcaseKeys(data);
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
 
-const createJournal = async ({
+const createJournal: CreateJournalHandler = async ({
   requestType,
   sessionId,
   userId,
   journal,
   images,
-}: Partial<{
-  requestType: string;
-  sessionId: string;
-  userId: string;
-  journal: JournalData & { id: string };
-  images: ImageRawData[];
-}>) => {
+}) => {
   try {
     const supabase = createClient();
     const supabaseAdmin = createServiceClient();
@@ -204,20 +260,23 @@ const createJournal = async ({
 
     const journalId = journal?.id ?? uuidv4();
 
-    const uploadedImages = [];
+    const uploadedImages: string[] = [];
     if (images?.length) {
-      for (let index = 0; index < images.length; index++) {
+      for (const image of images) {
         const path = await uploadFileToStorage({
-          file: images[index].file,
+          file: image.file,
           path: `journals/${userId}/${journalId}`,
-          name: images[index]?.name,
-          contentType: images[index]?.contentType,
+          name: image?.name,
+          contentType: image?.contentType,
         });
 
-        uploadedImages.push(path);
+        // Only add successful uploads (string paths, not error objects)
+        if (typeof path === "string") {
+          uploadedImages.push(path);
+        }
       }
     }
-    let data: any = {
+    let data: JournalDbRecord = {
       id: journalId,
       session_id: sessionData.id,
       book_id: sessionData.book_id,
@@ -330,8 +389,7 @@ const createJournal = async ({
       });
     }
     return camelcaseKeys(journalData);
-  } catch (error: any) {
-    console.log(error.errors);
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return {
         error: serverErrorTypes.invalidRequest,
@@ -339,6 +397,7 @@ const createJournal = async ({
       };
     }
 
-    return { error: error.message };
+    const message = error instanceof Error ? error.message : "Unknown error occurred";
+    return { error: message };
   }
 };

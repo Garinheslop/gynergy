@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 
 import camelcaseKeys from "camelcase-keys";
@@ -12,14 +14,13 @@ import { errorTypes, serverErrorTypes } from "@resources/types/error";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-type _UserBookSessionsRequestDataTypes = {
-  date: string;
-  userId: string;
-  bookId: string;
-};
-type _GetBookRequestDataTypes = {
-  bookId: string;
-};
+// ============================================================================
+// Type Definitions for Type Safety
+// ============================================================================
+
+interface FetcherErrorResponse {
+  error: string;
+}
 export async function GET(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
@@ -43,40 +44,33 @@ export async function GET(request: Request, { params }: { params: { requestType:
   const bookId = new URL(request.url).searchParams.get("bookId");
   const slug = new URL(request.url).searchParams.get("slug");
 
-  let fetcherHandler: ((args: any) => Promise<any>) | null = null;
-  let args: any | {} = {};
-  let responseName;
+  let data: FetcherErrorResponse | Record<string, unknown>;
+  let responseName: string;
 
   if (requestType === booksRequestTypes.userCurrentBookSession) {
     if (!bookId) {
       return NextResponse.json({ error: "Book id is requried" }, { status: 400 });
     }
-    fetcherHandler = getUserEnrolledBookSession;
-    console.log({ email: user?.email });
-
-    args = {
+    data = await getUserEnrolledBookSession({
       userId: user.id,
       bookId,
-    };
+    });
     responseName = "enrollment";
   } else if (requestType === booksRequestTypes.latestBookSessions) {
     if (!slug) {
       return NextResponse.json({ error: "Book slug is requried" }, { status: 400 });
     }
-    console.log({ email: user?.email });
-    fetcherHandler = getBookData;
-    args = {
+    data = await getBookData({
       slug,
       date: new Date().toISOString().split("T")[0],
-    };
+    });
     responseName = "book";
-  }
-  if (!fetcherHandler || !responseName) {
+  } else {
     return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
   }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
+
+  if ("error" in data) {
+    return NextResponse.json({ error: { message: data.error } }, { status: 500 });
   } else {
     return NextResponse.json({
       [responseName]: data,
@@ -104,9 +98,7 @@ export async function POST(request: Request, { params }: { params: { requestType
   const { bookId } = await request.json();
   const timezone = request.headers.get("x-user-timezone");
 
-  let fetcherHandler: ((args: any) => Promise<any>) | null = null;
-  let args: any | {} = {};
-  let responseName;
+  let data: FetcherErrorResponse | Record<string, unknown>;
 
   if (requestType === booksRequestTypes.bookEnrollment) {
     if (!bookId) {
@@ -115,23 +107,20 @@ export async function POST(request: Request, { params }: { params: { requestType
     if (!timezone) {
       return NextResponse.json({ error: "User Time zone is required." }, { status: 400 });
     }
-    fetcherHandler = createUserBookEnrollment;
-    args = {
+    data = await createUserBookEnrollment({
       userId: user.id,
       bookId,
       userTimezone: timezone,
-    };
-    responseName = "enrollment";
-  }
-  if (!fetcherHandler || !responseName) {
+    });
+  } else {
     return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
   }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
+
+  if ("error" in data) {
+    return NextResponse.json({ error: { message: data.error } }, { status: 500 });
   } else {
     return NextResponse.json({
-      [responseName]: data,
+      enrollment: data,
     });
   }
 }
@@ -154,9 +143,7 @@ export async function PUT(request: Request, { params }: { params: { requestType:
   const timezone = request.headers.get("x-user-timezone");
   const { sessionId } = await request.json();
 
-  let fetcherHandler: ((args: any) => Promise<any>) | null = null;
-  let args: any | {} = {};
-  let responseName;
+  let data: FetcherErrorResponse | Record<string, unknown> | boolean;
 
   if (requestType === booksRequestTypes.resetUserBookSession) {
     if (!sessionId) {
@@ -165,23 +152,20 @@ export async function PUT(request: Request, { params }: { params: { requestType:
     if (!timezone) {
       return NextResponse.json({ error: "user timezone is requried" }, { status: 400 });
     }
-    fetcherHandler = resetBookSession;
-    args = {
+    data = await resetBookSession({
       userId: user.id,
       sessionId,
       userTimezone: timezone,
-    };
-    responseName = "enrollment";
-  }
-  if (!fetcherHandler || !responseName) {
+    });
+  } else {
     return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
   }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
+
+  if (typeof data === "object" && "error" in data) {
+    return NextResponse.json({ error: { message: data.error } }, { status: 500 });
   } else {
     return NextResponse.json({
-      [responseName]: data,
+      enrollment: data,
     });
   }
 }
@@ -242,8 +226,9 @@ const getUserEnrolledBookSession = async ({
 
       createdAt: sessionEnrollmentData.created_at,
     };
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
 const getBookData = async ({ slug, date }: { slug: string; date: string }) => {
