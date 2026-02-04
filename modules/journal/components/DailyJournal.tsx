@@ -1,9 +1,14 @@
+import { useEffect, useState } from "react";
+
+import dayjs from "dayjs";
+
 import { cn } from "@lib/utils/style";
 import Image from "@modules/common/components/Image";
 import Loader from "@modules/common/components/Loader";
 import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { fontIcons } from "@resources/icons";
+import images from "@resources/images";
 import { ActionLogData } from "@resources/types/action";
 import { historyRequestTypes, historyTypes } from "@resources/types/history";
 import {
@@ -16,10 +21,10 @@ import { loaderTypes } from "@resources/types/loader";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
 import { getUserDailyHistory } from "@store/modules/history";
-import { useEffect, useState } from "react";
+
 import MeditationCard from "./card/MeditationCard";
-import dayjs from "dayjs";
-import images from "@resources/images";
+
+
 
 const DailyJournal = ({ day }: { day: number }) => {
   const dispatch = useDispatch();
@@ -68,10 +73,10 @@ const DailyJournal = ({ day }: { day: number }) => {
   return (
     <>
       {(morningData || histories.loading) && (
-        <section className="flex flex-col gap-[20px] md:p-[30px] rounded-[20px] bg-bkg-light">
+        <section className="bg-bkg-light flex flex-col gap-[20px] rounded-[20px] md:p-[30px]">
           <Header type={journalTypes.morningJournal} />
 
-          <div className="w-full border-b border-border-light" />
+          <div className="border-border-light w-full border-b" />
 
           {histories.loading ? (
             <Loader type={loaderTypes.spinner} sx={"h-[500px]"} />
@@ -90,7 +95,7 @@ const DailyJournal = ({ day }: { day: number }) => {
                 <Heading variant={headingVariants.cardHeading} sx="!font-bold">
                   Positive Affirmations
                 </Heading>
-                <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-[20px] lg:gap-[40px]">
+                <div className="grid grid-cols-1 gap-[20px] lg:grid-cols-[1fr_1fr] lg:gap-[40px]">
                   <Entries
                     entryType={journalEntryTypes.affirmation}
                     entries={
@@ -99,7 +104,7 @@ const DailyJournal = ({ day }: { day: number }) => {
                       )?.content
                     }
                   />
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-[20px]">
+                  <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2">
                     <Entries
                       entryType={journalEntryTypes.gratitude}
                       heading="I Am Grateful For:"
@@ -129,10 +134,10 @@ const DailyJournal = ({ day }: { day: number }) => {
         </section>
       )}
       {(eveningData || histories.loading) && (
-        <section className="flex flex-col gap-[20px] md:p-[30px] rounded-[20px] bg-bkg-light">
+        <section className="bg-bkg-light flex flex-col gap-[20px] rounded-[20px] md:p-[30px]">
           <Header type={journalTypes.eveningJournal} />
 
-          <div className="w-full border-b border-border-light" />
+          <div className="border-border-light w-full border-b" />
           {histories.loading ? (
             <Loader type={loaderTypes.spinner} sx={"h-[500px]"} />
           ) : (
@@ -164,7 +169,7 @@ const DailyJournal = ({ day }: { day: number }) => {
                 <Heading variant={headingVariants.cardHeading} sx="!font-bold">
                   Dream Magic
                 </Heading>
-                <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-[20px] lg:gap-[40px]">
+                <div className="grid grid-cols-1 gap-[20px] lg:grid-cols-[1fr_1fr] lg:gap-[40px]">
                   <Entries
                     entryType={journalEntryTypes.dreammagic}
                     entries={
@@ -180,10 +185,10 @@ const DailyJournal = ({ day }: { day: number }) => {
         </section>
       )}
       {(actionData || histories.loading) && (
-        <section className="flex flex-col gap-[20px] md:p-[30px] rounded-[20px] bg-bkg-light">
+        <section className="bg-bkg-light flex flex-col gap-[20px] rounded-[20px] md:p-[30px]">
           <Header type={journalTypes.gratitudeAction} />
 
-          <div className="w-full border-b border-border-light" />
+          <div className="border-border-light w-full border-b" />
           {histories.loading ? (
             <Loader type={loaderTypes.spinner} sx={"h-[500px]"} />
           ) : (
@@ -250,9 +255,9 @@ const getHeaderData = (journalType: string) => {
 
 const Header = ({ type }: { type: string }) => {
   return (
-    <div className="flex items-center sm:items-start sm:flex-col gap-[10px]">
+    <div className="flex items-center gap-[10px] sm:flex-col sm:items-start">
       <i
-        className={cn(`text-[32px] py-[4px]`, {
+        className={cn(`py-[4px] text-[32px]`, {
           "gng-morning text-primary": type === journalTypes.morningJournal,
           "gng-evening text-action-secondary": type === journalTypes.eveningJournal,
           "gng-action text-primary-500": type === journalTypes.gratitudeAction,
@@ -281,7 +286,7 @@ const Question = ({
       </Heading>
       <div
         className={cn(
-          "h-[57px] w-[73px] flex justify-center items-center rounded border border-border-light bg-action"
+          "border-border-light bg-action flex h-[57px] w-[73px] items-center justify-center rounded border"
         )}
       >
         <Paragraph content={isCompleted ? "Yes" : "No"} />
@@ -324,10 +329,10 @@ const MoodScore = ({ score, contributions }: { score: number; contributions?: st
               <div
                 key={index}
                 className={cn(
-                  "flex items-center justify-center h-[60px] rounded-full duration-300 shrink-0 text-action-secondary w-[60px] bg-action-50"
+                  "text-action-secondary bg-action-50 flex h-[60px] w-[60px] shrink-0 items-center justify-center rounded-full duration-300"
                 )}
               >
-                <i className={`gng-${iconName} text-[30px] duration-150 text-action-secondary`} />
+                <i className={`gng-${iconName} text-action-secondary text-[30px] duration-150`} />
               </div>
             )}
           </>
@@ -355,7 +360,7 @@ const Entries = ({
       <div className="flex flex-col gap-[10px]">
         {entries &&
           entries.map((entry, index) => (
-            <div key={index} className="flex items-start lg:items-center gap-[10px]">
+            <div key={index} className="flex items-start gap-[10px] lg:items-center">
               <Paragraph
                 content={entryType === journalEntryTypes.affirmation ? "I am" : `${index + 1}.`}
                 sx={cn("text-content-dark-secondary min-w-[15px] shrink-0", {

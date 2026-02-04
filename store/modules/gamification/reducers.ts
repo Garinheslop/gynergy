@@ -122,17 +122,13 @@ const slice = createSlice({
     },
     badgeAdded: (state, action: PayloadAction<UserBadge>) => {
       // Add new badge to the list (from real-time subscription)
-      const exists = state.userBadges.data.some(
-        (b) => b.id === action.payload.id
-      );
+      const exists = state.userBadges.data.some((b) => b.id === action.payload.id);
       if (!exists) {
         state.userBadges.data.unshift(action.payload);
       }
     },
     badgeMarkedSeen: (state, action: PayloadAction<string>) => {
-      const badge = state.userBadges.data.find(
-        (b) => b.badgeId === action.payload
-      );
+      const badge = state.userBadges.data.find((b) => b.badgeId === action.payload);
       if (badge) {
         badge.isNew = false;
       }
@@ -141,9 +137,7 @@ const slice = createSlice({
       state,
       action: PayloadAction<{ badgeId: string; isShowcased: boolean }>
     ) => {
-      const badge = state.userBadges.data.find(
-        (b) => b.badgeId === action.payload.badgeId
-      );
+      const badge = state.userBadges.data.find((b) => b.badgeId === action.payload.badgeId);
       if (badge) {
         badge.isShowcased = action.payload.isShowcased;
       }
@@ -154,10 +148,7 @@ const slice = createSlice({
       state.multipliers.loading = true;
       state.multipliers.error = "";
     },
-    multipliersFetched: (
-      state,
-      action: PayloadAction<{ multipliers: MultiplierConfig[] }>
-    ) => {
+    multipliersFetched: (state, action: PayloadAction<{ multipliers: MultiplierConfig[] }>) => {
       state.multipliers.all = action.payload.multipliers;
       state.multipliers.loading = false;
     },
@@ -186,10 +177,7 @@ const slice = createSlice({
       state.points.total = action.payload.totalPoints;
       state.points.loading = false;
     },
-    pointsHistoryFetched: (
-      state,
-      action: PayloadAction<{ transactions: PointsTransaction[] }>
-    ) => {
+    pointsHistoryFetched: (state, action: PayloadAction<{ transactions: PointsTransaction[] }>) => {
       state.points.history = action.payload.transactions;
       state.points.loading = false;
     },
@@ -205,9 +193,7 @@ const slice = createSlice({
     celebrationQueued: (state, action: PayloadAction<CelebrationEvent>) => {
       // Insert based on priority (higher priority first)
       const event = action.payload;
-      const index = state.celebrations.queue.findIndex(
-        (e) => e.priority < event.priority
-      );
+      const index = state.celebrations.queue.findIndex((e) => e.priority < event.priority);
       if (index === -1) {
         state.celebrations.queue.push(event);
       } else {
@@ -221,9 +207,7 @@ const slice = createSlice({
     celebrationsQueued: (state, action: PayloadAction<CelebrationEvent[]>) => {
       // Add multiple celebrations (already sorted by priority)
       action.payload.forEach((event) => {
-        const index = state.celebrations.queue.findIndex(
-          (e) => e.priority < event.priority
-        );
+        const index = state.celebrations.queue.findIndex((e) => e.priority < event.priority);
         if (index === -1) {
           state.celebrations.queue.push(event);
         } else {

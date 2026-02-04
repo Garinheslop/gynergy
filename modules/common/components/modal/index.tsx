@@ -1,10 +1,12 @@
-import { Transition } from "react-transition-group";
 import { ReactNode, useEffect } from "react";
+
+import { Transition } from "react-transition-group";
+
 import { cn } from "@lib/utils/style";
 
 interface ModalProps {
   children: ReactNode;
-  open: Boolean;
+  open: boolean;
   onClose: () => void;
 }
 
@@ -30,7 +32,7 @@ const Modal = ({ children, open, onClose }: ModalProps) => {
         return (
           <div
             className={cn(
-              `fixed top-0 left-0 z-[10000] h-screen w-screen bg-bkg-dark/10 transition-all backdrop-blur-[5px] backdrop-brightness-[100%] `,
+              `bg-bkg-dark/10 fixed top-0 left-0 z-[10000] h-screen w-screen backdrop-blur-[5px] backdrop-brightness-[100%] transition-all`,
               {
                 "opacity-0": ["entering", "exiting", "exited"].includes(state),
                 "opacity-100": state === "entered",
@@ -38,7 +40,7 @@ const Modal = ({ children, open, onClose }: ModalProps) => {
             )}
             onClick={closeModal}
           >
-            <div id="close-modal" className="flex justify-center items-center w-screen h-full">
+            <div id="close-modal" className="flex h-full w-screen items-center justify-center">
               {children}
             </div>
           </div>

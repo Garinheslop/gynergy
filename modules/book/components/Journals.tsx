@@ -1,23 +1,28 @@
+import { useEffect, useState } from "react";
+
+import { useRouter } from "next/navigation";
+
+import dayjs from "dayjs";
+
+import { useSession } from "@contexts/UseSession";
+import { cn } from "@lib/utils/style";
 import Heading from "@modules/common/components/typography/Heading";
+import MeditationCard from "@modules/journal/components/card/MeditationCard";
 import { pagePaths } from "@resources/paths";
 import { journalTypes } from "@resources/types/journal";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
-import { setEditorDataStates } from "@store/modules/editor";
-import { getUserVisions } from "@store/modules/vision";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import JournalCard from "../../journal/components/card/JournalCard";
 import { getUserActions, getUserDailyActionLogs } from "@store/modules/action";
-import dayjs from "dayjs";
+import { setEditorDataStates } from "@store/modules/editor";
+import { updateUserStreak } from "@store/modules/enrollment";
+import { getUserJournals } from "@store/modules/journal";
+import { getUserMeditations } from "@store/modules/meditation";
+import { getUserVisions } from "@store/modules/vision";
+
 import Highlights from "./Highlights";
 import Quote from "./Quote";
-import { cn } from "@lib/utils/style";
-import { getUserJournals } from "@store/modules/journal";
-import { updateUserStreak } from "@store/modules/enrollment";
-import MeditationCard from "@modules/journal/components/card/MeditationCard";
-import { getUserMeditations } from "@store/modules/meditation";
-import { useSession } from "@contexts/UseSession";
+import JournalCard from "../../journal/components/card/JournalCard";
+
 
 const sectionTypes = {
   daily: "daily",
@@ -217,15 +222,15 @@ const Tasks = ({ heading, type, journalCardContents, onJournalWrite, isLoading }
         {heading}
       </Heading>
       {type === sectionTypes.daily && (
-        <div className="grid grid-cols-1 xmd:grid-cols-[384px_1fr] w-full gap-y-5 xmd:gap-5">
+        <div className="xmd:grid-cols-[384px_1fr] xmd:gap-5 grid w-full grid-cols-1 gap-y-5">
           <Highlights />
           <Quote />
         </div>
       )}
       {(type === sectionTypes.weekly || !bookSession.isCompleted) && (
         <div
-          className={cn("grid grid-cols-1 xmd:grid-cols-[386px_1fr] w-full gap-y-5 xmd:gap-5", {
-            "xmd:grid-cols-2 lg:grid-cols-3 gap-[20px]": type === sectionTypes.daily,
+          className={cn("xmd:grid-cols-[386px_1fr] xmd:gap-5 grid w-full grid-cols-1 gap-y-5", {
+            "xmd:grid-cols-2 gap-[20px] lg:grid-cols-3": type === sectionTypes.daily,
           })}
         >
           {journalCardContents.map((content: any, index: number) => (

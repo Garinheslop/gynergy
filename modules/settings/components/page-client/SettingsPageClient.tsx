@@ -1,21 +1,25 @@
 "use client";
 
+import React, { useEffect, useMemo, useState } from "react";
+
+import { useRouter } from "next/navigation";
+
+import { usePopup } from "@contexts/UsePopup";
 import ActionButton from "@modules/common/components/ActionButton";
 import Input from "@modules/common/components/Input";
+import Loader from "@modules/common/components/Loader";
 import SectionCard from "@modules/common/components/SectionCard";
 import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
-import { headingVariants, paragraphVariants } from "@resources/variants";
-import { RootState } from "@store/configureStore";
-import { updateUserProfileData } from "@store/modules/profile";
-import React, { useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "@store/hooks";
-import ProfileImage from "../ProfileImage";
-import { usePopup } from "@contexts/UsePopup";
-import { resetUserBookSessionData } from "@store/modules/enrollment";
-import Loader from "@modules/common/components/Loader";
 import { loaderTypes } from "@resources/types/loader";
-import { useRouter } from "next/navigation";
+import { headingVariants, paragraphVariants } from "@resources/variants";
+import { useDispatch, useSelector } from "@store/hooks";
+import { resetUserBookSessionData } from "@store/modules/enrollment";
+import { updateUserProfileData } from "@store/modules/profile";
+
+import ProfileImage from "../ProfileImage";
+
+
 
 type InputState = {
   value?: string;
@@ -105,14 +109,15 @@ const SettingsPageClient: React.FC = () => {
   }, [firstName.value, lastName.value, imageFile, profile?.current]);
 
   const handleReset = () => {
-    if (!enrollments.resetting) {
+    const sessionId = enrollments.current?.session?.id;
+    if (!enrollments.resetting && sessionId) {
       messagePopupObj.open({
         popupData: {
           description:
             "Are you sure you want to delete all you journals? This action is irreversible.",
           heading: "Reset Date Zero Progress",
           cta: {
-            action: () => dispatch(resetUserBookSessionData(enrollments.current?.session.id!)),
+            action: () => dispatch(resetUserBookSessionData(sessionId)),
             label: "Confirm",
             style: "bg-danger [&>p]:text-content-light",
           },
@@ -122,7 +127,7 @@ const SettingsPageClient: React.FC = () => {
   };
 
   return (
-    <section className="flex flex-col max-w-[804px] mx-auto py-[100px] md:py-[130px] px-4">
+    <section className="mx-auto flex max-w-[804px] flex-col px-4 py-[100px] md:py-[130px]">
       {enrollments.resetting && <Loader type={loaderTypes.window} />}
       <Heading variant={headingVariants.heading} sx="!font-bold text-center capitalize">
         My Settings
@@ -135,7 +140,7 @@ const SettingsPageClient: React.FC = () => {
               Account Details
             </Heading>
             <ProfileImage onFileChangeHandler={(file: any) => setImageFile(file)} />
-            <div className="flex flex-col sm:flex-row gap-5">
+            <div className="flex flex-col gap-5 sm:flex-row">
               <Input
                 label="First Name"
                 value={firstName?.value || ""}
@@ -153,7 +158,7 @@ const SettingsPageClient: React.FC = () => {
             </div>
             <Input label="Email Address" value={profile?.current?.email || ""} disabled />
           </div>
-          <div className="border-b border-border-light"></div>
+          <div className="border-border-light border-b"></div>
           <ActionButton
             isSpinner
             label="Save Changes"
@@ -169,7 +174,7 @@ const SettingsPageClient: React.FC = () => {
           <Heading variant={headingVariants.heading} sx="!font-bold text-center capitalize">
             Reset Your Journaling History
           </Heading>
-          <div className="w-fit mx-auto relative flex flex-col gap-3">
+          <div className="relative mx-auto flex w-fit flex-col gap-3">
             <Paragraph
               variant={paragraphVariants.regular}
               content={

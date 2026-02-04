@@ -17,7 +17,7 @@ const useGetParagraphVariant = ({
   variant: (typeof paragraphVariants)[keyof typeof paragraphVariants];
   sx: string;
 }) => {
-  let paragraphStyles = {
+  const paragraphStyles = {
     [paragraphVariants.title]: cn(
       "text-[20px] md:text-title text-content-dark leading-[1.2em] ",
       sx

@@ -1,3 +1,7 @@
+import { useEffect, useRef, useState } from "react";
+
+import { useDispatch } from "react-redux";
+
 import { usePopup } from "@contexts/UsePopup";
 import { cn } from "@lib/utils/style";
 import ActionButton from "@modules/common/components/ActionButton";
@@ -7,8 +11,6 @@ import { buttonActionTypes } from "@resources/types/button";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useSelector } from "@store/hooks";
 import { createUserMeditations } from "@store/modules/meditation";
-import { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
 
 interface MeditationCardProps {
   day: number;
@@ -59,11 +61,11 @@ const MeditationCard: React.FC<MeditationCardProps> = ({
   return (
     <div
       className={cn(
-        "relative flex flex-col p-5 md:p-[30px] justify-center items-between rounded gap-[20px] bg-[#E5EDFA]",
+        "items-between relative flex flex-col justify-center gap-[20px] rounded bg-[#E5EDFA] p-5 md:p-[30px]",
         { "card-loading grayscale": isLoading }
       )}
     >
-      <div className="flex flex-col gap-[20px] h-full">
+      <div className="flex h-full flex-col gap-[20px]">
         <div className={cn("flex flex-col gap-[10px]")}>
           <i className={cn(`gng-meditation text-[25px] text-[#6699FF]`)} />
           <Heading
@@ -82,7 +84,7 @@ const MeditationCard: React.FC<MeditationCardProps> = ({
             />
           )}
         </div>
-        <div className="flex items-center justify-center aspect-video bg-white sm:p-[10px] rounded overflow-hidden">
+        <div className="flex aspect-video items-center justify-center overflow-hidden rounded bg-white sm:p-[10px]">
           <iframe
             className="h-full w-full rounded-[6px]"
             src={videoUrl}
@@ -93,8 +95,8 @@ const MeditationCard: React.FC<MeditationCardProps> = ({
         </div>
       </div>
       {!isStatic && (
-        <div className="flex gap-[10px] items-center pt-[15px] border-t border-[#CADBFD] w-full">
-          <i className="gng-info text-[21px] text-content-dark" />
+        <div className="flex w-full items-center gap-[10px] border-t border-[#CADBFD] pt-[15px]">
+          <i className="gng-info text-content-dark text-[21px]" />
           <Paragraph
             content={`Complete this meditation as part of this week’s challenge`}
             variant={paragraphVariants.regular}
@@ -103,10 +105,10 @@ const MeditationCard: React.FC<MeditationCardProps> = ({
         </div>
       )}
       {!isStatic && (
-        <div className="md:absolute top-[30px] right-[30px]">
+        <div className="top-[30px] right-[30px] md:absolute">
           {isCompleted ? (
             <div className="flex gap-[10px]">
-              <i className="gng-complete-circle text-[25px] text-action-secondary" />
+              <i className="gng-complete-circle text-action-secondary text-[25px]" />
               <Paragraph content={"Completed"} variant={paragraphVariants.regular} />
             </div>
           ) : (

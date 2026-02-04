@@ -1,12 +1,12 @@
 import { cn } from "@lib/utils/style";
 
-const Spinner = ({ label, sx }: { label?: String; sx?: String }) => {
+const Spinner = ({ label, sx }: { label?: string; sx?: string }) => {
   return (
-    <div className="inline-flex flex-col items-center gap-2 rounded-lg text-center text-body font-medium text-content-reverse">
+    <div className="text-body text-content-reverse inline-flex flex-col items-center gap-2 rounded-lg text-center font-medium">
       <svg
         aria-hidden="true"
         role="status"
-        className={cn("inline h-8 w-8 animate-spin text-action-secondary", sx)}
+        className={cn("text-action-secondary inline h-8 w-8 animate-spin", sx)}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -20,7 +20,7 @@ const Spinner = ({ label, sx }: { label?: String; sx?: String }) => {
           fill="currentColor"
         />
       </svg>
-      {label && <p className="text-loading ml-2 text-content/80">{label}</p>}
+      {label && <p className="text-loading text-content/80 ml-2">{label}</p>}
     </div>
   );
 };

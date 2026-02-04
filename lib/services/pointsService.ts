@@ -49,10 +49,7 @@ export function getComboBonus(hasCombo: boolean): number {
 /**
  * Calculate early bird bonus points
  */
-export function getEarlyBirdBonus(
-  activityType: ActivityType,
-  isEarlyBird: boolean
-): number {
+export function getEarlyBirdBonus(activityType: ActivityType, isEarlyBird: boolean): number {
   // Early bird bonus only applies to morning journal
   if (activityType === "morning_journal" && isEarlyBird) {
     return 5;
@@ -63,9 +60,7 @@ export function getEarlyBirdBonus(
 /**
  * Calculate total points for an activity
  */
-export function calculatePoints(
-  input: PointsCalculationInput
-): PointsCalculationResult {
+export function calculatePoints(input: PointsCalculationInput): PointsCalculationResult {
   const { activityType, basePoints, streak, hasCombo, isEarlyBird } = input;
 
   // Get multiplier
@@ -197,10 +192,7 @@ export async function getTotalPoints(
       return { total: 0, error: error.message };
     }
 
-    const total = (data || []).reduce(
-      (sum: number, t: any) => sum + (t.final_points || 0),
-      0
-    );
+    const total = (data || []).reduce((sum: number, t: any) => sum + (t.final_points || 0), 0);
 
     return { total };
   } catch (error: any) {
@@ -328,8 +320,7 @@ export async function awardPoints(
     const streak = enrollment?.streak_count || 0;
 
     // Check if user has combo (all three activities today)
-    const hasCombo =
-      completedToday.morning && completedToday.evening && completedToday.dga;
+    const hasCombo = completedToday.morning && completedToday.evening && completedToday.dga;
 
     // Check if early bird (before 8am for morning journal)
     const hour = timestamp.getHours();
@@ -346,26 +337,23 @@ export async function awardPoints(
     });
 
     // Log the transaction
-    const { transaction, error: transactionError } = await logPointsTransaction(
-      supabase,
-      {
-        userId,
-        sessionId,
-        activityType,
-        basePoints: pointsResult.basePoints,
-        multiplier: pointsResult.multiplier,
-        bonusPoints: pointsResult.bonusPoints,
-        finalPoints: pointsResult.finalPoints,
-        sourceId,
-        sourceType,
-        metadata: {
-          streak,
-          hasCombo,
-          isEarlyBird,
-          appliedMultipliers: pointsResult.appliedMultipliers,
-        },
-      }
-    );
+    const { transaction, error: transactionError } = await logPointsTransaction(supabase, {
+      userId,
+      sessionId,
+      activityType,
+      basePoints: pointsResult.basePoints,
+      multiplier: pointsResult.multiplier,
+      bonusPoints: pointsResult.bonusPoints,
+      finalPoints: pointsResult.finalPoints,
+      sourceId,
+      sourceType,
+      metadata: {
+        streak,
+        hasCombo,
+        isEarlyBird,
+        appliedMultipliers: pointsResult.appliedMultipliers,
+      },
+    });
 
     if (transactionError) {
       return { points: pointsResult, transaction: null, error: transactionError };

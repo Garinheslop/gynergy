@@ -1,8 +1,9 @@
 "use client";
 
 //components
-import Popups from "@modules/common/components/modal/Popups";
 import { Toaster } from "react-hot-toast";
+
+import Popups from "@modules/common/components/modal/Popups";
 
 const DefaultLayout = ({ children }: { children: React.ReactNode }) => {
   return (

@@ -1,12 +1,7 @@
 // AI Providers - Main entry point with fallback logic
 import { anthropicProvider } from "./anthropic";
 import { openaiProvider } from "./openai";
-import {
-  AICompletionOptions,
-  AICompletionResult,
-  AIStreamChunk,
-  AIProvider,
-} from "./types";
+import { AICompletionOptions, AICompletionResult, AIStreamChunk, AIProvider } from "./types";
 
 export * from "./types";
 
@@ -55,16 +50,11 @@ export async function complete(
       return await provider.complete(options);
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      console.warn(
-        `${provider.name} failed:`,
-        lastError.message
-      );
+      console.warn(`${provider.name} failed:`, lastError.message);
     }
   }
 
-  throw new Error(
-    lastError?.message || "No AI providers configured or all providers failed"
-  );
+  throw new Error(lastError?.message || "No AI providers configured or all providers failed");
 }
 
 // Stream with automatic fallback

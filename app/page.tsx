@@ -101,10 +101,10 @@ export default function LandingPage() {
   };
 
   return (
-    <section className="flex flex-col items-center justify-center gap-[50px] md:gap-0 md:grid grid-cols-2 h-screen overflow-hidden bg-bkg-light">
+    <section className="bg-bkg-light flex h-screen grid-cols-2 flex-col items-center justify-center gap-[50px] overflow-hidden md:grid md:gap-0">
       <Image
-        className={cn("h-[300px] md:h-full w-full md:object-cover object-contain", {
-          "md:flex hidden md:order-1": formType === formTypes.nameInput,
+        className={cn("h-[300px] w-full object-contain md:h-full md:object-cover", {
+          "hidden md:order-1 md:flex": formType === formTypes.nameInput,
         })}
         src={images.banner.login}
         unoptimized
@@ -114,10 +114,10 @@ export default function LandingPage() {
       />
       <div
         className={cn(
-          "flex flex-col items-start justify-center gap-[40px] lg:gap-[50px] w-full xl:w-[640px] mx-auto px-5"
+          "mx-auto flex w-full flex-col items-start justify-center gap-[40px] px-5 lg:gap-[50px] xl:w-[640px]"
         )}
       >
-        <div className="flex flex-col justify-center md:justify-start items-center md:items-start gap-5 md:gap-[10px] w-full">
+        <div className="flex w-full flex-col items-center justify-center gap-5 md:items-start md:justify-start md:gap-[10px]">
           <Image
             className="h-[40px] w-auto"
             src={icons.dateZeroLogo}
@@ -151,9 +151,9 @@ export default function LandingPage() {
             sx="text-action-700 text-center sm:text-start"
           />
         ) : (
-          <div className="flex flex-col gap-5 md:gap-[30px] lg:gap-[50px] w-full">
+          <div className="flex w-full flex-col gap-5 md:gap-[30px] lg:gap-[50px]">
             {formType === formTypes.nameInput ? (
-              <div className="flex flex-col md:flex-row gap-[15px] w-full">
+              <div className="flex w-full flex-col gap-[15px] md:flex-row">
                 <Input
                   label="First Name"
                   value={firstName}

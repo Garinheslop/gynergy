@@ -1,12 +1,13 @@
 import { useState } from "react";
-import toast from "react-hot-toast";
-import { journalErrorMessages, JournalErrorMessageType } from "@resources/messages/error";
 
+import toast from "react-hot-toast";
+
+import { usePopup } from "@contexts/UsePopup";
+import { journalErrorMessages, JournalErrorMessageType } from "@resources/messages/error";
+import { errorTypes, fileErrorTypes } from "@resources/types/error";
 import { EditorData, journalTypes } from "@resources/types/journal";
 import { ImageRawData } from "@resources/types/ocr";
 import { visionTypes } from "@resources/types/vision";
-import { usePopup } from "@contexts/UsePopup";
-import { errorTypes, fileErrorTypes } from "@resources/types/error";
 const editorTypes = {
   ...journalTypes,
   ...visionTypes,

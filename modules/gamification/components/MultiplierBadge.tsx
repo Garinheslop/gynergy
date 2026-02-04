@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+
 import { cn } from "@lib/utils/style";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { paragraphVariants } from "@resources/variants";
@@ -64,11 +65,7 @@ const MultiplierBadge: React.FC<MultiplierBadgeProps> = ({
   };
 
   if (variant === "compact") {
-    return (
-      <span className={cn(config.text, "text-action", sx)}>
-        {multiplier}x
-      </span>
-    );
+    return <span className={cn(config.text, "text-action", sx)}>{multiplier}x</span>;
   }
 
   if (variant === "pill") {
@@ -102,11 +99,7 @@ const MultiplierBadge: React.FC<MultiplierBadgeProps> = ({
         <span className={config.text}>{multiplier}x</span>
       </div>
       {showLabel && name && (
-        <Paragraph
-          content={name}
-          variant={config.label}
-          sx="text-center opacity-70"
-        />
+        <Paragraph content={name} variant={config.label} sx="text-center opacity-70" />
       )}
     </div>
   );
@@ -139,8 +132,8 @@ export const MultiplierProgress: React.FC<MultiplierProgressProps> = ({
     return (
       <div className={cn("flex flex-col items-center gap-2", sx)}>
         <div className="flex items-center gap-2">
-          <i className="gng-crown text-amber-400 text-[24px]" />
-          <span className="text-amber-400 font-bold">Max Multiplier!</span>
+          <i className="gng-crown text-[24px] text-amber-400" />
+          <span className="font-bold text-amber-400">Max Multiplier!</span>
         </div>
         <Paragraph
           content="You've reached the maximum 2.0x multiplier"
@@ -163,7 +156,7 @@ export const MultiplierProgress: React.FC<MultiplierProgressProps> = ({
 
   return (
     <div className={cn("flex flex-col gap-2", sx)}>
-      <div className="flex justify-between items-center text-sm">
+      <div className="flex items-center justify-between text-sm">
         <span className="text-content-dark-secondary">
           {currentMultiplier > 1 ? `${currentMultiplier}x` : "No multiplier"}
         </span>
@@ -171,9 +164,9 @@ export const MultiplierProgress: React.FC<MultiplierProgressProps> = ({
           {nextThreshold.name} at {nextThreshold.streak} days
         </span>
       </div>
-      <div className="h-2 bg-bkg-dark/30 rounded-full overflow-hidden">
+      <div className="bg-bkg-dark/30 h-2 overflow-hidden rounded-full">
         <div
-          className="h-full bg-gradient-to-r from-action to-action-secondary rounded-full transition-all duration-500"
+          className="from-action to-action-secondary h-full rounded-full bg-gradient-to-r transition-all duration-500"
           style={{ width: `${Math.min(progress, 100)}%` }}
         />
       </div>

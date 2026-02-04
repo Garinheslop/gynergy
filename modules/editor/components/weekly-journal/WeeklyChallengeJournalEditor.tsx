@@ -1,33 +1,41 @@
+import { FC, useEffect, useState } from "react";
+
+import { useRouter } from "next/navigation";
+
+import { journalOcrFileLimit } from "@configs/app";
+import { usePopup } from "@contexts/UsePopup";
+import { getBase64 } from "@lib/utils/image";
+import { handleImageCompress } from "@lib/utils/ImageCompressor";
+import { cn } from "@lib/utils/style";
+import FileInput from "@modules/common/components/FileInput";
+import Spinner from "@modules/common/components/Spinner";
+import TextArea from "@modules/common/components/TextArea";
 import TextAreaWithHeading from "@modules/common/components/TextAreaWithHeading";
 import useSetEditorData from "@modules/journal/hooks/useSetEditorData";
 import { EditorData, JourneyTableData, WeeklyChallengeData } from "@resources/types/journal";
 import { useSelector } from "@store/hooks";
-import { FC, useEffect, useState } from "react";
-import { usePopup } from "@contexts/UsePopup";
 import { ImageRawData } from "@resources/types/ocr";
-import { journalOcrFileLimit } from "@configs/app";
 import {
   setEditorLoadingState,
   updateEditorCurrentState,
   updateEditorImageState,
 } from "@store/modules/editor";
-import EditorHeader from "../EditorHeader";
-import { headingVariants, paragraphVariants } from "@resources/variants";
+
 import EditorActionBtns from "../EditorActionBtns";
+import EditorHeader from "../EditorHeader";
+
+import { headingVariants, paragraphVariants } from "@resources/variants";
 import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { ActionData } from "@resources/types/action";
-import { useRouter } from "next/navigation";
+
+
 import { pagePaths } from "@resources/paths";
-import { cn } from "@lib/utils/style";
-import TextArea from "@modules/common/components/TextArea";
-import FileInput from "@modules/common/components/FileInput";
-import Spinner from "@modules/common/components/Spinner";
 import Image from "@modules/common/components/Image";
-import { handleImageCompress } from "@lib/utils/ImageCompressor";
-import { getBase64 } from "@lib/utils/image";
+
 import EulogyIntro from "./EulogyIntro";
 import JourneyTable from "./JourneyTable";
+
 import { JournalCardData } from "@resources/types/history";
 
 const WeeklyChallengeJournalEditor: FC<{ intro?: boolean }> = ({ intro }) => {
@@ -103,7 +111,7 @@ const WeeklyChallengeJournalEditor: FC<{ intro?: boolean }> = ({ intro }) => {
           />
         )}
       </EditorHeader>
-      <div className="w-full border-b border-border-light" />
+      <div className="border-border-light w-full border-b" />
       <div className="flex flex-col gap-[10px]">
         <Heading variant={headingVariants.sectionHeading} sx="!font-bold capitalize">
           {weeklyAction?.title.toLowerCase()}
@@ -221,7 +229,7 @@ const ActionCompletion = ({
       <div className="flex gap-[10px]">
         <button
           className={cn(
-            "h-[57px] w-[73px] flex justify-center items-center rounded border border-border-light cursor-pointer",
+            "border-border-light flex h-[57px] w-[73px] cursor-pointer items-center justify-center rounded border",
             { "bg-action": value, "cursor-default": isMeditation }
           )}
           onClick={() => {
@@ -235,7 +243,7 @@ const ActionCompletion = ({
 
         <button
           className={cn(
-            "h-[57px] w-[73px] flex justify-center items-center rounded border border-border-light cursor-pointer",
+            "border-border-light flex h-[57px] w-[73px] cursor-pointer items-center justify-center rounded border",
             { "bg-action": value === false, "cursor-default": isMeditation }
           )}
           onClick={() => {
@@ -248,8 +256,8 @@ const ActionCompletion = ({
         </button>
       </div>
       {isMeditation && (
-        <div className="flex gap-[10px] items-center">
-          <i className="gng-info text-[21px] text-content-dark" />
+        <div className="flex items-center gap-[10px]">
+          <i className="gng-info text-content-dark text-[21px]" />
           <Paragraph
             content={`Complete at least one meditation to complete this week’s challenge`}
             variant={paragraphVariants.regular}
@@ -267,7 +275,7 @@ const MeditationCard = () => {
   return (
     <div
       className={cn(
-        "relative flex flex-col p-5 md:p-[30px] justify-center items-between rounded gap-[20px] bg-[#E5EDFA]"
+        "items-between relative flex flex-col justify-center gap-[20px] rounded bg-[#E5EDFA] p-5 md:p-[30px]"
       )}
     >
       <div className={cn("flex flex-col gap-[10px]")}>
@@ -337,10 +345,10 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
         variant={paragraphVariants.meta}
         sx="text-content-dark-secondary"
       />
-      <div className="flex sm:grid grid-cols-3 sm:flex-row flex-col sm:justify-between gap-[30px] sm:items-start w-full sm:h-[280px]">
+      <div className="flex w-full grid-cols-3 flex-col gap-[30px] sm:grid sm:h-[280px] sm:flex-row sm:items-start sm:justify-between">
         {image ? (
           <div
-            className={cn("relative rounded max-h-[270px] flex gap-[10px] overflow-hidden w-full")}
+            className={cn("relative flex max-h-[270px] w-full gap-[10px] overflow-hidden rounded")}
           >
             {!loading && (
               <button
@@ -348,7 +356,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
                   setImage(null);
                   onUpdate(null);
                 }}
-                className="absolute top-2 right-2 h-[20px] w-[20px] flex items-center justify-center z-10 !bg-dark-900/60 rounded-[10px] cursor-pointer"
+                className="!bg-dark-900/60 absolute top-2 right-2 z-10 flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-[10px]"
               >
                 <i className="gng-trash text-danger text-body" />
               </button>
@@ -357,7 +365,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
             {loading && (
               <div
                 className={cn(
-                  "absolute top-0 left-0 bg-bkg-dark/50 flex items-center justify-center rounded w-full md:w-full border border-border-light gap-[10px] overflow-hidden h-[100px] md:h-full"
+                  "bg-bkg-dark/50 border-border-light absolute top-0 left-0 flex h-[100px] w-full items-center justify-center gap-[10px] overflow-hidden rounded border md:h-full md:w-full"
                 )}
               >
                 <Spinner />
@@ -366,7 +374,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
           </div>
         ) : (
           <section
-            className="relative w-full max-h-[550px] md:max-h-auto h-full rounded-[10px] overflow-hidden mx-auto shrink"
+            className="md:max-h-auto relative mx-auto h-full max-h-[550px] w-full shrink overflow-hidden rounded-[10px]"
             onDrop={handleDrop}
             onDragOver={preventDefaultHandler}
             onDragEnter={preventDefaultHandler}
@@ -381,13 +389,13 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
                 }
               }}
             >
-              <div className="h-full border-[4px] border-dashed border-border-light rounded-[10px] flex flex-col gap-[20px] justify-center p-5 lg:p-10">
+              <div className="border-border-light flex h-full flex-col justify-center gap-[20px] rounded-[10px] border-[4px] border-dashed p-5 lg:p-10">
                 <div
                   className={cn(
-                    "flex justify-center items-center mx-auto cursor-pointer border-border-light rounded-full shrink-0 md:border md:size-[70px]"
+                    "border-border-light mx-auto flex shrink-0 cursor-pointer items-center justify-center rounded-full md:size-[70px] md:border"
                   )}
                 >
-                  <i className="gng-add-thin text-center text-[25px] text-content-dark" />
+                  <i className="gng-add-thin text-content-dark text-center text-[25px]" />
                 </div>
                 <div className="flex flex-col items-center justify-center gap-1">
                   <Paragraph
@@ -406,13 +414,13 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
           </section>
         )}
         {!value?.file && (
-          <div className="flex sm:flex-row flex-col w-full h-full gap-5 col-span-2">
-            <div className="flex sm:flex-col justify-center items-center h-full shrink-0 gap-5">
-              <div className="flex sm:h-full w-full sm:w-[1px] border-t sm:border-r border-border-light " />
+          <div className="col-span-2 flex h-full w-full flex-col gap-5 sm:flex-row">
+            <div className="flex h-full shrink-0 items-center justify-center gap-5 sm:flex-col">
+              <div className="border-border-light flex w-full border-t sm:h-full sm:w-[1px] sm:border-r" />
               <Paragraph content={"or"} sx="text-content-dark-secondary" />
-              <div className="flex sm:h-full w-full sm:w-[1px] border-t sm:border-r border-border-light " />
+              <div className="border-border-light flex w-full border-t sm:h-full sm:w-[1px] sm:border-r" />
             </div>
-            <div className="flex flex-col gap-[5px] w-full h-full">
+            <div className="flex h-full w-full flex-col gap-[5px]">
               <Paragraph content={"Explain your freeflow"} sx="text-content-dark" />
               <TextArea
                 value={value?.file ? "" : value}

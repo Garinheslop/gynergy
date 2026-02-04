@@ -1,11 +1,12 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
+
 import { cn } from "@lib/utils/style";
-import { Badge, UserBadge, BadgeRarity } from "@resources/types/gamification";
-import Paragraph from "@modules/common/components/typography/Paragraph";
 import ActionButton from "@modules/common/components/ActionButton";
-import { paragraphVariants } from "@resources/variants";
+import Paragraph from "@modules/common/components/typography/Paragraph";
 import { buttonActionTypes } from "@resources/types/button";
+import { Badge, UserBadge, BadgeRarity } from "@resources/types/gamification";
+import { paragraphVariants } from "@resources/variants";
 
 interface BadgeUnlockPopupProps {
   badge: Badge;
@@ -41,7 +42,7 @@ const ConfettiParticle: React.FC<{
   left: number;
 }> = ({ color, delay, duration, left }) => (
   <div
-    className="absolute w-2 h-2 rounded-sm opacity-0"
+    className="absolute h-2 w-2 rounded-sm opacity-0"
     style={{
       backgroundColor: color,
       left: `${left}%`,
@@ -127,7 +128,8 @@ const BadgeUnlockPopup: React.FC<BadgeUnlockPopupProps> = ({
           }
         }
         @keyframes glow-pulse {
-          0%, 100% {
+          0%,
+          100% {
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
           }
           50% {
@@ -147,7 +149,7 @@ const BadgeUnlockPopup: React.FC<BadgeUnlockPopupProps> = ({
       >
         {/* Confetti container */}
         {showConfetti && (
-          <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="pointer-events-none fixed inset-0 overflow-hidden">
             {particles.map((particle) => (
               <ConfettiParticle
                 key={particle.id}
@@ -163,8 +165,8 @@ const BadgeUnlockPopup: React.FC<BadgeUnlockPopupProps> = ({
         {/* Popup content */}
         <div
           className={cn(
-            "relative flex flex-col items-center max-w-sm w-full p-8 rounded-2xl",
-            "bg-bkg-dark border border-border-light/20",
+            "relative flex w-full max-w-sm flex-col items-center rounded-2xl p-8",
+            "bg-bkg-dark border-border-light/20 border",
             rarityBg[badge.rarity]
           )}
           onClick={(e) => e.stopPropagation()}
@@ -172,7 +174,7 @@ const BadgeUnlockPopup: React.FC<BadgeUnlockPopupProps> = ({
         >
           {/* Close button */}
           <button
-            className="absolute top-4 right-4 text-content-dark/50 hover:text-content-dark"
+            className="text-content-dark/50 hover:text-content-dark absolute top-4 right-4"
             onClick={onClose}
             aria-label="Close"
           >
@@ -189,7 +191,7 @@ const BadgeUnlockPopup: React.FC<BadgeUnlockPopupProps> = ({
           {/* Badge icon with glow */}
           <div
             className={cn(
-              "w-32 h-32 flex items-center justify-center rounded-full mb-6",
+              "mb-6 flex h-32 w-32 items-center justify-center rounded-full",
               "bg-gradient-to-br",
               rarityColors[badge.rarity]
             )}
@@ -213,31 +215,27 @@ const BadgeUnlockPopup: React.FC<BadgeUnlockPopupProps> = ({
           />
 
           {/* Rarity and points */}
-          <div className="flex items-center gap-4 mb-6">
+          <div className="mb-6 flex items-center gap-4">
             <span
-              className={cn(
-                "px-3 py-1 rounded-full text-sm font-medium capitalize",
-                {
-                  "bg-gray-500/20 text-gray-300": badge.rarity === "common",
-                  "bg-green-500/20 text-green-300": badge.rarity === "uncommon",
-                  "bg-blue-500/20 text-blue-300": badge.rarity === "rare",
-                  "bg-purple-500/20 text-purple-300": badge.rarity === "epic",
-                  "bg-amber-500/20 text-amber-300": badge.rarity === "legendary",
-                }
-              )}
+              className={cn("rounded-full px-3 py-1 text-sm font-medium capitalize", {
+                "bg-gray-500/20 text-gray-300": badge.rarity === "common",
+                "bg-green-500/20 text-green-300": badge.rarity === "uncommon",
+                "bg-blue-500/20 text-blue-300": badge.rarity === "rare",
+                "bg-purple-500/20 text-purple-300": badge.rarity === "epic",
+                "bg-amber-500/20 text-amber-300": badge.rarity === "legendary",
+              })}
             >
               {badge.rarity}
             </span>
             {(points || badge.pointsReward > 0) && (
-              <span className="flex items-center gap-1 text-action font-bold">
-                <i className="gng-star text-[16px]" />
-                +{points || badge.pointsReward} pts
+              <span className="text-action flex items-center gap-1 font-bold">
+                <i className="gng-star text-[16px]" />+{points || badge.pointsReward} pts
               </span>
             )}
           </div>
 
           {/* Action buttons */}
-          <div className="flex gap-3 w-full">
+          <div className="flex w-full gap-3">
             {onShare && (
               <ActionButton
                 label="Share"
@@ -247,11 +245,7 @@ const BadgeUnlockPopup: React.FC<BadgeUnlockPopupProps> = ({
                 sx="flex-1"
               />
             )}
-            <ActionButton
-              label="Continue"
-              onClick={onClose}
-              sx="flex-1"
-            />
+            <ActionButton label="Continue" onClick={onClose} sx="flex-1" />
           </div>
         </div>
       </div>

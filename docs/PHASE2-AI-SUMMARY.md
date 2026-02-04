@@ -14,12 +14,12 @@ Phase 2 implemented a complete AI character system with two coaching personas (Y
 
 ## Verification Results
 
-| Test | Status | Details |
-|------|--------|---------|
+| Test             | Status    | Details                          |
+| ---------------- | --------- | -------------------------------- |
 | TypeScript Check | ✅ PASSED | `npm run type-check` - no errors |
-| Unit Tests | ✅ PASSED | 33 tests passing |
-| Lint (AI files) | ✅ PASSED | 0 errors in AI-specific files |
-| Build (AI files) | ✅ PASSED | Compiles successfully |
+| Unit Tests       | ✅ PASSED | 33 tests passing                 |
+| Lint (AI files)  | ✅ PASSED | 0 errors in AI-specific files    |
+| Build (AI files) | ✅ PASSED | Compiles successfully            |
 
 ---
 
@@ -27,79 +27,81 @@ Phase 2 implemented a complete AI character system with two coaching personas (Y
 
 ### Core Library (`/lib/ai/`)
 
-| File | Purpose | Lines |
-|------|---------|-------|
-| `index.ts` | Main exports, chat & chatStream functions | 227 |
-| `character-config.ts` | Yesi & Garin persona definitions | 175 |
-| `context-manager.ts` | User context building, conversation storage | 350+ |
-| `providers/types.ts` | TypeScript interfaces for AI providers | 50 |
-| `providers/openai.ts` | OpenAI GPT-4o integration | 120 |
-| `providers/anthropic.ts` | Anthropic Claude fallback | 115 |
-| `providers/index.ts` | Provider orchestration | 85 |
+| File                     | Purpose                                     | Lines |
+| ------------------------ | ------------------------------------------- | ----- |
+| `index.ts`               | Main exports, chat & chatStream functions   | 227   |
+| `character-config.ts`    | Yesi & Garin persona definitions            | 175   |
+| `context-manager.ts`     | User context building, conversation storage | 350+  |
+| `providers/types.ts`     | TypeScript interfaces for AI providers      | 50    |
+| `providers/openai.ts`    | OpenAI GPT-4o integration                   | 120   |
+| `providers/anthropic.ts` | Anthropic Claude fallback                   | 115   |
+| `providers/index.ts`     | Provider orchestration                      | 85    |
 
 ### API Routes (`/app/api/ai/`)
 
-| File | Purpose | Endpoints |
-|------|---------|-----------|
-| `[requestType]/route.ts` | REST API handlers | GET: characters, character, history, user-context, suggest-character<br>POST: chat, end-session, rate-session |
-| `chat-stream/route.ts` | SSE streaming endpoint | POST: streaming chat |
+| File                     | Purpose                | Endpoints                                                                                                     |
+| ------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `[requestType]/route.ts` | REST API handlers      | GET: characters, character, history, user-context, suggest-character<br>POST: chat, end-session, rate-session |
+| `chat-stream/route.ts`   | SSE streaming endpoint | POST: streaming chat                                                                                          |
 
 ### Redux Store (`/store/modules/ai/`)
 
-| File | Purpose |
-|------|---------|
+| File          | Purpose                                           |
+| ------------- | ------------------------------------------------- |
 | `reducers.ts` | Redux slice with character, chat, streaming state |
-| `index.ts` | Action creators and thunks |
+| `index.ts`    | Action creators and thunks                        |
 
 ### Components (`/modules/ai/components/`)
 
-| Component | Purpose |
-|-----------|---------|
-| `CharacterAvatar.tsx` | Character profile image display |
-| `CharacterSelector.tsx` | Character selection UI (cards/pills) |
-| `ChatMessage.tsx` | Individual message rendering |
-| `ChatInput.tsx` | Message input with send functionality |
-| `ChatContainer.tsx` | Main orchestrating container |
-| `FloatingChatButton.tsx` | FAB for opening chat |
+| Component                | Purpose                               |
+| ------------------------ | ------------------------------------- |
+| `CharacterAvatar.tsx`    | Character profile image display       |
+| `CharacterSelector.tsx`  | Character selection UI (cards/pills)  |
+| `ChatMessage.tsx`        | Individual message rendering          |
+| `ChatInput.tsx`          | Message input with send functionality |
+| `ChatContainer.tsx`      | Main orchestrating container          |
+| `FloatingChatButton.tsx` | FAB for opening chat                  |
 
 ### Hooks (`/modules/ai/hooks/`)
 
-| File | Purpose |
-|------|---------|
+| File           | Purpose                               |
+| -------------- | ------------------------------------- |
 | `useAIChat.ts` | Custom hook for chat state management |
 
 ### Types (`/resources/types/`)
 
-| File | Purpose |
-|------|---------|
+| File    | Purpose                                 |
+| ------- | --------------------------------------- |
 | `ai.ts` | TypeScript types, constants, interfaces |
 
 ### Database (`/supabse/schema/`)
 
-| File | Tables |
-|------|--------|
+| File                | Tables                                                             |
+| ------------------- | ------------------------------------------------------------------ |
 | `ai-characters.sql` | ai_characters, ai_conversations, ai_user_context, ai_chat_sessions |
 
 ### Documentation (`/docs/`)
 
-| File | Purpose |
-|------|---------|
-| `api/endpoints/ai-chat.md` | Complete API documentation |
-| `components/ai-components.md` | Component documentation |
-| `adr/0004-ai-character-system.md` | Architecture decision record |
-| `guides/ai-system.md` | Comprehensive developer guide |
+| File                              | Purpose                       |
+| --------------------------------- | ----------------------------- |
+| `api/endpoints/ai-chat.md`        | Complete API documentation    |
+| `components/ai-components.md`     | Component documentation       |
+| `adr/0004-ai-character-system.md` | Architecture decision record  |
+| `guides/ai-system.md`             | Comprehensive developer guide |
 
 ---
 
 ## Features Implemented
 
 ### Character System
+
 - ✅ Two distinct AI personas (Yesi & Garin)
 - ✅ Character-specific system prompts
 - ✅ Signature expressions and voice tones
 - ✅ Smart character suggestion based on user state
 
 ### Context Awareness
+
 - ✅ User profile integration (name, day in journey)
 - ✅ Current streak data (morning, evening, gratitude)
 - ✅ Recent journal entries with mood scores
@@ -108,24 +110,28 @@ Phase 2 implemented a complete AI character system with two coaching personas (Y
 - ✅ Mood trend calculation (improving/stable/declining)
 
 ### Streaming Responses
+
 - ✅ Server-Sent Events (SSE) implementation
 - ✅ Real-time character-by-character display
 - ✅ Typing indicator animation
 - ✅ Graceful error handling
 
 ### Provider Integration
+
 - ✅ OpenAI GPT-4o (primary)
 - ✅ Anthropic Claude 3.5 Sonnet (fallback)
 - ✅ Automatic provider selection
 - ✅ Token budget management
 
 ### Conversation Management
+
 - ✅ Message history persistence
 - ✅ Session tracking
 - ✅ Session ratings and feedback
 - ✅ Conversation trimming for token limits
 
 ### UI Components
+
 - ✅ Character selector (cards and pills variants)
 - ✅ Chat message bubbles (user/assistant styling)
 - ✅ Auto-expanding input field
@@ -135,6 +141,7 @@ Phase 2 implemented a complete AI character system with two coaching personas (Y
 - ✅ Empty state with suggested prompts
 
 ### Redux Integration
+
 - ✅ Follows existing project patterns
 - ✅ Persist configuration (blacklists streaming content)
 - ✅ Custom hook for async operations
@@ -144,23 +151,26 @@ Phase 2 implemented a complete AI character system with two coaching personas (Y
 ## Technical Specifications
 
 ### Token Budgets
-| Component | Limit |
-|-----------|-------|
-| System Prompt | 1500 tokens |
-| User Context | 1000 tokens |
+
+| Component            | Limit       |
+| -------------------- | ----------- |
+| System Prompt        | 1500 tokens |
+| User Context         | 1000 tokens |
 | Conversation History | 2000 tokens |
-| Response | 800 tokens |
+| Response             | 800 tokens  |
 
 ### Rate Limits
-| Limit | Value |
-|-------|-------|
-| Requests/minute | 20 |
-| Messages/day | 100 |
+
+| Limit           | Value |
+| --------------- | ----- |
+| Requests/minute | 20    |
+| Messages/day    | 100   |
 
 ### API Models
-| Provider | Model |
-|----------|-------|
-| OpenAI | gpt-4o |
+
+| Provider  | Model                      |
+| --------- | -------------------------- |
+| OpenAI    | gpt-4o                     |
 | Anthropic | claude-3-5-sonnet-20241022 |
 
 ---
@@ -178,15 +188,19 @@ ANTHROPIC_API_KEY=sk-ant-...  # Optional fallback
 ## Database Tables
 
 ### ai_characters
+
 Stores character definitions (Yesi, Garin)
 
 ### ai_conversations
+
 Stores all chat messages with metadata
 
 ### ai_user_context
+
 Stores persistent user memory (themes, patterns)
 
 ### ai_chat_sessions
+
 Tracks sessions with ratings
 
 ---
@@ -195,21 +209,23 @@ Tracks sessions with ratings
 
 ### Modified Existing Files
 
-| File | Change |
-|------|--------|
-| `/store/reducer.ts` | Added AI reducer |
+| File                       | Change                  |
+| -------------------------- | ----------------------- |
+| `/store/reducer.ts`        | Added AI reducer        |
 | `/store/configureStore.ts` | Added AI persist config |
-| `/store/configs/urls.ts` | Added AI URL constant |
+| `/store/configs/urls.ts`   | Added AI URL constant   |
 
 ---
 
 ## Testing Coverage
 
 ### Unit Tests (33 total)
+
 - Example tests: 9 passing
 - Gamification service tests: 24 passing
 
 ### Integration Testing
+
 - Manual testing of chat flows
 - Streaming response verification
 - Character switching

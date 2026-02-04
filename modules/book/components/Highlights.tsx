@@ -1,12 +1,15 @@
+import { useEffect } from "react";
+
+import dayjs from "dayjs";
+
 import { cn } from "@lib/utils/style";
+import Image from "@modules/common/components/Image";
 import Paragraph from "@modules/common/components/typography/Paragraph";
+import icons from "@resources/icons";
+import { journalTypes } from "@resources/types/journal";
 import { paragraphVariants } from "@resources/variants";
 import { useSelector } from "@store/hooks";
-import { journalTypes } from "@resources/types/journal";
-import dayjs from "dayjs";
-import Image from "@modules/common/components/Image";
-import icons from "@resources/icons";
-import { useEffect } from "react";
+
 
 const Highlights = () => {
   const journals = useSelector((state) => state.journals);
@@ -14,15 +17,15 @@ const Highlights = () => {
   const userEnrollment = useSelector((state) => state.enrollments.current);
 
   return (
-    <div className="flex flex-col gap-[40px] px-[30px] md:px-[40px] py-5 bg-bkg-light rounded">
+    <div className="bg-bkg-light flex flex-col gap-[40px] rounded px-[30px] py-5 md:px-[40px]">
       <div className="flex flex-col gap-[5px]">
-        <div className="flex gap-5 justify-between">
+        <div className="flex justify-between gap-5">
           <Paragraph
             content={`Day ${(dayjs().diff(dayjs(userEnrollment?.enrollmentDate).startOf("d"), "d") + 1).toString().padStart(2, "0")}`}
             variant={paragraphVariants.titleXlg}
             sx="!font-bold"
           />
-          <div className="flex gap-[5px] items-center">
+          <div className="flex items-center gap-[5px]">
             {[
               journalTypes.morningJournal,
               journalTypes.eveningJournal,
@@ -31,9 +34,9 @@ const Highlights = () => {
               <i
                 key={index}
                 className={cn(
-                  "w-[33px] h-[33px] border-[10px] border-border-light bg-bkg-light shrink-0 rounded-full",
+                  "border-border-light bg-bkg-light h-[33px] w-[33px] shrink-0 rounded-full border-[10px]",
                   {
-                    "gng-complete-circle border-0 bg-none text-[33px] text-action-secondary":
+                    "gng-complete-circle text-action-secondary border-0 bg-none text-[33px]":
                       journals.data.find((journal) => journal.journalType === type) ||
                       actions.data.find((action) => action.actionType === type),
                   }
@@ -49,7 +52,7 @@ const Highlights = () => {
         />
       </div>
       <div className="flex gap-[5px]">
-        <Image src={icons.point} className="w-auto h-[25px]" />
+        <Image src={icons.point} className="h-[25px] w-auto" />
         {userEnrollment && (
           <Paragraph
             isHtml

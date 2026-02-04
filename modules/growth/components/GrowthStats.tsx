@@ -23,11 +23,11 @@ export default function GrowthStats({
   return (
     <div
       className={cn(
-        "flex flex-col sm:flex-row xl:flex-col xmd:p-0 p-[20px] gap-[20px] bg-bkg-ligh-secondary",
+        "xmd:p-0 bg-bkg-ligh-secondary flex flex-col gap-[20px] p-[20px] sm:flex-row xl:flex-col",
         sx
       )}
     >
-      <div className="flex flex-col gap-[5px] items-center p-5 bg-grey-50 rounded">
+      <div className="bg-grey-50 flex flex-col items-center gap-[5px] rounded p-5">
         <Paragraph
           content={"Current Level"}
           variant={paragraphVariants.meta}
@@ -49,7 +49,7 @@ export default function GrowthStats({
           />
         )}
       </div>
-      <div className="flex flex-col gap-[5px] items-center p-5 bg-grey-50 rounded">
+      <div className="bg-grey-50 flex flex-col items-center gap-[5px] rounded p-5">
         <Paragraph
           content={"Journal Progress"}
           variant={paragraphVariants.meta}
@@ -66,7 +66,7 @@ export default function GrowthStats({
         )}
       </div>
       {milestones.find((milestone) => milestone.startPoint > currentPoints) && (
-        <div className="flex flex-col gap-[5px] items-center p-5 bg-grey-50 rounded">
+        <div className="bg-grey-50 flex flex-col items-center gap-[5px] rounded p-5">
           <Paragraph
             content={"Points to next level"}
             variant={paragraphVariants.meta}

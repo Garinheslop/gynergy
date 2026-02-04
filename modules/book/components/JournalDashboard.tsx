@@ -1,22 +1,26 @@
+import { useEffect, useRef, useState } from "react";
+
+import { useRouter, useSearchParams } from "next/navigation";
+
+import dayjs from "dayjs";
+
+import { useSession } from "@contexts/UseSession";
 import Card from "@modules/common/components/Card";
 import Paragraph from "@modules/common/components/typography/Paragraph";
+import Leaderboard from "@modules/leaderboard/components/Leaderboard";
 import { pagePaths } from "@resources/paths";
 import { visionTypes, UserVision } from "@resources/types/vision";
 import { paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
 import { setEditorDataStates } from "@store/modules/editor";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { setHideBookMessageState } from "@store/modules/global/states";
+
+import BookCompletion from "./BookCompletion";
 import Journals from "./Journals";
+import Mantra from "./Mantra";
 import Visions from "./Visions";
 import Growth from "../../growth/components/Growth";
-import Leaderboard from "@modules/leaderboard/components/Leaderboard";
-import dayjs from "dayjs";
-import BookCompletion from "./BookCompletion";
 import useCheckEnrollmentSession from "../hooks/useCheckEnrollmentSession";
-import { useSession } from "@contexts/UseSession";
-import { setHideBookMessageState } from "@store/modules/global/states";
-import Mantra from "./Mantra";
 
 const JournalDashboard = () => {
   const router = useRouter();

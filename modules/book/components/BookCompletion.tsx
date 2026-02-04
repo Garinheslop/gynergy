@@ -1,5 +1,7 @@
 "use client";
 
+import { useSelector } from "react-redux";
+
 import ActionButton from "@modules/common/components/ActionButton";
 import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
@@ -8,14 +10,13 @@ import { headingVariants, paragraphVariants } from "@resources/variants";
 import { RootState } from "@store/configureStore";
 import { useDispatch } from "@store/hooks";
 import { enrollUserToBookSession } from "@store/modules/enrollment";
-import { useSelector } from "react-redux";
 
 const BookCompletion = ({ latestSession }: { latestSession?: BookSessionData | null }) => {
   const dispatch = useDispatch();
 
   const currentBook = useSelector((state: RootState) => state.books.current);
   return (
-    <section className="flex flex-col items-center gap-[30px] md:gap-[40px] max-w-[1200px] p-[20px] md:p-[50px] pb-[20px] md:pb-[30px] bg-bkg-light rounded-[20px] mx-auto">
+    <section className="bg-bkg-light mx-auto flex max-w-[1200px] flex-col items-center gap-[30px] rounded-[20px] p-[20px] pb-[20px] md:gap-[40px] md:p-[50px] md:pb-[30px]">
       <Heading
         isHtml
         variant={headingVariants.heading}

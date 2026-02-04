@@ -1,12 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { cn } from "@lib/utils/style";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { paragraphVariants } from "@resources/variants";
-import { useEffect, useState } from "react";
+
+import GrowthStats from "./GrowthStats";
 import MountainPaths from "./MountainPaths";
 import TestSvg from "../../book/components/TestSvg";
-import GrowthStats from "./GrowthStats";
 
 interface MountainProgressProps {
   totalPoints: number;
@@ -48,7 +50,7 @@ export default function MountainProgress({
   // Calculate next milestone points safely
 
   return (
-    <div className="relative bg-bkg-light rounded h-full w-full">
+    <div className="bg-bkg-light relative h-full w-full rounded">
       <GrowthStats
         currentPoints={currentPoints}
         milestones={milestones}
@@ -58,18 +60,18 @@ export default function MountainProgress({
       />
       <div
         className={cn(
-          "relative flex xmd:flex-row flex-col w-full [&>svg]:object-cover bg-bkg-light rounded"
+          "xmd:flex-row bg-bkg-light relative flex w-full flex-col rounded [&>svg]:object-cover"
         )}
       >
         {milestones?.length &&
           milestones.map((milestone, index) => (
             <div
               key={index}
-              className={cn("flex flex-col items-center justify-center absolute", {
+              className={cn("absolute flex flex-col items-center justify-center", {
                 "bottom-[15%] left-[8%] sm:bottom-[5%] sm:left-[12%]": index === 0,
-                "bottom-[30%] sm:bottom-[23%] left-[34.8%]": index === 1,
-                "bottom-[40%] sm:bottom-[39%] right-[35%] sm:right-[43%]": index === 2,
-                "top-[15%] sm:top-[20%] right-[15%] sm:right-[21%]": index === 3,
+                "bottom-[30%] left-[34.8%] sm:bottom-[23%]": index === 1,
+                "right-[35%] bottom-[40%] sm:right-[43%] sm:bottom-[39%]": index === 2,
+                "top-[15%] right-[15%] sm:top-[20%] sm:right-[21%]": index === 3,
                 "top-[2%] right-[5%] sm:right-[7%]": index === 4,
               })}
             >
@@ -100,7 +102,7 @@ export default function MountainProgress({
           <MountainPaths>
             <path
               className={cn(
-                "relative stroke-action-secondary stroke-5 transition-all duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] [stroke-linecap:round]",
+                "stroke-action-secondary relative stroke-5 transition-all duration-1000 ease-[cubic-bezier(0.4,0,0.2,1)] [stroke-linecap:round]",
                 { "stroke-grey-300 card-loading": isLoading }
               )}
               d="M250 503.5L314.885 467.835C321.806 464.03 329.699 462.36 337.569 463.034L345.927 463.751C355.338 464.558 364.73 462.008 372.441 456.554L410.765 429.447C418.046 424.297 426.838 421.728 435.746 422.148L503.742 425.352C512.657 425.772 521.457 423.198 528.741 418.04L613.318 358.148C619.007 354.119 625.651 351.648 632.59 350.978L685.228 345.895C691.328 345.306 697.211 343.324 702.423 340.101L760.83 303.98C767.152 300.071 774.437 298 781.869 298H783.057C791.161 298 799.074 295.538 805.747 290.941L950.753 191.059C957.426 186.462 965.339 184 973.443 184H984.923C992.486 184 999.894 181.856 1006.29 177.817L1135 96.5"

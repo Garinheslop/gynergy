@@ -1,9 +1,12 @@
+import React, { ReactNode } from "react";
+
 import { cn } from "@lib/utils/style";
 import { loaderTypes } from "@resources/types/loader";
-import React, { ReactNode } from "react";
+import { paragraphVariants } from "@resources/variants";
+
 import Modal from "./modal";
 import Paragraph from "./typography/Paragraph";
-import { paragraphVariants } from "@resources/variants";
+
 
 const Loader = ({
   label,
@@ -20,11 +23,11 @@ const Loader = ({
 }) => {
   if (type === loaderTypes.spinner) {
     return (
-      <div className="inline-flex flex-col items-center gap-2 rounded-lg text-center text-body font-medium text-content-reverse">
+      <div className="text-body text-content-reverse inline-flex flex-col items-center gap-2 rounded-lg text-center font-medium">
         <svg
           aria-hidden="true"
           role="status"
-          className={cn("inline h-8 w-8 animate-spin text-action", sx)}
+          className={cn("text-action inline h-8 w-8 animate-spin", sx)}
           viewBox="0 0 100 101"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -38,18 +41,18 @@ const Loader = ({
             fill="currentColor"
           />
         </svg>
-        {label && <p className="text-loading ml-2 text-content/80">{label}</p>}
+        {label && <p className="text-loading text-content/80 ml-2">{label}</p>}
       </div>
     );
   } else if (type === loaderTypes.window) {
     return (
       <section
         className={cn(
-          "fixed z-[1000] top-0 left-0 w-screen h-screen bg-bkg-light/90 backdrop-blur-sm p-4 overflow-hidden flex justify-center items-center",
+          "bg-bkg-light/90 fixed top-0 left-0 z-[1000] flex h-screen w-screen items-center justify-center overflow-hidden p-4 backdrop-blur-sm",
           sx
         )}
       >
-        <div className="flex flex-col items-center justify-center overflow-hidden gradient-animation">
+        <div className="gradient-animation flex flex-col items-center justify-center overflow-hidden">
           <i id="clipWave" className={cn("gng-infinity text-[100px] text-transparent", sx)} />
           {label && <p className="text-content/80">{label}</p>}
         </div>
@@ -60,11 +63,11 @@ const Loader = ({
       <Modal open={true} onClose={() => {}}>
         <section
           className={cn(
-            "bg-bkg-light flex flex-col justify-center p-[30px] items-center w-screen h-screen sm:w-[470px] sm:h-[300px] rounded",
+            "bg-bkg-light flex h-screen w-screen flex-col items-center justify-center rounded p-[30px] sm:h-[300px] sm:w-[470px]",
             sx
           )}
         >
-          <div className="flex flex-col items-center justify-center overflow-hidden gradient-animation">
+          <div className="gradient-animation flex flex-col items-center justify-center overflow-hidden">
             <i id="clipWave" className={cn("gng-infinity text-[100px] text-transparent", sx)} />
           </div>
           <div className="flex flex-col gap-[10px]">

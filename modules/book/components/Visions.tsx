@@ -1,25 +1,28 @@
+import { useEffect, useRef, useState } from "react";
+
+import { useRouter } from "next/navigation";
+
 import { cn } from "@lib/utils/style";
+import ActionButton from "@modules/common/components/ActionButton";
 import Card from "@modules/common/components/Card";
+import Image from "@modules/common/components/Image";
 import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
-import { pagePaths } from "@resources/paths";
-import { visionTypes, UserVision } from "@resources/types/vision";
-import { journalTypes } from "@resources/types/journal";
-import { headingVariants, paragraphVariants } from "@resources/variants";
-import { useDispatch, useSelector } from "@store/hooks";
-import { setEditorDataStates } from "@store/modules/editor";
-import { getUserVisions } from "@store/modules/vision";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import ActionButton from "@modules/common/components/ActionButton";
-import { setHistoryCurrentStates } from "@store/modules/history";
-import { buttonActionTypes } from "@resources/types/button";
 import {
   discoveryInputData,
   highestSelfInputData,
   visionInputData,
 } from "@resources/data/input/visions";
-import Image from "@modules/common/components/Image";
+import { pagePaths } from "@resources/paths";
+import { buttonActionTypes } from "@resources/types/button";
+import { journalTypes } from "@resources/types/journal";
+import { visionTypes, UserVision } from "@resources/types/vision";
+import { headingVariants, paragraphVariants } from "@resources/variants";
+import { useDispatch, useSelector } from "@store/hooks";
+import { setEditorDataStates } from "@store/modules/editor";
+import { setHistoryCurrentStates } from "@store/modules/history";
+import { getUserVisions } from "@store/modules/vision";
+
 
 const Visions = ({ isStatic = false }: { isStatic?: boolean }) => {
   const router = useRouter();
@@ -94,7 +97,7 @@ const Visions = ({ isStatic = false }: { isStatic?: boolean }) => {
   if (isStatic && visions.data.length > 0) {
     if (visionsCards.filter((visionsCard) => visionsCard?.value?.isCompleted).length > 0) {
       return (
-        <div className="flex flex-col gap-[10px] w-full">
+        <div className="flex w-full flex-col gap-[10px]">
           {visionsCards
             .filter(
               (visionsCard) =>
@@ -142,7 +145,7 @@ const Visions = ({ isStatic = false }: { isStatic?: boolean }) => {
           variant={paragraphVariants.regular}
           sx="text-center max-w-[800px]"
         />
-        <div className="flex flex-col gap-[10px] w-full">
+        <div className="flex w-full flex-col gap-[10px]">
           {visionsCards
             .filter((visionsCard) => !visionsCard?.value?.isCompleted)
             .map((visionsCard, index) => (
@@ -277,7 +280,7 @@ const UserVisionData = ({
                 {field === "symbols" ? (
                   <div
                     className={
-                      "relative rounded max-w-[250px] max-h-[270px] flex gap-[10px] overflow-hidden w-full"
+                      "relative flex max-h-[270px] w-full max-w-[250px] gap-[10px] overflow-hidden rounded"
                     }
                   >
                     {userVision[field] ? (

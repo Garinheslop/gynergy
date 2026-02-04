@@ -8,9 +8,11 @@ import {
   FC,
   Ref,
 } from "react";
+
 import { cn } from "@lib/utils/style";
-import Paragraph from "./typography/Paragraph";
 import { paragraphVariants } from "@resources/variants";
+
+import Paragraph from "./typography/Paragraph";
 
 interface InputProps {
   label?: string;
@@ -71,13 +73,13 @@ const Input: FC<InputProps> = ({
 
   return (
     <section
-      className={cn("relative flex w-full items-start justify-center flex-col gap-[5px]", sx)}
+      className={cn("relative flex w-full flex-col items-start justify-center gap-[5px]", sx)}
     >
       {label && <Paragraph content={label} variant={paragraphVariant} sx="text-content-dark" />}
-      {icon && <i className={`gng-${icon} text-body ml-4 text-content-dark`} />}
+      {icon && <i className={`gng-${icon} text-body text-content-dark ml-4`} />}
       <section
         className={cn(
-          "relative flex w-full items-center rounded border border-border-light [&>input]:px-[15px] [&>input]:py-[10px] overflow-hidden min-h-[47px]",
+          "border-border-light relative flex min-h-[47px] w-full items-center overflow-hidden rounded border [&>input]:px-[15px] [&>input]:py-[10px]",
           inputSx,
           { "border-danger": error },
           {
@@ -90,7 +92,7 @@ const Input: FC<InputProps> = ({
           ref={inputRef}
           type={show ? "text" : type}
           className={cn(
-            "flex h-full w-full bg-transparent text-start outline-none text-content-dark",
+            "text-content-dark flex h-full w-full bg-transparent text-start outline-none",
             { "text-body": paragraphVariant === paragraphVariants.regular }
           )}
           value={content}
@@ -118,7 +120,7 @@ const Input: FC<InputProps> = ({
             onClick={() => setShow((prev) => !prev)}
           >
             {!show && (
-              <span className="w-[20px] absolute right-[-2px] top-[8px] border-t border-[#8F9194] -rotate-45" />
+              <span className="absolute top-[8px] right-[-2px] w-[20px] -rotate-45 border-t border-[#8F9194]" />
             )}
           </i>
         )}

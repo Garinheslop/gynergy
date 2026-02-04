@@ -1,7 +1,9 @@
 "use client";
 import React from "react";
+
 import { cn } from "@lib/utils/style";
 import { CharacterKey, ConversationRole } from "@resources/types/ai";
+
 import CharacterAvatar from "./CharacterAvatar";
 
 interface ChatMessageProps {
@@ -38,13 +40,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
     : null;
 
   return (
-    <div
-      className={cn(
-        "flex gap-3 w-full",
-        isUser ? "flex-row-reverse" : "flex-row",
-        sx
-      )}
-    >
+    <div className={cn("flex w-full gap-3", isUser ? "flex-row-reverse" : "flex-row", sx)}>
       {/* Avatar */}
       {!isUser && characterKey && (
         <div className="flex-shrink-0">
@@ -53,25 +49,18 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
       )}
 
       {/* Message bubble */}
-      <div
-        className={cn(
-          "flex flex-col max-w-[80%]",
-          isUser ? "items-end" : "items-start"
-        )}
-      >
+      <div className={cn("flex max-w-[80%] flex-col", isUser ? "items-end" : "items-start")}>
         {/* Character name */}
         {!isUser && characterName && (
-          <span className="text-xs text-content-dark-secondary mb-1 ml-1">
-            {characterName}
-          </span>
+          <span className="text-content-dark-secondary mb-1 ml-1 text-xs">{characterName}</span>
         )}
 
         {/* Content */}
         <div
           className={cn(
-            "px-4 py-3 rounded-2xl",
+            "rounded-2xl px-4 py-3",
             isUser
-              ? "bg-action text-white rounded-br-md"
+              ? "bg-action rounded-br-md text-white"
               : "bg-bkg-light text-content-dark rounded-bl-md",
             isStreaming && "animate-pulse"
           )}
@@ -79,17 +68,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
           {/* Render content with simple markdown support */}
           <div className="text-sm leading-relaxed whitespace-pre-wrap">
             {content}
-            {isStreaming && (
-              <span className="inline-block w-2 h-4 ml-1 bg-current animate-pulse" />
-            )}
+            {isStreaming && <span className="ml-1 inline-block h-4 w-2 animate-pulse bg-current" />}
           </div>
         </div>
 
         {/* Timestamp */}
         {formattedTime && !isStreaming && (
-          <span className="text-xs text-content-dark-secondary/50 mt-1 mx-1">
-            {formattedTime}
-          </span>
+          <span className="text-content-dark-secondary/50 mx-1 mt-1 text-xs">{formattedTime}</span>
         )}
       </div>
 

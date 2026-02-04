@@ -1,9 +1,12 @@
 "use client";
 import { useState, useCallback } from "react";
-import { useDispatch, useSelector } from "@store/hooks";
-import { CharacterKey, ChatMessage, ChatResponse } from "@resources/types/ai";
-import { aiActions } from "@store/modules/ai/reducers";
+
 import axios from "axios";
+
+import { CharacterKey, ChatMessage, ChatResponse } from "@resources/types/ai";
+import { useDispatch, useSelector } from "@store/hooks";
+import { aiActions } from "@store/modules/ai/reducers";
+
 
 interface UseAIChatReturn {
   // State
@@ -197,8 +200,7 @@ export function useAIChat(): UseAIChatReturn {
           })
         );
       } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Failed to stream message";
+        const errorMessage = error instanceof Error ? error.message : "Failed to stream message";
         dispatch(aiActions.streamFailed(errorMessage));
       } finally {
         setLocalLoading(false);

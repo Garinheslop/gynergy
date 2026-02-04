@@ -1,3 +1,7 @@
+import { useEffect, useState } from "react";
+
+import { useRouter } from "next/navigation";
+
 import { useSession } from "@contexts/UseSession";
 import { cn } from "@lib/utils/style";
 import ActionButton from "@modules/common/components/ActionButton";
@@ -23,8 +27,6 @@ import {
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
 import { setEditorDataStates } from "@store/modules/editor";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 const VisionJournal = () => {
   const router = useRouter();
@@ -48,8 +50,8 @@ const VisionJournal = () => {
   }, [currentHistories]);
 
   return (
-    <section className="flex flex-col gap-[30px] sm:p-[30px] rounded-[20px] bg-bkg-light w-full">
-      <div className="flex items-center sm:items-start justify-between flex-col sm:flex-row gap-[10px]">
+    <section className="bg-bkg-light flex w-full flex-col gap-[30px] rounded-[20px] sm:p-[30px]">
+      <div className="flex flex-col items-center justify-between gap-[10px] sm:flex-row sm:items-start">
         <Heading variant={headingVariants.heading} sx={cn("!font-bold")}>
           {getHeaderData(currentHistories?.entryType!)}
         </Heading>
@@ -70,7 +72,7 @@ const VisionJournal = () => {
           />
         )}
       </div>
-      <div className="w-full border-b border-border-light" />
+      <div className="border-border-light w-full border-b" />
       <div className="flex flex-col gap-5">
         {fields.map((field, index) => {
           return (
@@ -81,7 +83,7 @@ const VisionJournal = () => {
               {field === "symbols" ? (
                 <div
                   className={
-                    "relative rounded max-w-[250px] max-h-[270px] flex gap-[10px] overflow-hidden w-full"
+                    "relative flex max-h-[270px] w-full max-w-[250px] gap-[10px] overflow-hidden rounded"
                   }
                 >
                   <Image

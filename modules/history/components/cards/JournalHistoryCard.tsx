@@ -1,9 +1,11 @@
+import React from "react";
+
+import dayjs from "dayjs";
+
 import { cn } from "@lib/utils/style";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { historyTypes, JournalCardData } from "@resources/types/history";
 import { paragraphVariants } from "@resources/variants";
-import dayjs from "dayjs";
-import React from "react";
 
 type Props = {
   data: JournalCardData;
@@ -30,9 +32,9 @@ const JournalHistoryCard = ({ data, onCardClick, isMeditation, isMeditationCompl
   return (
     <div
       className={cn(
-        "p-5 rounded bg-action-25 flex flex-col gap-5 shadow-2xs cursor-pointer hover:translate-y-[-2px] duration-150",
+        "bg-action-25 flex cursor-pointer flex-col gap-5 rounded p-5 shadow-2xs duration-150 hover:translate-y-[-2px]",
         {
-          "gap-[10px] bg-bkg-light": data?.isDailyJournal,
+          "bg-bkg-light gap-[10px]": data?.isDailyJournal,
           "bg-grey-50 cursor-default hover:translate-y-0":
             !data?.morningCompleted &&
             !data?.eveningCompleted &&
@@ -68,20 +70,20 @@ const JournalHistoryCard = ({ data, onCardClick, isMeditation, isMeditationCompl
       />
       {(data?.isDailyJournal || isMeditation) && (
         <>
-          <div className="border-b border-border-light" />
-          <div className="px-2.5 py-[15px] flex justify-between">
+          <div className="border-border-light border-b" />
+          <div className="flex justify-between px-2.5 py-[15px]">
             <i
-              className={cn("gng-morning text-[25px] text-primary", {
+              className={cn("gng-morning text-primary text-[25px]", {
                 "text-content-lighter": !data?.morningCompleted,
               })}
             />
             <i
-              className={cn("gng-evening text-[25px] text-action-secondary", {
+              className={cn("gng-evening text-action-secondary text-[25px]", {
                 "text-content-lighter": !data?.eveningCompleted,
               })}
             />
             <i
-              className={cn("gng-action text-[25px] text-primary-500", {
+              className={cn("gng-action text-primary-500 text-[25px]", {
                 "text-content-lighter": !data.gratitudeActionCompleted,
               })}
             />
@@ -102,10 +104,10 @@ const JournalHistoryCard = ({ data, onCardClick, isMeditation, isMeditationCompl
         </>
       )}
       {data?.isWeeklyJournal && (
-        <div className="flex gap-[5px] items-center">
+        <div className="flex items-center gap-[5px]">
           <i
             className={cn(
-              `gng-${data?.weeklyChallengeCompleted || data?.weeklyReflectionCompleted ? "complete-circle" : "alert-circle"} text-[24px] p-[3px] text-action-secondary`,
+              `gng-${data?.weeklyChallengeCompleted || data?.weeklyReflectionCompleted ? "complete-circle" : "alert-circle"} text-action-secondary p-[3px] text-[24px]`,
               {
                 "text-content-dark-secondary":
                   !data?.weeklyChallengeCompleted && !data?.weeklyReflectionCompleted,

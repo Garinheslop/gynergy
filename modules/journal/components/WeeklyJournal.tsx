@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { cn } from "@lib/utils/style";
 import Image from "@modules/common/components/Image";
 import Loader from "@modules/common/components/Loader";
@@ -7,11 +9,9 @@ import JourneyTable from "@modules/editor/components/weekly-journal/JourneyTable
 import { historyRequestTypes, historyTypes } from "@resources/types/history";
 import { journalTypes } from "@resources/types/journal";
 import { loaderTypes } from "@resources/types/loader";
-
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
 import { getUserDailyHistory } from "@store/modules/history";
-import { useEffect, useState } from "react";
 
 const WeeklyJournal = () => {
   const dispatch = useDispatch();
@@ -47,13 +47,13 @@ const WeeklyJournal = () => {
   }, [histories.current?.entryDate, userEnrollment]);
 
   return (
-    <section className="flex flex-col gap-[30px] sm:p-[30px] rounded-[20px] bg-bkg-light w-full">
-      <div className="flex items-center sm:items-start justify-between flex-col sm:flex-row gap-[10px]">
+    <section className="bg-bkg-light flex w-full flex-col gap-[30px] rounded-[20px] sm:p-[30px]">
+      <div className="flex flex-col items-center justify-between gap-[10px] sm:flex-row sm:items-start">
         <Heading variant={headingVariants.titleLg} sx={cn("!font-bold")}>
           {getHeaderData(histories.current?.entryType!)}
         </Heading>
       </div>
-      <div className="w-full border-b border-border-light" />
+      <div className="border-border-light w-full border-b" />
       {histories.loading || !historyData ? (
         <Loader type={loaderTypes.spinner} sx={"h-[500px]"} />
       ) : (
@@ -167,7 +167,7 @@ const Question = ({ heading, isCompleted }: { heading: string; isCompleted: bool
       </Heading>
       <div
         className={cn(
-          "h-[57px] w-[73px] flex justify-center items-center rounded border border-border-light bg-action"
+          "border-border-light bg-action flex h-[57px] w-[73px] items-center justify-center rounded border"
         )}
       >
         <Paragraph content={isCompleted ? "Yes" : "No"} />
@@ -181,7 +181,7 @@ const MeditationCard = () => {
   return (
     <div
       className={cn(
-        "relative flex flex-col p-5 md:p-[30px] justify-center items-between rounded gap-[20px] bg-[#E5EDFA]"
+        "items-between relative flex flex-col justify-center gap-[20px] rounded bg-[#E5EDFA] p-5 md:p-[30px]"
       )}
     >
       <div className={cn("flex flex-col gap-[10px]")}>

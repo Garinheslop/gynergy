@@ -9,7 +9,6 @@ import { usePopup } from "@contexts/UsePopup";
 import { pagePaths } from "@resources/paths";
 import { signOutAndReset } from "@store/modules/profile";
 
-
 export default function Error({
   error,
   reset: _reset,

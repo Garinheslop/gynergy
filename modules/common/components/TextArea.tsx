@@ -7,6 +7,7 @@ import React, {
   ClipboardEvent,
   useRef,
 } from "react";
+
 // utils
 import { cn } from "@lib/utils/style";
 // resources
@@ -132,7 +133,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           placeholder={placeholder}
           disabled={disabled}
           className={cn(
-            "box-border w-full bg-bkg-light border border-border-light outline-0 rounded p-4 text-content-dark placeholder-content-dark/40 text-body resize-none transition-all duration-300 ease focus:outline-none focus:border-action focus:shadow-[0_0_0_2px_rgba(255,200,120,0.1)]",
+            "bg-bkg-light border-border-light text-content-dark placeholder-content-dark/40 text-body ease focus:border-action box-border w-full resize-none rounded border p-4 outline-0 transition-all duration-300 focus:shadow-[0_0_0_2px_rgba(255,200,120,0.1)] focus:outline-none",
             textareaSx
           )}
         />

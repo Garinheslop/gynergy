@@ -110,9 +110,7 @@ const videoSlice = createSlice({
       state.currentRoom.error = "";
     },
     participantJoined: (state, action: PayloadAction<ParticipantWithUser>) => {
-      const exists = state.currentRoom.participants.some(
-        (p) => p.userId === action.payload.userId
-      );
+      const exists = state.currentRoom.participants.some((p) => p.userId === action.payload.userId);
       if (!exists) {
         state.currentRoom.participants.push(action.payload);
       }
@@ -151,10 +149,7 @@ const videoSlice = createSlice({
       state.invitations.loading = true;
       state.invitations.error = "";
     },
-    invitationsFetched: (
-      state,
-      action: PayloadAction<{ invitations: VideoRoomInvitation[] }>
-    ) => {
+    invitationsFetched: (state, action: PayloadAction<{ invitations: VideoRoomInvitation[] }>) => {
       state.invitations.data = action.payload.invitations;
       state.invitations.loading = false;
       state.invitations.error = "";
@@ -167,14 +162,9 @@ const videoSlice = createSlice({
       state.invitations.data.unshift(action.payload);
     },
     invitationRemoved: (state, action: PayloadAction<string>) => {
-      state.invitations.data = state.invitations.data.filter(
-        (i) => i.id !== action.payload
-      );
+      state.invitations.data = state.invitations.data.filter((i) => i.id !== action.payload);
     },
-    invitationResponded: (
-      state,
-      action: PayloadAction<{ id: string; status: string }>
-    ) => {
+    invitationResponded: (state, action: PayloadAction<{ id: string; status: string }>) => {
       const invitation = state.invitations.data.find((i) => i.id === action.payload.id);
       if (invitation) {
         invitation.status = action.payload.status as "pending" | "accepted" | "declined";
@@ -185,10 +175,7 @@ const videoSlice = createSlice({
     templatesRequested: (state) => {
       state.templates.loading = true;
     },
-    templatesFetched: (
-      state,
-      action: PayloadAction<{ templates: VideoRoomTemplate[] }>
-    ) => {
+    templatesFetched: (state, action: PayloadAction<{ templates: VideoRoomTemplate[] }>) => {
       state.templates.data = action.payload.templates;
       state.templates.loading = false;
       state.templates.fetched = true;

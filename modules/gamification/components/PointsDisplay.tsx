@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
+
 import { cn } from "@lib/utils/style";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { paragraphVariants } from "@resources/variants";
@@ -116,11 +117,7 @@ const PointsDisplay: React.FC<PointsDisplayProps> = ({
     return (
       <div className={cn("flex flex-col", config.container, sx)}>
         {showLabel && (
-          <Paragraph
-            content={label}
-            variant={config.label}
-            sx="text-content-dark-secondary"
-          />
+          <Paragraph content={label} variant={config.label} sx="text-content-dark-secondary" />
         )}
         <div className="flex items-center gap-2">
           <i className={cn("gng-star text-action", config.icon)} />
@@ -128,13 +125,13 @@ const PointsDisplay: React.FC<PointsDisplayProps> = ({
             {displayedPoints.toLocaleString()}
           </span>
         </div>
-        <div className="flex flex-col gap-1 mt-2 text-sm text-content-dark-secondary">
+        <div className="text-content-dark-secondary mt-2 flex flex-col gap-1 text-sm">
           <div className="flex justify-between">
             <span>Base</span>
             <span>+{breakdown.base}</span>
           </div>
           {breakdown.multiplier > 1 && (
-            <div className="flex justify-between text-action">
+            <div className="text-action flex justify-between">
               <span>{breakdown.multiplier}x Multiplier</span>
               <span>x{breakdown.multiplier}</span>
             </div>
@@ -153,11 +150,7 @@ const PointsDisplay: React.FC<PointsDisplayProps> = ({
   return (
     <div className={cn("flex flex-col items-center", config.container, sx)}>
       {showLabel && (
-        <Paragraph
-          content={label}
-          variant={config.label}
-          sx="text-content-dark-secondary"
-        />
+        <Paragraph content={label} variant={config.label} sx="text-content-dark-secondary" />
       )}
       <div className="flex items-center gap-2">
         <i className={cn("gng-star text-action", config.icon)} />
@@ -207,8 +200,8 @@ export const PointsEarned: React.FC<PointsEarnedProps> = ({
   return (
     <div
       className={cn(
-        "flex items-center gap-2 px-4 py-2 bg-action/20 rounded-full transition-all duration-300",
-        visible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2",
+        "bg-action/20 flex items-center gap-2 rounded-full px-4 py-2 transition-all duration-300",
+        visible ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0",
         sx
       )}
     >

@@ -87,10 +87,7 @@ export const anthropicProvider: AIProvider = {
       });
 
       for await (const event of stream) {
-        if (
-          event.type === "content_block_delta" &&
-          event.delta.type === "text_delta"
-        ) {
+        if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
           yield { type: "content", content: event.delta.text };
         }
 

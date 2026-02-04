@@ -1,17 +1,20 @@
+import { FC } from "react";
+
+import { journalOcrFileLimit } from "@configs/app";
+import { usePopup } from "@contexts/UsePopup";
 import TextAreaWithHeading from "@modules/common/components/TextAreaWithHeading";
 import useSetEditorData from "@modules/journal/hooks/useSetEditorData";
 import { WeeklyJournalData } from "@resources/types/journal";
-import { useSelector } from "@store/hooks";
-import { FC } from "react";
-import EditorActionBtns from "../EditorActionBtns";
-import { usePopup } from "@contexts/UsePopup";
 import { ImageRawData } from "@resources/types/ocr";
-import { journalOcrFileLimit } from "@configs/app";
+import { useSelector } from "@store/hooks";
 import {
   setEditorLoadingState,
   updateEditorCurrentState,
   updateEditorImageState,
 } from "@store/modules/editor";
+
+import EditorActionBtns from "../EditorActionBtns";
+
 
 const WeeklyJournalEditor: FC = () => {
   const { imageScanPopupObj } = usePopup();
@@ -31,7 +34,7 @@ const WeeklyJournalEditor: FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-5 w-full ">
+    <div className="flex w-full flex-col gap-5">
       <EditorActionBtns
         isScanned={
           editor.isRead &&

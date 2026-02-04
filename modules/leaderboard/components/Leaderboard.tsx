@@ -4,11 +4,12 @@ import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { leaderboardFilterTypes } from "@resources/types/leaderboard";
 import { headingVariants, paragraphVariants } from "@resources/variants";
-import useLeaderBoardData from "../hooks/useLeaderBoardData";
-import UserCard from "./UserCard";
-import UserCardSkeleton from "./UserCardSkeleton";
 import { useDispatch, useSelector } from "@store/hooks";
 import { setLeaderboardFilter } from "@store/modules/leaderboard";
+
+import UserCard from "./UserCard";
+import UserCardSkeleton from "./UserCardSkeleton";
+import useLeaderBoardData from "../hooks/useLeaderBoardData";
 
 const Leaderboard = () => {
   const dispatch = useDispatch();
@@ -18,8 +19,8 @@ const Leaderboard = () => {
   const { scrollEndRef, leaderboardData } = useLeaderBoardData();
 
   return (
-    <section className="flex flex-col items-center gap-[30px] max-w-[1200px] w-full mx-auto">
-      <i className="gng-community text-[28px] py-[10] text-content" />
+    <section className="mx-auto flex w-full max-w-[1200px] flex-col items-center gap-[30px]">
+      <i className="gng-community text-content py-[10] text-[28px]" />
       <Heading variant={headingVariants.sectionHeading} sx="text-center !font-bold max-w-[700px]">
         {"The Community Growth Leaderboard"}
       </Heading>
@@ -31,10 +32,10 @@ const Leaderboard = () => {
         sx="max-w-[850px] text-center"
       />
 
-      <div className="flex flex-col gap-5 w-full">
+      <div className="flex w-full flex-col gap-5">
         <div
           className={cn(
-            "flex justify-between sm:gap-2.5 p-2.5 border border-border-light rounded bg-bkg-light w-full sm:w-fit mx-auto"
+            "border-border-light bg-bkg-light mx-auto flex w-full justify-between rounded border p-2.5 sm:w-fit sm:gap-2.5"
           )}
         >
           {Object.values(leaderboardFilterTypes).map((type: string) => {
@@ -66,7 +67,7 @@ const Leaderboard = () => {
           })}
         </div>
 
-        <div className="flex flex-col gap-2.5 p-[15px] rounded-large bg-bkg-light shadow w-full">
+        <div className="rounded-large bg-bkg-light flex w-full flex-col gap-2.5 p-[15px] shadow">
           {leaderboard.loading && !leaderboardData.length ? (
             <SkeletonWrapper renderTimes={10}>
               <UserCardSkeleton />
@@ -90,13 +91,13 @@ const Leaderboard = () => {
                 />
               ) : (
                 <>
-                  <div className=" items-center p-2 sm:px-[15px] sm:py-2.5 mt-[22px] rounded [&>p]:text-black hidden sm:flex">
+                  <div className="mt-[22px] hidden items-center rounded p-2 sm:flex sm:px-[15px] sm:py-2.5 [&>p]:text-black">
                     <Paragraph
                       content={"Rank"}
                       variant={paragraphVariants.regular}
                       sx={"!font-bold text-center w-[84px] mr-2 sm:mr-5"}
                     />
-                    <div className="grid grid-cols-3 w-full">
+                    <div className="grid w-full grid-cols-3">
                       <Paragraph
                         content={"User"}
                         variant={paragraphVariants.regular}

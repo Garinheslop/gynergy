@@ -18,14 +18,14 @@ const MoodTracker: React.FC<MoodTrackerProps> = ({ value, onClick }) => {
           <button
             key={index}
             className={cn(
-              "flex items-center justify-center h-[60px] w-[50px] rounded-full cursor-pointer duration-300 shrink-0 hover:[&>i]:text-action-secondary",
+              "hover:[&>i]:text-action-secondary flex h-[60px] w-[50px] shrink-0 cursor-pointer items-center justify-center rounded-full duration-300",
               {
-                "[&>i]:text-action-secondary w-[60px] bg-action-50": value === index + 1,
+                "[&>i]:text-action-secondary bg-action-50 w-[60px]": value === index + 1,
               }
             )}
             onClick={() => onClick("moodScore", index + 1)}
           >
-            <i className={`gng-${iconName} text-[30px] text-grey-400 duration-150`} />
+            <i className={`gng-${iconName} text-grey-400 text-[30px] duration-150`} />
           </button>
         ))}
       </div>

@@ -1,36 +1,43 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
+import { useRouter } from "next/navigation";
+
+import dayjs from "dayjs";
+
+import { usePopup } from "@contexts/UsePopup";
+import { cn } from "@lib/utils/style";
 import ActionButton from "@modules/common/components/ActionButton";
+import Loader from "@modules/common/components/Loader";
+import Heading from "@modules/common/components/typography/Heading";
+import Paragraph from "@modules/common/components/typography/Paragraph";
 import VisionHighestSelfEditor from "@modules/editor/components/vision/VisionHighestSelfEditor";
 import VisionMantraEditor from "@modules/editor/components/vision/VisionMantraEditor";
+import { pagePaths } from "@resources/paths";
+import { actionRequestTypes } from "@resources/types/action";
 import { buttonActionTypes } from "@resources/types/button";
 import { useDispatch, useSelector } from "@store/hooks";
 import { editorDataCreationRequested, resetEditorDataStates } from "@store/modules/editor";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+
+import EveningJournalEditor from "../daily-journal/EveningJournalEditor";
+import MorningJournalEditor from "../daily-journal/MorningJournalEditor";
 import EditorHeader from "../EditorHeader";
 import { journalRequestTypes, journalTypes } from "@resources/types/journal";
 import VisionCreedEditor from "../vision/VisionCreedEditor";
 import VisionDiscoveryEditor from "../vision/VisionDiscoveryEditor";
-import MorningJournalEditor from "../daily-journal/MorningJournalEditor";
-import Heading from "@modules/common/components/typography/Heading";
 import { headingVariants, paragraphVariants } from "@resources/variants";
-import Paragraph from "@modules/common/components/typography/Paragraph";
-import dayjs from "dayjs";
-import EveningJournalEditor from "../daily-journal/EveningJournalEditor";
+
+
 import GratitudeActionJournalEditor from "../daily-journal/GratitudeActionJournalEditor";
 import WeeklyChallengeJournalEditor from "../weekly-journal/WeeklyChallengeJournalEditor";
 import WeeklyJournalEditor from "../weekly-journal/WeeklyJournalEditor";
-import Loader from "@modules/common/components/Loader";
+
 import { loaderTypes } from "@resources/types/loader";
 import { createUserjournal } from "@store/modules/journal";
 import { visionRequestTypes, visionTypes } from "@resources/types/vision";
 import { createUserActionLog } from "@store/modules/action";
 import { updateUserVisions } from "@store/modules/vision";
-import { usePopup } from "@contexts/UsePopup";
-import { pagePaths } from "@resources/paths";
-import { actionRequestTypes } from "@resources/types/action";
-import { cn } from "@lib/utils/style";
 
 const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
   const router = useRouter();
@@ -75,9 +82,9 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
   }, [editorStates.created]);
 
   const completePromptHandler = () => {
-    let journalRequestType = getJournalRequestType(editorType);
-    let actionRequestType = getActionRequestType(editorType);
-    let visionRequestType = getVisionRequestType(editorType);
+    const journalRequestType = getJournalRequestType(editorType);
+    const actionRequestType = getActionRequestType(editorType);
+    const visionRequestType = getVisionRequestType(editorType);
     if (userEnrollment?.session?.id) {
       if (journalRequestType) {
         dispatch(
@@ -116,7 +123,7 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
 
   if (!editorType) return null;
   return (
-    <section className="flex flex-col gap-[20px] bg-bkg-light sm:bg-transparent w-full justify-start max-w-[1253px] mx-auto py-[100px] md:py-[130px] px-4">
+    <section className="bg-bkg-light mx-auto flex w-full max-w-[1253px] flex-col justify-start gap-[20px] px-4 py-[100px] sm:bg-transparent md:py-[130px]">
       {editorStates.creating && <Loader label={"Please Wait..."} type={loaderTypes.window} />}{" "}
       {editorStates.loading && (
         <Loader
@@ -157,7 +164,7 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
           />
         </div>
       )}
-      <div className="flex flex-col gap-[30px] sm:p-[30px] rounded-[20px] bg-bkg-light w-full">
+      <div className="bg-bkg-light flex w-full flex-col gap-[30px] rounded-[20px] sm:p-[30px]">
         {(
           [
             journalTypes.morningJournal,
@@ -187,10 +194,10 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
             {editorType === journalTypes.weeklyReflection && <WeeklyJournalEditor />}
           </>
         )}
-        <div className="w-full border-b border-border-light" />
+        <div className="border-border-light w-full border-b" />
         <div
           className={cn("flex items-center gap-5", {
-            "sm:grid sm:grid-cols-3 ":
+            "sm:grid sm:grid-cols-3":
               editorStates.action?.isEulogy || editorStates.action?.isJourneyTable,
           })}
         >
@@ -208,14 +215,14 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
             </div>
           )}
           {(editorStates.action?.isEulogy || editorStates.action?.isJourneyTable) && (
-            <div className="hidden sm:flex gap-[10px] items-center mx-auto">
+            <div className="mx-auto hidden items-center gap-[10px] sm:flex">
               {Array.from({ length: 2 }, (_, index) => (
                 <span
                   key={index}
                   className={cn(
-                    "w-[10px] h-[10px] rounded-full bg-grey-300 duration-200 cursor-pointer",
+                    "bg-grey-300 h-[10px] w-[10px] cursor-pointer rounded-full duration-200",
                     {
-                      "w-[30px] bg-dark-pure rounded-[20px]":
+                      "bg-dark-pure w-[30px] rounded-[20px]":
                         (index === 0 && intro) || (index === 1 && !intro),
                     }
                   )}

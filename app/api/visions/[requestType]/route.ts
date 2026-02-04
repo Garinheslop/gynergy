@@ -14,7 +14,6 @@ import { uploadFileToStorage } from "app/api/upload/controller";
 
 import { validateVisionSchema } from "./validation";
 
-
 type UserVisionRequestDataTypes = {
   userId: string;
   sessionId: string;

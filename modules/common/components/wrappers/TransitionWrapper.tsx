@@ -1,6 +1,8 @@
 import React, { FC, ReactNode } from "react";
+
 import { Transition } from "react-transition-group";
 import type { TransitionStatus } from "react-transition-group/Transition";
+
 import { cn } from "@lib/utils/style";
 
 interface TransitionWrapperProps {

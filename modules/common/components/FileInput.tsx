@@ -1,8 +1,9 @@
 import { useRef, FC, ReactNode, RefObject, ChangeEvent, useEffect } from "react";
+
 // lib
+import { usePopup } from "@contexts/UsePopup";
 import { getBase64 } from "@lib/utils/image";
 import { cn } from "@lib/utils/style";
-import { usePopup } from "@contexts/UsePopup";
 
 interface FileInputProps {
   triggerRef?: RefObject<HTMLInputElement>;

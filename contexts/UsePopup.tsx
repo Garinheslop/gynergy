@@ -141,40 +141,47 @@ const UsePopupContextProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [celebrationQueueState, setCelebrationQueueState] = useState<CelebrationEvent[]>([]);
   const [currentCelebration, setCurrentCelebration] = useState<CelebrationEvent | null>(null);
 
-  const generateCelebrationId = () => `celebration_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+  const generateCelebrationId = () =>
+    `celebration_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 
-  const addCelebration = useCallback((event: Omit<CelebrationEvent, "id">) => {
-    const newEvent: CelebrationEvent = {
-      ...event,
-      id: generateCelebrationId(),
-    };
+  const addCelebration = useCallback(
+    (event: Omit<CelebrationEvent, "id">) => {
+      const newEvent: CelebrationEvent = {
+        ...event,
+        id: generateCelebrationId(),
+      };
 
-    setCelebrationQueueState((prev) => {
-      const updated = [...prev, newEvent].sort((a, b) => b.priority - a.priority);
-      // If nothing is currently showing, show the highest priority item
-      if (!currentCelebration) {
-        setCurrentCelebration(updated[0]);
-        return updated.slice(1);
-      }
-      return updated;
-    });
-  }, [currentCelebration]);
+      setCelebrationQueueState((prev) => {
+        const updated = [...prev, newEvent].sort((a, b) => b.priority - a.priority);
+        // If nothing is currently showing, show the highest priority item
+        if (!currentCelebration) {
+          setCurrentCelebration(updated[0]);
+          return updated.slice(1);
+        }
+        return updated;
+      });
+    },
+    [currentCelebration]
+  );
 
-  const addMultipleCelebrations = useCallback((events: Omit<CelebrationEvent, "id">[]) => {
-    const newEvents: CelebrationEvent[] = events.map((event) => ({
-      ...event,
-      id: generateCelebrationId(),
-    }));
+  const addMultipleCelebrations = useCallback(
+    (events: Omit<CelebrationEvent, "id">[]) => {
+      const newEvents: CelebrationEvent[] = events.map((event) => ({
+        ...event,
+        id: generateCelebrationId(),
+      }));
 
-    setCelebrationQueueState((prev) => {
-      const updated = [...prev, ...newEvents].sort((a, b) => b.priority - a.priority);
-      if (!currentCelebration) {
-        setCurrentCelebration(updated[0]);
-        return updated.slice(1);
-      }
-      return updated;
-    });
-  }, [currentCelebration]);
+      setCelebrationQueueState((prev) => {
+        const updated = [...prev, ...newEvents].sort((a, b) => b.priority - a.priority);
+        if (!currentCelebration) {
+          setCurrentCelebration(updated[0]);
+          return updated.slice(1);
+        }
+        return updated;
+      });
+    },
+    [currentCelebration]
+  );
 
   const dismissCelebration = useCallback(() => {
     if (currentCelebration?.onDismiss) {

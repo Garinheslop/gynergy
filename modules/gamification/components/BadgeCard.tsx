@@ -1,8 +1,9 @@
 "use client";
 import React from "react";
+
 import { cn } from "@lib/utils/style";
-import { Badge, UserBadge, BadgeRarity } from "@resources/types/gamification";
 import Paragraph from "@modules/common/components/typography/Paragraph";
+import { Badge, UserBadge, BadgeRarity } from "@resources/types/gamification";
 import { paragraphVariants } from "@resources/variants";
 
 interface BadgeCardProps {
@@ -79,9 +80,9 @@ const BadgeCard: React.FC<BadgeCardProps> = ({
               rarityGlow[badge.rarity],
               "shadow-lg"
             )
-          : "bg-bkg-light/50 border-border-light/20 grayscale opacity-50",
+          : "bg-bkg-light/50 border-border-light/20 opacity-50 grayscale",
         // Hover effects only if earned and clickable
-        earned && onClick && "hover:scale-105 cursor-pointer",
+        earned && onClick && "cursor-pointer hover:scale-105",
         !earned && "cursor-default",
         sx
       )}
@@ -91,7 +92,7 @@ const BadgeCard: React.FC<BadgeCardProps> = ({
     >
       {/* New badge indicator */}
       {isNew && (
-        <span className="absolute -top-1 -right-1 w-3 h-3 bg-action rounded-full animate-pulse" />
+        <span className="bg-action absolute -top-1 -right-1 h-3 w-3 animate-pulse rounded-full" />
       )}
 
       {/* Showcased indicator */}
@@ -124,9 +125,9 @@ const BadgeCard: React.FC<BadgeCardProps> = ({
 
       {/* Progress bar (for locked badges) */}
       {showProgress && !earned && progress > 0 && (
-        <div className="absolute bottom-1 left-2 right-2 h-1 bg-bkg-dark/30 rounded-full overflow-hidden">
+        <div className="bg-bkg-dark/30 absolute right-2 bottom-1 left-2 h-1 overflow-hidden rounded-full">
           <div
-            className="h-full bg-action/50 rounded-full transition-all duration-300"
+            className="bg-action/50 h-full rounded-full transition-all duration-300"
             style={{ width: `${Math.min(progress, 100)}%` }}
           />
         </div>
@@ -155,15 +156,12 @@ export const BadgeCardDetailed: React.FC<BadgeCardDetailedProps> = ({
 
   return (
     <div
-      className={cn(
-        "flex flex-col items-center p-6 bg-bkg-light rounded-2xl max-w-sm w-full",
-        sx
-      )}
+      className={cn("bg-bkg-light flex w-full max-w-sm flex-col items-center rounded-2xl p-6", sx)}
     >
       {/* Close button */}
       {onClose && (
         <button
-          className="absolute top-4 right-4 text-content-dark/50 hover:text-content-dark"
+          className="text-content-dark/50 hover:text-content-dark absolute top-4 right-4"
           onClick={onClose}
           aria-label="Close"
         >
@@ -174,7 +172,7 @@ export const BadgeCardDetailed: React.FC<BadgeCardDetailedProps> = ({
       {/* Badge display */}
       <div
         className={cn(
-          "w-24 h-24 flex items-center justify-center rounded-full bg-gradient-to-br mb-4",
+          "mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br",
           earned ? rarityColors[badge.rarity] : "bg-bkg-dark/20"
         )}
       >
@@ -199,25 +197,20 @@ export const BadgeCardDetailed: React.FC<BadgeCardDetailedProps> = ({
       />
 
       {/* Rarity and points */}
-      <div className="flex items-center gap-4 mb-4">
+      <div className="mb-4 flex items-center gap-4">
         <span
-          className={cn(
-            "px-3 py-1 rounded-full text-xs font-medium capitalize",
-            {
-              "bg-gray-500/20 text-gray-300": badge.rarity === "common",
-              "bg-green-500/20 text-green-300": badge.rarity === "uncommon",
-              "bg-blue-500/20 text-blue-300": badge.rarity === "rare",
-              "bg-purple-500/20 text-purple-300": badge.rarity === "epic",
-              "bg-amber-500/20 text-amber-300": badge.rarity === "legendary",
-            }
-          )}
+          className={cn("rounded-full px-3 py-1 text-xs font-medium capitalize", {
+            "bg-gray-500/20 text-gray-300": badge.rarity === "common",
+            "bg-green-500/20 text-green-300": badge.rarity === "uncommon",
+            "bg-blue-500/20 text-blue-300": badge.rarity === "rare",
+            "bg-purple-500/20 text-purple-300": badge.rarity === "epic",
+            "bg-amber-500/20 text-amber-300": badge.rarity === "legendary",
+          })}
         >
           {badge.rarity}
         </span>
         {badge.pointsReward > 0 && (
-          <span className="text-action text-sm font-medium">
-            +{badge.pointsReward} pts
-          </span>
+          <span className="text-action text-sm font-medium">+{badge.pointsReward} pts</span>
         )}
       </div>
 
@@ -234,7 +227,7 @@ export const BadgeCardDetailed: React.FC<BadgeCardDetailedProps> = ({
       {userBadge && onToggleShowcase && (
         <button
           className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors",
+            "flex items-center gap-2 rounded-lg px-4 py-2 transition-colors",
             userBadge.isShowcased
               ? "bg-amber-500/20 text-amber-300"
               : "bg-bkg-dark/20 text-content-dark-secondary hover:bg-bkg-dark/30"
@@ -242,9 +235,7 @@ export const BadgeCardDetailed: React.FC<BadgeCardDetailedProps> = ({
           onClick={onToggleShowcase}
         >
           <i className="gng-star text-[16px]" />
-          <span className="text-sm">
-            {userBadge.isShowcased ? "Showcased" : "Add to Showcase"}
-          </span>
+          <span className="text-sm">{userBadge.isShowcased ? "Showcased" : "Add to Showcase"}</span>
         </button>
       )}
     </div>

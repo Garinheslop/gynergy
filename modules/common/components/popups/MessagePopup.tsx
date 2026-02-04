@@ -3,12 +3,13 @@ import { usePopup } from "@contexts/UsePopup";
 //component
 //resources
 import { cn } from "@lib/utils/style";
-import Paragraph from "../typography/Paragraph";
 import { headingVariants, paragraphVariants } from "@resources/variants";
-import Heading from "../typography/Heading";
 import { useDispatch } from "@store/hooks";
+
 import ActionButton from "../ActionButton";
 import Modal from "../modal";
+import Heading from "../typography/Heading";
+import Paragraph from "../typography/Paragraph";
 
 const MessagePopup = () => {
   //context
@@ -25,10 +26,10 @@ const MessagePopup = () => {
 
   return (
     <Modal open={messagePopupObj.show} onClose={closeMessagePopup}>
-      <section className="flex w-[90vw] flex-col rounded bg-bkg-light sm:h-auto sm:w-[30rem] lg:w-[40rem]">
+      <section className="bg-bkg-light flex w-[90vw] flex-col rounded sm:h-auto sm:w-[30rem] lg:w-[40rem]">
         <header
           className={cn(
-            "relative flex w-full items-center justify-center border-b border-border-light-secondary",
+            "border-border-light-secondary relative flex w-full items-center justify-center border-b",
             heading ? "p-4" : "px-4 py-0"
           )}
         >
@@ -39,7 +40,7 @@ const MessagePopup = () => {
           )}
           <button
             onClick={() => closeMessagePopup()}
-            className="absolute right-4 top-4 items-center justify-center text-sm text-content cursor-pointer"
+            className="text-content absolute top-4 right-4 cursor-pointer items-center justify-center text-sm"
           >
             <i className="gng-close"></i>
           </button>

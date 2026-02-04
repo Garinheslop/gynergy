@@ -1,10 +1,12 @@
 "use client";
 import React, { useState, useMemo } from "react";
+
 import { cn } from "@lib/utils/style";
-import { Badge, UserBadge, BadgeCategory } from "@resources/types/gamification";
-import BadgeCard, { BadgeCardDetailed } from "./BadgeCard";
 import Paragraph from "@modules/common/components/typography/Paragraph";
+import { Badge, UserBadge, BadgeCategory } from "@resources/types/gamification";
 import { paragraphVariants } from "@resources/variants";
+
+import BadgeCard, { BadgeCardDetailed } from "./BadgeCard";
 
 interface BadgeGridProps {
   badges: Badge[];
@@ -148,7 +150,7 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({
         <div className="flex flex-wrap gap-2">
           <button
             className={cn(
-              "px-3 py-1 rounded-full text-sm transition-colors",
+              "rounded-full px-3 py-1 text-sm transition-colors",
               selectedCategory === "all"
                 ? "bg-action text-content-dark"
                 : "bg-bkg-light text-content-dark-secondary hover:bg-bkg-light/80"
@@ -161,7 +163,7 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({
             <button
               key={category}
               className={cn(
-                "px-3 py-1 rounded-full text-sm transition-colors capitalize",
+                "rounded-full px-3 py-1 text-sm capitalize transition-colors",
                 selectedCategory === category
                   ? "bg-action text-content-dark"
                   : "bg-bkg-light text-content-dark-secondary hover:bg-bkg-light/80"
@@ -200,12 +202,9 @@ const BadgeGrid: React.FC<BadgeGridProps> = ({
 
       {/* Empty state */}
       {filteredBadges.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-8 text-content-dark-secondary">
-          <i className="gng-trophy text-[48px] mb-2 opacity-30" />
-          <Paragraph
-            content="No badges found"
-            variant={paragraphVariants.regular}
-          />
+        <div className="text-content-dark-secondary flex flex-col items-center justify-center py-8">
+          <i className="gng-trophy mb-2 text-[48px] opacity-30" />
+          <Paragraph content="No badges found" variant={paragraphVariants.regular} />
         </div>
       )}
 

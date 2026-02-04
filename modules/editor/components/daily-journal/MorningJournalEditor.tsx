@@ -1,3 +1,5 @@
+import { FC, useEffect, useState } from "react";
+
 import { journalOcrFileLimit } from "@configs/app";
 import { usePopup } from "@contexts/UsePopup";
 import { cn } from "@lib/utils/style";
@@ -14,7 +16,7 @@ import {
   updateEditorCurrentState,
   updateEditorImageState,
 } from "@store/modules/editor";
-import { FC, useEffect, useState } from "react";
+
 import EditorActionBtns from "../EditorActionBtns";
 import EditorHeader from "../EditorHeader";
 import MoodTracker from "../MoodTracker";
@@ -63,7 +65,7 @@ const MorningJournalEditor: FC = () => {
           }
         />
       </EditorHeader>
-      <div className="w-full border-b border-border-light" />
+      <div className="border-border-light w-full border-b" />
       <div className="flex flex-col gap-5">
         <DreamEssence
           value={editor.data?.isDreamt}
@@ -92,13 +94,13 @@ const MorningJournalEditor: FC = () => {
           <Heading variant={headingVariants.cardHeading} sx="!font-bold">
             Positive Affirmations
           </Heading>
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-[20px] lg:gap-[40px]">
+          <div className="grid grid-cols-1 gap-[20px] lg:grid-cols-[1fr_1fr] lg:gap-[40px]">
             <Entries
               entryType={journalEntryTypes.affirmation}
               values={editor.data?.affirmations}
               onEntryInput={(value) => editor.update("affirmations", value)}
             />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[20px]">
+            <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2">
               <Entries
                 entryType={journalEntryTypes.gratitude}
                 values={editor.data?.gratitudes}
@@ -145,7 +147,7 @@ const DreamEssence = ({
       <div className="flex gap-[10px]">
         <button
           className={cn(
-            "h-[57px] w-[73px] flex justify-center items-center rounded border border-border-light cursor-pointer",
+            "border-border-light flex h-[57px] w-[73px] cursor-pointer items-center justify-center rounded border",
             { "bg-action": value }
           )}
           onClick={() => {
@@ -157,7 +159,7 @@ const DreamEssence = ({
 
         <button
           className={cn(
-            "h-[57px] w-[73px] flex justify-center items-center rounded border border-border-light cursor-pointer",
+            "border-border-light flex h-[57px] w-[73px] cursor-pointer items-center justify-center rounded border",
             { "bg-action": value === false }
           )}
           onClick={() => {
@@ -168,7 +170,7 @@ const DreamEssence = ({
         </button>
       </div>
       <div
-        className={`overflow-hidden flex flex-col gap-5 md:gap-[30px] px-1 transition-all duration-500 sm:p-0 ${
+        className={`flex flex-col gap-5 overflow-hidden px-1 transition-all duration-500 sm:p-0 md:gap-[30px] ${
           value ? "max-h-[50vh] ease-in" : "max-h-0 ease-out"
         }`}
       >
@@ -236,7 +238,7 @@ const Entries = ({
             />
             <input
               type="text"
-              className="box-border w-full bg-bkg-transparent border border-border-light outline-0 rounded px-[15px] py-[10px] text-content-dark placeholder-content-dark/40 text-regular transition-all duration-300 ease focus:outline-none focus:border-action"
+              className="bg-bkg-transparent border-border-light text-content-dark placeholder-content-dark/40 text-regular ease focus:border-action box-border w-full rounded border px-[15px] py-[10px] outline-0 transition-all duration-300 focus:outline-none"
               value={entry.value}
               onChange={(e) => {
                 const newEntries = [...entries];

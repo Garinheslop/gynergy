@@ -19,17 +19,11 @@ import {
 import { createClient, createServiceClient } from "@lib/supabase-server";
 import { gamificationRequestTypes } from "@resources/types/gamification";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { requestType: string } }
-) {
+export async function GET(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
   if (!requestType) {
-    return NextResponse.json(
-      { error: "Request type is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Request type is required" }, { status: 400 });
   }
 
   const supabase = createClient();
@@ -58,10 +52,7 @@ export async function GET(
     // GET: User's earned badges
     if (requestType === gamificationRequestTypes.getUserBadges) {
       if (!sessionId) {
-        return NextResponse.json(
-          { error: "Session ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Session ID is required" }, { status: 400 });
       }
       const { badges, error } = await getUserBadges(supabase, user.id, sessionId);
       if (error) {
@@ -73,10 +64,7 @@ export async function GET(
     // GET: New (unseen) badges
     if (requestType === gamificationRequestTypes.getNewBadges) {
       if (!sessionId) {
-        return NextResponse.json(
-          { error: "Session ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Session ID is required" }, { status: 400 });
       }
       const { badges, error } = await getNewBadges(supabase, user.id, sessionId);
       if (error) {
@@ -97,10 +85,7 @@ export async function GET(
     // GET: Active multiplier for user
     if (requestType === gamificationRequestTypes.getActiveMultiplier) {
       if (!sessionId) {
-        return NextResponse.json(
-          { error: "Session ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Session ID is required" }, { status: 400 });
       }
       const { multiplier, streak, error } = await getActiveMultiplierForUser(
         supabase,
@@ -116,18 +101,10 @@ export async function GET(
     // GET: Points history
     if (requestType === gamificationRequestTypes.getPointsHistory) {
       if (!sessionId) {
-        return NextResponse.json(
-          { error: "Session ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Session ID is required" }, { status: 400 });
       }
       const limit = parseInt(url.searchParams.get("limit") || "50", 10);
-      const { transactions, error } = await getPointsHistory(
-        supabase,
-        user.id,
-        sessionId,
-        limit
-      );
+      const { transactions, error } = await getPointsHistory(supabase, user.id, sessionId, limit);
       if (error) {
         return NextResponse.json({ error }, { status: 500 });
       }
@@ -137,10 +114,7 @@ export async function GET(
     // GET: Total points
     if (requestType === gamificationRequestTypes.getTotalPoints) {
       if (!sessionId) {
-        return NextResponse.json(
-          { error: "Session ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Session ID is required" }, { status: 400 });
       }
       const { total, error } = await getTotalPoints(supabase, user.id, sessionId);
       if (error) {
@@ -159,17 +133,11 @@ export async function GET(
   }
 }
 
-export async function POST(
-  request: Request,
-  { params }: { params: { requestType: string } }
-) {
+export async function POST(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
   if (!requestType) {
-    return NextResponse.json(
-      { error: "Request type is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Request type is required" }, { status: 400 });
   }
 
   const supabase = createClient();
@@ -189,10 +157,7 @@ export async function POST(
     if (requestType === gamificationRequestTypes.markBadgeSeen) {
       const { badgeId } = body;
       if (!badgeId) {
-        return NextResponse.json(
-          { error: "Badge ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Badge ID is required" }, { status: 400 });
       }
       const { success, error } = await markBadgeSeen(supabase, user.id, badgeId);
       if (error) {
@@ -210,12 +175,7 @@ export async function POST(
           { status: 400 }
         );
       }
-      const { success, error } = await toggleBadgeShowcase(
-        supabase,
-        user.id,
-        badgeId,
-        sessionId
-      );
+      const { success, error } = await toggleBadgeShowcase(supabase, user.id, badgeId, sessionId);
       if (error) {
         return NextResponse.json({ error }, { status: 500 });
       }
@@ -226,10 +186,7 @@ export async function POST(
     if (requestType === gamificationRequestTypes.checkBadges) {
       const { sessionId, context } = body;
       if (!sessionId || !context) {
-        return NextResponse.json(
-          { error: "Session ID and context are required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Session ID and context are required" }, { status: 400 });
       }
 
       const supabaseAdmin = createServiceClient();

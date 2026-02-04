@@ -1,11 +1,13 @@
+import { Fragment, useEffect } from "react";
+
+import dayjs from "dayjs";
+
 import { useSession } from "@contexts/UseSession";
 import TextSkeleton from "@modules/common/components/skeleton/TextSkeleton";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
 import { getUserDailyQuote } from "@store/modules/quote";
-import dayjs from "dayjs";
-import { Fragment, useEffect } from "react";
 
 const Quote = () => {
   const dispatch = useDispatch();
@@ -23,7 +25,7 @@ const Quote = () => {
     }
   }, [enrollmentData]);
   return (
-    <div className="flex flex-col py-[15px] px-[30px] md:px-[40px] gap-[30px] w-full bg-action-50 rounded">
+    <div className="bg-action-50 flex w-full flex-col gap-[30px] rounded px-[30px] py-[15px] md:px-[40px]">
       {quotes.loading ? (
         <>
           <div className="flex flex-col gap-[10px]">

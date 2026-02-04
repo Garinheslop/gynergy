@@ -1,24 +1,29 @@
 //context
-import Modal from "@modules/common/components/modal";
-import { usePopup } from "@contexts/UsePopup";
-import Webcam from "react-webcam";
 import { useCallback, useEffect, useRef, useState } from "react";
-import ActionButton from "@modules/common/components/ActionButton";
-import { base64ToArrayBuffer, getBase64 } from "@lib/utils/image";
-import FileInput from "@modules/common/components/FileInput";
-import Paragraph from "@modules/common/components/typography/Paragraph";
-import { headingVariants, paragraphVariants } from "@resources/variants";
-import Image from "@modules/common/components/Image";
-import { ImageRawData } from "@resources/types/ocr";
-import Heading from "@modules/common/components/typography/Heading";
-import { buttonActionTypes } from "@resources/types/button";
-import { cn } from "@lib/utils/style";
-import { journalTypes } from "@resources/types/journal";
-import icons from "@resources/icons";
-import { useSelector } from "@store/hooks";
+
 import { useRouter } from "next/navigation";
+
 import ReactConfetti from "react-confetti";
+import Webcam from "react-webcam";
+
+import { usePopup } from "@contexts/UsePopup";
+import { base64ToArrayBuffer, getBase64 } from "@lib/utils/image";
+import { cn } from "@lib/utils/style";
+import ActionButton from "@modules/common/components/ActionButton";
+import FileInput from "@modules/common/components/FileInput";
+import Image from "@modules/common/components/Image";
+import Modal from "@modules/common/components/modal";
+
+
+import Heading from "@modules/common/components/typography/Heading";
+import Paragraph from "@modules/common/components/typography/Paragraph";
+import icons from "@resources/icons";
 import images from "@resources/images";
+import { buttonActionTypes } from "@resources/types/button";
+import { journalTypes } from "@resources/types/journal";
+import { ImageRawData } from "@resources/types/ocr";
+import { headingVariants, paragraphVariants } from "@resources/variants";
+import { useSelector } from "@store/hooks";
 
 const JournalCompletionPopup = () => {
   const router = useRouter();
@@ -55,7 +60,7 @@ const JournalCompletionPopup = () => {
 
   return (
     <Modal open={journalCompletionPopupObj.show} onClose={journalCompletionPopupObj.close}>
-      <section className="relative flex gap-[30px] flex-col mx-auto p-[30px] w-[90vw] md:w-[500px] min-h-[430px] overflow-auto bg-bkg-light rounded-[20px]">
+      <section className="bg-bkg-light relative mx-auto flex min-h-[430px] w-[90vw] flex-col gap-[30px] overflow-auto rounded-[20px] p-[30px] md:w-[500px]">
         <ReactConfetti
           className="h-full w-full"
           run={showConfetti}
@@ -69,16 +74,16 @@ const JournalCompletionPopup = () => {
             setShowConfetti(false);
           }}
         />
-        <div className="relative w-max mx-auto">
+        <div className="relative mx-auto w-max">
           <i
-            className={cn(`gng-${popupContents?.icon} text-[80px] p-[10px]`, {
+            className={cn(`gng-${popupContents?.icon} p-[10px] text-[80px]`, {
               "text-primary": popupType === journalTypes.morningJournal,
               "text-action-secondary": popupType === journalTypes.eveningJournal,
               "text-primary-500": popupType === journalTypes.gratitudeAction,
             })}
           />
-          <div className="absolute -bottom-[10px] right-[0] w-[45px] h-[45px] flex justify-center items-center rounded-full bg-bkg-light">
-            <i className={cn(`gng-complete-circle text-[30px] text-action-secondary`)} />
+          <div className="bg-bkg-light absolute right-[0] -bottom-[10px] flex h-[45px] w-[45px] items-center justify-center rounded-full">
+            <i className={cn(`gng-complete-circle text-action-secondary text-[30px]`)} />
           </div>
         </div>
 
@@ -95,7 +100,7 @@ const JournalCompletionPopup = () => {
             sx="!font-bold text-center text-action-secondary lowercase"
           />
         )}
-        <Image src={images.congratsAvatar} className="w-full h-auto max-h-[225px]" />
+        <Image src={images.congratsAvatar} className="h-auto max-h-[225px] w-full" />
         <div className="flex gap-[20px]">
           <ActionButton
             label="Close"

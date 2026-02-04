@@ -1,21 +1,24 @@
+import { FC, useEffect } from "react";
+
+import { journalOcrFileLimit } from "@configs/app";
+import { usePopup } from "@contexts/UsePopup";
+import ActionButton from "@modules/common/components/ActionButton";
 import TextAreaWithHeading from "@modules/common/components/TextAreaWithHeading";
 import useSetEditorData from "@modules/journal/hooks/useSetEditorData";
-import { visionDiscoveryKeys, VisionDiscovery } from "@resources/types/vision";
+import { discoveryInputData } from "@resources/data/input/visions";
 import { journalTypes } from "@resources/types/journal";
-import { useSelector } from "@store/hooks";
-import { FC, useEffect } from "react";
-import EditorHeader from "../EditorHeader";
-import EditorActionBtns from "../EditorActionBtns";
-import { usePopup } from "@contexts/UsePopup";
 import { ImageRawData } from "@resources/types/ocr";
-import { journalOcrFileLimit } from "@configs/app";
+import { visionDiscoveryKeys, VisionDiscovery } from "@resources/types/vision";
+import { useSelector } from "@store/hooks";
 import {
   setEditorLoadingState,
   updateEditorCurrentState,
   updateEditorImageState,
 } from "@store/modules/editor";
-import ActionButton from "@modules/common/components/ActionButton";
-import { discoveryInputData } from "@resources/data/input/visions";
+
+import EditorActionBtns from "../EditorActionBtns";
+import EditorHeader from "../EditorHeader";
+
 
 const VisionDiscoveryEditor: FC = () => {
   const { imageScanPopupObj } = usePopup();
@@ -35,7 +38,7 @@ const VisionDiscoveryEditor: FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-5 w-full ">
+    <div className="flex w-full flex-col gap-5">
       <EditorActionBtns
         isScanned={
           editor.isRead &&

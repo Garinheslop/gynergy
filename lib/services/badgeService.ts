@@ -29,10 +29,7 @@ import {
 /**
  * Check if a streak condition is met
  */
-function checkStreakCondition(
-  condition: StreakCondition,
-  context: BadgeCheckContext
-): boolean {
+function checkStreakCondition(condition: StreakCondition, context: BadgeCheckContext): boolean {
   const { activity, count } = condition;
 
   switch (activity) {
@@ -54,10 +51,7 @@ function checkStreakCondition(
 /**
  * Check if a first-time condition is met
  */
-function checkFirstCondition(
-  condition: FirstCondition,
-  context: BadgeCheckContext
-): boolean {
+function checkFirstCondition(condition: FirstCondition, context: BadgeCheckContext): boolean {
   const { activity } = condition;
 
   switch (activity) {
@@ -75,10 +69,7 @@ function checkFirstCondition(
 /**
  * Check if a combo condition is met
  */
-function checkComboCondition(
-  condition: ComboCondition,
-  context: BadgeCheckContext
-): boolean {
+function checkComboCondition(condition: ComboCondition, context: BadgeCheckContext): boolean {
   const { activities, count = 1 } = condition;
 
   // Check if all specified activities are completed today
@@ -106,10 +97,7 @@ function checkComboCondition(
 /**
  * Check if a time-based condition is met
  */
-function checkTimeCondition(
-  condition: TimeCondition,
-  context: BadgeCheckContext
-): boolean {
+function checkTimeCondition(condition: TimeCondition, context: BadgeCheckContext): boolean {
   const { activity: _activity, before, after, count = 1 } = condition;
 
   // Parse the timestamp in user's timezone
@@ -140,10 +128,7 @@ function checkTimeCondition(
 /**
  * Check if a share condition is met
  */
-function checkShareCondition(
-  condition: ShareCondition,
-  context: BadgeCheckContext
-): boolean {
+function checkShareCondition(condition: ShareCondition, context: BadgeCheckContext): boolean {
   return context.totalCounts.shares >= condition.count;
 }
 
@@ -170,10 +155,7 @@ function checkMilestoneCondition(
 /**
  * Check if a comeback condition is met
  */
-function checkComebackCondition(
-  condition: ComebackCondition,
-  context: BadgeCheckContext
-): boolean {
+function checkComebackCondition(condition: ComebackCondition, context: BadgeCheckContext): boolean {
   if (!context.lastJournalDate) {
     return false;
   }
@@ -189,10 +171,7 @@ function checkComebackCondition(
 /**
  * Check if a weekend condition is met
  */
-function checkWeekendCondition(
-  _condition: WeekendCondition,
-  context: BadgeCheckContext
-): boolean {
+function checkWeekendCondition(_condition: WeekendCondition, context: BadgeCheckContext): boolean {
   const dayOfWeek = context.timestamp.getDay();
   const isSunday = dayOfWeek === 0;
 
@@ -215,10 +194,7 @@ function checkWeekendCondition(
 /**
  * Check if a mood improvement condition is met
  */
-function checkMoodCondition(
-  condition: MoodCondition,
-  context: BadgeCheckContext
-): boolean {
+function checkMoodCondition(condition: MoodCondition, context: BadgeCheckContext): boolean {
   const { moodHistory } = context;
 
   if (moodHistory.length < condition.count + 1) {
@@ -239,10 +215,7 @@ function checkMoodCondition(
 /**
  * Check if a complete/graduate condition is met
  */
-function checkCompleteCondition(
-  condition: CompleteCondition,
-  context: BadgeCheckContext
-): boolean {
+function checkCompleteCondition(condition: CompleteCondition, context: BadgeCheckContext): boolean {
   if (condition.type === "graduate") {
     return context.dayInJourney >= 45 && context.streaks.combined >= 45;
   }
@@ -255,10 +228,7 @@ function checkCompleteCondition(
 /**
  * Check if a badge unlock condition is met
  */
-export function checkBadgeCondition(
-  badge: Badge,
-  context: BadgeCheckContext
-): boolean {
+export function checkBadgeCondition(badge: Badge, context: BadgeCheckContext): boolean {
   const condition = badge.unlockCondition;
 
   switch (condition.type) {
@@ -424,10 +394,12 @@ export async function getUserBadges(
   try {
     const { data, error } = await supabase
       .from("user_badges")
-      .select(`
+      .select(
+        `
         *,
         badge:badges(*)
-      `)
+      `
+      )
       .eq("user_id", userId)
       .eq("session_id", sessionId)
       .order("unlocked_at", { ascending: false });
@@ -445,9 +417,7 @@ export async function getUserBadges(
 /**
  * Get all badge definitions
  */
-export async function getAllBadges(
-  supabase: any
-): Promise<{ badges: Badge[]; error?: string }> {
+export async function getAllBadges(supabase: any): Promise<{ badges: Badge[]; error?: string }> {
   try {
     const { data, error } = await supabase
       .from("badges")
@@ -475,10 +445,12 @@ export async function getNewBadges(
   try {
     const { data, error } = await supabase
       .from("user_badges")
-      .select(`
+      .select(
+        `
         *,
         badge:badges(*)
-      `)
+      `
+      )
       .eq("user_id", userId)
       .eq("session_id", sessionId)
       .eq("is_new", true)

@@ -4,12 +4,8 @@ import React from "react";
 
 import { cn } from "@lib/utils/style";
 import Paragraph from "@modules/common/components/typography/Paragraph";
+import { VideoRoomWithDetails, roomTypeLabels, VideoRoomStatus } from "@resources/types/video";
 import { paragraphVariants } from "@resources/variants";
-import {
-  VideoRoomWithDetails,
-  roomTypeLabels,
-  VideoRoomStatus,
-} from "@resources/types/video";
 
 interface VideoRoomCardProps {
   room: VideoRoomWithDetails;
@@ -69,23 +65,20 @@ const VideoRoomCard: React.FC<VideoRoomCardProps> = ({
     return (
       <div
         className={cn(
-          "flex items-center justify-between p-3 rounded-lg",
+          "flex items-center justify-between rounded-lg p-3",
           "bg-bkg-light hover:bg-bkg-light/80 transition-colors",
           "cursor-pointer",
           sx
         )}
         onClick={onView}
       >
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <div
-            className={cn(
-              "w-10 h-10 rounded-lg flex items-center justify-center",
-              "bg-action/10"
-            )}
+            className={cn("flex h-10 w-10 items-center justify-center rounded-lg", "bg-action/10")}
           >
-            <i className="gng-video text-[18px] text-action" />
+            <i className="gng-video text-action text-[18px]" />
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <Paragraph
               content={room.title}
               variant={paragraphVariants.meta}
@@ -99,10 +92,7 @@ const VideoRoomCard: React.FC<VideoRoomCardProps> = ({
           </div>
         </div>
         <span
-          className={cn(
-            "px-2 py-1 rounded-full text-xs font-medium",
-            statusColors[room.status]
-          )}
+          className={cn("rounded-full px-2 py-1 text-xs font-medium", statusColors[room.status])}
         >
           {statusLabels[room.status]}
         </span>
@@ -113,21 +103,18 @@ const VideoRoomCard: React.FC<VideoRoomCardProps> = ({
   return (
     <div
       className={cn(
-        "p-4 rounded-xl bg-bkg-light border border-border-light/20",
+        "bg-bkg-light border-border-light/20 rounded-xl border p-4",
         "hover:border-action/30 transition-all duration-200",
         sx
       )}
     >
       {/* Header */}
-      <div className="flex items-start justify-between mb-3">
+      <div className="mb-3 flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div
-            className={cn(
-              "w-12 h-12 rounded-xl flex items-center justify-center",
-              "bg-action/10"
-            )}
+            className={cn("flex h-12 w-12 items-center justify-center rounded-xl", "bg-action/10")}
           >
-            <i className="gng-video text-[24px] text-action" />
+            <i className="gng-video text-action text-[24px]" />
           </div>
           <div>
             <Paragraph
@@ -143,10 +130,7 @@ const VideoRoomCard: React.FC<VideoRoomCardProps> = ({
           </div>
         </div>
         <span
-          className={cn(
-            "px-3 py-1 rounded-full text-xs font-medium",
-            statusColors[room.status]
-          )}
+          className={cn("rounded-full px-3 py-1 text-xs font-medium", statusColors[room.status])}
         >
           {statusLabels[room.status]}
         </span>
@@ -162,7 +146,7 @@ const VideoRoomCard: React.FC<VideoRoomCardProps> = ({
       )}
 
       {/* Details */}
-      <div className="flex items-center gap-4 text-content-dark-secondary mb-4">
+      <div className="text-content-dark-secondary mb-4 flex items-center gap-4">
         <div className="flex items-center gap-1">
           <i className="gng-calendar text-[14px]" />
           <span className="text-sm">{formatDate(room.scheduledStart)}</span>
@@ -181,9 +165,9 @@ const VideoRoomCard: React.FC<VideoRoomCardProps> = ({
 
       {/* Host info */}
       {room.hostName && (
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-6 h-6 rounded-full bg-action/20 flex items-center justify-center">
-            <span className="text-xs font-medium text-action">
+        <div className="mb-4 flex items-center gap-2">
+          <div className="bg-action/20 flex h-6 w-6 items-center justify-center rounded-full">
+            <span className="text-action text-xs font-medium">
               {room.hostName.charAt(0).toUpperCase()}
             </span>
           </div>
@@ -202,8 +186,8 @@ const VideoRoomCard: React.FC<VideoRoomCardProps> = ({
             <button
               onClick={onJoin}
               className={cn(
-                "flex-1 px-4 py-2 rounded-lg font-medium text-sm",
-                "bg-action text-white hover:bg-action/90",
+                "flex-1 rounded-lg px-4 py-2 text-sm font-medium",
+                "bg-action hover:bg-action/90 text-white",
                 "transition-colors duration-200"
               )}
             >
@@ -214,8 +198,8 @@ const VideoRoomCard: React.FC<VideoRoomCardProps> = ({
             <button
               onClick={onView}
               className={cn(
-                "px-4 py-2 rounded-lg font-medium text-sm",
-                "bg-transparent text-content-dark border border-border-light",
+                "rounded-lg px-4 py-2 text-sm font-medium",
+                "text-content-dark border-border-light border bg-transparent",
                 "hover:bg-bkg-light transition-colors duration-200"
               )}
             >
@@ -226,14 +210,14 @@ const VideoRoomCard: React.FC<VideoRoomCardProps> = ({
             <div className="flex items-center gap-1">
               <button
                 onClick={() => onRSVP("accepted")}
-                className="p-2 rounded-lg hover:bg-success/10 text-success"
+                className="hover:bg-success/10 text-success rounded-lg p-2"
                 title="Accept"
               >
                 <i className="gng-check text-[18px]" />
               </button>
               <button
                 onClick={() => onRSVP("declined")}
-                className="p-2 rounded-lg hover:bg-danger/10 text-danger"
+                className="hover:bg-danger/10 text-danger rounded-lg p-2"
                 title="Decline"
               >
                 <i className="gng-close text-[18px]" />

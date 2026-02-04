@@ -1,3 +1,5 @@
+import { useRouter } from "next/navigation";
+
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { pagePaths } from "@resources/paths";
 import { UserVision, visionTypes } from "@resources/types/vision";
@@ -7,7 +9,6 @@ import { useDispatch, useSelector } from "@store/hooks";
 import { setEditorDataStates } from "@store/modules/editor";
 import { setHistoryCurrentStates } from "@store/modules/history";
 import { setJournalCurrentStates } from "@store/modules/journal";
-import { useRouter } from "next/navigation";
 
 const VisionCards: React.FC = () => {
   const router = useRouter();
@@ -58,7 +59,7 @@ type VisionCardProps = {
 };
 const VisionCard: React.FC<VisionCardProps> = ({ visions, cardType, onCardClick }) => {
   let heading;
-  let visionExists = visions.find((vision) => vision.visionType === cardType);
+  const visionExists = visions.find((vision) => vision.visionType === cardType);
   if (cardType === visionTypes.highestSelf) heading = "Your Highest Self";
   if (cardType === visionTypes.mantra) heading = "Your Mantra";
   if (cardType === visionTypes.creed) heading = "Your Creed";
@@ -66,13 +67,13 @@ const VisionCard: React.FC<VisionCardProps> = ({ visions, cardType, onCardClick 
 
   return (
     <div
-      className="p-5 rounded bg-purple-light flex flex-col gap-5 shadow-2xs cursor-pointer min-h-[178px]"
+      className="bg-purple-light flex min-h-[178px] cursor-pointer flex-col gap-5 rounded p-5 shadow-2xs"
       onClick={() => onCardClick && onCardClick(visionExists!)}
     >
       <Paragraph variant={paragraphVariants.title} content={heading} sx="!font-bold" />
       {visionExists?.isCompleted && (
-        <div className="flex gap-[5px] items-center">
-          <i className="gng-complete-circle text-[25px] p-[3px] text-purple" />
+        <div className="flex items-center gap-[5px]">
+          <i className="gng-complete-circle text-purple p-[3px] text-[25px]" />
           <Paragraph variant={paragraphVariants.regular} content="Completed" sx="text-purple" />
         </div>
       )}

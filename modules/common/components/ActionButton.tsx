@@ -1,13 +1,16 @@
 import React, { useEffect, useRef, useState, MouseEvent, ChangeEvent } from "react";
+
 import Link from "next/link";
+
 // lib
 import { cn } from "@lib/utils/style";
 // resources
 import { buttonActionTypes } from "@resources/types/button";
 import { paragraphVariants } from "@resources/variants";
+
 // components
-import Paragraph from "./typography/Paragraph";
 import Spinner from "./Spinner";
+import Paragraph from "./typography/Paragraph";
 
 interface ActionButtonProps {
   buttonActionType?: string;
@@ -242,7 +245,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={cn(
-        "flex w-full items-center justify-center gap-[10px] rounded px-[25px] py-[5px] text-content-dark duration-150 cursor-pointer disabled:cursor-default",
+        "text-content-dark flex w-full cursor-pointer items-center justify-center gap-[10px] rounded px-[25px] py-[5px] duration-150 disabled:cursor-default",
         disabled || isLoading
           ? "bg-bkg-disabled/20 text-content-dark/40 [&>p]:text-content-dark/40"
           : "bg-action hover:bg-action-100",
@@ -311,8 +314,8 @@ const TextButton: React.FC<TextButtonProps> = ({
   return (
     <button
       className={cn(
-        "flex w-full items-center gap-[10px] duration-150 group py-2 rounded group",
-        disabled ? "[&>p,i]:text-content-dark/30" : "cursor-pointer hover:bg-action hover:px-4",
+        "group group flex w-full items-center gap-[10px] rounded py-2 duration-150",
+        disabled ? "[&>p,i]:text-content-dark/30" : "hover:bg-action cursor-pointer hover:px-4",
         sx
       )}
       onClick={(e) => {
@@ -322,7 +325,7 @@ const TextButton: React.FC<TextButtonProps> = ({
     >
       {icon && (
         <i
-          className={cn(`gng-${icon}`, "text-content-dark text-[22px] duration-150 ", {
+          className={cn(`gng-${icon}`, "text-content-dark text-[22px] duration-150", {
             "group-hover:translate-x-[3px]": !disabled,
           })}
         />
@@ -345,7 +348,7 @@ const RadioBtn: React.FC<RadioBtnProps> = ({
   return (
     <button
       className={cn(
-        "flex cursor-pointer items-center justify-between gap-4 px-4 py-2 text-content-dark",
+        "text-content-dark flex cursor-pointer items-center justify-between gap-4 px-4 py-2",
         sx
       )}
       onClick={onClick}
@@ -374,7 +377,7 @@ const RadioQuizBtn: React.FC<RadioQuizBtnProps> = ({
   return (
     <button
       className={cn(
-        "flex cursor-pointer items-center justify-between gap-4 px-4 py-2 text-content-dark",
+        "text-content-dark flex cursor-pointer items-center justify-between gap-4 px-4 py-2",
         { "cursor-default": disabled },
         sx
       )}
@@ -383,10 +386,10 @@ const RadioQuizBtn: React.FC<RadioQuizBtnProps> = ({
     >
       <div
         className={cn(
-          "flex-center border-border-3/10 h-6 w-6 flex-shrink-0 rounded-full border bg-bkg-light text-[10px] text-white sm:h-7 sm:w-7 sm:text-[12px]"
+          "flex-center border-border-3/10 bg-bkg-light h-6 w-6 flex-shrink-0 rounded-full border text-[10px] text-white sm:h-7 sm:w-7 sm:text-[12px]"
         )}
       >
-        {isSelected && <span className="h-6 w-6 rounded-full bg-active" />}
+        {isSelected && <span className="bg-active h-6 w-6 rounded-full" />}
       </div>
       <Paragraph content={label} variant={paragraphVariant} sx="text-start" />
     </button>
@@ -459,10 +462,10 @@ const SliderBtn: React.FC<SliderBtnProps> = ({
       <button
         id="slider"
         className={cn(
-          "relative flex h-[24px] w-[46px] flex-shrink-0 cursor-pointer items-center rounded-[73px] outline-none duration-150",
+          "relative flex h-[24px] w-[46px] flex-shrink-0 cursor-pointer items-center rounded-[73px] duration-150 outline-none",
           !sliderState ? "bg-border-light-secondary" : "bg-action",
           {
-            "cursor-default bg-bkg-disabled/40 text-content-dark/60": disabled,
+            "bg-bkg-disabled/40 text-content-dark/60 cursor-default": disabled,
             "text-loading": isLoading,
           }
         )}
@@ -482,7 +485,7 @@ const SliderBtn: React.FC<SliderBtnProps> = ({
             <i
               className={cn(
                 `gng-${icon} text-[14px] duration-150`,
-                sliderState ? "text-danger-light" : " text-action",
+                sliderState ? "text-danger-light" : "text-action",
                 { "text-content-dark/70": disabled }
               )}
             />
@@ -520,9 +523,9 @@ const ToggleBtn: React.FC<ToggleBtnProps> = ({
     <section className={cn("flex items-center", sx)}>
       <button
         className={cn(
-          "relative flex h-7 w-[62px] flex-shrink-0 cursor-pointer items-center rounded-[73px] outline-none duration-150",
+          "relative flex h-7 w-[62px] flex-shrink-0 cursor-pointer items-center rounded-[73px] duration-150 outline-none",
           sliderState ? "bg-danger-light" : "bg-action",
-          { "cursor-default bg-bkg-disabled/40 text-content-dark/60": disabled }
+          { "bg-bkg-disabled/40 text-content-dark/60 cursor-default": disabled }
         )}
         onClick={onSliderToggleHandler}
         disabled={disabled}
@@ -538,7 +541,7 @@ const ToggleBtn: React.FC<ToggleBtnProps> = ({
             <i
               className={cn(
                 `gng-${icon} text-[14px] duration-150`,
-                sliderState ? "text-danger-light" : " text-action",
+                sliderState ? "text-danger-light" : "text-action",
                 { "text-content-dark/70": disabled }
               )}
             />

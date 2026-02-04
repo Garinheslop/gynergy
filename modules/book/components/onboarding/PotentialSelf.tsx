@@ -15,7 +15,7 @@ const PotentialSelf = () => {
       >
         Meeting Your Highest Potential Self
       </Heading>
-      <div className="flex w-full border-t border-border-light" />
+      <div className="border-border-light flex w-full border-t" />
       <div className="flex flex-col gap-[30px] md:gap-[40px]">
         <div className="flex flex-col gap-5">
           <Paragraph

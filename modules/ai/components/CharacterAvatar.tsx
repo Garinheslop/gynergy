@@ -1,8 +1,9 @@
 "use client";
 import React from "react";
+
 import { cn } from "@lib/utils/style";
-import { CharacterKey } from "@resources/types/ai";
 import Paragraph from "@modules/common/components/typography/Paragraph";
+import { CharacterKey } from "@resources/types/ai";
 import { paragraphVariants } from "@resources/variants";
 
 interface CharacterAvatarProps {
@@ -61,7 +62,7 @@ const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
     <div className={cn("flex flex-col items-center gap-1", sx)}>
       <div
         className={cn(
-          "rounded-full flex items-center justify-center",
+          "flex items-center justify-center rounded-full",
           "bg-gradient-to-br",
           styles.gradient,
           config.container,

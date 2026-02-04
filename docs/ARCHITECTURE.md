@@ -120,6 +120,7 @@ gynergy/
 ## Data Flow
 
 ### Journal Entry Flow
+
 ```
 User Input → JournalForm → Redux Action → API Route → Supabase
                                               │
@@ -137,6 +138,7 @@ User Input → JournalForm → Redux Action → API Route → Supabase
 ```
 
 ### AI Chat Flow
+
 ```
 User Message → CharacterChat → API Route → Context Manager
                                                │
@@ -159,6 +161,7 @@ User Message → CharacterChat → API Route → Context Manager
 ```
 
 ### Video Call Flow
+
 ```
 Schedule Call → API Route → 100ms Create Room → Store in DB
                                                     │
@@ -186,6 +189,7 @@ Leave/End → Update participant records → Realtime broadcast
 ## State Management
 
 ### Redux Store Structure
+
 ```typescript
 {
   global: { ... },           // App-wide state
@@ -209,6 +213,7 @@ Leave/End → Update participant records → Realtime broadcast
 ```
 
 ### Persistence Strategy
+
 - Root state: Redux Persist with localStorage
 - Individual modules: Separate persist configs with blacklists
 - Migration system: Versioned with `createMigrate`
@@ -216,12 +221,15 @@ Leave/End → Update participant records → Realtime broadcast
 ## Security
 
 ### Row Level Security (RLS)
+
 All Supabase tables have RLS enabled:
+
 - Users can only access their own data
 - Cohort members can view shared cohort data
 - Public badges readable by all
 
 ### API Security
+
 - All API routes verify Supabase auth
 - Rate limiting on AI endpoints
 - Input validation with Zod schemas
@@ -229,11 +237,13 @@ All Supabase tables have RLS enabled:
 ## Performance Considerations
 
 ### Caching
+
 - Redux persist for offline-capable state
 - Supabase query caching
 - AI context caching (5-minute TTL)
 
 ### Optimization
+
 - Dynamic imports for heavy components
 - Image optimization via Next.js
 - Incremental static regeneration for public pages
@@ -241,6 +251,7 @@ All Supabase tables have RLS enabled:
 ## Monitoring & Observability
 
 ### Recommended Setup
+
 - Error tracking: Sentry
 - Performance: Vercel Analytics
 - Logs: Vercel Logs

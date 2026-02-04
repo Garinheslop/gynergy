@@ -117,11 +117,13 @@ Display in UI
 ### Yesi - Nurturing Transformation Coach
 
 **Personality:**
+
 - Warm, empathetic, intuitive
 - Celebratory of small wins
 - Uses gentle, reflective questions
 
 **Focus Areas:**
+
 - Emotional support
 - Gratitude deepening
 - Inner transformation
@@ -129,11 +131,13 @@ Display in UI
 - Mindfulness
 
 **Signature Expressions:**
+
 - "I see you, and I'm so proud of the work you're doing."
 - "Every step forward, no matter how small, is a victory worth celebrating."
 - "Your heart knows the way - let's listen together."
 
 **When Suggested:**
+
 - Mood is declining
 - Streak was recently broken
 - User seems to need emotional support
@@ -141,11 +145,13 @@ Display in UI
 ### Garin - Strategic Accountability Coach
 
 **Personality:**
+
 - Direct, analytical, action-oriented
 - Challenging but supportive
 - Data-driven approach
 
 **Focus Areas:**
+
 - Goal-setting
 - Accountability
 - Consistency building
@@ -153,11 +159,13 @@ Display in UI
 - Habit formation
 
 **Signature Expressions:**
+
 - "Let's look at the data - your streaks tell a story."
 - "Consistency isn't about perfection, it's about commitment to showing up."
 - "What's the ONE thing that would make everything else easier?"
 
 **When Suggested:**
+
 - Mood is stable or improving
 - Strong streak maintained
 - User seems goal-focused
@@ -196,12 +204,12 @@ The AI receives context about the user:
 
 To manage costs and context window limits:
 
-| Component | Max Tokens |
-|-----------|------------|
-| System prompt | 1500 |
-| User context | 1000 |
-| Conversation history | 2000 |
-| AI response | 800 |
+| Component            | Max Tokens |
+| -------------------- | ---------- |
+| System prompt        | 1500       |
+| User context         | 1000       |
+| Conversation history | 2000       |
+| AI response          | 800        |
 
 ### Customizing Context
 
@@ -213,10 +221,7 @@ export async function fetchUserContext(userId: string): Promise<UserContext | nu
   // ... existing code ...
 
   // Add your custom data
-  const { data: customData } = await supabase
-    .from("your_table")
-    .select("*")
-    .eq("user_id", userId);
+  const { data: customData } = await supabase.from("your_table").select("*").eq("user_id", userId);
 
   return {
     // ... existing fields ...
@@ -352,8 +357,12 @@ Edit `/lib/ai/character-config.ts`:
 
 ```typescript
 export const CHARACTERS: Record<CharacterKey, CharacterConfig> = {
-  yesi: { /* existing */ },
-  garin: { /* existing */ },
+  yesi: {
+    /* existing */
+  },
+  garin: {
+    /* existing */
+  },
 
   // Add new character
   newcharacter: {
@@ -368,10 +377,7 @@ export const CHARACTERS: Record<CharacterKey, CharacterConfig> = {
     },
     voiceTone: ["tone1", "tone2"],
     focusAreas: ["area1", "area2"],
-    signatureExpressions: [
-      "Quote 1",
-      "Quote 2",
-    ],
+    signatureExpressions: ["Quote 1", "Quote 2"],
     systemPromptAddition: `
       Your character-specific system prompt here.
       Describe how this character should behave.
@@ -463,6 +469,7 @@ To force a specific provider, modify the providers array order.
 ### "No AI provider configured"
 
 Ensure you have at least one API key in `.env.local`:
+
 ```bash
 OPENAI_API_KEY=sk-...
 # or

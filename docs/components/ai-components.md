@@ -39,11 +39,13 @@ Displays the character's avatar image.
 | sx | string | No | - | Additional CSS classes |
 
 **Sizes:**
+
 - `small`: 32x32px
 - `medium`: 48x48px
 - `large`: 80x80px
 
 **Usage:**
+
 ```tsx
 <CharacterAvatar characterKey="yesi" size="large" />
 ```
@@ -65,11 +67,13 @@ Allows users to select which AI character to chat with.
 | variant | 'cards' \| 'pills' | No | 'cards' | Display style |
 
 **Features:**
+
 - Shows character name, role, and avatar
 - Highlights suggested character with badge
 - Cards variant for full display, pills for compact
 
 **Usage:**
+
 ```tsx
 <CharacterSelector
   selectedCharacter={activeCharacter}
@@ -98,11 +102,13 @@ Renders a single chat message (user or assistant).
 | isStreaming | boolean | No | false | Shows typing indicator |
 
 **Styling:**
+
 - User messages: Right-aligned, action color background
 - Assistant messages: Left-aligned, with avatar, light background
 - Streaming: Pulsing cursor animation
 
 **Usage:**
+
 ```tsx
 <ChatMessage
   role="assistant"
@@ -129,18 +135,16 @@ Message input field with send functionality.
 | placeholder | string | No | 'Type a message...' | Input placeholder |
 
 **Features:**
+
 - Auto-expanding textarea
 - Send on Enter (Shift+Enter for newline)
 - Disabled state during streaming
 - Character count (optional)
 
 **Usage:**
+
 ```tsx
-<ChatInput
-  onSend={handleSendMessage}
-  isLoading={isStreaming}
-  placeholder="Message Yesi..."
-/>
+<ChatInput onSend={handleSendMessage} isLoading={isStreaming} placeholder="Message Yesi..." />
 ```
 
 ---
@@ -159,11 +163,13 @@ Main container that orchestrates the complete chat experience.
 | sx | string | No | - | Additional CSS classes |
 
 **States:**
+
 1. **Character Selection**: Shows CharacterSelector when no character is active
 2. **Empty Chat**: Shows welcome message and suggested prompts
 3. **Active Chat**: Shows message history, streaming response, input
 
 **Features:**
+
 - Auto-scroll to bottom on new messages
 - Character switching button
 - Clear chat button
@@ -172,12 +178,9 @@ Main container that orchestrates the complete chat experience.
 - Suggested prompts for empty state
 
 **Usage:**
+
 ```tsx
-<ChatContainer
-  onClose={() => setShowChat(false)}
-  showHeader={true}
-  sx="h-[600px]"
-/>
+<ChatContainer onClose={() => setShowChat(false)} showHeader={true} sx="h-[600px]" />
 ```
 
 ---
@@ -196,17 +199,15 @@ Floating action button to open chat interface.
 | unreadCount | number | No | 0 | Notification badge count |
 
 **Features:**
+
 - Fixed position on screen
 - Pulse animation for notifications
 - Accessible button with aria-label
 
 **Usage:**
+
 ```tsx
-<FloatingChatButton
-  onClick={() => setShowChat(true)}
-  position="bottom-right"
-  unreadCount={0}
-/>
+<FloatingChatButton onClick={() => setShowChat(true)} position="bottom-right" unreadCount={0} />
 ```
 
 ---
@@ -218,6 +219,7 @@ Custom hook for managing AI chat state and interactions.
 **File:** `modules/ai/hooks/useAIChat.ts`
 
 **Returns:**
+
 ```typescript
 interface UseAIChatReturn {
   // State
@@ -246,6 +248,7 @@ interface UseAIChatReturn {
 ```
 
 **Usage:**
+
 ```tsx
 function MyComponent() {
   const {
@@ -287,6 +290,7 @@ function MyComponent() {
 The AI module uses Redux for state management.
 
 **State Structure:**
+
 ```typescript
 interface AIState {
   characters: {
@@ -335,6 +339,7 @@ interface AIState {
 ## Styling Guidelines
 
 ### Color Tokens
+
 - User messages: `bg-action` (primary action color)
 - Assistant messages: `bg-bkg-light`
 - Character name: `text-content-dark`
@@ -342,11 +347,13 @@ interface AIState {
 - Errors: `text-danger`, `bg-danger/10`
 
 ### Spacing
+
 - Message gap: `space-y-4` (16px)
 - Container padding: `p-4` (16px)
 - Avatar to text gap: `gap-3` (12px)
 
 ### Typography
+
 - Messages: `paragraphVariants.regular`
 - Character name: `paragraphVariants.regular` + `font-bold`
 - Timestamps: `paragraphVariants.meta`

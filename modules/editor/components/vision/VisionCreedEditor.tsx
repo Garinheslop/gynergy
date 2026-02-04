@@ -1,17 +1,20 @@
+import { FC } from "react";
+
+import { journalOcrFileLimit } from "@configs/app";
+import { usePopup } from "@contexts/UsePopup";
 import TextAreaWithHeading from "@modules/common/components/TextAreaWithHeading";
 import useSetEditorData from "@modules/journal/hooks/useSetEditorData";
+import { ImageRawData } from "@resources/types/ocr";
 import { VisionCreed } from "@resources/types/vision";
 import { useSelector } from "@store/hooks";
-import { FC } from "react";
-import EditorActionBtns from "../EditorActionBtns";
-import { usePopup } from "@contexts/UsePopup";
-import { ImageRawData } from "@resources/types/ocr";
-import { journalOcrFileLimit } from "@configs/app";
 import {
   setEditorLoadingState,
   updateEditorCurrentState,
   updateEditorImageState,
 } from "@store/modules/editor";
+
+import EditorActionBtns from "../EditorActionBtns";
+
 
 const VisionCreedEditor: FC = () => {
   const { imageScanPopupObj } = usePopup();
@@ -31,7 +34,7 @@ const VisionCreedEditor: FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-5 w-full ">
+    <div className="flex w-full flex-col gap-5">
       <EditorActionBtns
         isScanned={
           editor.isRead &&

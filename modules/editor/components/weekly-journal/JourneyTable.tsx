@@ -1,8 +1,9 @@
+import { useEffect, useState } from "react";
+
 import { cn } from "@lib/utils/style";
 import TextArea from "@modules/common/components/TextArea";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { JourneyTableData } from "@resources/types/journal";
-import { useEffect, useState } from "react";
 
 type FieldKey =
   // Group 1: Current / Vision
@@ -152,14 +153,14 @@ const JourneyTable = ({
   return (
     <div className="flex flex-col gap-8">
       {tableConfigs.map((tbl, tblIndex) => (
-        <div key={tblIndex} className="border border-border-light rounded w-full overflow-x-auto">
+        <div key={tblIndex} className="border-border-light w-full overflow-x-auto rounded border">
           {/* Headers */}
-          <div className="grid grid-cols-[233px_1fr_1fr] min-w-[700px]">
+          <div className="grid min-w-[700px] grid-cols-[233px_1fr_1fr]">
             {tbl.title.map((txt, i) => (
               <div
                 key={i}
                 className={cn(
-                  "border-r last:border-r-0 border-b border-border-light min-h-[57px] flex items-center justify-center",
+                  "border-border-light flex min-h-[57px] items-center justify-center border-r border-b last:border-r-0",
                   {
                     "bg-action-50": !tbl.isSecondary,
                     "bg-gray-100": tbl.isSecondary,
@@ -177,12 +178,12 @@ const JourneyTable = ({
           {tbl.rows.map((row, rowIndex) => (
             <div
               key={rowIndex}
-              className="grid grid-cols-[233px_1fr_1fr] border-b last:border-0 border-border-light min-w-[700px]"
+              className="border-border-light grid min-w-[700px] grid-cols-[233px_1fr_1fr] border-b last:border-0"
             >
               {/* Row header */}
               <div
                 className={cn(
-                  "border-r px-[15px] border-border-light min-h-[57px] flex items-center",
+                  "border-border-light flex min-h-[57px] items-center border-r px-[15px]",
                   {
                     "bg-action-50": !tbl.isSecondary,
                     "bg-gray-100": tbl.isSecondary,
@@ -198,8 +199,8 @@ const JourneyTable = ({
                 return (
                   <div
                     key={colIdx}
-                    className={cn("min-h-[57px] flex items-center justify-center", {
-                      "border-r border-border-light": colIdx === 0,
+                    className={cn("flex min-h-[57px] items-center justify-center", {
+                      "border-border-light border-r": colIdx === 0,
                       "justify-start px-[15px]": isStatic,
                     })}
                   >

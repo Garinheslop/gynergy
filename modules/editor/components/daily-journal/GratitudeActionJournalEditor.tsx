@@ -1,30 +1,34 @@
-import TextAreaWithHeading from "@modules/common/components/TextAreaWithHeading";
-import useSetEditorData from "@modules/journal/hooks/useSetEditorData";
-import { DailyChallengeData } from "@resources/types/journal";
-import { useSelector } from "@store/hooks";
 import { FC, useEffect, useState } from "react";
-import { usePopup } from "@contexts/UsePopup";
-import { ImageRawData } from "@resources/types/ocr";
+
+import { useRouter } from "next/navigation";
+
 import { journalOcrFileLimit } from "@configs/app";
+import { usePopup } from "@contexts/UsePopup";
+import { getBase64 } from "@lib/utils/image";
+import { handleImageCompress } from "@lib/utils/ImageCompressor";
+import { cn } from "@lib/utils/style";
+import FileInput from "@modules/common/components/FileInput";
+import Image from "@modules/common/components/Image";
+import Spinner from "@modules/common/components/Spinner";
+import TextAreaWithHeading from "@modules/common/components/TextAreaWithHeading";
+import Heading from "@modules/common/components/typography/Heading";
+import Paragraph from "@modules/common/components/typography/Paragraph";
+import useSetEditorData from "@modules/journal/hooks/useSetEditorData";
+import { pagePaths } from "@resources/paths";
+import { ActionData } from "@resources/types/action";
+import { DailyChallengeData } from "@resources/types/journal";
+import { ImageRawData } from "@resources/types/ocr";
+import { headingVariants, paragraphVariants } from "@resources/variants";
+import { useSelector } from "@store/hooks";
 import {
   setEditorLoadingState,
   updateEditorCurrentState,
   updateEditorImageState,
 } from "@store/modules/editor";
-import EditorHeader from "../EditorHeader";
-import { headingVariants, paragraphVariants } from "@resources/variants";
+
 import EditorActionBtns from "../EditorActionBtns";
-import Heading from "@modules/common/components/typography/Heading";
-import { cn } from "@lib/utils/style";
-import Paragraph from "@modules/common/components/typography/Paragraph";
-import { ActionData } from "@resources/types/action";
-import { useRouter } from "next/navigation";
-import { pagePaths } from "@resources/paths";
-import { getBase64 } from "@lib/utils/image";
-import { handleImageCompress } from "@lib/utils/ImageCompressor";
-import Image from "@modules/common/components/Image";
-import Spinner from "@modules/common/components/Spinner";
-import FileInput from "@modules/common/components/FileInput";
+import EditorHeader from "../EditorHeader";
+
 
 const GratitudeActionJournalEditor: FC = () => {
   const { imageScanPopupObj } = usePopup();
@@ -82,7 +86,7 @@ const GratitudeActionJournalEditor: FC = () => {
           }
         />
       </EditorHeader>
-      <div className="w-full border-b border-border-light" />
+      <div className="border-border-light w-full border-b" />
       <div className="flex flex-col gap-[10px]">
         <Heading variant={headingVariants.sectionHeading} sx="!font-bold capitalize">
           {dailyAction?.title.toLowerCase()}
@@ -147,7 +151,7 @@ const ActionCompletion = ({
       <div className="flex gap-[10px]">
         <button
           className={cn(
-            "h-[57px] w-[73px] flex justify-center items-center rounded border border-border-light cursor-pointer",
+            "border-border-light flex h-[57px] w-[73px] cursor-pointer items-center justify-center rounded border",
             { "bg-action": value }
           )}
           onClick={() => {
@@ -159,7 +163,7 @@ const ActionCompletion = ({
 
         <button
           className={cn(
-            "h-[57px] w-[73px] flex justify-center items-center rounded border border-border-light cursor-pointer",
+            "border-border-light flex h-[57px] w-[73px] cursor-pointer items-center justify-center rounded border",
             { "bg-action": value === false }
           )}
           onClick={() => {
@@ -170,7 +174,7 @@ const ActionCompletion = ({
         </button>
       </div>
       <div
-        className={`overflow-hidden flex flex-col gap-5 md:gap-[30px] px-1 transition-all duration-500 sm:p-0 ${
+        className={`flex flex-col gap-5 overflow-hidden px-1 transition-all duration-500 sm:p-0 md:gap-[30px] ${
           value === undefined ? "max-h-0 ease-out" : "max-h-[50vh] ease-in"
         }`}
       >
@@ -200,12 +204,11 @@ const Draw = ({ onUpdate }: { onUpdate: (data?: any) => void }) => {
   const handleFileInput = async (url: string, file: File) => {
     setImage(url);
     setLoading(true);
-    let filteData;
     const compressedFile = await handleImageCompress(file);
     const arrBuffer = await compressedFile.arrayBuffer();
     const buffer = Buffer.from(arrBuffer);
 
-    filteData = {
+    const filteData = {
       file: buffer,
       name: compressedFile?.name ?? new Date().getTime(),
       contentType: compressedFile?.type,
@@ -229,7 +232,7 @@ const Draw = ({ onUpdate }: { onUpdate: (data?: any) => void }) => {
       {image ? (
         <div
           className={cn(
-            "relative rounded max-w-[250px] max-h-[270px] flex gap-[10px] overflow-hidden w-full"
+            "relative flex max-h-[270px] w-full max-w-[250px] gap-[10px] overflow-hidden rounded"
           )}
         >
           {!loading && (
@@ -238,7 +241,7 @@ const Draw = ({ onUpdate }: { onUpdate: (data?: any) => void }) => {
                 setImage(null);
                 onUpdate(null);
               }}
-              className="absolute top-2 right-2 h-[20px] w-[20px] flex items-center justify-center z-10 !bg-dark-900/60 rounded-[10px] cursor-pointer"
+              className="!bg-dark-900/60 absolute top-2 right-2 z-10 flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-[10px]"
             >
               <i className="gng-trash text-danger text-body" />
             </button>
@@ -247,7 +250,7 @@ const Draw = ({ onUpdate }: { onUpdate: (data?: any) => void }) => {
           {loading && (
             <div
               className={cn(
-                "absolute top-0 left-0 bg-bkg-dark/50 flex items-center justify-center rounded w-full md:w-[250px] border border-border-light gap-[10px] overflow-hidden h-[100px] md:h-full"
+                "bg-bkg-dark/50 border-border-light absolute top-0 left-0 flex h-[100px] w-full items-center justify-center gap-[10px] overflow-hidden rounded border md:h-full md:w-[250px]"
               )}
             >
               <Spinner />
@@ -256,7 +259,7 @@ const Draw = ({ onUpdate }: { onUpdate: (data?: any) => void }) => {
         </div>
       ) : (
         <section
-          className="relative w-full max-h-[550px] md:max-h-auto h-full rounded-[10px] overflow-hidden mx-auto shrink-0 md:shrink"
+          className="md:max-h-auto relative mx-auto h-full max-h-[550px] w-full shrink-0 overflow-hidden rounded-[10px] md:shrink"
           onDrop={handleDrop}
           onDragOver={preventDefaultHandler}
           onDragEnter={preventDefaultHandler}
@@ -271,13 +274,13 @@ const Draw = ({ onUpdate }: { onUpdate: (data?: any) => void }) => {
               }
             }}
           >
-            <div className="h-full border-[4px] border-dashed border-border-light rounded-[10px] flex flex-col gap-[20px] justify-center p-5 lg:p-10">
+            <div className="border-border-light flex h-full flex-col justify-center gap-[20px] rounded-[10px] border-[4px] border-dashed p-5 lg:p-10">
               <div
                 className={cn(
-                  "flex justify-center items-center mx-auto cursor-pointer border-border-light rounded-full shrink-0 md:border md:size-[70px]"
+                  "border-border-light mx-auto flex shrink-0 cursor-pointer items-center justify-center rounded-full md:size-[70px] md:border"
                 )}
               >
-                <i className="gng-add-thin text-center text-[25px] text-content-dark" />
+                <i className="gng-add-thin text-content-dark text-center text-[25px]" />
               </div>
               <div className="flex flex-col items-center justify-center gap-1">
                 <Paragraph

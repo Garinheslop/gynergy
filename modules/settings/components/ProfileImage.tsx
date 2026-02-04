@@ -1,8 +1,10 @@
+import React, { useEffect, useState } from "react";
+
+import { useSelector } from "react-redux";
+
 import { handleImageCompress } from "@lib/utils/ImageCompressor";
 import Image from "@modules/common/components/Image";
 import { RootState } from "@store/configureStore";
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 
 type ImageState = { src?: string } | { path?: string } | null;
 
@@ -42,15 +44,15 @@ function ProfileImage({ onFileChangeHandler }: ProfileImageProps) {
     }
   };
   return (
-    <div className="w-fit mx-auto relative overflow-hidden">
+    <div className="relative mx-auto w-fit overflow-hidden">
       <Image
         src={image && "src" in image ? image.src : undefined}
         path={image && "path" in image ? image.path : undefined}
-        className="sm:h-[142px] sm:w-[142px] h-[100px] w-[100px] rounded-full border-2 border-border-dark object-cover"
+        className="border-border-dark h-[100px] w-[100px] rounded-full border-2 object-cover sm:h-[142px] sm:w-[142px]"
       />
       <label
         htmlFor="image-upload"
-        className="cursor-pointer absolute sm:bottom-2 bottom-0 sm:right-1 right-0"
+        className="absolute right-0 bottom-0 cursor-pointer sm:right-1 sm:bottom-2"
       >
         <input
           type="file"
@@ -59,8 +61,8 @@ function ProfileImage({ onFileChangeHandler }: ProfileImageProps) {
           onChange={handleImageChange}
           hidden
         />
-        <div className="bg-bkg-dark w-fit px-3 py-2.5 rounded-full">
-          <i className="gng-add-photo-filled h-5 w-5 text-content-light" />
+        <div className="bg-bkg-dark w-fit rounded-full px-3 py-2.5">
+          <i className="gng-add-photo-filled text-content-light h-5 w-5" />
         </div>
       </label>
     </div>

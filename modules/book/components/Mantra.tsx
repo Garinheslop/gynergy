@@ -1,3 +1,7 @@
+import { useEffect, useRef, useState } from "react";
+
+import { useRouter } from "next/navigation";
+
 import ActionButton from "@modules/common/components/ActionButton";
 import Card from "@modules/common/components/Card";
 import Paragraph from "@modules/common/components/typography/Paragraph";
@@ -8,8 +12,6 @@ import { paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
 import { setEditorDataStates } from "@store/modules/editor";
 import { setHistoryCurrentStates } from "@store/modules/history";
-import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
 const Mantra = ({ userVision }: { userVision: UserVision }) => {
   const router = useRouter();
   const dispatch = useDispatch();

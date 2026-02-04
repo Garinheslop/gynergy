@@ -1,10 +1,13 @@
 "use client";
 import React, { useState } from "react";
-import { cn } from "@lib/utils/style";
+
 import { useSelector } from "react-redux";
+
+import { cn } from "@lib/utils/style";
 import { RootState } from "@store/configureStore";
-import ChatContainer from "./ChatContainer";
+
 import CharacterAvatar from "./CharacterAvatar";
+import ChatContainer from "./ChatContainer";
 
 interface FloatingChatButtonProps {
   position?: "bottom-right" | "bottom-left";
@@ -31,9 +34,9 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({
           className={cn(
             "fixed z-50",
             positionClasses[position],
-            "w-full max-w-md h-[600px] max-h-[80vh]",
-            "rounded-2xl overflow-hidden shadow-2xl",
-            "border border-border-light/20",
+            "h-[600px] max-h-[80vh] w-full max-w-md",
+            "overflow-hidden rounded-2xl shadow-2xl",
+            "border-border-light/20 border",
             // Mobile: full screen
             "sm:w-96"
           )}
@@ -52,18 +55,16 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({
         className={cn(
           "fixed z-50",
           positionClasses[position],
-          "w-14 h-14 rounded-full",
+          "h-14 w-14 rounded-full",
           "flex items-center justify-center",
           "shadow-lg transition-all duration-300",
-          isOpen
-            ? "bg-bkg-light rotate-0"
-            : "bg-gradient-to-br from-action to-action-secondary",
+          isOpen ? "bg-bkg-light rotate-0" : "from-action to-action-secondary bg-gradient-to-br",
           "hover:scale-105 active:scale-95",
           sx
         )}
       >
         {isOpen ? (
-          <i className="gng-close text-[24px] text-content-dark" />
+          <i className="gng-close text-content-dark text-[24px]" />
         ) : activeCharacter ? (
           <CharacterAvatar characterKey={activeCharacter} size="medium" />
         ) : (

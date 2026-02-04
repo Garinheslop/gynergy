@@ -1,13 +1,15 @@
 import React, { MouseEvent } from "react";
-import { headingVariants, paragraphVariants } from "@resources/variants";
-import Accordion from "./Accordion";
-import Paragraph from "./typography/Paragraph";
 import { ReactNode } from "react";
+
 import { cn } from "@lib/utils/style";
-import Heading from "./typography/Heading";
-import ActionButton from "./ActionButton";
 import { buttonActionTypes } from "@resources/types/button";
+import { headingVariants, paragraphVariants } from "@resources/variants";
+
+import Accordion from "./Accordion";
+import ActionButton from "./ActionButton";
 import TextSkeleton from "./skeleton/TextSkeleton";
+import Heading from "./typography/Heading";
+import Paragraph from "./typography/Paragraph";
 
 interface CardProps {
   children?: ReactNode;
@@ -79,18 +81,18 @@ const Card = ({
     return (
       <section
         className={cn(
-          "flex flex-col h-full w-full bg-bkg-light p-5 md:p-[30px] gap-[30px] rounded sm:rounded-[20px] duration-150",
+          "bg-bkg-light flex h-full w-full flex-col gap-[30px] rounded p-5 duration-150 sm:rounded-[20px] md:p-[30px]",
           {
             "cursor-pointer": onClick,
             "hover:translate-y-[-2px]": onClick,
-            "cursor-default grayscale card-loading hover:translate-y-[0px]": isLoading,
+            "card-loading cursor-default grayscale hover:translate-y-[0px]": isLoading,
           },
           sx
         )}
         onClick={(e) => onClick && !isLoading && onClick(e)}
       >
         <div className={cn("flex items-center justify-between gap-5")}>
-          <div className="flex md:flex-row flex-col gap-5 md:items-center w-full">
+          <div className="flex w-full flex-col gap-5 md:flex-row md:items-center">
             <Heading
               isHtml={isHtml}
               variant={headingVariant}
@@ -111,14 +113,14 @@ const Card = ({
           </div>
           {(icon || primaryActionIconBtn?.action) && !isLoading && (
             <div
-              className={cn("flex gap-[5px] items-center h-full", {
+              className={cn("flex h-full items-center gap-[5px]", {
                 "cursor-pointer": primaryActionIconBtn?.action,
               })}
               onClick={icon?.action}
             >
               <i
                 className={cn(
-                  `gng-${primaryActionIconBtn?.icon ?? icon?.class} text-[24px] text-content-dark duration-500`
+                  `gng-${primaryActionIconBtn?.icon ?? icon?.class} text-content-dark text-[24px] duration-500`
                 )}
                 onClick={() => primaryActionIconBtn?.action && primaryActionIconBtn?.action()}
               />

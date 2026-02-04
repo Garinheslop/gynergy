@@ -1,7 +1,9 @@
 import { ReactNode, MouseEvent, useEffect, useRef, useState } from "react";
-import { headingVariants, paragraphVariants } from "@resources/variants";
-import Heading from "./typography/Heading";
+
 import { cn } from "@lib/utils/style";
+import { headingVariants, paragraphVariants } from "@resources/variants";
+
+import Heading from "./typography/Heading";
 import Paragraph from "./typography/Paragraph";
 
 interface AccordionProps {
@@ -77,7 +79,7 @@ const Accordion = ({
       aria-label="accordion"
       ref={accordionRef}
       className={cn(
-        "flex flex-col h-full w-full rounded sm:rounded-[20px] bg-bkg-light p-5 md:p-[30px] group",
+        "bg-bkg-light group flex h-full w-full flex-col rounded p-5 sm:rounded-[20px] md:p-[30px]",
         sx
       )}
       onClick={accordionHandler}
@@ -93,13 +95,13 @@ const Accordion = ({
             {title}
           </Heading>
         )}
-        <div className="flex gap-[20px] items-center h-full">
+        <div className="flex h-full items-center gap-[20px]">
           {secondaryActionIconBtn && (
             <>
               <div className="flex items-center gap-[10px]">
                 <i
                   className={cn(
-                    `gng-${secondaryActionIconBtn?.icon} text-action-secondary text-[20px] duration-150 cursor-pointer`,
+                    `gng-${secondaryActionIconBtn?.icon} text-action-secondary cursor-pointer text-[20px] duration-150`,
                     secondaryActionIconBtn?.sx,
                     { "opacity-0 group-hover:opacity-100": isStatic }
                   )}
@@ -113,7 +115,7 @@ const Accordion = ({
                   />
                 )}
               </div>
-              <div className="h-[30px] w-[1px] border-r border-border-light" />
+              <div className="border-border-light h-[30px] w-[1px] border-r" />
             </>
           )}
           {(open || isStatic) && (
@@ -121,7 +123,7 @@ const Accordion = ({
               <div className="flex gap-[10px]">
                 <i
                   className={cn(
-                    `gng-${primaryActionIconBtn?.icon} text-action-secondary text-[20px] duration-150 cursor-pointer`,
+                    `gng-${primaryActionIconBtn?.icon} text-action-secondary cursor-pointer text-[20px] duration-150`,
                     primaryActionIconBtn?.sx,
                     { "opacity-0 group-hover:opacity-100": isStatic }
                   )}
@@ -135,7 +137,7 @@ const Accordion = ({
                   />
                 )}
               </div>
-              {!isStatic && <div className="h-[30px] w-[1px] border-r border-border-light" />}
+              {!isStatic && <div className="border-border-light h-[30px] w-[1px] border-r" />}
             </>
           )}
           {!isStatic && (
@@ -149,11 +151,11 @@ const Accordion = ({
       </div>
       <div
         className={cn(
-          "overflow-hidden flex flex-col gap-5 md:gap-[30px] px-1 transition-all duration-500 sm:p-0 max-h-0 ease-out",
+          "flex max-h-0 flex-col gap-5 overflow-hidden px-1 transition-all duration-500 ease-out sm:p-0 md:gap-[30px]",
           { "max-h-[350vh] ease-in": open || isStatic }
         )}
       >
-        <div className="w-full border-b border-border-light mt-5 md:mt-[30px]" />
+        <div className="border-border-light mt-5 w-full border-b md:mt-[30px]" />
         {(isRenderContent || isStatic) && children}
       </div>
     </section>

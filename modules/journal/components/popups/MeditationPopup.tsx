@@ -1,24 +1,19 @@
 //context
-import Modal from "@modules/common/components/modal";
+import { useState } from "react";
+
 import { usePopup } from "@contexts/UsePopup";
-import Webcam from "react-webcam";
-import { useCallback, useEffect, useRef, useState } from "react";
-import ActionButton from "@modules/common/components/ActionButton";
-import { base64ToArrayBuffer, getBase64 } from "@lib/utils/image";
-import FileInput from "@modules/common/components/FileInput";
-import Paragraph from "@modules/common/components/typography/Paragraph";
-import { headingVariants, paragraphVariants } from "@resources/variants";
-import Image from "@modules/common/components/Image";
-import { ImageRawData } from "@resources/types/ocr";
-import Heading from "@modules/common/components/typography/Heading";
-import { buttonActionTypes } from "@resources/types/button";
 import { cn } from "@lib/utils/style";
-import { journalTypes } from "@resources/types/journal";
-import icons from "@resources/icons";
-import { useSelector } from "@store/hooks";
-import { useRouter } from "next/navigation";
-import ReactConfetti from "react-confetti";
+import ActionButton from "@modules/common/components/ActionButton";
+import Modal from "@modules/common/components/modal";
 import TextArea from "@modules/common/components/TextArea";
+import Heading from "@modules/common/components/typography/Heading";
+import Paragraph from "@modules/common/components/typography/Paragraph";
+import { buttonActionTypes } from "@resources/types/button";
+import { journalTypes } from "@resources/types/journal";
+import { headingVariants, paragraphVariants } from "@resources/variants";
+
+
+
 
 const MeditationPopup = () => {
   const { meditationPopupObj } = usePopup();
@@ -31,15 +26,15 @@ const MeditationPopup = () => {
 
   return (
     <Modal open={meditationPopupObj.show} onClose={meditationPopupObj.close}>
-      <section className="relative flex justify-center items-between flex-col mx-auto p-[30px] w-screen h-screen sm:h-max sm:w-[620px] gap-[30px] overflow-auto bg-bkg-light rounded">
+      <section className="items-between bg-bkg-light relative mx-auto flex h-screen w-screen flex-col justify-center gap-[30px] overflow-auto rounded p-[30px] sm:h-max sm:w-[620px]">
         <i
-          className="gng-close text-[18px] cursor-pointer absolute top-2 right-2 p-6"
+          className="gng-close absolute top-2 right-2 cursor-pointer p-6 text-[18px]"
           onClick={meditationPopupObj.close}
         />
-        <div className="flex flex-col w-full h-full gap-5">
+        <div className="flex h-full w-full flex-col gap-5">
           <div className="flex flex-col gap-[10px]">
             <i
-              className={cn(`gng-meditation text-[25px] py-[4px] text-[#6699FF]`, {
+              className={cn(`gng-meditation py-[4px] text-[25px] text-[#6699FF]`, {
                 "text-primary": popupType === journalTypes.morningJournal,
                 "text-action-secondary": popupType === journalTypes.eveningJournal,
                 "text-primary-500": popupType === journalTypes.gratitudeAction,
@@ -49,7 +44,7 @@ const MeditationPopup = () => {
               Day {popupData?.day} Meditation
             </Heading>
           </div>
-          <div className="flex w-full border-t border-border-light" />
+          <div className="border-border-light flex w-full border-t" />
           <div className="flex flex-col gap-[5px]">
             <Paragraph
               variant={paragraphVariants.title}
@@ -68,7 +63,7 @@ const MeditationPopup = () => {
           </div>
         </div>
 
-        <div className="flex sm:flex-row flex-col items-center justify-between gap-5 h-max">
+        <div className="flex h-max flex-col items-center justify-between gap-5 sm:flex-row">
           {popupData?.video && (
             <ActionButton
               label="Watch Meditation Video"

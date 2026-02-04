@@ -3,11 +3,7 @@
 
 export type CharacterKey = "yesi" | "garin";
 
-export type RelationshipStage =
-  | "introduction"
-  | "building"
-  | "established"
-  | "deep";
+export type RelationshipStage = "introduction" | "building" | "established" | "deep";
 
 export type ConversationRole = "user" | "assistant" | "system";
 

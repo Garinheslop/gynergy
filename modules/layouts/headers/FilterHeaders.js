@@ -3,12 +3,11 @@ import SelectBtn from "@modules/common/components/buttons/Select";
 import InputWithIcon from "@modules/common/components/InputWithIcon";
 //resources
 import { inputPlaceholders } from "@resources/labels";
-import { useEffect, useState } from "react";
 
 const FilterHeader = ({ searchedInput, searchHandler, loading, sortObj }) => {
   return (
     <header
-      className={`flex w-full flex-col items-center justify-between gap-4 border-b border-tertiary py-3 xmd:h-20 xmd:flex-row`}
+      className={`border-tertiary xmd:h-20 xmd:flex-row flex w-full flex-col items-center justify-between gap-4 border-b py-3`}
     >
       <section className="flex h-12 w-full justify-end gap-3">
         {sortObj && (

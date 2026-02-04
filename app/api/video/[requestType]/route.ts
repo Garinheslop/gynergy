@@ -22,17 +22,11 @@ import {
 } from "@resources/types/video";
 
 // GET handlers
-export async function GET(
-  request: Request,
-  { params }: { params: { requestType: string } }
-) {
+export async function GET(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
   if (!requestType) {
-    return NextResponse.json(
-      { error: "Request type is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Request type is required" }, { status: 400 });
   }
 
   const supabase = createClient();
@@ -84,10 +78,7 @@ export async function GET(
       const roomId = url.searchParams.get("roomId");
 
       if (!roomId) {
-        return NextResponse.json(
-          { error: "Room ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Room ID is required" }, { status: 400 });
       }
 
       const { data: room, error } = await supabase
@@ -133,10 +124,7 @@ export async function GET(
       const roomId = url.searchParams.get("roomId");
 
       if (!roomId) {
-        return NextResponse.json(
-          { error: "Room ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Room ID is required" }, { status: 400 });
       }
 
       const { data: participants, error } = await supabase
@@ -183,10 +171,7 @@ export async function GET(
       const roomId = url.searchParams.get("roomId");
 
       if (!roomId) {
-        return NextResponse.json(
-          { error: "Room ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Room ID is required" }, { status: 400 });
       }
 
       const { data: notes, error } = await supabase
@@ -229,17 +214,11 @@ export async function GET(
 }
 
 // POST handlers
-export async function POST(
-  request: Request,
-  { params }: { params: { requestType: string } }
-) {
+export async function POST(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
   if (!requestType) {
-    return NextResponse.json(
-      { error: "Request type is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Request type is required" }, { status: 400 });
   }
 
   const supabase = createClient();
@@ -258,19 +237,13 @@ export async function POST(
     // POST: Create room
     if (requestType === videoRequestTypes.createRoom) {
       if (!is100msConfigured()) {
-        return NextResponse.json(
-          { error: "Video service not configured" },
-          { status: 503 }
-        );
+        return NextResponse.json({ error: "Video service not configured" }, { status: 503 });
       }
 
       const createRequest = body as CreateRoomRequest;
 
       if (!createRequest.title || !createRequest.roomType) {
-        return NextResponse.json(
-          { error: "Title and room type are required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Title and room type are required" }, { status: 400 });
       }
 
       // Create room in 100ms
@@ -319,19 +292,13 @@ export async function POST(
     // POST: Join room
     if (requestType === videoRequestTypes.joinRoom) {
       if (!is100msConfigured()) {
-        return NextResponse.json(
-          { error: "Video service not configured" },
-          { status: 503 }
-        );
+        return NextResponse.json({ error: "Video service not configured" }, { status: 503 });
       }
 
       const { roomId, role = "participant" } = body;
 
       if (!roomId) {
-        return NextResponse.json(
-          { error: "Room ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Room ID is required" }, { status: 400 });
       }
 
       // Get room from database
@@ -347,10 +314,7 @@ export async function POST(
 
       // Check if room is joinable
       if (room.status === "ended" || room.status === "cancelled") {
-        return NextResponse.json(
-          { error: "Room is no longer active" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Room is no longer active" }, { status: 400 });
       }
 
       // Determine role (host gets host role, others get participant)
@@ -374,18 +338,16 @@ export async function POST(
       });
 
       // Update or create participant record
-      const { error: participantError } = await supabase
-        .from("video_room_participants")
-        .upsert(
-          {
-            room_id: room.id,
-            user_id: user.id,
-            role: actualRole,
-            rsvp_status: "accepted",
-            joined_at: new Date().toISOString(),
-          },
-          { onConflict: "room_id,user_id" }
-        );
+      const { error: participantError } = await supabase.from("video_room_participants").upsert(
+        {
+          room_id: room.id,
+          user_id: user.id,
+          role: actualRole,
+          rsvp_status: "accepted",
+          joined_at: new Date().toISOString(),
+        },
+        { onConflict: "room_id,user_id" }
+      );
 
       if (participantError) {
         console.error("Participant upsert error:", participantError);
@@ -415,10 +377,7 @@ export async function POST(
       const { roomId } = body;
 
       if (!roomId) {
-        return NextResponse.json(
-          { error: "Room ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Room ID is required" }, { status: 400 });
       }
 
       // Update participant record
@@ -442,10 +401,7 @@ export async function POST(
       const { roomId } = body;
 
       if (!roomId) {
-        return NextResponse.json(
-          { error: "Room ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Room ID is required" }, { status: 400 });
       }
 
       // Verify user is host
@@ -460,10 +416,7 @@ export async function POST(
       }
 
       if (room.host_id !== user.id) {
-        return NextResponse.json(
-          { error: "Only the host can end the room" },
-          { status: 403 }
-        );
+        return NextResponse.json({ error: "Only the host can end the room" }, { status: 403 });
       }
 
       // End room in 100ms
@@ -495,22 +448,17 @@ export async function POST(
       const { roomId, status } = body as { roomId: string; status: RSVPStatus };
 
       if (!roomId || !status) {
-        return NextResponse.json(
-          { error: "Room ID and status are required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Room ID and status are required" }, { status: 400 });
       }
 
-      const { error } = await supabase
-        .from("video_room_participants")
-        .upsert(
-          {
-            room_id: roomId,
-            user_id: user.id,
-            rsvp_status: status,
-          },
-          { onConflict: "room_id,user_id" }
-        );
+      const { error } = await supabase.from("video_room_participants").upsert(
+        {
+          room_id: roomId,
+          user_id: user.id,
+          rsvp_status: status,
+        },
+        { onConflict: "room_id,user_id" }
+      );
 
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -538,10 +486,7 @@ export async function POST(
         .single();
 
       if (roomError || !room || room.host_id !== user.id) {
-        return NextResponse.json(
-          { error: "Only the host can send invitations" },
-          { status: 403 }
-        );
+        return NextResponse.json({ error: "Only the host can send invitations" }, { status: 403 });
       }
 
       // Create invitations
@@ -665,10 +610,7 @@ export async function POST(
       const { roomId, content, isPrivate = true } = body;
 
       if (!roomId || !content) {
-        return NextResponse.json(
-          { error: "Room ID and content are required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Room ID and content are required" }, { status: 400 });
       }
 
       const { data: note, error } = await supabase
@@ -694,10 +636,7 @@ export async function POST(
       const { noteId, content, isPrivate } = body;
 
       if (!noteId) {
-        return NextResponse.json(
-          { error: "Note ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Note ID is required" }, { status: 400 });
       }
 
       const updateData: { content?: string; is_private?: boolean } = {};
@@ -722,10 +661,7 @@ export async function POST(
       const { noteId } = body;
 
       if (!noteId) {
-        return NextResponse.json(
-          { error: "Note ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Note ID is required" }, { status: 400 });
       }
 
       const { error } = await supabase
@@ -752,17 +688,11 @@ export async function POST(
 }
 
 // DELETE handler
-export async function DELETE(
-  request: Request,
-  { params }: { params: { requestType: string } }
-) {
+export async function DELETE(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
   if (!requestType) {
-    return NextResponse.json(
-      { error: "Request type is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Request type is required" }, { status: 400 });
   }
 
   const supabase = createClient();
@@ -783,10 +713,7 @@ export async function DELETE(
       const roomId = url.searchParams.get("roomId");
 
       if (!roomId) {
-        return NextResponse.json(
-          { error: "Room ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Room ID is required" }, { status: 400 });
       }
 
       // Verify user is host
@@ -801,10 +728,7 @@ export async function DELETE(
       }
 
       if (room.host_id !== user.id) {
-        return NextResponse.json(
-          { error: "Only the host can delete the room" },
-          { status: 403 }
-        );
+        return NextResponse.json({ error: "Only the host can delete the room" }, { status: 403 });
       }
 
       // Can only delete scheduled or cancelled rooms
@@ -815,10 +739,7 @@ export async function DELETE(
         );
       }
 
-      const { error } = await supabase
-        .from("video_rooms")
-        .delete()
-        .eq("id", roomId);
+      const { error } = await supabase.from("video_rooms").delete().eq("id", roomId);
 
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });

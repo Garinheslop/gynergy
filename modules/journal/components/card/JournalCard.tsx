@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+
 import { usePopup } from "@contexts/UsePopup";
 import { cn } from "@lib/utils/style";
 import ActionButton from "@modules/common/components/ActionButton";
@@ -9,7 +11,6 @@ import icons from "@resources/icons";
 import { buttonActionTypes } from "@resources/types/button";
 import { journalTypes } from "@resources/types/journal";
 import { headingVariants, paragraphVariants } from "@resources/variants";
-import { useEffect, useRef, useState } from "react";
 
 interface JournalCardProps {
   journalType: (typeof journalTypes)[keyof typeof journalTypes];
@@ -56,11 +57,11 @@ const JournalCard: React.FC<JournalCardProps> = ({
   return (
     <div
       className={cn(
-        "flex flex-col p-5 md:p-[30px] justify-center items-between rounded bg-bkg-light gap-[30px]",
+        "items-between bg-bkg-light flex flex-col justify-center gap-[30px] rounded p-5 md:p-[30px]",
         { "bg-grey-50": isCompleted || isDisabled }
       )}
     >
-      <div className="flex flex-col gap-[30px] h-full">
+      <div className="flex h-full flex-col gap-[30px]">
         <div
           className={cn("flex flex-col gap-[10px]", {
             "gap-5": journalType === journalTypes.weeklyChallenge,
@@ -68,7 +69,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
         >
           {icon && (
             <i
-              className={cn(`gng-${icon} text-[32px] py-[4px]`, {
+              className={cn(`gng-${icon} py-[4px] text-[32px]`, {
                 "text-primary": journalType === journalTypes.morningJournal,
                 "text-action-secondary": journalType === journalTypes.eveningJournal,
                 "text-primary-500": journalType === journalTypes.gratitudeAction,
@@ -86,7 +87,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
             {heading}
           </Heading>
           {isLoading && subDescription ? (
-            <div className="flex flex-col w-full gap-[5px]">
+            <div className="flex w-full flex-col gap-[5px]">
               <TextSkeleton sx="w-[65%] h-[18px]" />
             </div>
           ) : (
@@ -100,7 +101,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
             />
           )}
           <div
-            className={cn("flex flex-col w-full", {
+            className={cn("flex w-full flex-col", {
               "gap-[10px]": journalType === journalTypes.weeklyChallenge,
             })}
           >
@@ -131,7 +132,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
             {isLoading &&
             (journalType === journalTypes.gratitudeAction ||
               journalType === journalTypes.weeklyChallenge) ? (
-              <div className="flex flex-col w-full gap-[5px]">
+              <div className="flex w-full flex-col gap-[5px]">
                 <TextSkeleton sx="w-full h-[18px]" />
                 <TextSkeleton sx="w-[95%] h-[18px]" />
               </div>
@@ -192,7 +193,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
         </div>
         {isCompleted && !isDisabled ? (
           <div className="flex gap-[10px]">
-            <i className="gng-complete-circle text-[25px] text-action-secondary" />
+            <i className="gng-complete-circle text-action-secondary text-[25px]" />
             <Paragraph content={"Completed"} variant={paragraphVariants.regular} />
           </div>
         ) : (
@@ -222,7 +223,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
               <TextSkeleton sx="w-[60%]" />
             ) : (
               <div className="flex gap-[5px]">
-                <Image src={icons.streak} className="w-auto h-[25px]" />
+                <Image src={icons.streak} className="h-[25px] w-auto" />
                 <Paragraph
                   isHtml
                   content={`<span>${streak > 0 ? streak.toString().padStart(2, "0") : 0}<span/> Days Streak`}
@@ -236,12 +237,12 @@ const JournalCard: React.FC<JournalCardProps> = ({
       </div>
 
       {!isCompleted && !isDisabled && (
-        <div className="flex gap-[10px] pt-[15px] border-t border-border-light">
+        <div className="border-border-light flex gap-[10px] border-t pt-[15px]">
           {isLoading ? (
             <TextSkeleton sx="w-[70%]" />
           ) : (
             <>
-              <Image src={icons.point} className="w-auto h-[25px]" />
+              <Image src={icons.point} className="h-[25px] w-auto" />
               <Paragraph
                 isHtml
                 content={`Complete & Earn <span>${points} Pts<span/>`}

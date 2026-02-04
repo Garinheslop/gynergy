@@ -1,24 +1,29 @@
 "use client";
 
-import ActionButton from "@modules/common/components/ActionButton";
-import { buttonActionTypes } from "@resources/types/button";
-import { useDispatch, useSelector } from "@store/hooks";
-import { resetEditorDataStates } from "@store/modules/editor";
-import { useRouter } from "next/navigation";
-import { journalTypes } from "@resources/types/journal";
-import Heading from "@modules/common/components/typography/Heading";
-import { headingVariants, paragraphVariants } from "@resources/variants";
-import Paragraph from "@modules/common/components/typography/Paragraph";
-import dayjs from "dayjs";
-import { usePopup } from "@contexts/UsePopup";
-import DailyJournal from "../DailyJournal";
-import VisionJournal from "../VisionJournal";
-import { resetHistoryCurrentState } from "@store/modules/history";
 import { useEffect } from "react";
-import WeeklyJournal from "../WeeklyJournal";
-import { pagePaths } from "@resources/paths";
+
+import { useRouter } from "next/navigation";
+
+import dayjs from "dayjs";
+
+import { usePopup } from "@contexts/UsePopup";
 import Inspiration from "@modules/book/components/onboarding/Inspiration";
 import PotentialSelf from "@modules/book/components/onboarding/PotentialSelf";
+import ActionButton from "@modules/common/components/ActionButton";
+import Heading from "@modules/common/components/typography/Heading";
+import Paragraph from "@modules/common/components/typography/Paragraph";
+import { pagePaths } from "@resources/paths";
+import { buttonActionTypes } from "@resources/types/button";
+import { journalTypes } from "@resources/types/journal";
+import { useDispatch, useSelector } from "@store/hooks";
+import { resetEditorDataStates } from "@store/modules/editor";
+import { headingVariants, paragraphVariants } from "@resources/variants";
+import { resetHistoryCurrentState } from "@store/modules/history";
+
+import DailyJournal from "../DailyJournal";
+import VisionJournal from "../VisionJournal";
+import WeeklyJournal from "../WeeklyJournal";
+
 
 const JournalClient = ({ bookSlug }: { bookSlug: string }) => {
   const dispatch = useDispatch();
@@ -34,7 +39,7 @@ const JournalClient = ({ bookSlug }: { bookSlug: string }) => {
     }
   }, [histories?.current]);
   return (
-    <section className="flex flex-col gap-[20px] bg-bkg-light sm:bg-transparent w-full justify-start max-w-[1220px] mx-auto py-[100px] md:py-[130px] px-4">
+    <section className="bg-bkg-light mx-auto flex w-full max-w-[1220px] flex-col justify-start gap-[20px] px-4 py-[100px] sm:bg-transparent md:py-[130px]">
       <ActionButton
         label="Back to Histories"
         buttonActionType={buttonActionTypes.text}
@@ -69,7 +74,7 @@ const JournalClient = ({ bookSlug }: { bookSlug: string }) => {
         {histories.current?.isWeeklyJournal && <WeeklyJournal />}
         {(histories.current?.isOnboardingInspiration ||
           histories.current?.isOnboardingPotentialSelf) && (
-          <div className="flex flex-col items-center gap-[30px] md:gap-[40px] max-w-[1200px] p-[20px] md:p-[50px] pb-[20px] md:pb-[30px] bg-bkg-light rounded-[20px] mx-auto">
+          <div className="bg-bkg-light mx-auto flex max-w-[1200px] flex-col items-center gap-[30px] rounded-[20px] p-[20px] pb-[20px] md:gap-[40px] md:p-[50px] md:pb-[30px]">
             {histories.current?.isOnboardingInspiration && <Inspiration />}
             {histories.current?.isOnboardingPotentialSelf && <PotentialSelf />}
           </div>

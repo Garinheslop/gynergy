@@ -54,9 +54,7 @@ export async function chat(options: ChatOptions): Promise<ChatResult> {
   }
 
   // Get or create chat session
-  const chatSessionId = characterId
-    ? await getOrCreateChatSession(userId, characterId)
-    : null;
+  const chatSessionId = characterId ? await getOrCreateChatSession(userId, characterId) : null;
 
   // Fetch and trim conversation history
   let conversationHistory: AIMessage[] = [];
@@ -208,9 +206,7 @@ export async function suggestCharacterForUser(userId: string): Promise<Character
   // Determine if streak was recently broken
   const { currentStreak } = userContext.user;
   const streakBroken =
-    currentStreak.morning === 0 ||
-    currentStreak.evening === 0 ||
-    currentStreak.gratitude === 0;
+    currentStreak.morning === 0 || currentStreak.evening === 0 || currentStreak.gratitude === 0;
 
   // Check for recent struggles (declining mood or missing entries)
   const recentStruggle = userContext.moodTrend === "declining";

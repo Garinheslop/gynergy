@@ -1,7 +1,8 @@
+import { FC } from "react";
+
 import { cn } from "@lib/utils/style";
 import ActionButton from "@modules/common/components/ActionButton";
 import { buttonActionTypes } from "@resources/types/button";
-import { FC } from "react";
 
 interface EditorActionBtnsProps {
   isScanned: boolean;
@@ -19,7 +20,7 @@ const EditorActionBtns: FC<EditorActionBtnsProps> = ({
   sx,
 }) => {
   return (
-    <section className={cn("flex gap-5 ml-auto w-full sm:w-max", sx)}>
+    <section className={cn("ml-auto flex w-full gap-5 sm:w-max", sx)}>
       {isScanned && (
         <ActionButton
           label="Clear All Fields"

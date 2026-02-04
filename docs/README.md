@@ -47,17 +47,17 @@ Welcome to the Gynergy documentation. This guide will help you understand, devel
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
+| Layer    | Technology                         |
+| -------- | ---------------------------------- |
 | Frontend | Next.js 14, React 18, TypeScript 5 |
-| Styling | Tailwind CSS 4.0 |
-| State | Redux Toolkit, Redux Persist |
-| Backend | Next.js API Routes, Supabase |
-| Database | PostgreSQL (via Supabase) |
-| Auth | NextAuth + Supabase Auth |
-| AI | OpenAI GPT-4o, Anthropic Claude |
-| Video | 100ms |
-| Testing | Vitest, Playwright |
+| Styling  | Tailwind CSS 4.0                   |
+| State    | Redux Toolkit, Redux Persist       |
+| Backend  | Next.js API Routes, Supabase       |
+| Database | PostgreSQL (via Supabase)          |
+| Auth     | NextAuth + Supabase Auth           |
+| AI       | OpenAI GPT-4o, Anthropic Claude    |
+| Video    | 100ms                              |
+| Testing  | Vitest, Playwright                 |
 
 ## Key Features
 
@@ -71,6 +71,7 @@ Welcome to the Gynergy documentation. This guide will help you understand, devel
 ## Support
 
 For questions or issues:
+
 - Check the [Troubleshooting Guide](./guides/debugging.md)
 - Open an issue on GitHub
 - Contact the development team

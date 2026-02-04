@@ -1,9 +1,9 @@
-import { combineComponents } from "@lib/utils/components";
 
 //react context
-import SessionContextProvider from "@contexts/UseSession";
 import UsePopupContextProvider from "@contexts/UsePopup";
 import RealtimeDataContextProvider from "@contexts/UseRealtimeData";
+import SessionContextProvider from "@contexts/UseSession";
+import { combineComponents } from "@lib/utils/components";
 
 const providers = [SessionContextProvider, UsePopupContextProvider, RealtimeDataContextProvider];
 

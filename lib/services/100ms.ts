@@ -172,9 +172,8 @@ export async function updateRoom(
     body: JSON.stringify({
       name: options.name,
       description: options.description,
-      recording_info: options.recordingEnabled !== undefined
-        ? { enabled: options.recordingEnabled }
-        : undefined,
+      recording_info:
+        options.recordingEnabled !== undefined ? { enabled: options.recordingEnabled } : undefined,
     }),
   });
 
@@ -297,9 +296,7 @@ export async function stopRecording(roomId: string): Promise<void> {
 }
 
 // Get recording details
-export async function getRecordings(
-  roomId: string
-): Promise<{
+export async function getRecordings(roomId: string): Promise<{
   recordings: Array<{
     id: string;
     room_id: string;

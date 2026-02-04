@@ -1,12 +1,15 @@
-import { EditorData, journalTypes } from "@resources/types/journal";
-import useSetEditorDataStates from "./useSetEditorDataStates";
-import useOcr from "./useOcr";
 import { useEffect } from "react";
+
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
-import { useDispatch } from "@store/hooks";
-import { visionTypes } from "@resources/types/vision";
+
 import { usePopup } from "@contexts/UsePopup";
 import { fileErrorTypes } from "@resources/types/error";
+import { EditorData, journalTypes } from "@resources/types/journal";
+import { visionTypes } from "@resources/types/vision";
+import { useDispatch } from "@store/hooks";
+
+import useOcr from "./useOcr";
+import useSetEditorDataStates from "./useSetEditorDataStates";
 
 const editorTypes = {
   ...journalTypes,

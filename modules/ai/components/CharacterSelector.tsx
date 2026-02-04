@@ -1,10 +1,12 @@
 "use client";
 import React from "react";
+
 import { cn } from "@lib/utils/style";
-import { CharacterKey } from "@resources/types/ai";
-import CharacterAvatar from "./CharacterAvatar";
 import Paragraph from "@modules/common/components/typography/Paragraph";
+import { CharacterKey } from "@resources/types/ai";
 import { paragraphVariants } from "@resources/variants";
+
+import CharacterAvatar from "./CharacterAvatar";
 
 interface CharacterOption {
   key: CharacterKey;
@@ -51,9 +53,9 @@ const CharacterSelector: React.FC<CharacterSelectorProps> = ({
             key={char.key}
             onClick={() => onSelect(char.key)}
             className={cn(
-              "flex items-center gap-2 px-3 py-2 rounded-full transition-all duration-200",
+              "flex items-center gap-2 rounded-full px-3 py-2 transition-all duration-200",
               selectedCharacter === char.key
-                ? "bg-action/20 ring-2 ring-action"
+                ? "bg-action/20 ring-action ring-2"
                 : "bg-bkg-light hover:bg-bkg-light/80"
             )}
           >
@@ -65,9 +67,7 @@ const CharacterSelector: React.FC<CharacterSelectorProps> = ({
             <span
               className={cn(
                 "text-sm font-medium",
-                selectedCharacter === char.key
-                  ? "text-action"
-                  : "text-content-dark-secondary"
+                selectedCharacter === char.key ? "text-action" : "text-content-dark-secondary"
               )}
             >
               {char.name}
@@ -89,24 +89,20 @@ const CharacterSelector: React.FC<CharacterSelectorProps> = ({
             key={char.key}
             onClick={() => onSelect(char.key)}
             className={cn(
-              "relative flex flex-col items-center p-4 rounded-xl transition-all duration-200",
+              "relative flex flex-col items-center rounded-xl p-4 transition-all duration-200",
               "border-2",
               isSelected
                 ? "bg-action/10 border-action"
-                : "bg-bkg-light border-transparent hover:border-border-light"
+                : "bg-bkg-light hover:border-border-light border-transparent"
             )}
           >
             {isSuggested && !isSelected && (
-              <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-action text-white text-xs rounded-full">
+              <span className="bg-action absolute -top-2 left-1/2 -translate-x-1/2 rounded-full px-2 py-0.5 text-xs text-white">
                 Suggested
               </span>
             )}
 
-            <CharacterAvatar
-              characterKey={char.key}
-              size="large"
-              isActive={isSelected}
-            />
+            <CharacterAvatar characterKey={char.key} size="large" isActive={isSelected} />
 
             <Paragraph
               content={char.name}

@@ -1,15 +1,18 @@
+import React, { useEffect, useRef } from "react";
+
+import dayjs from "dayjs";
+
 import { useSession } from "@contexts/UseSession";
 import useComponentVisible from "@modules/common/hooks/useComponentVisible";
+import useOnScreen from "@modules/common/hooks/useOnScreen";
 import { RootState } from "@store/configureStore";
+import { useDispatch, useSelector } from "@store/hooks";
 import {
   getInitialLeaderboardData,
   getLeaderboardData,
   getUserRank,
 } from "@store/modules/leaderboard";
-import dayjs from "dayjs";
-import React, { useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "@store/hooks";
-import useOnScreen from "@modules/common/hooks/useOnScreen";
+
 
 const useLeaderBoardData = () => {
   const { session } = useSession();

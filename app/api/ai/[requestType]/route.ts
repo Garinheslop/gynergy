@@ -15,17 +15,11 @@ import { createClient } from "@lib/supabase-server";
 import { aiRequestTypes, CharacterKey } from "@resources/types/ai";
 
 // GET handlers
-export async function GET(
-  request: Request,
-  { params }: { params: { requestType: string } }
-) {
+export async function GET(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
   if (!requestType) {
-    return NextResponse.json(
-      { error: "Request type is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Request type is required" }, { status: 400 });
   }
 
   const supabase = createClient();
@@ -60,10 +54,7 @@ export async function GET(
     if (requestType === aiRequestTypes.getCharacter) {
       const characterKey = url.searchParams.get("key") as CharacterKey;
       if (!characterKey) {
-        return NextResponse.json(
-          { error: "Character key is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Character key is required" }, { status: 400 });
       }
       const character = getCharacter(characterKey);
       return NextResponse.json({
@@ -85,10 +76,7 @@ export async function GET(
       const limit = parseInt(url.searchParams.get("limit") || "20", 10);
 
       if (!characterId) {
-        return NextResponse.json(
-          { error: "Character ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Character ID is required" }, { status: 400 });
       }
 
       const history = await fetchConversationHistory(user.id, characterId, limit);
@@ -99,10 +87,7 @@ export async function GET(
     if (requestType === aiRequestTypes.getUserContext) {
       const context = await fetchUserContext(user.id);
       if (!context) {
-        return NextResponse.json(
-          { error: "Could not fetch user context" },
-          { status: 500 }
-        );
+        return NextResponse.json({ error: "Could not fetch user context" }, { status: 500 });
       }
       return NextResponse.json({
         context,
@@ -127,17 +112,11 @@ export async function GET(
 }
 
 // POST handlers
-export async function POST(
-  request: Request,
-  { params }: { params: { requestType: string } }
-) {
+export async function POST(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
   if (!requestType) {
-    return NextResponse.json(
-      { error: "Request type is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Request type is required" }, { status: 400 });
   }
 
   const supabase = createClient();
@@ -192,10 +171,7 @@ export async function POST(
     if (requestType === aiRequestTypes.endChatSession) {
       const { chatSessionId } = body;
       if (!chatSessionId) {
-        return NextResponse.json(
-          { error: "Chat session ID is required" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Chat session ID is required" }, { status: 400 });
       }
       await endChatSession(chatSessionId);
       return NextResponse.json({ success: true });

@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+
 import { cn } from "@lib/utils/style";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { paragraphVariants } from "@resources/variants";
@@ -99,33 +100,23 @@ const StreakDisplay: React.FC<StreakDisplayProps> = ({
           )}
           <span className={cn(config.number, "text-content-dark")}>{streak}</span>
           {showLabel && (
-            <Paragraph
-              content={label}
-              variant={config.label}
-              sx="text-content-dark-secondary"
-            />
+            <Paragraph content={label} variant={config.label} sx="text-content-dark-secondary" />
           )}
         </div>
 
         {/* Individual streaks */}
-        <div className="flex gap-4 mt-2">
+        <div className="mt-2 flex gap-4">
           <div className="flex items-center gap-1">
-            <i className="gng-sun text-yellow-400 text-[16px]" />
-            <span className="text-sm text-content-dark-secondary">
-              {streakTypes.morning}
-            </span>
+            <i className="gng-sun text-[16px] text-yellow-400" />
+            <span className="text-content-dark-secondary text-sm">{streakTypes.morning}</span>
           </div>
           <div className="flex items-center gap-1">
-            <i className="gng-moon text-blue-400 text-[16px]" />
-            <span className="text-sm text-content-dark-secondary">
-              {streakTypes.evening}
-            </span>
+            <i className="gng-moon text-[16px] text-blue-400" />
+            <span className="text-content-dark-secondary text-sm">{streakTypes.evening}</span>
           </div>
           <div className="flex items-center gap-1">
-            <i className="gng-heart text-pink-400 text-[16px]" />
-            <span className="text-sm text-content-dark-secondary">
-              {streakTypes.gratitude}
-            </span>
+            <i className="gng-heart text-[16px] text-pink-400" />
+            <span className="text-content-dark-secondary text-sm">{streakTypes.gratitude}</span>
           </div>
         </div>
       </div>
@@ -148,11 +139,7 @@ const StreakDisplay: React.FC<StreakDisplayProps> = ({
         <span className={cn(config.number, "text-content-dark")}>{streak}</span>
       </div>
       {showLabel && (
-        <Paragraph
-          content={label}
-          variant={config.label}
-          sx="text-content-dark-secondary"
-        />
+        <Paragraph content={label} variant={config.label} sx="text-content-dark-secondary" />
       )}
     </div>
   );
@@ -182,9 +169,9 @@ export const StreakMilestone: React.FC<StreakMilestoneProps> = ({
           {current}/{next}
         </span>
       </div>
-      <div className="h-2 bg-bkg-dark/30 rounded-full overflow-hidden">
+      <div className="bg-bkg-dark/30 h-2 overflow-hidden rounded-full">
         <div
-          className="h-full bg-gradient-to-r from-orange-400 to-amber-400 rounded-full transition-all duration-500"
+          className="h-full rounded-full bg-gradient-to-r from-orange-400 to-amber-400 transition-all duration-500"
           style={{ width: `${Math.min(progress, 100)}%` }}
         />
       </div>

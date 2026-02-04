@@ -2,7 +2,12 @@
 // Builds user context for AI conversations with token budgeting
 
 import { createClient } from "@lib/supabase-server";
-import { UserContextForAI, TOKEN_BUDGET, ChatMessage, RelationshipStage } from "@resources/types/ai";
+import {
+  UserContextForAI,
+  TOKEN_BUDGET,
+  ChatMessage,
+  RelationshipStage,
+} from "@resources/types/ai";
 
 // Type definitions for database records
 interface JournalRecord {
@@ -119,11 +124,7 @@ function buildDGASection(context: UserContextForAI): string {
 function buildBadgesSection(context: UserContextForAI): string {
   const { badges, milestones } = context;
 
-  const lines: string[] = [
-    `Total Badges Earned: ${badges.total}`,
-    "",
-    "Recent Badges:",
-  ];
+  const lines: string[] = [`Total Badges Earned: ${badges.total}`, "", "Recent Badges:"];
 
   if (badges.recent.length) {
     badges.recent.forEach((badge) => {
@@ -135,7 +136,9 @@ function buildBadgesSection(context: UserContextForAI): string {
 
   lines.push("");
   lines.push("Milestones:");
-  lines.push(`  - Reached: ${milestones.reached.length > 0 ? milestones.reached.join(", ") : "None yet"}`);
+  lines.push(
+    `  - Reached: ${milestones.reached.length > 0 ? milestones.reached.join(", ") : "None yet"}`
+  );
   lines.push(`  - Next milestone: Day ${milestones.next}`);
 
   return truncateToTokens(lines.join("\n"), TOKEN_BUDGET.badges);

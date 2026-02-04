@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect, KeyboardEvent } from "react";
+
 import { cn } from "@lib/utils/style";
 
 interface ChatInputProps {
@@ -24,10 +25,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.min(
-        textareaRef.current.scrollHeight,
-        120
-      )}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
     }
   }, [message]);
 
@@ -53,14 +51,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const canSend = message.trim().length > 0 && !isLoading && !disabled;
 
   return (
-    <div
-      className={cn(
-        "flex items-end gap-2 p-3 bg-bkg-dark border-t border-border-light/20",
-        sx
-      )}
-    >
+    <div className={cn("bg-bkg-dark border-border-light/20 flex items-end gap-2 border-t p-3", sx)}>
       {/* Text input */}
-      <div className="flex-1 relative">
+      <div className="relative flex-1">
         <textarea
           ref={textareaRef}
           value={message}
@@ -70,12 +63,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
           disabled={disabled || isLoading}
           rows={1}
           className={cn(
-            "w-full px-4 py-3 rounded-2xl resize-none",
+            "w-full resize-none rounded-2xl px-4 py-3",
             "bg-bkg-light text-content-dark placeholder:text-content-dark-secondary/50",
-            "border border-transparent focus:border-action/50 focus:outline-none",
+            "focus:border-action/50 border border-transparent focus:outline-none",
             "transition-all duration-200",
             "text-sm leading-relaxed",
-            (disabled || isLoading) && "opacity-50 cursor-not-allowed"
+            (disabled || isLoading) && "cursor-not-allowed opacity-50"
           )}
         />
       </div>
@@ -85,15 +78,15 @@ const ChatInput: React.FC<ChatInputProps> = ({
         onClick={handleSend}
         disabled={!canSend}
         className={cn(
-          "flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center",
+          "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full",
           "transition-all duration-200",
           canSend
-            ? "bg-action text-white hover:bg-action/90"
+            ? "bg-action hover:bg-action/90 text-white"
             : "bg-bkg-light text-content-dark-secondary/30"
         )}
       >
         {isLoading ? (
-          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
         ) : (
           <i className="gng-send text-[18px]" />
         )}

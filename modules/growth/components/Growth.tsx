@@ -1,19 +1,24 @@
+import React, { forwardRef } from "react";
+
+import { useRouter } from "next/navigation";
+
+import ActionButton from "@modules/common/components/ActionButton";
 import Heading from "@modules/common/components/typography/Heading";
+import Paragraph from "@modules/common/components/typography/Paragraph";
 import { pagePaths } from "@resources/paths";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useSelector } from "@store/hooks";
-import { useRouter } from "next/navigation";
-import React, { forwardRef } from "react";
-import Paragraph from "@modules/common/components/typography/Paragraph";
+
+
 import MountainProgress from "./MountainProgress";
-import ActionButton from "@modules/common/components/ActionButton";
+
 const Growth = forwardRef<HTMLDivElement>(({}, ref) => {
   const router = useRouter();
   const currentBook = useSelector((state) => state.books.current);
   const enrollments = useSelector((state) => state.enrollments);
   return (
     <section ref={ref} className="flex flex-col items-center gap-[30px]">
-      <i className="gng-mountain-progress text-[28px] py-[10] text-content" />
+      <i className="gng-mountain-progress text-content py-[10] text-[28px]" />
       <Heading variant={headingVariants.sectionHeading} sx="text-center !font-bold">
         {"Climbing the Mountain of Growth"}
       </Heading>

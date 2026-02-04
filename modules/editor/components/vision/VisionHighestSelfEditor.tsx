@@ -1,27 +1,29 @@
-import TextAreaWithHeading from "@modules/common/components/TextAreaWithHeading";
-import useSetEditorData from "@modules/journal/hooks/useSetEditorData";
-import { visionHighestSelfKeys, VisionHighestSelf, EmblemsCrop } from "@resources/types/vision";
-import { useSelector } from "@store/hooks";
 import { FC, useEffect, useRef, useState } from "react";
-import EditorActionBtns from "../EditorActionBtns";
-import { usePopup } from "@contexts/UsePopup";
-import { ImageRawData } from "@resources/types/ocr";
+
 import { journalOcrFileLimit } from "@configs/app";
+import { usePopup } from "@contexts/UsePopup";
+import FileInput from "@modules/common/components/FileInput";
+import { handleImageCompress } from "@lib/utils/ImageCompressor";
+import { getBase64 } from "@lib/utils/image";
+import { cropImageFromArrayBuffer } from "@lib/utils/imageCrop";
+import Heading from "@modules/common/components/typography/Heading";
+import { cn } from "@lib/utils/style";
+import Image from "@modules/common/components/Image";
+import TextAreaWithHeading from "@modules/common/components/TextAreaWithHeading";
+import Paragraph from "@modules/common/components/typography/Paragraph";
+import useSetEditorData from "@modules/journal/hooks/useSetEditorData";
+import { highestSelfInputData } from "@resources/data/input/visions";
+import { ImageRawData } from "@resources/types/ocr";
+import { visionHighestSelfKeys, VisionHighestSelf, EmblemsCrop } from "@resources/types/vision";
+import { headingVariants, paragraphVariants } from "@resources/variants";
+import { useSelector } from "@store/hooks";
 import {
   setEditorLoadingState,
   updateEditorCurrentState,
   updateEditorImageState,
 } from "@store/modules/editor";
-import { cropImageFromArrayBuffer } from "@lib/utils/imageCrop";
-import Paragraph from "@modules/common/components/typography/Paragraph";
-import { headingVariants, paragraphVariants } from "@resources/variants";
-import FileInput from "@modules/common/components/FileInput";
-import { handleImageCompress } from "@lib/utils/ImageCompressor";
-import { getBase64 } from "@lib/utils/image";
-import Heading from "@modules/common/components/typography/Heading";
-import { cn } from "@lib/utils/style";
-import Image from "@modules/common/components/Image";
-import { highestSelfInputData } from "@resources/data/input/visions";
+
+import EditorActionBtns from "../EditorActionBtns";
 
 const VisionHighestSelfEditor: FC = () => {
   const { imageScanPopupObj } = usePopup();
@@ -41,7 +43,7 @@ const VisionHighestSelfEditor: FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-5 w-full ">
+    <div className="flex w-full flex-col gap-5">
       <EditorActionBtns
         isScanned={
           editor.isRead &&
@@ -160,7 +162,7 @@ const Emblems: React.FC<CropImageProps> = ({ value, onUpdate }) => {
       {croppedUrl || value ? (
         <div
           className={cn(
-            "relative rounded max-w-[250px] max-h-[270px] flex gap-[10px] overflow-hidden w-full"
+            "relative flex max-h-[270px] w-full max-w-[250px] gap-[10px] overflow-hidden rounded"
           )}
         >
           <button
@@ -168,7 +170,7 @@ const Emblems: React.FC<CropImageProps> = ({ value, onUpdate }) => {
               setCroppedUrl("");
               onUpdate(null);
             }}
-            className="absolute top-2 right-2 h-[20px] w-[20px] flex items-center justify-center z-10 !bg-dark-900/60 rounded-[10px] cursor-pointer"
+            className="!bg-dark-900/60 absolute top-2 right-2 z-10 flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-[10px]"
           >
             <i className="gng-trash text-danger text-body" />
           </button>
@@ -180,7 +182,7 @@ const Emblems: React.FC<CropImageProps> = ({ value, onUpdate }) => {
         </div>
       ) : (
         <section
-          className="relative w-full lg:w-[500px] max-h-[550px] md:max-h-auto h-full rounded-[10px] overflow-hidden mx-auto shrink-0 md:shrink"
+          className="md:max-h-auto relative mx-auto h-full max-h-[550px] w-full shrink-0 overflow-hidden rounded-[10px] md:shrink lg:w-[500px]"
           onDrop={handleDrop}
           onDragOver={preventDefaultHandler}
           onDragEnter={preventDefaultHandler}
@@ -195,9 +197,9 @@ const Emblems: React.FC<CropImageProps> = ({ value, onUpdate }) => {
               }
             }}
           >
-            <div className="h-full border-[4px] border-dashed border-border-light rounded-[10px] flex flex-col gap-[20px] justify-center p-5 lg:p-10">
-              <div className="size-[70px] flex justify-center items-center mx-auto cursor-pointer border border-border-light rounded-[10px]">
-                <i className="gng-add-photo-filled text-center text-2xl text-content-dark-secondary" />
+            <div className="border-border-light flex h-full flex-col justify-center gap-[20px] rounded-[10px] border-[4px] border-dashed p-5 lg:p-10">
+              <div className="border-border-light mx-auto flex size-[70px] cursor-pointer items-center justify-center rounded-[10px] border">
+                <i className="gng-add-photo-filled text-content-dark-secondary text-center text-2xl" />
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center justify-center gap-1">

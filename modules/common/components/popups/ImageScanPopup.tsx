@@ -1,22 +1,26 @@
 //context
-import Modal from "@modules/common/components/modal";
-import { usePopup } from "@contexts/UsePopup";
-import Webcam from "react-webcam";
 import { useCallback, useEffect, useRef, useState } from "react";
-import ActionButton from "@modules/common/components/ActionButton";
+
+import Webcam from "react-webcam";
+
+import { usePopup } from "@contexts/UsePopup";
 import { base64ToArrayBuffer, getBase64 } from "@lib/utils/image";
-import FileInput from "@modules/common/components/FileInput";
-import Paragraph from "@modules/common/components/typography/Paragraph";
-import { headingVariants, paragraphVariants } from "@resources/variants";
-import Image from "@modules/common/components/Image";
-import { ImageRawData } from "@resources/types/ocr";
-import Heading from "@modules/common/components/typography/Heading";
-import { buttonActionTypes } from "@resources/types/button";
-import { cn } from "@lib/utils/style";
 import { handleImageCompress } from "@lib/utils/ImageCompressor";
-import Spinner from "../Spinner";
 import { convertNumberToWords } from "@lib/utils/number";
+import { cn } from "@lib/utils/style";
+import ActionButton from "@modules/common/components/ActionButton";
+import FileInput from "@modules/common/components/FileInput";
+import Image from "@modules/common/components/Image";
+import Modal from "@modules/common/components/modal";
+import Heading from "@modules/common/components/typography/Heading";
+import Paragraph from "@modules/common/components/typography/Paragraph";
 import useWindowDimensions from "@modules/common/hooks/useWindowDimensions";
+import { buttonActionTypes } from "@resources/types/button";
+import { ImageRawData } from "@resources/types/ocr";
+import { headingVariants, paragraphVariants } from "@resources/variants";
+
+import Spinner from "../Spinner";
+
 
 const ImageScanPopup = () => {
   //context
@@ -159,12 +163,12 @@ const ImageScanPopup = () => {
     <Modal open={imageScanPopupObj.show} onClose={imageScanPopupObj.close}>
       <section
         className={cn(
-          "flex gap-[30px] flex-col mx-auto pb-[150px] sm:pb-[30px] p-[30px] w-screen sm:max-w-[95vw] md:w-[730px] h-screen sm:h-auto sm:max-h-[95vh] overflow-auto bg-bkg-light rounded",
-          { "bg-bkg-dark !w-max p-0 gap-0": openCamera && windowWidth! > 450 }
+          "bg-bkg-light mx-auto flex h-screen w-screen flex-col gap-[30px] overflow-auto rounded p-[30px] pb-[150px] sm:h-auto sm:max-h-[95vh] sm:max-w-[95vw] sm:pb-[30px] md:w-[730px]",
+          { "bg-bkg-dark !w-max gap-0 p-0": openCamera && windowWidth! > 450 }
         )}
       >
         {openCamera && images.length < fileLimit && windowWidth! > 450 ? (
-          <div className="relative flex gap-5 mx-auto w-max">
+          <div className="relative mx-auto flex w-max gap-5">
             <Webcam
               ref={webcamRef}
               audio={false}
@@ -175,11 +179,11 @@ const ImageScanPopup = () => {
               videoConstraints={videoConstraints}
             />
             <i
-              className="gng-close text-[18px] text-content-light absolute top-4 right-4 cursor-pointer"
+              className="gng-close text-content-light absolute top-4 right-4 cursor-pointer text-[18px]"
               onClick={() => setOpenCamera(false)}
             />
             {images.length > 0 && (
-              <div className="grid grid-cols-2 gap-[10px] h-max pt-12">
+              <div className="grid h-max grid-cols-2 gap-[10px] pt-12">
                 {images.map((imgObj, index) => (
                   <ImageViewer
                     key={index}
@@ -202,7 +206,7 @@ const ImageScanPopup = () => {
                   Add Pages to Scan
                 </Heading>
                 <i
-                  className="gng-close text-[18px] cursor-pointer"
+                  className="gng-close cursor-pointer text-[18px]"
                   onClick={imageScanPopupObj.close}
                 />
               </div>
@@ -217,7 +221,7 @@ const ImageScanPopup = () => {
 
             <div
               className={cn(
-                "relative w-full rounded-[10px] overflow-hidden shrink-0 md:shrink h-[270px]",
+                "relative h-[270px] w-full shrink-0 overflow-hidden rounded-[10px] md:shrink",
                 {
                   "h-max": openCamera,
                 }
@@ -227,7 +231,7 @@ const ImageScanPopup = () => {
               onDragEnter={preventDefaultHandler}
               onDragLeave={preventDefaultHandler}
             >
-              <div className={cn("grid grid-cols-4 md:flex gap-[10px] h-full w-full")}>
+              <div className={cn("grid h-full w-full grid-cols-4 gap-[10px] md:flex")}>
                 {images.map((imgObj, index) => (
                   <ImageViewer
                     key={index}
@@ -246,11 +250,11 @@ const ImageScanPopup = () => {
                         <div
                           key={index}
                           className={cn(
-                            "relative rounded h-[100px] max-w-[250px] max-h-[270px] flex gap-[10px] overflow-hidden w-full md:max-w-[210px] md:h-full"
+                            "relative flex h-[100px] max-h-[270px] w-full max-w-[250px] gap-[10px] overflow-hidden rounded md:h-full md:max-w-[210px]"
                           )}
                         >
                           <Image src={img.url} className="h-auto w-full object-cover" />
-                          <div className="flex flex-col gap-[5px] h-full w-full justify-center items-center bg-bkg-dark/70 absolute top-0 left-0">
+                          <div className="bg-bkg-dark/70 absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center gap-[5px]">
                             <Paragraph
                               content={`${img.progress}%`}
                               variant={paragraphVariants.meta}
@@ -277,29 +281,29 @@ const ImageScanPopup = () => {
                       >
                         <div
                           className={cn(
-                            "md:h-full border-[4px] w-[210px] border-dashed border-border-light rounded-[10px] flex flex-col gap-[20px] justify-center p-[10px]",
+                            "border-border-light flex w-[210px] flex-col justify-center gap-[20px] rounded-[10px] border-[4px] border-dashed p-[10px] md:h-full",
                             {
-                              "h-[100px] md:h-full w-full md:w-[210px]":
+                              "h-[100px] w-full md:h-full md:w-[210px]":
                                 images.length > 0 && windowWidth! < 768,
                             }
                           )}
                         >
                           <div
                             className={cn(
-                              "flex justify-center items-center mx-auto cursor-pointer border-border-light rounded-full shrink-0",
+                              "border-border-light mx-auto flex shrink-0 cursor-pointer items-center justify-center rounded-full",
                               {
-                                "md:border md:size-[70px]":
+                                "md:size-[70px] md:border":
                                   images.length > 0 && windowWidth! <= 450,
-                                "border size-[70px]": images.length === 0 || windowWidth! > 450,
+                                "size-[70px] border": images.length === 0 || windowWidth! > 450,
                               }
                             )}
                           >
-                            <i className="gng-add-thin text-center text-[25px] text-content-dark" />
+                            <i className="gng-add-thin text-content-dark text-center text-[25px]" />
                           </div>
 
                           <div
-                            className={cn("flex-col gap-[5px] flex", {
-                              "md:flex hidden": images.length > 0 && windowWidth! < 768,
+                            className={cn("flex flex-col gap-[5px]", {
+                              "hidden md:flex": images.length > 0 && windowWidth! < 768,
                             })}
                           >
                             <Paragraph
@@ -329,8 +333,8 @@ const ImageScanPopup = () => {
 
         <div className="flex flex-col gap-5">
           {!openCamera && (
-            <div className="flex gap-[10px] items-center">
-              <i className="gng-Info text-[18px] text-content-dark-secondary" />
+            <div className="flex items-center gap-[10px]">
+              <i className="gng-Info text-content-dark-secondary text-[18px]" />
               <Paragraph
                 content={`For this instance, you can upload ${fileLimit > 1 ? `up to ${convertNumberToWords(fileLimit)} images` : `${convertNumberToWords(fileLimit)} image`} at once.`}
                 variant={paragraphVariants.regular}
@@ -338,7 +342,7 @@ const ImageScanPopup = () => {
               />
             </div>
           )}
-          <div className="flex justify-between border-t border-border-light gap-[10px] pt-5">
+          <div className="border-border-light flex justify-between gap-[10px] border-t pt-5">
             {!openCamera && (
               <ActionButton
                 label={openCamera && windowWidth! > 450 ? "Close Camera" : "Take Photo"}
@@ -360,10 +364,10 @@ const ImageScanPopup = () => {
             )}
             {openCamera && windowWidth! > 450 && (
               <div
-                className="flex size-[60px] justify-center items-center rounded-full mx-auto bg-bkg-light cursor-pointer"
+                className="bg-bkg-light mx-auto flex size-[60px] cursor-pointer items-center justify-center rounded-full"
                 onClick={captureHandler}
               >
-                <div className="flex size-[54px] rounded-full bg-bkg-light border-4 border-dark-pure"></div>
+                <div className="bg-bkg-light border-dark-pure flex size-[54px] rounded-full border-4"></div>
               </div>
             )}
           </div>
@@ -387,13 +391,13 @@ const ImageViewer = ({
   return (
     <div
       className={cn(
-        "relative rounded h-full max-w-[250px] max-h-[270px] flex gap-[10px] overflow-hidden w-full",
+        "relative flex h-full max-h-[270px] w-full max-w-[250px] gap-[10px] overflow-hidden rounded",
         sx
       )}
     >
       <button
         onClick={() => onDelete(id)}
-        className="absolute top-2 right-2 h-[20px] w-[20px] flex items-center justify-center z-10 !bg-dark-900/60 rounded-[10px] cursor-pointer"
+        className="!bg-dark-900/60 absolute top-2 right-2 z-10 flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-[10px]"
       >
         <i className="gng-trash text-danger text-body" />
       </button>

@@ -1,21 +1,23 @@
 "use client";
 
 import React, { FC } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { pagePaths } from "@resources/paths";
+
 import Link from "next/link";
-import icons from "@resources/icons";
-import Paragraph from "@modules/common/components/typography/Paragraph";
-import { paragraphVariants } from "@resources/variants";
-import ActionButton from "@modules/common/components/ActionButton";
+import { usePathname, useRouter } from "next/navigation";
+
 import { useSession } from "@contexts/UseSession";
 import { cn } from "@lib/utils/style";
-import useComponentVisible from "@modules/common/hooks/useComponentVisible";
-import TransitionWrapper from "@modules/common/components/wrappers/TransitionWrapper";
+import ActionButton from "@modules/common/components/ActionButton";
 import Image from "@modules/common/components/Image";
+import Paragraph from "@modules/common/components/typography/Paragraph";
+import TransitionWrapper from "@modules/common/components/wrappers/TransitionWrapper";
+import useComponentVisible from "@modules/common/hooks/useComponentVisible";
+import icons from "@resources/icons";
+import images from "@resources/images";
+import { pagePaths } from "@resources/paths";
+import { paragraphVariants } from "@resources/variants";
 import { RootState } from "@store/configureStore";
 import { useSelector } from "@store/hooks";
-import images from "@resources/images";
 
 const Navbar: FC = () => {
   const { session } = useSession();
@@ -30,10 +32,10 @@ const Navbar: FC = () => {
   return (
     <nav
       className={cn(
-        "z-[1001] fixed h-[70px] w-full items-center justify-between border-b border-border-light bg-bkg-light px-5 text-light"
+        "border-border-light bg-bkg-light text-light fixed z-[1001] h-[70px] w-full items-center justify-between border-b px-5"
       )}
     >
-      <section className="py-[10px] mx-auto max-w-[1256px] flex justify-between items-center px-4 w-full">
+      <section className="mx-auto flex w-full max-w-[1256px] items-center justify-between px-4 py-[10px]">
         <Link href={`/${currentBook?.slug ?? "/"}`} className="flex items-center gap-[5px]">
           <Image className="h-[40px] w-auto" src={icons.dateZeroLogo} alt="date-zero-logo" />
         </Link>
@@ -92,20 +94,20 @@ const DropdownMenu: FC = () => {
     useComponentVisible<HTMLDivElement>(false);
   const currentProfile = useSelector((state: RootState) => state.profile.current);
   return (
-    <div className={cn("relative group shrink-0")} ref={ref}>
+    <div className={cn("group relative shrink-0")} ref={ref}>
       <button
-        className="relative flex justify-center items-center shrink-0 cursor-pointer group"
+        className="group relative flex shrink-0 cursor-pointer items-center justify-center"
         onClick={() => {
           setIsComponentVisible(!isComponentVisible);
         }}
       >
         <Image
-          className="shrink-0 w-[50px] h-[50px] rounded-full object-cover border-2 border-dark-pure group-hover:border-action-secondary duration-300"
+          className="border-dark-pure group-hover:border-action-secondary h-[50px] w-[50px] shrink-0 rounded-full border-2 object-cover duration-300"
           path={currentProfile?.profileImage}
           onErrorImage={images.placeholders.profileImage}
           alt={"Profile Image"}
         />
-        <div className="absolute bottom-[1px] right-[1px] flex h-[20px] w-[20px] rounded-full justify-center items-center bg-dark-pure border border-dark-pure group-hover:border-action-secondary duration-300">
+        <div className="bg-dark-pure border-dark-pure group-hover:border-action-secondary absolute right-[1px] bottom-[1px] flex h-[20px] w-[20px] items-center justify-center rounded-full border duration-300">
           <i className="gng-arrow-down-thin text-action-secondary text-[10px]" />
         </div>
       </button>
@@ -126,15 +128,15 @@ interface UserMenuItemsProps {
 }
 const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
   const router = useRouter();
-  const { session, logout } = useSession();
+  const { logout } = useSession();
   const currentBook = useSelector((state) => state.books.current);
   const userEnrollment = useSelector((state) => state.enrollments.current);
   const currentProfile = useSelector((state: RootState) => state.profile.current);
   return (
-    <ul className="flex flex-col gap-[30px] sm:gap-0 sm:justify-between items-start bg-bkg-light border border-border-light h-full w-full px-[30px] py-[20px] rounded overflow-hidden relative [&>li]:w-full [&>li>i]:duration-150 [&>li]:hover:[&>i]:mr-[2px] [&>li]:hover:[&>i]:text-action-secondary">
+    <ul className="bg-bkg-light border-border-light [&>li]:hover:[&>i]:text-action-secondary relative flex h-full w-full flex-col items-start gap-[30px] overflow-hidden rounded border px-[30px] py-[20px] sm:justify-between sm:gap-0 [&>li]:w-full [&>li]:hover:[&>i]:mr-[2px] [&>li>i]:duration-150">
       <li className="flex items-center gap-[10px]">
         <Image
-          className="shrink-0 w-[50px] h-[50px] rounded-full object-cover border-2 border-dark-pure"
+          className="border-dark-pure h-[50px] w-[50px] shrink-0 rounded-full border-2 object-cover"
           onErrorImage={images.placeholders.profileImage}
           path={currentProfile?.profileImage}
           alt={"Profile Image"}
@@ -147,7 +149,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
       </li>
       <li className="flex items-center gap-[16px]">
         <div className="flex items-center gap-[10px]">
-          <Image src={icons.point} className="w-auto h-[25px]" />
+          <Image src={icons.point} className="h-[25px] w-auto" />
           <Paragraph
             variant={paragraphVariants.regular}
             content={userEnrollment?.totalPoints}
@@ -155,7 +157,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
           />
         </div>
         <div className="flex items-center gap-[10px]">
-          <Image src={icons.streak} className="w-auto h-[25px]" />
+          <Image src={icons.streak} className="h-[25px] w-auto" />
           <Paragraph
             variant={paragraphVariants.regular}
             content={Math.max(
@@ -167,9 +169,9 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
           />
         </div>
       </li>
-      <div className="w-full border-b border-border-light" />
+      <div className="border-border-light w-full border-b" />
       <li
-        className="items-center gap-[10px] cursor-pointer sm:hidden flex"
+        className="flex cursor-pointer items-center gap-[10px] sm:hidden"
         onClick={() => {
           router.push(`${currentBook?.slug}/${pagePaths.history}`);
           onItemClick();
@@ -183,7 +185,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
         />
       </li>
       <li
-        className="flex items-center gap-[10px] cursor-pointer"
+        className="flex cursor-pointer items-center gap-[10px]"
         onClick={() => {
           router.push(`/${currentBook?.slug}/${pagePaths.settings}`);
           onItemClick();
@@ -197,7 +199,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
         />
       </li>
       <li
-        className="flex items-center gap-[10px] cursor-pointer"
+        className="flex cursor-pointer items-center gap-[10px]"
         onClick={() => {
           window.open(
             "mailto:bitechxconnect+kojwp6mtw4hinjw7vdoe@boards.trello.com",
@@ -215,7 +217,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
         />
       </li>
       <li
-        className="items-center gap-[10px] cursor-pointer sm:hidden flex"
+        className="flex cursor-pointer items-center gap-[10px] sm:hidden"
         onClick={() => {
           window.open(
             "https://glxu7q1mylasl0ssnlqn.app.clientclub.net",
@@ -233,7 +235,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
         />
       </li>
       <li
-        className="flex items-center gap-[10px] cursor-pointer"
+        className="flex cursor-pointer items-center gap-[10px]"
         onClick={() => {
           logout();
           onItemClick();

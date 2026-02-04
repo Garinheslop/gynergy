@@ -1,9 +1,11 @@
 "use client";
 
+import { FC } from "react";
+
 import TextArea from "@modules/common/components/TextArea";
 import Heading from "@modules/common/components/typography/Heading";
 import { headingVariants, paragraphVariants } from "@resources/variants";
-import { FC } from "react";
+
 import Paragraph from "./typography/Paragraph";
 interface TextAreaWithHeadingProps {
   heading?: string;

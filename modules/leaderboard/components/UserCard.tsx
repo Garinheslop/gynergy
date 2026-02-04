@@ -1,10 +1,12 @@
+import React from "react";
+
+import dayjs from "dayjs";
+
 import { cn } from "@lib/utils/style";
 import Image from "@modules/common/components/Image";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import images from "@resources/images";
 import { paragraphVariants } from "@resources/variants";
-import dayjs from "dayjs";
-import React from "react";
 
 type Props = {
   rank: number;
@@ -16,13 +18,13 @@ function UserCard({ rank, data, sx }: Props) {
   return (
     <div
       className={cn(
-        "flex items-center p-2 sm:px-[15px] sm:py-2.5 rounded border border-border-light",
+        "border-border-light flex items-center rounded border p-2 sm:px-[15px] sm:py-2.5",
         sx
       )}
     >
       <div
         className={cn(
-          "relative rounded h-[50px] md:w-[84px] w-[60px] mr-2 sm:mr-5 flex items-center justify-center",
+          "relative mr-2 flex h-[50px] w-[60px] items-center justify-center rounded sm:mr-5 md:w-[84px]",
           { "bg-gradient-to-r from-[#FFC878] to-[#F9E4B8]": rank == 1 },
           { "bg-gradient-to-r from-[#F3F3F3] to-[#D8D8D8]": rank == 2 },
           { "bg-gradient-to-r from-[#AC8D61] to-[#F6ECD8]": rank == 3 }
@@ -49,13 +51,13 @@ function UserCard({ rank, data, sx }: Props) {
           )}
         />
       </div>
-      <div className="w-full grid grid-cols-2 sm:grid-cols-3 items-center">
-        <div className="flex items-center gap-2.5 sm:w-[200px] w-full">
+      <div className="grid w-full grid-cols-2 items-center sm:grid-cols-3">
+        <div className="flex w-full items-center gap-2.5 sm:w-[200px]">
           <Image
             path={data?.userData?.profileImage}
             onErrorImage={images.placeholders.image}
             alt="user"
-            className="w-[30px] sm:w-[50px] h-[30px] sm:h-[50px] rounded-full border-2 border-black object-cover"
+            className="h-[30px] w-[30px] rounded-full border-2 border-black object-cover sm:h-[50px] sm:w-[50px]"
           />
           <Paragraph
             content={data?.userData?.firstName}
@@ -68,15 +70,15 @@ function UserCard({ rank, data, sx }: Props) {
           variant={paragraphVariants.regular}
           sx="text-content-dark-secondary truncate hidden sm:flex"
         />
-        <div className="flex flex-col gap-[10px] items-end sm:items-start">
-          <div className="gap-[10px] sm:hidden flex w-max">
+        <div className="flex flex-col items-end gap-[10px] sm:items-start">
+          <div className="flex w-max gap-[10px] sm:hidden">
             <Paragraph
               content={`${data?.totalPoints} Pts`}
               variant={paragraphVariants.regular}
               sx="text-content-dark-secondary truncate"
             />
           </div>
-          <div className="flex gap-[10px] justify-end w-max sm:w-full">
+          <div className="flex w-max justify-end gap-[10px] sm:w-full">
             <Paragraph
               content={dayjs(data?.enrollmentDate).format("MMM DD, YYYY")}
               variant={paragraphVariants.regular}

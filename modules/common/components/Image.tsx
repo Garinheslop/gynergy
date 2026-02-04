@@ -1,9 +1,11 @@
 import { FC, useEffect, useState } from "react";
-import { cn } from "@lib/utils/style";
-import images from "@resources/images";
+
 import NextImage from "next/image";
+
 import { useSession } from "@contexts/UseSession";
 import { createClient } from "@lib/supabase-client";
+import { cn } from "@lib/utils/style";
+import images from "@resources/images";
 
 interface ImageProps {
   path?: string;

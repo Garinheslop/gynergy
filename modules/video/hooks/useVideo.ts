@@ -1,16 +1,17 @@
 "use client";
 
 import { useCallback } from "react";
+
 import axios from "axios";
 
-import { useDispatch, useSelector } from "@store/hooks";
-import { videoActions } from "@store/modules/video/reducers";
 import {
   CreateRoomRequest,
   RSVPStatus,
   VideoRoomStatus,
   videoRequestTypes,
 } from "@resources/types/video";
+import { useDispatch, useSelector } from "@store/hooks";
+import { videoActions } from "@store/modules/video/reducers";
 
 const VIDEO_API_BASE = "/api/video";
 
@@ -121,13 +122,11 @@ export function useVideo() {
     async (roomId: string, role?: string) => {
       dispatch(videoActions.connectionStarted());
       try {
-        const response = await axios.post(
-          `${VIDEO_API_BASE}/${videoRequestTypes.joinRoom}`,
-          { roomId, role }
-        );
-        dispatch(
-          videoActions.connectionEstablished({ authToken: response.data.authToken })
-        );
+        const response = await axios.post(`${VIDEO_API_BASE}/${videoRequestTypes.joinRoom}`, {
+          roomId,
+          role,
+        });
+        dispatch(videoActions.connectionEstablished({ authToken: response.data.authToken }));
         return response.data;
       } catch (error) {
         const message =
@@ -184,9 +183,7 @@ export function useVideo() {
   const deleteRoom = useCallback(
     async (roomId: string) => {
       try {
-        await axios.delete(
-          `${VIDEO_API_BASE}/${videoRequestTypes.deleteRoom}?roomId=${roomId}`
-        );
+        await axios.delete(`${VIDEO_API_BASE}/${videoRequestTypes.deleteRoom}?roomId=${roomId}`);
         dispatch(videoActions.roomRemoved(roomId));
       } catch (error) {
         const message =
@@ -200,34 +197,27 @@ export function useVideo() {
   );
 
   // RSVP
-  const rsvp = useCallback(
-    async (roomId: string, status: RSVPStatus) => {
-      try {
-        await axios.post(`${VIDEO_API_BASE}/${videoRequestTypes.rsvp}`, {
-          roomId,
-          status,
-        });
-      } catch (error) {
-        const message =
-          axios.isAxiosError(error) && error.response?.data?.error
-            ? error.response.data.error
-            : "Failed to RSVP";
-        throw new Error(message);
-      }
-    },
-    []
-  );
+  const rsvp = useCallback(async (roomId: string, status: RSVPStatus) => {
+    try {
+      await axios.post(`${VIDEO_API_BASE}/${videoRequestTypes.rsvp}`, {
+        roomId,
+        status,
+      });
+    } catch (error) {
+      const message =
+        axios.isAxiosError(error) && error.response?.data?.error
+          ? error.response.data.error
+          : "Failed to RSVP";
+      throw new Error(message);
+    }
+  }, []);
 
   // Fetch invitations
   const fetchInvitations = useCallback(async () => {
     dispatch(videoActions.invitationsRequested());
     try {
-      const response = await axios.get(
-        `${VIDEO_API_BASE}/${videoRequestTypes.getInvitations}`
-      );
-      dispatch(
-        videoActions.invitationsFetched({ invitations: response.data.invitations })
-      );
+      const response = await axios.get(`${VIDEO_API_BASE}/${videoRequestTypes.getInvitations}`);
+      dispatch(videoActions.invitationsFetched({ invitations: response.data.invitations }));
       return response.data.invitations;
     } catch (error) {
       const message =
@@ -243,10 +233,10 @@ export function useVideo() {
   const respondToInvitation = useCallback(
     async (invitationId: string, status: "accepted" | "declined") => {
       try {
-        await axios.post(
-          `${VIDEO_API_BASE}/${videoRequestTypes.respondInvitation}`,
-          { invitationId, status }
-        );
+        await axios.post(`${VIDEO_API_BASE}/${videoRequestTypes.respondInvitation}`, {
+          invitationId,
+          status,
+        });
         dispatch(videoActions.invitationResponded({ id: invitationId, status }));
       } catch (error) {
         const message =

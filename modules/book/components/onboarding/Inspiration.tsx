@@ -15,9 +15,9 @@ const Inspiration = () => {
       >
         Inspiration and Gratitude
       </Heading>
-      <div className="flex w-full border-t border-border-light" />
-      <div className="grid md:grid-cols-[540px_1fr] gap-[30px] md:gap-[40px] items-center">
-        <Image className="w-full h-auto rounded-[20px]" src={images.inspirationGratitude} />
+      <div className="border-border-light flex w-full border-t" />
+      <div className="grid items-center gap-[30px] md:grid-cols-[540px_1fr] md:gap-[40px]">
+        <Image className="h-auto w-full rounded-[20px]" src={images.inspirationGratitude} />
         <Paragraph
           isHtml
           content={description}

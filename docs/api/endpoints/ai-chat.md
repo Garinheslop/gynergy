@@ -27,6 +27,7 @@ GET /api/ai/characters
 ```
 
 **Response:**
+
 ```json
 {
   "characters": [
@@ -71,6 +72,7 @@ GET /api/ai/character?key=yesi
 | key | string | Yes | Character key (`yesi` or `garin`) |
 
 **Response:**
+
 ```json
 {
   "character": {
@@ -107,6 +109,7 @@ GET /api/ai/history?characterId={uuid}&limit=20
 | limit | number | No | 20 | Max messages to return |
 
 **Response:**
+
 ```json
 {
   "history": [
@@ -138,6 +141,7 @@ GET /api/ai/user-context
 ```
 
 **Response:**
+
 ```json
 {
   "context": {
@@ -173,6 +177,7 @@ GET /api/ai/suggest-character
 ```
 
 **Response:**
+
 ```json
 {
   "suggestedCharacter": "yesi"
@@ -180,6 +185,7 @@ GET /api/ai/suggest-character
 ```
 
 **Suggestion Logic:**
+
 - **Yesi** suggested when: declining mood, broken streak, emotional support needed
 - **Garin** suggested when: stable/improving mood, long streaks, goal-focused
 
@@ -196,6 +202,7 @@ POST /api/ai/chat
 ```
 
 **Request Body:**
+
 ```json
 {
   "message": "How am I doing on my journey?",
@@ -205,6 +212,7 @@ POST /api/ai/chat
 ```
 
 **Response:**
+
 ```json
 {
   "message": "I see you've been showing up consistently for 7 days now! That's wonderful dedication...",
@@ -226,6 +234,7 @@ POST /api/ai/chat-stream
 ```
 
 **Request Body:**
+
 ```json
 {
   "message": "I need some motivation today",
@@ -234,6 +243,7 @@ POST /api/ai/chat-stream
 ```
 
 **Response (SSE Stream):**
+
 ```
 data: {"type":"content","content":"Let's"}
 data: {"type":"content","content":" look"}
@@ -262,6 +272,7 @@ POST /api/ai/end-session
 ```
 
 **Request Body:**
+
 ```json
 {
   "chatSessionId": "uuid"
@@ -269,6 +280,7 @@ POST /api/ai/end-session
 ```
 
 **Response:**
+
 ```json
 {
   "success": true
@@ -286,6 +298,7 @@ POST /api/ai/rate-session
 ```
 
 **Request Body:**
+
 ```json
 {
   "chatSessionId": "uuid",
@@ -295,6 +308,7 @@ POST /api/ai/rate-session
 ```
 
 **Response:**
+
 ```json
 {
   "success": true
@@ -313,31 +327,31 @@ All errors follow this format:
 }
 ```
 
-| Status Code | Description |
-|-------------|-------------|
-| 400 | Bad request (missing required fields) |
-| 401 | Unauthorized (not logged in) |
-| 500 | Internal server error |
+| Status Code | Description                           |
+| ----------- | ------------------------------------- |
+| 400         | Bad request (missing required fields) |
+| 401         | Unauthorized (not logged in)          |
+| 500         | Internal server error                 |
 
 ---
 
 ## Rate Limits
 
-| Limit Type | Value | Window |
-|------------|-------|--------|
-| Requests per minute | 20 | 1 minute |
-| Messages per day | 100 | 24 hours |
+| Limit Type          | Value | Window   |
+| ------------------- | ----- | -------- |
+| Requests per minute | 20    | 1 minute |
+| Messages per day    | 100   | 24 hours |
 
 ---
 
 ## Token Budgets
 
-| Context Type | Max Tokens |
-|--------------|------------|
-| System prompt | 1500 |
-| User context | 1000 |
-| Conversation history | 2000 |
-| Response | 800 |
+| Context Type         | Max Tokens |
+| -------------------- | ---------- |
+| System prompt        | 1500       |
+| User context         | 1000       |
+| Conversation history | 2000       |
+| Response             | 800        |
 
 ---
 

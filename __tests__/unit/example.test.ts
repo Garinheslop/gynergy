@@ -30,11 +30,7 @@ describe("Example Test Suite", () => {
 });
 
 describe("Points Calculation (Example)", () => {
-  const calculatePoints = (
-    basePoints: number,
-    streak: number,
-    hasCombo: boolean
-  ): number => {
+  const calculatePoints = (basePoints: number, streak: number, hasCombo: boolean): number => {
     let multiplier = 1.0;
     if (streak >= 30) multiplier = 2.0;
     else if (streak >= 14) multiplier = 1.5;

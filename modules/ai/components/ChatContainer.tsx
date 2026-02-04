@@ -1,14 +1,17 @@
 "use client";
 import React, { useEffect, useRef } from "react";
+
 import { cn } from "@lib/utils/style";
-import { CharacterKey } from "@resources/types/ai";
-import { useAIChat } from "../hooks/useAIChat";
-import CharacterSelector from "./CharacterSelector";
-import ChatMessage from "./ChatMessage";
-import ChatInput from "./ChatInput";
-import CharacterAvatar from "./CharacterAvatar";
 import Paragraph from "@modules/common/components/typography/Paragraph";
+import { CharacterKey } from "@resources/types/ai";
 import { paragraphVariants } from "@resources/variants";
+
+import CharacterAvatar from "./CharacterAvatar";
+import CharacterSelector from "./CharacterSelector";
+import ChatInput from "./ChatInput";
+import ChatMessage from "./ChatMessage";
+import { useAIChat } from "../hooks/useAIChat";
+
 
 interface ChatContainerProps {
   onClose?: () => void;
@@ -16,11 +19,7 @@ interface ChatContainerProps {
   sx?: string;
 }
 
-const ChatContainer: React.FC<ChatContainerProps> = ({
-  onClose,
-  showHeader = true,
-  sx,
-}) => {
+const ChatContainer: React.FC<ChatContainerProps> = ({ onClose, showHeader = true, sx }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Use the AI chat hook
@@ -75,10 +74,10 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
   // Show character selector if no character selected
   if (!activeCharacter) {
     return (
-      <div className={cn("flex flex-col h-full bg-bkg-dark", sx)}>
+      <div className={cn("bg-bkg-dark flex h-full flex-col", sx)}>
         {/* Header */}
         {showHeader && (
-          <div className="flex items-center justify-between p-4 border-b border-border-light/20">
+          <div className="border-border-light/20 flex items-center justify-between border-b p-4">
             <Paragraph
               content="Choose Your Coach"
               variant={paragraphVariants.regular}
@@ -96,7 +95,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
         )}
 
         {/* Character selection */}
-        <div className="flex-1 flex flex-col items-center justify-center p-6">
+        <div className="flex flex-1 flex-col items-center justify-center p-6">
           <Paragraph
             content="Who would you like to chat with today?"
             variant={paragraphVariants.meta}
@@ -114,10 +113,10 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
   }
 
   return (
-    <div className={cn("flex flex-col h-full bg-bkg-dark", sx)}>
+    <div className={cn("bg-bkg-dark flex h-full flex-col", sx)}>
       {/* Header */}
       {showHeader && (
-        <div className="flex items-center justify-between p-4 border-b border-border-light/20">
+        <div className="border-border-light/20 flex items-center justify-between border-b p-4">
           <div className="flex items-center gap-3">
             <CharacterAvatar characterKey={activeCharacter} size="medium" />
             <div>
@@ -137,7 +136,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
             {/* Switch character button */}
             <button
               onClick={() => setActiveCharacter(activeCharacter === "yesi" ? "garin" : "yesi")}
-              className="p-2 text-content-dark-secondary hover:text-content-dark rounded-full hover:bg-bkg-light"
+              className="text-content-dark-secondary hover:text-content-dark hover:bg-bkg-light rounded-full p-2"
               title="Switch character"
             >
               <i className="gng-refresh text-[18px]" />
@@ -146,7 +145,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
             {messages.length > 0 && (
               <button
                 onClick={handleClearChat}
-                className="p-2 text-content-dark-secondary hover:text-content-dark rounded-full hover:bg-bkg-light"
+                className="text-content-dark-secondary hover:text-content-dark hover:bg-bkg-light rounded-full p-2"
                 title="Clear chat"
               >
                 <i className="gng-trash text-[18px]" />
@@ -156,7 +155,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
             {onClose && (
               <button
                 onClick={onClose}
-                className="p-2 text-content-dark-secondary hover:text-content-dark rounded-full hover:bg-bkg-light"
+                className="text-content-dark-secondary hover:text-content-dark hover:bg-bkg-light rounded-full p-2"
               >
                 <i className="gng-close text-[20px]" />
               </button>
@@ -166,10 +165,10 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
       )}
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {/* Empty state */}
         {messages.length === 0 && !isStreaming && (
-          <div className="flex flex-col items-center justify-center h-full text-center">
+          <div className="flex h-full flex-col items-center justify-center text-center">
             <CharacterAvatar characterKey={activeCharacter} size="large" />
             <Paragraph
               content={`Hi! I'm ${currentCharacter?.name || activeCharacter}.`}
@@ -183,7 +182,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
             />
 
             {/* Suggested prompts */}
-            <div className="flex flex-col gap-2 mt-6 w-full max-w-xs">
+            <div className="mt-6 flex w-full max-w-xs flex-col gap-2">
               {[
                 "How am I doing on my journey?",
                 "I need some motivation today",
@@ -193,10 +192,10 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
                   key={prompt}
                   onClick={() => handleSendMessage(prompt)}
                   className={cn(
-                    "px-4 py-2 rounded-full text-sm",
+                    "rounded-full px-4 py-2 text-sm",
                     "bg-bkg-light text-content-dark-secondary",
                     "hover:bg-action/10 hover:text-action",
-                    "transition-all duration-200 text-left"
+                    "text-left transition-all duration-200"
                   )}
                 >
                   {prompt}
@@ -231,19 +230,19 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
 
         {/* Loading indicator */}
         {loading && !isStreaming && (
-          <div className="flex items-center gap-2 text-content-dark-secondary">
+          <div className="text-content-dark-secondary flex items-center gap-2">
             <CharacterAvatar characterKey={activeCharacter} size="small" />
             <div className="flex gap-1">
               <span
-                className="w-2 h-2 bg-content-dark-secondary/50 rounded-full animate-bounce"
+                className="bg-content-dark-secondary/50 h-2 w-2 animate-bounce rounded-full"
                 style={{ animationDelay: "0ms" }}
               />
               <span
-                className="w-2 h-2 bg-content-dark-secondary/50 rounded-full animate-bounce"
+                className="bg-content-dark-secondary/50 h-2 w-2 animate-bounce rounded-full"
                 style={{ animationDelay: "150ms" }}
               />
               <span
-                className="w-2 h-2 bg-content-dark-secondary/50 rounded-full animate-bounce"
+                className="bg-content-dark-secondary/50 h-2 w-2 animate-bounce rounded-full"
                 style={{ animationDelay: "300ms" }}
               />
             </div>
@@ -252,7 +251,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
 
         {/* Error message */}
         {error && (
-          <div className="flex items-center gap-2 p-3 bg-danger/10 text-danger rounded-lg">
+          <div className="bg-danger/10 text-danger flex items-center gap-2 rounded-lg p-3">
             <i className="gng-warning text-[18px]" />
             <span className="text-sm">{error}</span>
           </div>

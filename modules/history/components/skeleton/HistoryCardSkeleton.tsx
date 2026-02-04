@@ -1,19 +1,20 @@
+import React from "react";
+
 import { cn } from "@lib/utils/style";
 import TextSkeleton from "@modules/common/components/skeleton/TextSkeleton";
-import React from "react";
 
 function HistoryCardSkeleton({ isVision }: { isVision?: boolean }) {
   return (
     <div
       className={cn(
-        "p-5 rounded flex flex-col justify-between h-[180px] gap-[10px] shadow-2xs bg-bkg-light",
+        "bg-bkg-light flex h-[180px] flex-col justify-between gap-[10px] rounded p-5 shadow-2xs",
         { "justify-start": isVision }
       )}
     >
       <TextSkeleton sx={cn("h-[20px] w-[50%]", { "w-full": isVision })} />
-      {!isVision && <div className="w-full border-t border-border-light" />}
+      {!isVision && <div className="border-border-light w-full border-t" />}
       {isVision ? (
-        <div className="flex gap-[10px] items-center mt-[30px]">
+        <div className="mt-[30px] flex items-center gap-[10px]">
           <TextSkeleton sx="size-[25px]" />
           <TextSkeleton sx="w-[100px]" />
         </div>

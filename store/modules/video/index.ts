@@ -28,9 +28,7 @@ export const fetchRooms = createAsyncThunk(
       if (status) params.append("status", status);
       params.append("limit", limit.toString());
 
-      const response = await axios.get(
-        `${VIDEO_API_BASE}/${videoRequestTypes.getRooms}?${params}`
-      );
+      const response = await axios.get(`${VIDEO_API_BASE}/${videoRequestTypes.getRooms}?${params}`);
       dispatch(videoActions.roomsFetched({ rooms: response.data.rooms }));
       return response.data.rooms;
     } catch (error: unknown) {
@@ -98,10 +96,7 @@ export const createRoom = createAsyncThunk(
   "video/createRoom",
   async (data: CreateRoomRequest, { dispatch, rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${VIDEO_API_BASE}/${videoRequestTypes.createRoom}`,
-        data
-      );
+      const response = await axios.post(`${VIDEO_API_BASE}/${videoRequestTypes.createRoom}`, data);
       dispatch(videoActions.roomAdded(response.data.room));
       return response.data.room;
     } catch (error: unknown) {
@@ -117,19 +112,14 @@ export const createRoom = createAsyncThunk(
 // Join room
 export const joinRoom = createAsyncThunk(
   "video/joinRoom",
-  async (
-    { roomId, role }: { roomId: string; role?: string },
-    { dispatch, rejectWithValue }
-  ) => {
+  async ({ roomId, role }: { roomId: string; role?: string }, { dispatch, rejectWithValue }) => {
     try {
       dispatch(videoActions.connectionStarted());
-      const response = await axios.post(
-        `${VIDEO_API_BASE}/${videoRequestTypes.joinRoom}`,
-        { roomId, role }
-      );
-      dispatch(
-        videoActions.connectionEstablished({ authToken: response.data.authToken })
-      );
+      const response = await axios.post(`${VIDEO_API_BASE}/${videoRequestTypes.joinRoom}`, {
+        roomId,
+        role,
+      });
+      dispatch(videoActions.connectionEstablished({ authToken: response.data.authToken }));
       return response.data;
     } catch (error: unknown) {
       const message =
@@ -194,9 +184,7 @@ export const deleteRoom = createAsyncThunk(
   "video/deleteRoom",
   async (roomId: string, { dispatch, rejectWithValue }) => {
     try {
-      await axios.delete(
-        `${VIDEO_API_BASE}/${videoRequestTypes.deleteRoom}?roomId=${roomId}`
-      );
+      await axios.delete(`${VIDEO_API_BASE}/${videoRequestTypes.deleteRoom}?roomId=${roomId}`);
       dispatch(videoActions.roomRemoved(roomId));
       return { success: true };
     } catch (error: unknown) {
@@ -212,10 +200,7 @@ export const deleteRoom = createAsyncThunk(
 // RSVP to room
 export const rsvpToRoom = createAsyncThunk(
   "video/rsvp",
-  async (
-    { roomId, status }: { roomId: string; status: RSVPStatus },
-    { rejectWithValue }
-  ) => {
+  async ({ roomId, status }: { roomId: string; status: RSVPStatus }, { rejectWithValue }) => {
     try {
       await axios.post(`${VIDEO_API_BASE}/${videoRequestTypes.rsvp}`, {
         roomId,
@@ -238,12 +223,8 @@ export const fetchInvitations = createAsyncThunk(
   async (_, { dispatch, rejectWithValue }) => {
     try {
       dispatch(videoActions.invitationsRequested());
-      const response = await axios.get(
-        `${VIDEO_API_BASE}/${videoRequestTypes.getInvitations}`
-      );
-      dispatch(
-        videoActions.invitationsFetched({ invitations: response.data.invitations })
-      );
+      const response = await axios.get(`${VIDEO_API_BASE}/${videoRequestTypes.getInvitations}`);
+      dispatch(videoActions.invitationsFetched({ invitations: response.data.invitations }));
       return response.data.invitations;
     } catch (error: unknown) {
       const message =
@@ -260,11 +241,7 @@ export const fetchInvitations = createAsyncThunk(
 export const sendInvitations = createAsyncThunk(
   "video/sendInvitations",
   async (
-    {
-      roomId,
-      inviteeIds,
-      message,
-    }: { roomId: string; inviteeIds: string[]; message?: string },
+    { roomId, inviteeIds, message }: { roomId: string; inviteeIds: string[]; message?: string },
     { rejectWithValue }
   ) => {
     try {
@@ -314,9 +291,7 @@ export const fetchTemplates = createAsyncThunk(
   async (_, { dispatch, rejectWithValue }) => {
     try {
       dispatch(videoActions.templatesRequested());
-      const response = await axios.get(
-        `${VIDEO_API_BASE}/${videoRequestTypes.getTemplates}`
-      );
+      const response = await axios.get(`${VIDEO_API_BASE}/${videoRequestTypes.getTemplates}`);
       dispatch(videoActions.templatesFetched({ templates: response.data.templates }));
       return response.data.templates;
     } catch (error: unknown) {
@@ -333,18 +308,15 @@ export const fetchTemplates = createAsyncThunk(
 export const addNote = createAsyncThunk(
   "video/addNote",
   async (
-    {
-      roomId,
-      content,
-      isPrivate = true,
-    }: { roomId: string; content: string; isPrivate?: boolean },
+    { roomId, content, isPrivate = true }: { roomId: string; content: string; isPrivate?: boolean },
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.post(
-        `${VIDEO_API_BASE}/${videoRequestTypes.addNote}`,
-        { roomId, content, isPrivate }
-      );
+      const response = await axios.post(`${VIDEO_API_BASE}/${videoRequestTypes.addNote}`, {
+        roomId,
+        content,
+        isPrivate,
+      });
       return response.data.note;
     } catch (error: unknown) {
       const message =

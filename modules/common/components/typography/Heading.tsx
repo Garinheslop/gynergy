@@ -1,4 +1,5 @@
 import React from "react";
+
 import useGetHeadingVariant from "@modules/common/hooks/variants/useGetHeadingVariant";
 import { headingVariants } from "@resources/variants";
 

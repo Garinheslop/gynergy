@@ -75,42 +75,43 @@ __tests__/unit/services/
 
 #### Base Points by Activity
 
-| Activity | Base Points |
-|----------|-------------|
-| Morning Journal | 10 |
-| Evening Journal | 10 |
-| Daily Gratitude Action (DGA) | 15 |
-| Weekly Journal | 25 |
-| Vision | 20 |
+| Activity                     | Base Points |
+| ---------------------------- | ----------- |
+| Morning Journal              | 10          |
+| Evening Journal              | 10          |
+| Daily Gratitude Action (DGA) | 15          |
+| Weekly Journal               | 25          |
+| Vision                       | 20          |
 
 #### Streak Multipliers
 
-| Streak Days | Multiplier | Name |
-|-------------|------------|------|
-| 0-6 | 1.0x | No multiplier |
-| 7-13 | 1.2x | Streak 7-13 |
-| 14-29 | 1.5x | Streak 14-29 |
-| 30+ | 2.0x | Streak 30+ |
+| Streak Days | Multiplier | Name          |
+| ----------- | ---------- | ------------- |
+| 0-6         | 1.0x       | No multiplier |
+| 7-13        | 1.2x       | Streak 7-13   |
+| 14-29       | 1.5x       | Streak 14-29  |
+| 30+         | 2.0x       | Streak 30+    |
 
 #### Bonuses
 
-| Bonus | Points | Condition |
-|-------|--------|-----------|
-| Daily Combo | +10 | Complete all 3 activities in one day |
-| Early Bird | +5 | Complete morning journal before 8am |
+| Bonus       | Points | Condition                            |
+| ----------- | ------ | ------------------------------------ |
+| Daily Combo | +10    | Complete all 3 activities in one day |
+| Early Bird  | +5     | Complete morning journal before 8am  |
 
 #### Calculation Formula
 
 ```typescript
-finalPoints = Math.floor(basePoints * multiplier) + bonuses
+finalPoints = Math.floor(basePoints * multiplier) + bonuses;
 ```
 
 **Example:**
+
 - Activity: Morning Journal (10 pts)
 - Streak: 14 days (1.5x multiplier)
 - Has Combo: Yes (+10)
 - Is Early Bird: Yes (+5)
-- **Final: Math.floor(10 * 1.5) + 10 + 5 = 30 points**
+- **Final: Math.floor(10 \* 1.5) + 10 + 5 = 30 points**
 
 ### Badge System
 
@@ -125,13 +126,13 @@ finalPoints = Math.floor(basePoints * multiplier) + bonuses
 
 #### Badge Rarities
 
-| Rarity | Priority | Example |
-|--------|----------|---------|
-| Legendary | 100 | Graduate (complete 45-day journey) |
-| Epic | 80 | Perfect Week |
-| Rare | 60 | 14-Day Streak |
-| Uncommon | 40 | 7-Day Streak |
-| Common | 20 | First Journal |
+| Rarity    | Priority | Example                            |
+| --------- | -------- | ---------------------------------- |
+| Legendary | 100      | Graduate (complete 45-day journey) |
+| Epic      | 80       | Perfect Week                       |
+| Rare      | 60       | 14-Day Streak                      |
+| Uncommon  | 40       | 7-Day Streak                       |
+| Common    | 20       | First Journal                      |
 
 ### Redux State Structure
 
@@ -256,34 +257,36 @@ supabse/schema/
 
 Total budget: 4000 tokens
 
-| Context | Tokens | Purpose |
-|---------|--------|---------|
-| Recent Messages | 1500 | Last 10 conversation turns |
-| User Profile | 500 | Name, journey day, preferences |
-| Recent Journals | 800 | Latest 5 journal entries |
-| Badges & Achievements | 400 | Current badges and progress |
-| Mood Trend | 200 | Emotional trajectory analysis |
-| System Overhead | 600 | Character prompt and formatting |
+| Context               | Tokens | Purpose                         |
+| --------------------- | ------ | ------------------------------- |
+| Recent Messages       | 1500   | Last 10 conversation turns      |
+| User Profile          | 500    | Name, journey day, preferences  |
+| Recent Journals       | 800    | Latest 5 journal entries        |
+| Badges & Achievements | 400    | Current badges and progress     |
+| Mood Trend            | 200    | Emotional trajectory analysis   |
+| System Overhead       | 600    | Character prompt and formatting |
 
 ### Provider Configuration
 
 **Primary:** OpenAI GPT-4o
+
 - Model: `gpt-4o`
 - Temperature: 0.7
 - Max tokens: 1000
 
 **Fallback:** Anthropic Claude
+
 - Model: `claude-3-5-sonnet-20241022`
 - Temperature: 0.7
 - Max tokens: 1000
 
 ### Rate Limiting
 
-| Limit | Value |
-|-------|-------|
-| Max messages per minute | 10 |
-| Max messages per hour | 100 |
-| Max messages per day | 500 |
+| Limit                   | Value       |
+| ----------------------- | ----------- |
+| Max messages per minute | 10          |
+| Max messages per hour   | 100         |
+| Max messages per day    | 500         |
 | Max conversation length | 50 messages |
 
 ### Streaming Response
@@ -292,10 +295,10 @@ The chat endpoint supports streaming for real-time responses:
 
 ```typescript
 // Client usage
-const response = await fetch('/api/ai/chat-stream', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ message, characterKey, sessionId })
+const response = await fetch("/api/ai/chat-stream", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ message, characterKey, sessionId }),
 });
 
 const reader = response.body.getReader();
@@ -308,16 +311,16 @@ const reader = response.body.getReader();
 
 ### Technology Stack
 
-| Layer | Technology |
-|-------|------------|
+| Layer    | Technology                       |
+| -------- | -------------------------------- |
 | Frontend | Next.js 14, React 18, TypeScript |
-| State | Redux Toolkit, Redux Persist |
-| Backend | Next.js API Routes |
-| Database | Supabase (PostgreSQL) |
-| AI | OpenAI GPT-4o, Anthropic Claude |
-| Auth | Supabase Auth |
-| Styling | TailwindCSS |
-| Testing | Vitest |
+| State    | Redux Toolkit, Redux Persist     |
+| Backend  | Next.js API Routes               |
+| Database | Supabase (PostgreSQL)            |
+| AI       | OpenAI GPT-4o, Anthropic Claude  |
+| Auth     | Supabase Auth                    |
+| Styling  | TailwindCSS                      |
+| Testing  | Vitest                           |
 
 ### Data Flow
 
@@ -351,9 +354,11 @@ UI Update
 ### Gamification Endpoints
 
 #### GET /api/gamification/getAllBadges
+
 Returns all badge definitions.
 
 **Response:**
+
 ```json
 {
   "badges": [
@@ -372,15 +377,19 @@ Returns all badge definitions.
 ```
 
 #### GET /api/gamification/getUserBadges?sessionId=xxx
+
 Returns user's earned badges for a session.
 
 #### GET /api/gamification/getTotalPoints?sessionId=xxx
+
 Returns user's total points for a session.
 
 #### POST /api/gamification/checkBadges
+
 Checks and awards badges after activity completion.
 
 **Request:**
+
 ```json
 {
   "sessionId": "uuid",
@@ -393,6 +402,7 @@ Checks and awards badges after activity completion.
 ```
 
 **Response:**
+
 ```json
 {
   "newBadges": [...],
@@ -404,15 +414,19 @@ Checks and awards badges after activity completion.
 ### AI Endpoints
 
 #### GET /api/ai/characters
+
 Returns available AI characters.
 
 #### GET /api/ai/suggestCharacter
+
 Suggests a character based on user's current state.
 
 #### POST /api/ai/chat
+
 Sends a chat message and receives a response.
 
 **Request:**
+
 ```json
 {
   "message": "How can I stay motivated?",
@@ -422,6 +436,7 @@ Sends a chat message and receives a response.
 ```
 
 #### POST /api/ai/chat-stream
+
 Streaming chat endpoint (SSE).
 
 ---
@@ -512,11 +527,11 @@ CREATE TABLE ai_user_context (
 
 ### Test Coverage
 
-| Module | Tests | Status |
-|--------|-------|--------|
-| Points Service | 24 | Passing |
-| Example Tests | 9 | Passing |
-| **Total** | **33** | **100% Pass** |
+| Module         | Tests  | Status        |
+| -------------- | ------ | ------------- |
+| Points Service | 24     | Passing       |
+| Example Tests  | 9      | Passing       |
+| **Total**      | **33** | **100% Pass** |
 
 ### Running Tests
 
@@ -574,6 +589,7 @@ ANTHROPIC_API_KEY=your-anthropic-key
 ### Vercel Deployment
 
 The project is configured for Vercel deployment with:
+
 - Automatic builds on push to main
 - Preview deployments on PRs
 - Environment variables configured in Vercel dashboard
@@ -583,20 +599,24 @@ The project is configured for Vercel deployment with:
 ## Security Considerations
 
 ### Authentication
+
 - All API routes require Supabase authentication
 - User context is fetched using authenticated user ID
 - Session-scoped data prevents cross-user access
 
 ### Rate Limiting
+
 - AI chat endpoints have per-user rate limits
 - Prevents abuse and controls costs
 
 ### Data Privacy
+
 - User journal content is only used for AI context within the session
 - No conversation data is shared between users
 - AI providers (OpenAI/Anthropic) data retention policies apply
 
 ### API Key Security
+
 - All API keys stored as environment variables
 - Never exposed to client-side code
 - Service role key only used server-side
@@ -606,21 +626,25 @@ The project is configured for Vercel deployment with:
 ## Future Enhancements
 
 ### Phase 3: 100ms Video Integration
+
 - Cohort group video calls
 - 1:1 coaching sessions
 - Community check-ins
 
 ### Phase 4: Cohort & Community
+
 - Multiple simultaneous cohorts
 - Cohort leaderboards
 - Peer encouragement system
 
 ### Phase 5: Social Sharing
+
 - DGA sharing to social media
 - Achievement sharing
 - Referral system
 
 ### Phase 6: Apple-Level Polish
+
 - Micro-animations
 - Haptic feedback
 - Accessibility improvements
@@ -637,6 +661,7 @@ See `resources/types/gamification.ts` and `resources/types/ai.ts` for complete t
 ### Service Function Reference
 
 #### badgeService.ts
+
 - `checkBadgeCondition(badge, context)` - Check if badge condition is met
 - `checkAndAwardBadges(supabase, context)` - Award all earned badges
 - `getUserBadges(supabase, userId, sessionId)` - Get user's badges
@@ -645,6 +670,7 @@ See `resources/types/gamification.ts` and `resources/types/ai.ts` for complete t
 - `toggleBadgeShowcase(supabase, userId, badgeId, sessionId)` - Toggle showcase
 
 #### pointsService.ts
+
 - `getBasePoints(activityType)` - Get base points for activity
 - `getStreakMultiplier(streak)` - Get multiplier for streak count
 - `getComboBonus(hasCombo)` - Get combo bonus points
@@ -654,4 +680,4 @@ See `resources/types/gamification.ts` and `resources/types/ai.ts` for complete t
 
 ---
 
-*Document generated by AI Implementation Team - Gynergy Platform*
+_Document generated by AI Implementation Team - Gynergy Platform_
