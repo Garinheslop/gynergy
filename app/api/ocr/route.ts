@@ -11,9 +11,14 @@ import journalSchemas from "@resources/ocr/journalSchemas";
 import { journalTypes } from "@resources/types/journal";
 import { visionTypes } from "@resources/types/vision";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy-initialize OpenAI client to avoid build-time errors
+let openaiClient: OpenAI | null = null;
+function getOpenAIClient(): OpenAI {
+  openaiClient ??= new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+  return openaiClient;
+}
 
 const contentTypes = {
   ...journalTypes,
@@ -47,7 +52,7 @@ export async function POST(request: Request) {
       journalSchemas
     );
 
-    const { choices } = await openai.chat.completions.create({
+    const { choices } = await getOpenAIClient().chat.completions.create({
       model: "gpt-4o-mini",
       messages,
       store: true,
