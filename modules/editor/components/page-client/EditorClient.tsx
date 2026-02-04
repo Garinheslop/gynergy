@@ -28,7 +28,6 @@ import VisionCreedEditor from "../vision/VisionCreedEditor";
 import VisionDiscoveryEditor from "../vision/VisionDiscoveryEditor";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 
-
 import GratitudeActionJournalEditor from "../daily-journal/GratitudeActionJournalEditor";
 import WeeklyChallengeJournalEditor from "../weekly-journal/WeeklyChallengeJournalEditor";
 import WeeklyJournalEditor from "../weekly-journal/WeeklyJournalEditor";

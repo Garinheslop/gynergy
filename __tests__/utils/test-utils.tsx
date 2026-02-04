@@ -4,7 +4,7 @@
  */
 import React, { PropsWithChildren, ReactElement } from "react";
 
-import { configureStore, EnhancedStore, PreloadedState } from "@reduxjs/toolkit";
+import { configureStore, EnhancedStore } from "@reduxjs/toolkit";
 import { render, RenderOptions, RenderResult, waitFor, screen } from "@testing-library/react";
 import { Provider } from "react-redux";
 
@@ -19,7 +19,7 @@ export { default as userEvent } from "@testing-library/user-event";
  * Options for renderWithProviders
  */
 interface ExtendedRenderOptions extends Omit<RenderOptions, "queries"> {
-  preloadedState?: PreloadedState<RootState>;
+  preloadedState?: Partial<RootState>;
   store?: EnhancedStore<RootState>;
 }
 
@@ -27,12 +27,10 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, "queries"> {
  * Create a test store with optional preloaded state
  * Note: This creates a non-persisted store for testing
  */
-export function createTestStore(
-  preloadedState?: PreloadedState<RootState>
-): EnhancedStore<RootState> {
+export function createTestStore(preloadedState?: Partial<RootState>): EnhancedStore<RootState> {
   return configureStore({
     reducer,
-    preloadedState,
+    preloadedState: preloadedState as RootState | undefined,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: false,

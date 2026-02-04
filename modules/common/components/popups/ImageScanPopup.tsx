@@ -21,7 +21,6 @@ import { headingVariants, paragraphVariants } from "@resources/variants";
 
 import Spinner from "../Spinner";
 
-
 const ImageScanPopup = () => {
   //context
   const webcamRef = useRef<any>(null);

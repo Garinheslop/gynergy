@@ -23,7 +23,6 @@ import Highlights from "./Highlights";
 import Quote from "./Quote";
 import JournalCard from "../../journal/components/card/JournalCard";
 
-
 const sectionTypes = {
   daily: "daily",
   weekly: "weekly",

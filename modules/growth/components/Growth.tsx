@@ -9,7 +9,6 @@ import { pagePaths } from "@resources/paths";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useSelector } from "@store/hooks";
 
-
 import MountainProgress from "./MountainProgress";
 
 const Growth = forwardRef<HTMLDivElement>(({}, ref) => {

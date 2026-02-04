@@ -5,7 +5,7 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { axe, toHaveNoViolations } from "jest-axe";
-import { expect } from "vitest";
+import { expect, vi } from "vitest";
 
 // Extend Vitest's expect with jest-axe matchers
 expect.extend(toHaveNoViolations);

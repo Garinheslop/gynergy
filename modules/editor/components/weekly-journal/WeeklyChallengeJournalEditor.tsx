@@ -29,7 +29,6 @@ import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { ActionData } from "@resources/types/action";
 
-
 import { pagePaths } from "@resources/paths";
 import Image from "@modules/common/components/Image";
 

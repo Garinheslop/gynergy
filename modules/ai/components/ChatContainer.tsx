@@ -12,7 +12,6 @@ import ChatInput from "./ChatInput";
 import ChatMessage from "./ChatMessage";
 import { useAIChat } from "../hooks/useAIChat";
 
-
 interface ChatContainerProps {
   onClose?: () => void;
   showHeader?: boolean;

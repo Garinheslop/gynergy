@@ -14,7 +14,6 @@ import FileInput from "@modules/common/components/FileInput";
 import Image from "@modules/common/components/Image";
 import Modal from "@modules/common/components/modal";
 
-
 import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import icons from "@resources/icons";

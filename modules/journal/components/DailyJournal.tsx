@@ -24,8 +24,6 @@ import { getUserDailyHistory } from "@store/modules/history";
 
 import MeditationCard from "./card/MeditationCard";
 
-
-
 const DailyJournal = ({ day }: { day: number }) => {
   const dispatch = useDispatch();
   const userEnrollment = useSelector((state) => state.enrollments.current);

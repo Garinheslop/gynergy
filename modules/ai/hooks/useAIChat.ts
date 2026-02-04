@@ -7,7 +7,6 @@ import { CharacterKey, ChatMessage, ChatResponse } from "@resources/types/ai";
 import { useDispatch, useSelector } from "@store/hooks";
 import { aiActions } from "@store/modules/ai/reducers";
 
-
 interface UseAIChatReturn {
   // State
   characters: {

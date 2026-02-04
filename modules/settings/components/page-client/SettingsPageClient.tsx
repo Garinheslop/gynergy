@@ -19,8 +19,6 @@ import { updateUserProfileData } from "@store/modules/profile";
 
 import ProfileImage from "../ProfileImage";
 
-
-
 type InputState = {
   value?: string;
   error: string;

@@ -12,9 +12,6 @@ import { buttonActionTypes } from "@resources/types/button";
 import { journalTypes } from "@resources/types/journal";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 
-
-
-
 const MeditationPopup = () => {
   const { meditationPopupObj } = usePopup();
 

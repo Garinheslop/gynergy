@@ -19,7 +19,6 @@ import {
 import EditorActionBtns from "../EditorActionBtns";
 import EditorHeader from "../EditorHeader";
 
-
 const VisionDiscoveryEditor: FC = () => {
   const { imageScanPopupObj } = usePopup();
   const editorStates = useSelector((state) => state.editor);

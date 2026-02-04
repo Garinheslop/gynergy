@@ -15,7 +15,6 @@ import {
 
 import EditorActionBtns from "../EditorActionBtns";
 
-
 const VisionCreedEditor: FC = () => {
   const { imageScanPopupObj } = usePopup();
   const editorStates = useSelector((state) => state.editor);

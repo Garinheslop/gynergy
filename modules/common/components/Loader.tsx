@@ -7,7 +7,6 @@ import { paragraphVariants } from "@resources/variants";
 import Modal from "./modal";
 import Paragraph from "./typography/Paragraph";
 
-
 const Loader = ({
   label,
   heading,

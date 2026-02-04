@@ -10,7 +10,6 @@ import { journalTypes } from "@resources/types/journal";
 import { paragraphVariants } from "@resources/variants";
 import { useSelector } from "@store/hooks";
 
-
 const Highlights = () => {
   const journals = useSelector((state) => state.journals);
   const actions = useSelector((state) => state.actions);

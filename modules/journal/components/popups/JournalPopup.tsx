@@ -14,7 +14,6 @@ import FileInput from "@modules/common/components/FileInput";
 import Image from "@modules/common/components/Image";
 import Modal from "@modules/common/components/modal";
 
-
 import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import icons from "@resources/icons";
@@ -23,8 +22,6 @@ import { journalTypes } from "@resources/types/journal";
 import { ImageRawData } from "@resources/types/ocr";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useSelector } from "@store/hooks";
-
-
 
 const JournalPopup = () => {
   const router = useRouter();

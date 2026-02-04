@@ -29,7 +29,6 @@ import {
 import EditorActionBtns from "../EditorActionBtns";
 import EditorHeader from "../EditorHeader";
 
-
 const GratitudeActionJournalEditor: FC = () => {
   const { imageScanPopupObj } = usePopup();
   const router = useRouter();

@@ -4,7 +4,7 @@
  */
 import React, { PropsWithChildren, ReactElement } from "react";
 
-import { configureStore, EnhancedStore, PreloadedState, Reducer } from "@reduxjs/toolkit";
+import { configureStore, EnhancedStore, Reducer } from "@reduxjs/toolkit";
 import { render, RenderOptions, RenderResult } from "@testing-library/react";
 import { Provider } from "react-redux";
 
@@ -15,7 +15,7 @@ import reducer from "@store/reducer";
  * Options for renderWithStore
  */
 interface RenderWithStoreOptions extends Omit<RenderOptions, "queries"> {
-  preloadedState?: PreloadedState<RootState>;
+  preloadedState?: Partial<RootState>;
   store?: EnhancedStore<RootState>;
   reducer?: Reducer<RootState>;
 }
@@ -25,12 +25,12 @@ interface RenderWithStoreOptions extends Omit<RenderOptions, "queries"> {
  * This is essential for unit testing as redux-persist adds async behavior
  */
 export function createTestStore(
-  preloadedState?: PreloadedState<RootState>,
+  preloadedState?: Partial<RootState>,
   customReducer?: Reducer<RootState>
 ): EnhancedStore<RootState> {
   return configureStore({
     reducer: customReducer || reducer,
-    preloadedState,
+    preloadedState: preloadedState as RootState | undefined,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: false,
@@ -82,10 +82,12 @@ export function renderWithStore(
     return <Provider store={store}>{children}</Provider>;
   }
 
+  const renderResult = render(ui, { wrapper: Wrapper, ...renderOptions });
+
   return {
     store,
-    ...render(ui, { wrapper: Wrapper, ...renderOptions }),
-  };
+    ...renderResult,
+  } as RenderResult & { store: EnhancedStore<RootState> };
 }
 
 /**
@@ -99,11 +101,12 @@ export function createSliceState<K extends keyof RootState>(
   // Get the initial state by creating a temporary store
   const tempStore = createTestStore();
   const initialState = tempStore.getState();
+  const sliceInitialState = initialState[sliceName];
 
   return {
     [sliceName]: {
-      ...initialState[sliceName],
-      ...state,
+      ...(sliceInitialState as object),
+      ...(state as object),
     },
   } as Partial<RootState>;
 }
@@ -156,7 +159,7 @@ export async function waitForStateChange(
  * Note: This requires a custom middleware to track actions
  */
 export function createStoreWithActionHistory(
-  preloadedState?: PreloadedState<RootState>
+  preloadedState?: Partial<RootState>
 ): EnhancedStore<RootState> & { actionHistory: unknown[] } {
   const actionHistory: unknown[] = [];
 
@@ -168,7 +171,7 @@ export function createStoreWithActionHistory(
 
   const store = configureStore({
     reducer,
-    preloadedState,
+    preloadedState: preloadedState as RootState | undefined,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: false,

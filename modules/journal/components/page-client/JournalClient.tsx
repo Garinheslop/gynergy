@@ -24,7 +24,6 @@ import DailyJournal from "../DailyJournal";
 import VisionJournal from "../VisionJournal";
 import WeeklyJournal from "../WeeklyJournal";
 
-
 const JournalClient = ({ bookSlug }: { bookSlug: string }) => {
   const dispatch = useDispatch();
   const router = useRouter();

@@ -13,7 +13,6 @@ import {
   getUserRank,
 } from "@store/modules/leaderboard";
 
-
 const useLeaderBoardData = () => {
   const { session } = useSession();
   const userEnrollment = useSelector((state) => state.enrollments.current);

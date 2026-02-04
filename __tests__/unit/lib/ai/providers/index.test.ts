@@ -13,7 +13,7 @@ let mockOpenAIStreamImpl: ReturnType<typeof vi.fn>;
 let mockAnthropicStreamImpl: ReturnType<typeof vi.fn>;
 
 // Mock the provider modules
-vi.mock("@/lib/ai/providers/openai", () => ({
+vi.mock("@lib/ai/providers/openai", () => ({
   openaiProvider: {
     name: "openai",
     isConfigured: () => mockOpenAIConfigured,
@@ -22,7 +22,7 @@ vi.mock("@/lib/ai/providers/openai", () => ({
   },
 }));
 
-vi.mock("@/lib/ai/providers/anthropic", () => ({
+vi.mock("@lib/ai/providers/anthropic", () => ({
   anthropicProvider: {
     name: "anthropic",
     isConfigured: () => mockAnthropicConfigured,
@@ -53,7 +53,7 @@ describe("AI Providers Index", () => {
   describe("getProvider", () => {
     it("returns openai provider when configured", async () => {
       mockOpenAIConfigured = true;
-      const { getProvider } = await import("@/lib/ai/providers");
+      const { getProvider } = await import("@lib/ai/providers");
 
       const provider = getProvider("openai");
 
@@ -63,7 +63,7 @@ describe("AI Providers Index", () => {
 
     it("returns anthropic provider when configured", async () => {
       mockAnthropicConfigured = true;
-      const { getProvider } = await import("@/lib/ai/providers");
+      const { getProvider } = await import("@lib/ai/providers");
 
       const provider = getProvider("anthropic");
 
@@ -73,7 +73,7 @@ describe("AI Providers Index", () => {
 
     it("returns null when openai not configured", async () => {
       mockOpenAIConfigured = false;
-      const { getProvider } = await import("@/lib/ai/providers");
+      const { getProvider } = await import("@lib/ai/providers");
 
       const provider = getProvider("openai");
 
@@ -82,7 +82,7 @@ describe("AI Providers Index", () => {
 
     it("returns null when anthropic not configured", async () => {
       mockAnthropicConfigured = false;
-      const { getProvider } = await import("@/lib/ai/providers");
+      const { getProvider } = await import("@lib/ai/providers");
 
       const provider = getProvider("anthropic");
 
@@ -94,7 +94,7 @@ describe("AI Providers Index", () => {
     it("returns true when openai is configured", async () => {
       mockOpenAIConfigured = true;
       mockAnthropicConfigured = false;
-      const { isAIConfigured } = await import("@/lib/ai/providers");
+      const { isAIConfigured } = await import("@lib/ai/providers");
 
       expect(isAIConfigured()).toBe(true);
     });
@@ -102,7 +102,7 @@ describe("AI Providers Index", () => {
     it("returns true when anthropic is configured", async () => {
       mockOpenAIConfigured = false;
       mockAnthropicConfigured = true;
-      const { isAIConfigured } = await import("@/lib/ai/providers");
+      const { isAIConfigured } = await import("@lib/ai/providers");
 
       expect(isAIConfigured()).toBe(true);
     });
@@ -110,7 +110,7 @@ describe("AI Providers Index", () => {
     it("returns true when both are configured", async () => {
       mockOpenAIConfigured = true;
       mockAnthropicConfigured = true;
-      const { isAIConfigured } = await import("@/lib/ai/providers");
+      const { isAIConfigured } = await import("@lib/ai/providers");
 
       expect(isAIConfigured()).toBe(true);
     });
@@ -118,7 +118,7 @@ describe("AI Providers Index", () => {
     it("returns false when no providers configured", async () => {
       mockOpenAIConfigured = false;
       mockAnthropicConfigured = false;
-      const { isAIConfigured } = await import("@/lib/ai/providers");
+      const { isAIConfigured } = await import("@lib/ai/providers");
 
       expect(isAIConfigured()).toBe(false);
     });
@@ -128,7 +128,7 @@ describe("AI Providers Index", () => {
     it("returns both providers when both configured", async () => {
       mockOpenAIConfigured = true;
       mockAnthropicConfigured = true;
-      const { getAvailableProviders } = await import("@/lib/ai/providers");
+      const { getAvailableProviders } = await import("@lib/ai/providers");
 
       const providers = getAvailableProviders();
 
@@ -138,7 +138,7 @@ describe("AI Providers Index", () => {
     it("returns only openai when anthropic not configured", async () => {
       mockOpenAIConfigured = true;
       mockAnthropicConfigured = false;
-      const { getAvailableProviders } = await import("@/lib/ai/providers");
+      const { getAvailableProviders } = await import("@lib/ai/providers");
 
       const providers = getAvailableProviders();
 
@@ -148,7 +148,7 @@ describe("AI Providers Index", () => {
     it("returns only anthropic when openai not configured", async () => {
       mockOpenAIConfigured = false;
       mockAnthropicConfigured = true;
-      const { getAvailableProviders } = await import("@/lib/ai/providers");
+      const { getAvailableProviders } = await import("@lib/ai/providers");
 
       const providers = getAvailableProviders();
 
@@ -158,7 +158,7 @@ describe("AI Providers Index", () => {
     it("returns empty array when no providers configured", async () => {
       mockOpenAIConfigured = false;
       mockAnthropicConfigured = false;
-      const { getAvailableProviders } = await import("@/lib/ai/providers");
+      const { getAvailableProviders } = await import("@lib/ai/providers");
 
       const providers = getAvailableProviders();
 
@@ -179,7 +179,7 @@ describe("AI Providers Index", () => {
         provider: "openai",
       });
 
-      const { complete } = await import("@/lib/ai/providers");
+      const { complete } = await import("@lib/ai/providers");
 
       const result = await complete(mockOptions, "openai");
 
@@ -195,7 +195,7 @@ describe("AI Providers Index", () => {
         provider: "anthropic",
       });
 
-      const { complete } = await import("@/lib/ai/providers");
+      const { complete } = await import("@lib/ai/providers");
 
       const result = await complete(mockOptions, "anthropic");
 
@@ -212,7 +212,7 @@ describe("AI Providers Index", () => {
         provider: "openai",
       });
 
-      const { complete } = await import("@/lib/ai/providers");
+      const { complete } = await import("@lib/ai/providers");
 
       const result = await complete(mockOptions, "anthropic");
 
@@ -231,7 +231,7 @@ describe("AI Providers Index", () => {
         provider: "anthropic",
       });
 
-      const { complete } = await import("@/lib/ai/providers");
+      const { complete } = await import("@lib/ai/providers");
 
       const result = await complete(mockOptions, "openai");
 
@@ -248,7 +248,7 @@ describe("AI Providers Index", () => {
         provider: "openai",
       });
 
-      const { complete } = await import("@/lib/ai/providers");
+      const { complete } = await import("@lib/ai/providers");
 
       const result = await complete(mockOptions);
 
@@ -266,7 +266,7 @@ describe("AI Providers Index", () => {
         provider: "anthropic",
       });
 
-      const { complete } = await import("@/lib/ai/providers");
+      const { complete } = await import("@lib/ai/providers");
 
       const result = await complete(mockOptions);
 
@@ -284,7 +284,7 @@ describe("AI Providers Index", () => {
         provider: "anthropic",
       });
 
-      const { complete } = await import("@/lib/ai/providers");
+      const { complete } = await import("@lib/ai/providers");
 
       await complete(mockOptions, "openai");
 
@@ -297,7 +297,7 @@ describe("AI Providers Index", () => {
       mockOpenAICompleteImpl.mockRejectedValue(new Error("OpenAI down"));
       mockAnthropicCompleteImpl.mockRejectedValue(new Error("Anthropic down"));
 
-      const { complete } = await import("@/lib/ai/providers");
+      const { complete } = await import("@lib/ai/providers");
 
       await expect(complete(mockOptions)).rejects.toThrow("Anthropic down");
     });
@@ -306,7 +306,7 @@ describe("AI Providers Index", () => {
       mockOpenAIConfigured = false;
       mockAnthropicConfigured = false;
 
-      const { complete } = await import("@/lib/ai/providers");
+      const { complete } = await import("@lib/ai/providers");
 
       await expect(complete(mockOptions)).rejects.toThrow(
         "No AI providers configured or all providers failed"
@@ -317,7 +317,7 @@ describe("AI Providers Index", () => {
       mockOpenAIConfigured = false;
       mockAnthropicCompleteImpl.mockRejectedValue(new Error("Anthropic error"));
 
-      const { complete } = await import("@/lib/ai/providers");
+      const { complete } = await import("@lib/ai/providers");
 
       await expect(complete(mockOptions, "openai")).rejects.toThrow("Anthropic error");
     });
@@ -326,7 +326,7 @@ describe("AI Providers Index", () => {
       mockOpenAICompleteImpl.mockRejectedValue("String error");
       mockAnthropicCompleteImpl.mockRejectedValue("Another string error");
 
-      const { complete } = await import("@/lib/ai/providers");
+      const { complete } = await import("@lib/ai/providers");
 
       await expect(complete(mockOptions)).rejects.toThrow("Another string error");
     });
@@ -343,7 +343,7 @@ describe("AI Providers Index", () => {
         yield { type: "done", tokensUsed: { prompt: 5, completion: 2, total: 7 } };
       });
 
-      const { stream } = await import("@/lib/ai/providers");
+      const { stream } = await import("@lib/ai/providers");
 
       const chunks = [];
       for await (const chunk of stream(mockOptions, "openai")) {
@@ -360,7 +360,7 @@ describe("AI Providers Index", () => {
         yield { type: "done", tokensUsed: { prompt: 5, completion: 3, total: 8 } };
       });
 
-      const { stream } = await import("@/lib/ai/providers");
+      const { stream } = await import("@lib/ai/providers");
 
       const chunks = [];
       for await (const chunk of stream(mockOptions, "anthropic")) {
@@ -380,7 +380,7 @@ describe("AI Providers Index", () => {
         yield { type: "done", tokensUsed: { prompt: 5, completion: 3, total: 8 } };
       });
 
-      const { stream } = await import("@/lib/ai/providers");
+      const { stream } = await import("@lib/ai/providers");
 
       const chunks = [];
       for await (const chunk of stream(mockOptions, "openai")) {
@@ -401,7 +401,7 @@ describe("AI Providers Index", () => {
         yield { type: "done", tokensUsed: { prompt: 5, completion: 3, total: 8 } };
       });
 
-      const { stream } = await import("@/lib/ai/providers");
+      const { stream } = await import("@lib/ai/providers");
 
       const chunks = [];
       for await (const chunk of stream(mockOptions, "openai")) {
@@ -417,7 +417,7 @@ describe("AI Providers Index", () => {
         yield { type: "done", tokensUsed: { prompt: 5, completion: 2, total: 7 } };
       });
 
-      const { stream } = await import("@/lib/ai/providers");
+      const { stream } = await import("@lib/ai/providers");
 
       const chunks = [];
       for await (const chunk of stream(mockOptions)) {
@@ -435,7 +435,7 @@ describe("AI Providers Index", () => {
         yield { type: "done", tokensUsed: { prompt: 5, completion: 3, total: 8 } };
       });
 
-      const { stream } = await import("@/lib/ai/providers");
+      const { stream } = await import("@lib/ai/providers");
 
       const chunks = [];
       for await (const chunk of stream(mockOptions)) {
@@ -455,7 +455,7 @@ describe("AI Providers Index", () => {
         yield { type: "done", tokensUsed: { prompt: 5, completion: 2, total: 7 } };
       });
 
-      const { stream } = await import("@/lib/ai/providers");
+      const { stream } = await import("@lib/ai/providers");
 
       const chunks = [];
       for await (const chunk of stream(mockOptions, "openai")) {
@@ -475,7 +475,7 @@ describe("AI Providers Index", () => {
         yield { type: "error", error: "Anthropic failed" };
       });
 
-      const { stream } = await import("@/lib/ai/providers");
+      const { stream } = await import("@lib/ai/providers");
 
       const chunks = [];
       for await (const chunk of stream(mockOptions)) {
@@ -492,7 +492,7 @@ describe("AI Providers Index", () => {
       mockOpenAIConfigured = false;
       mockAnthropicConfigured = false;
 
-      const { stream } = await import("@/lib/ai/providers");
+      const { stream } = await import("@lib/ai/providers");
 
       const chunks = [];
       for await (const chunk of stream(mockOptions)) {
@@ -515,7 +515,7 @@ describe("AI Providers Index", () => {
         yield { type: "done", tokensUsed: { prompt: 5, completion: 3, total: 8 } };
       });
 
-      const { stream } = await import("@/lib/ai/providers");
+      const { stream } = await import("@lib/ai/providers");
 
       const chunks = [];
       for await (const chunk of stream(mockOptions, "openai")) {
@@ -540,7 +540,7 @@ describe("AI Providers Index", () => {
         yield { type: "done", tokensUsed: { prompt: 10, completion: 5, total: 15 } };
       });
 
-      const { stream } = await import("@/lib/ai/providers");
+      const { stream } = await import("@lib/ai/providers");
 
       const chunks = [];
       for await (const chunk of stream(mockOptions, "openai")) {
@@ -554,7 +554,7 @@ describe("AI Providers Index", () => {
 
   describe("re-exports", () => {
     it("exports types from types module", async () => {
-      const providers = await import("@/lib/ai/providers");
+      const providers = await import("@lib/ai/providers");
 
       // Should export constants
       expect(providers.DEFAULT_MODELS).toBeDefined();

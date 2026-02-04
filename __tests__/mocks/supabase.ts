@@ -33,14 +33,17 @@ export function getMockData(table: string): unknown[] {
 /**
  * Create a chainable query builder mock
  */
-function createQueryBuilder(table: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MockQueryBuilder = Record<string, any>;
+
+function createQueryBuilder(table: string): MockQueryBuilder {
   const filters: Record<string, unknown> = {};
   let _selectFields: string = "*";
   let orderConfig: { column: string; ascending: boolean } | null = null;
   let limitValue: number | null = null;
   let singleResult = false;
 
-  const builder = {
+  const builder: MockQueryBuilder = {
     select: vi.fn((fields: string = "*") => {
       _selectFields = fields;
       return builder;
@@ -136,8 +139,8 @@ function createQueryBuilder(table: string) {
       // Apply ordering
       if (orderConfig) {
         data = [...data].sort((a, b) => {
-          const aVal = (a as Record<string, unknown>)[orderConfig!.column];
-          const bVal = (b as Record<string, unknown>)[orderConfig!.column];
+          const aVal = (a as Record<string, unknown>)[orderConfig!.column] as string | number;
+          const bVal = (b as Record<string, unknown>)[orderConfig!.column] as string | number;
           const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
           return orderConfig!.ascending ? comparison : -comparison;
         });
@@ -200,8 +203,8 @@ function createStorageMock() {
  * Create mock Supabase auth
  */
 function createAuthMock(initialSession = mockSession()) {
-  let currentSession = initialSession;
-  let currentUser = initialSession?.user || null;
+  let currentSession: ReturnType<typeof mockSession> | null = initialSession;
+  let currentUser: ReturnType<typeof mockSupabaseUser> | null = initialSession?.user || null;
 
   return {
     getUser: vi.fn(async () => ({

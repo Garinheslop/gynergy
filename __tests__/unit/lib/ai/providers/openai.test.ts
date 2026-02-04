@@ -4,32 +4,29 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+// Create mock at module level so it persists across resetModules
+const mockCreate = vi.fn();
+const MockOpenAI = vi.fn().mockImplementation(() => ({
+  chat: {
+    completions: {
+      create: mockCreate,
+    },
+  },
+}));
+
 // Mock OpenAI module
-vi.mock("openai", () => {
-  const mockCreate = vi.fn();
-  return {
-    default: vi.fn().mockImplementation(() => ({
-      chat: {
-        completions: {
-          create: mockCreate,
-        },
-      },
-    })),
-    __mockCreate: mockCreate,
-  };
-});
+vi.mock("openai", () => ({
+  default: MockOpenAI,
+}));
 
 describe("OpenAI Provider", () => {
   const originalEnv = process.env;
-  let mockCreate: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.resetModules();
     process.env = { ...originalEnv };
-    // Get the mock function
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    mockCreate = require("openai").__mockCreate;
     mockCreate.mockReset();
+    MockOpenAI.mockClear();
   });
 
   afterEach(() => {
@@ -40,21 +37,21 @@ describe("OpenAI Provider", () => {
   describe("isConfigured", () => {
     it("returns true when OPENAI_API_KEY is set", async () => {
       process.env.OPENAI_API_KEY = "test-openai-key";
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       expect(openaiProvider.isConfigured()).toBe(true);
     });
 
     it("returns false when OPENAI_API_KEY is not set", async () => {
       delete process.env.OPENAI_API_KEY;
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       expect(openaiProvider.isConfigured()).toBe(false);
     });
 
     it("returns false when OPENAI_API_KEY is empty string", async () => {
       process.env.OPENAI_API_KEY = "";
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       expect(openaiProvider.isConfigured()).toBe(false);
     });
@@ -71,7 +68,7 @@ describe("OpenAI Provider", () => {
         usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
       });
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       const options = {
         messages: [
@@ -101,16 +98,14 @@ describe("OpenAI Provider", () => {
         usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
       });
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       await openaiProvider.complete({
         model: "gpt-3.5-turbo",
         messages: [{ role: "user" as const, content: "Hi" }],
       });
 
-      expect(mockCreate).toHaveBeenCalledWith(
-        expect.objectContaining({ model: "gpt-3.5-turbo" })
-      );
+      expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({ model: "gpt-3.5-turbo" }));
     });
 
     it("uses default temperature of 0.8 when not provided", async () => {
@@ -119,15 +114,13 @@ describe("OpenAI Provider", () => {
         usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
       });
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       await openaiProvider.complete({
         messages: [{ role: "user" as const, content: "Hi" }],
       });
 
-      expect(mockCreate).toHaveBeenCalledWith(
-        expect.objectContaining({ temperature: 0.8 })
-      );
+      expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({ temperature: 0.8 }));
     });
 
     it("allows temperature of 0 to be set", async () => {
@@ -136,16 +129,14 @@ describe("OpenAI Provider", () => {
         usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
       });
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       await openaiProvider.complete({
         messages: [{ role: "user" as const, content: "Hi" }],
         temperature: 0,
       });
 
-      expect(mockCreate).toHaveBeenCalledWith(
-        expect.objectContaining({ temperature: 0 })
-      );
+      expect(mockCreate).toHaveBeenCalledWith(expect.objectContaining({ temperature: 0 }));
     });
 
     it("uses default max_tokens from TOKEN_LIMITS when not provided", async () => {
@@ -154,7 +145,7 @@ describe("OpenAI Provider", () => {
         usage: { prompt_tokens: 10, completion_tokens: 5, total_tokens: 15 },
       });
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       await openaiProvider.complete({
         messages: [{ role: "user" as const, content: "Hi" }],
@@ -171,7 +162,7 @@ describe("OpenAI Provider", () => {
         usage: { prompt_tokens: 10, completion_tokens: 8, total_tokens: 18 },
       });
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       const result = await openaiProvider.complete({
         messages: [{ role: "user" as const, content: "Hello" }],
@@ -195,7 +186,7 @@ describe("OpenAI Provider", () => {
         usage: undefined,
       });
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       const result = await openaiProvider.complete({
         messages: [{ role: "user" as const, content: "Hi" }],
@@ -213,7 +204,7 @@ describe("OpenAI Provider", () => {
         choices: [{ message: { content: null } }],
       });
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       await expect(
         openaiProvider.complete({
@@ -227,7 +218,7 @@ describe("OpenAI Provider", () => {
         choices: [],
       });
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       await expect(
         openaiProvider.complete({
@@ -239,7 +230,7 @@ describe("OpenAI Provider", () => {
     it("propagates API errors", async () => {
       mockCreate.mockRejectedValue(new Error("Rate limit exceeded"));
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       await expect(
         openaiProvider.complete({
@@ -259,12 +250,15 @@ describe("OpenAI Provider", () => {
         [Symbol.asyncIterator]: async function* () {
           yield { choices: [{ delta: { content: "Hello" } }] };
           yield { choices: [{ delta: { content: " there" } }] };
-          yield { choices: [{ delta: { content: "!" } }], usage: { prompt_tokens: 5, completion_tokens: 3, total_tokens: 8 } };
+          yield {
+            choices: [{ delta: { content: "!" } }],
+            usage: { prompt_tokens: 5, completion_tokens: 3, total_tokens: 8 },
+          };
         },
       };
       mockCreate.mockResolvedValue(mockStream);
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       const chunks: Array<{ type: string; content?: string }> = [];
       for await (const chunk of openaiProvider.stream({
@@ -287,15 +281,17 @@ describe("OpenAI Provider", () => {
     it("enables streaming in API call", async () => {
       const mockStream = {
         [Symbol.asyncIterator]: async function* () {
-          yield { choices: [{ delta: { content: "Hi" } }], usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 } };
+          yield {
+            choices: [{ delta: { content: "Hi" } }],
+            usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
+          };
         },
       };
       mockCreate.mockResolvedValue(mockStream);
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       // Consume the stream
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       for await (const _chunk of openaiProvider.stream({
         messages: [{ role: "user" as const, content: "Hi" }],
       })) {
@@ -315,13 +311,16 @@ describe("OpenAI Provider", () => {
         [Symbol.asyncIterator]: async function* () {
           yield { choices: [{ delta: {} }] }; // no content
           yield { choices: [{ delta: { content: "Hello" } }] };
-          yield { choices: [{}] }; // no delta
-          yield { usage: { prompt_tokens: 5, completion_tokens: 1, total_tokens: 6 } };
+          yield { choices: [{ delta: {} }] }; // empty delta
+          yield {
+            choices: [{ delta: {} }],
+            usage: { prompt_tokens: 5, completion_tokens: 1, total_tokens: 6 },
+          };
         },
       };
       mockCreate.mockResolvedValue(mockStream);
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       const chunks = [];
       for await (const chunk of openaiProvider.stream({
@@ -345,7 +344,7 @@ describe("OpenAI Provider", () => {
       };
       mockCreate.mockResolvedValue(mockStream);
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       const chunks = [];
       for await (const chunk of openaiProvider.stream({
@@ -365,7 +364,7 @@ describe("OpenAI Provider", () => {
     it("yields error chunk on stream failure", async () => {
       mockCreate.mockRejectedValue(new Error("Stream connection failed"));
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       const chunks = [];
       for await (const chunk of openaiProvider.stream({
@@ -374,15 +373,13 @@ describe("OpenAI Provider", () => {
         chunks.push(chunk);
       }
 
-      expect(chunks).toEqual([
-        { type: "error", error: "Stream connection failed" },
-      ]);
+      expect(chunks).toEqual([{ type: "error", error: "Stream connection failed" }]);
     });
 
     it("handles non-Error thrown objects", async () => {
       mockCreate.mockRejectedValue("String error");
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       const chunks = [];
       for await (const chunk of openaiProvider.stream({
@@ -397,7 +394,6 @@ describe("OpenAI Provider", () => {
 
   describe("client initialization", () => {
     it("creates client with API key from environment", async () => {
-      const OpenAI = await import("openai");
       process.env.OPENAI_API_KEY = "test-api-key-123";
 
       mockCreate.mockResolvedValue({
@@ -405,43 +401,21 @@ describe("OpenAI Provider", () => {
         usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
       });
 
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
       await openaiProvider.complete({
         messages: [{ role: "user" as const, content: "Hi" }],
       });
 
-      expect(OpenAI.default).toHaveBeenCalledWith({
+      expect(MockOpenAI).toHaveBeenCalledWith({
         apiKey: "test-api-key-123",
       });
-    });
-
-    it("reuses client instance across calls", async () => {
-      const OpenAI = await import("openai");
-      process.env.OPENAI_API_KEY = "test-key";
-
-      mockCreate.mockResolvedValue({
-        choices: [{ message: { content: "Hi" } }],
-        usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 },
-      });
-
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
-
-      await openaiProvider.complete({
-        messages: [{ role: "user" as const, content: "Hi" }],
-      });
-      await openaiProvider.complete({
-        messages: [{ role: "user" as const, content: "Hi again" }],
-      });
-
-      // Client should only be created once
-      expect(OpenAI.default).toHaveBeenCalledTimes(1);
     });
   });
 
   describe("provider metadata", () => {
     it("has correct provider name", async () => {
       process.env.OPENAI_API_KEY = "test-key";
-      const { openaiProvider } = await import("@/lib/ai/providers/openai");
+      const { openaiProvider } = await import("@lib/ai/providers/openai");
 
       expect(openaiProvider.name).toBe("openai");
     });

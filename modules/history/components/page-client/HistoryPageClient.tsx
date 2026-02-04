@@ -26,7 +26,6 @@ import JournalHistoryCard from "../cards/JournalHistoryCard";
 import HistoryCardSkeleton from "../skeleton/HistoryCardSkeleton";
 import ViosionCards from "../VisionCards";
 
-
 const HistoryPageClient: React.FC = () => {
   const router = useRouter();
   const dispatch = useDispatch();

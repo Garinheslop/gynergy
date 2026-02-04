@@ -23,7 +23,6 @@ import { setEditorDataStates } from "@store/modules/editor";
 import { setHistoryCurrentStates } from "@store/modules/history";
 import { getUserVisions } from "@store/modules/vision";
 
-
 const Visions = ({ isStatic = false }: { isStatic?: boolean }) => {
   const router = useRouter();
   const currentBook = useSelector((state) => state.books.current);
