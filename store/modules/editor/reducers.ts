@@ -10,7 +10,7 @@ const editorTypes = {
 interface EditorState {
   current: EditorData | null;
   action: ActionData | null;
-  images: any | [];
+  images: Record<string, unknown>[];
   type: (typeof editorTypes)[keyof typeof editorTypes] | null;
   isFormComplete: boolean;
   isCompleted: boolean;
@@ -51,14 +51,16 @@ const slice = createSlice({
     },
     updateEditorCurrentState: (state, action) => {
       state.current = action.payload;
-      state.isFormComplete = checkForEmptyField(
-        {
-          ...state.current,
-          isEulogy: state.action?.isEulogy,
-          isJourneyTable: state.action?.isJourneyTable,
-        },
-        state.type!
-      );
+      if (state.current && state.type) {
+        state.isFormComplete = checkForEmptyField(
+          {
+            ...state.current,
+            isEulogy: state.action?.isEulogy,
+            isJourneyTable: state.action?.isJourneyTable,
+          } as EditorData & { isEulogy?: boolean; isJourneyTable?: boolean },
+          state.type
+        );
+      }
     },
     updateEditorImageState: (state, action) => {
       state.images = action.payload;
@@ -83,8 +85,9 @@ const slice = createSlice({
   },
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const checkForEmptyField = (
-  editorData: any,
+  editorData: Record<string, any> & { isEulogy?: boolean; isJourneyTable?: boolean },
   editorType: (typeof editorTypes)[keyof typeof editorTypes]
 ) => {
   if (!editorData) return false;

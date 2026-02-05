@@ -34,9 +34,6 @@ export async function PUT(request: Request, { params }: { params: { requestType:
     error: authError,
   } = await supabase.auth.getUser();
 
-  console.log({ authError });
-  console.log({ user });
-
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -304,8 +301,6 @@ const recalculateStreak = async ({ userId, sessionId }: { userId: string; sessio
       p_user_id: userId,
       p_session_id: sessionId,
     });
-
-    console.log({ error });
 
     if (error) return { error: error.message };
 

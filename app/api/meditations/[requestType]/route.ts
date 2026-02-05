@@ -25,6 +25,12 @@ type PostRequestJson = {
   sessionId: string;
   reflection: string;
 };
+
+// Type definitions for type safety
+interface FetcherErrorResponse {
+  error: string;
+}
+
 export async function GET(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
@@ -38,21 +44,12 @@ export async function GET(request: Request, { params }: { params: { requestType:
     error: authError,
   } = await supabase.auth.getUser();
 
-  console.log({ authError });
-  console.log({ user });
-
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const sessionId = new URL(request.url).searchParams.get("sessionId");
   const timezone = request.headers.get("x-user-timezone");
-
-  let fetcherHandler: ((args: Partial<UserMeditationRequestDataTypes>) => Promise<any>) | null =
-    null;
-  let args: Partial<UserMeditationRequestDataTypes> | {} = {};
-  let responseName;
-  let total;
 
   if (requestType === meditationRequestTypes.userMeditations) {
     if (!sessionId) {
@@ -61,27 +58,26 @@ export async function GET(request: Request, { params }: { params: { requestType:
     if (!timezone) {
       return NextResponse.json({ error: "User Time zone is required." }, { status: 400 });
     }
-    fetcherHandler = getUserMeditations;
-    args = {
+
+    const data = await getUserMeditations({
       userId: user.id,
       sessionId,
       userTimezone: timezone,
-    };
-    responseName = "meditations";
-    total = await getUserTotalMeditations({ userId: user.id, sessionId });
-  }
-  if (!fetcherHandler || !responseName) {
-    return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
-  }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
-  } else {
+    });
+
+    if ("error" in data) {
+      return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    }
+
+    const total = await getUserTotalMeditations({ userId: user.id, sessionId });
+
     return NextResponse.json({
-      [responseName]: data,
+      meditations: data,
       total,
     });
   }
+
+  return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
 }
 
 export async function POST(request: Request, { params }: { params: { requestType: string } }) {
@@ -105,25 +101,17 @@ export async function POST(request: Request, { params }: { params: { requestType
     return NextResponse.json({ error: serverErrorTypes.invalidRequest }, { status: 400 });
   }
 
-  let fetcherHandler: ((args: any) => Promise<any>) | null = null;
-  let args: any | {} = {};
-  const responseName = "meditation";
   if (requestType === meditationRequestTypes.createUserMeditations) {
-    fetcherHandler = createMeditation;
-    args = { sessionId, userId: user.id, reflection };
+    const data = await createMeditation({ sessionId, userId: user.id, reflection });
+    if ("error" in data) {
+      return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    }
+    return NextResponse.json({ meditation: data });
   }
-  if (!fetcherHandler || !responseName) {
-    return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
-  }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
-  } else {
-    return NextResponse.json({
-      [responseName]: data,
-    });
-  }
+
+  return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
 }
+
 const createMeditation = async ({
   sessionId,
   userId,
@@ -132,7 +120,7 @@ const createMeditation = async ({
   sessionId: string;
   userId: string;
   reflection: string;
-}>) => {
+}>): Promise<FetcherErrorResponse | Record<string, unknown>> => {
   try {
     const supabaseAdmin = createServiceClient();
     if (!sessionId || !userId || !reflection) {
@@ -161,9 +149,9 @@ const createMeditation = async ({
     if (meditationError || !meditationData) return { error: serverErrorTypes.serverError };
 
     return camelcaseKeys(meditationData);
-  } catch (error: any) {
-    console.log("create meditation error", error.errors);
-    return { error: error.message };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error occurred";
+    return { error: message };
   }
 };
 
@@ -171,7 +159,7 @@ const getUserMeditations = async ({
   userId,
   sessionId,
   userTimezone,
-}: Partial<UserMeditationRequestDataTypes>) => {
+}: Partial<UserMeditationRequestDataTypes>): Promise<FetcherErrorResponse | Record<string, unknown>[]> => {
   const supabase = createClient();
 
   const _startOfDay = dayjs().tz(userTimezone).startOf("day").utc().toISOString();
@@ -190,17 +178,19 @@ const getUserMeditations = async ({
     if (error) return { error: error.message };
 
     return camelcaseKeys(data);
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
+
 const getUserTotalMeditations = async ({
   userId,
   sessionId,
 }: {
   userId: string;
   sessionId: string;
-}) => {
+}): Promise<FetcherErrorResponse | number | null> => {
   const supabase = createClient();
 
   try {
@@ -220,7 +210,8 @@ const getUserTotalMeditations = async ({
     if (error) return { error: error.message };
 
     return count;
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };

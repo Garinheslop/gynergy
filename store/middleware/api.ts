@@ -7,11 +7,10 @@ interface ApiCallPayload {
   url: string;
   method?: string;
   headers?: Record<string, string>;
-  data?: any;
+  data?: Record<string, unknown>;
   onSuccess?: string;
   onError?: string;
   onStart?: string;
-  // Additional properties can be added as needed
 }
 
 interface ApiCallAction {
@@ -57,18 +56,19 @@ const api: Middleware =
         dispatchSuccessToasts(dispatch, onSuccess, responseData);
         dispatchOnSuccessAction(dispatch, onSuccess, responseData);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       dispatchErrorToasts(dispatch, onError, error);
       dispatch(
         actions.apiCallFailed({
-          error: error.message,
+          error: errorMessage,
         })
       );
       if (onError) {
         dispatch({
           type: onError,
           payload: {
-            error: error.message,
+            error: errorMessage,
           },
         });
       }

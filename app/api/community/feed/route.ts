@@ -4,6 +4,38 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { createClient } from "@lib/supabase-server";
 
+// Type definitions for type safety
+interface PostAuthor {
+  id: string;
+  first_name: string;
+  last_name: string;
+  profile_image: string | null;
+}
+
+interface UserReaction {
+  reaction_type: string;
+}
+
+interface CommunityPost {
+  id: string;
+  user_id: string;
+  cohort_id: string | null;
+  post_type: string;
+  title: string | null;
+  content: string;
+  media_urls: string[];
+  reaction_count: number;
+  comment_count: number;
+  share_count: number;
+  visibility: string;
+  is_featured: boolean;
+  is_pinned: boolean;
+  created_at: string;
+  updated_at: string;
+  author: PostAuthor | null;
+  user_reaction: UserReaction[] | null;
+}
+
 // GET: Fetch community feed
 export async function GET(request: NextRequest) {
   try {
@@ -74,12 +106,12 @@ export async function GET(request: NextRequest) {
     const { data: posts, error } = await query;
 
     if (error) {
-      console.error("Error fetching feed:", error);
       return NextResponse.json({ error: "Failed to fetch feed" }, { status: 500 });
     }
 
     // Format response
-    const formattedPosts = (posts || []).map((post: any) => ({
+    const typedPosts = posts as CommunityPost[] | null;
+    const formattedPosts = (typedPosts || []).map((post) => ({
       id: post.id,
       userId: post.user_id,
       cohortId: post.cohort_id,
@@ -106,17 +138,17 @@ export async function GET(request: NextRequest) {
       userReaction: post.user_reaction?.[0]?.reaction_type || null,
     }));
 
-    const hasMore = posts && posts.length === limit;
-    const nextCursor = hasMore ? posts[posts.length - 1]?.created_at : null;
+    const hasMore = typedPosts && typedPosts.length === limit;
+    const nextCursor = hasMore ? typedPosts[typedPosts.length - 1]?.created_at : null;
 
     return NextResponse.json({
       posts: formattedPosts,
       hasMore,
       nextCursor,
     });
-  } catch (error) {
-    console.error("Feed error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -174,7 +206,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error("Error creating post:", error);
       return NextResponse.json({ error: "Failed to create post" }, { status: 500 });
     }
 
@@ -216,8 +247,8 @@ export async function POST(request: NextRequest) {
         userReaction: null,
       },
     });
-  } catch (error) {
-    console.error("Create post error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

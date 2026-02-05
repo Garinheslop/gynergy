@@ -127,7 +127,7 @@ const appReducer = combineReducers({
   video: persistReducer(persistVideoConfig, videoReducer.reducer),
   payment: persistReducer(persistPaymentConfig, paymentReducer),
 });
-const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: any) => {
+const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: { type: string }) => {
   if (
     action.type === successReducerTypes.signOutUser ||
     action.type === successReducerTypes.resetEnrollment

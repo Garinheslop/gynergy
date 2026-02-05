@@ -96,7 +96,7 @@ interface ApiCallPayload {
   onSuccess?: string;
   onError?: string;
   onStart?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 interface ApiCallAction {
   type: string;
@@ -135,7 +135,7 @@ export default configureModifiedStore;
 export const store = configureModifiedStore();
 export const persistor = persistStore(store);
 
-export type AppThunkDispatch = ThunkDispatch<RootState, any, ApiCallAction>;
+export type AppThunkDispatch = ThunkDispatch<RootState, unknown, ApiCallAction>;
 export type AppDispatch = typeof store.dispatch;
 export type AppThunk<ReturnType = void> = ThunkAction<
   ReturnType,

@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import { forwardRef } from "react";
 
 import useGetParagraphVariant from "@modules/common/hooks/variants/useGetParagraphVariant";
@@ -20,7 +21,7 @@ const Paragraph = forwardRef<HTMLParagraphElement | HTMLDivElement, ParagraphPro
           ref={ref}
           onClick={onClick}
           className={componentStyle}
-          dangerouslySetInnerHTML={{ __html: String(content) }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(content)) }}
         />
       );
     return (

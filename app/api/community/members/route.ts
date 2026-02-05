@@ -4,6 +4,28 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { createClient } from "@lib/supabase-server";
 
+// Type definitions for type safety
+interface CohortMembershipUser {
+  id: string;
+  first_name: string;
+  last_name: string;
+  profile_image: string | null;
+}
+
+interface CohortMembership {
+  role: string;
+  joined_at: string;
+  user: CohortMembershipUser[] | CohortMembershipUser | null;
+}
+
+interface SessionEnrollment {
+  user_id: string;
+  total_points: number;
+  morning_streak: number;
+  evening_streak: number;
+  gratitude_streak: number;
+}
+
 // GET: Fetch cohort members
 export async function GET(request: NextRequest) {
   try {
@@ -67,25 +89,31 @@ export async function GET(request: NextRequest) {
       .order("joined_at", { ascending: true });
 
     if (error) {
-      console.error("Error fetching members:", error);
       return NextResponse.json({ error: "Failed to fetch members" }, { status: 500 });
     }
 
     // Get enrollment stats for each user
-    const userIds = members?.map((m: any) => m.user?.id).filter(Boolean) || [];
+    const typedMembers = members as unknown as CohortMembership[] | null;
+    const userIds = typedMembers?.map((m) => {
+      const user = Array.isArray(m.user) ? m.user[0] : m.user;
+      return user?.id;
+    }).filter((id): id is string => Boolean(id)) || [];
 
     const { data: enrollments } = await supabase
       .from("session_enrollments")
       .select("user_id, total_points, morning_streak, evening_streak, gratitude_streak")
       .in("user_id", userIds);
 
-    const enrollmentMap = new Map(enrollments?.map((e: any) => [e.user_id, e]) || []);
+    const typedEnrollments = enrollments as SessionEnrollment[] | null;
+    const enrollmentMap = new Map(typedEnrollments?.map((e) => [e.user_id, e]) || []);
 
     // Format response
-    const formattedMembers = (members || [])
-      .filter((m: any) => m.user)
-      .map((m: any) => {
-        const enrollment = enrollmentMap.get(m.user.id);
+    const formattedMembers = (typedMembers || [])
+      .filter((m) => m.user)
+      .map((m) => {
+        const user = Array.isArray(m.user) ? m.user[0] : m.user;
+        if (!user) return null;
+        const enrollment = enrollmentMap.get(user.id);
         const maxStreak = Math.max(
           enrollment?.morning_streak || 0,
           enrollment?.evening_streak || 0,
@@ -93,16 +121,17 @@ export async function GET(request: NextRequest) {
         );
 
         return {
-          id: m.user.id,
-          firstName: m.user.first_name,
-          lastName: m.user.last_name,
-          profileImage: m.user.profile_image,
+          id: user.id,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          profileImage: user.profile_image,
           role: m.role,
           joinedAt: m.joined_at,
           streak: maxStreak,
           points: enrollment?.total_points || 0,
         };
-      });
+      })
+      .filter((m): m is NonNullable<typeof m> => m !== null);
 
     // Get cohort info
     const { data: cohort } = await supabase
@@ -125,8 +154,8 @@ export async function GET(request: NextRequest) {
       members: formattedMembers,
       totalMembers: formattedMembers.length,
     });
-  } catch (error) {
-    console.error("Members error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

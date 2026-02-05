@@ -14,7 +14,7 @@ import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import VisionHighestSelfEditor from "@modules/editor/components/vision/VisionHighestSelfEditor";
 import VisionMantraEditor from "@modules/editor/components/vision/VisionMantraEditor";
-import { pagePaths } from "@resources/paths";
+// pagePaths import removed - unused
 import { actionRequestTypes } from "@resources/types/action";
 import { buttonActionTypes } from "@resources/types/button";
 import { useDispatch, useSelector } from "@store/hooks";
@@ -84,13 +84,13 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
     const journalRequestType = getJournalRequestType(editorType);
     const actionRequestType = getActionRequestType(editorType);
     const visionRequestType = getVisionRequestType(editorType);
-    if (userEnrollment?.session?.id) {
+    if (userEnrollment?.session?.id && editorStates.current) {
       if (journalRequestType) {
         dispatch(
           createUserjournal({
             journalRequestType,
             sessionId: userEnrollment?.session.id,
-            journal: editorStates.current,
+            journal: editorStates.current as Record<string, unknown>,
             images: editorStates.images,
           })
         );
@@ -101,7 +101,7 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
             actionRequestType,
             actionId: editorStates.action.id,
             sessionId: userEnrollment?.session.id,
-            actionLog: editorStates.current,
+            actionLog: editorStates.current as Record<string, unknown>,
             images: editorStates.images,
           })
         );
@@ -111,7 +111,7 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
           updateUserVisions({
             visionRequestType,
             sessionId: userEnrollment?.session.id,
-            vision: editorStates.current,
+            vision: editorStates.current as Record<string, unknown>,
             images: editorStates.images,
           })
         );

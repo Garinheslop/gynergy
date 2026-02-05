@@ -132,15 +132,13 @@ const UseSessionContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   }, [session, enrollments]);
 
   const logout = async () => {
-    console.log("logged out");
-
     try {
       const { error } = await supabase.auth.signOut({ scope: "local" });
       if (error) throw error;
       dispatch(signOutAndReset());
       router.push("/");
     } catch (error) {
-      console.log("logout ====> ", error);
+      // Logout error handled silently
     }
   };
   return (

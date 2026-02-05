@@ -4,6 +4,44 @@ import { NextResponse } from "next/server";
 
 import { createClient, createServiceClient } from "@lib/supabase-server";
 
+// Type definitions for type safety
+interface ReferredUser {
+  id: string;
+  first_name: string;
+  last_name: string;
+  profile_image: string | null;
+}
+
+interface Referral {
+  id: string;
+  status: string;
+  points_awarded: number;
+  converted_at: string | null;
+  created_at: string;
+  referred: ReferredUser | null;
+}
+
+interface ReferralMilestone {
+  id: string;
+  name: string;
+  description: string;
+  referrals_required: number;
+  points_bonus: number;
+  reward_description: string | null;
+}
+
+interface UserMilestone {
+  milestone_id: string;
+}
+
+interface ReferralCode {
+  id: string;
+  code: string;
+  uses_count: number;
+  total_points_earned: number;
+  is_active: boolean;
+}
+
 // GET: Get user's referral code and stats
 export async function GET() {
   try {
@@ -24,12 +62,11 @@ export async function GET() {
       .single();
 
     if (codeError && codeError.code !== "PGRST116") {
-      console.error("Error fetching referral code:", codeError);
       return NextResponse.json({ error: "Failed to fetch referral code" }, { status: 500 });
     }
 
     // If no code exists, create one
-    let code = referralCode;
+    let code = referralCode as ReferralCode | null;
     if (!code) {
       const serviceSupabase = createServiceClient();
       const { data: newCode, error: createError } = await serviceSupabase.rpc(
@@ -37,9 +74,7 @@ export async function GET() {
         { p_user_id: user.id }
       );
 
-      if (createError) {
-        console.error("Error generating referral code:", createError);
-      } else {
+      if (!createError) {
         // Insert the new code
         const { data: insertedCode } = await serviceSupabase
           .from("referral_codes")
@@ -50,7 +85,7 @@ export async function GET() {
           .select()
           .single();
 
-        code = insertedCode;
+        code = insertedCode as ReferralCode | null;
       }
     }
 
@@ -84,10 +119,12 @@ export async function GET() {
       .select("milestone_id")
       .eq("user_id", user.id);
 
-    const achievedIds = new Set(achievedMilestones?.map((m: any) => m.milestone_id) || []);
+    const typedAchievedMilestones = achievedMilestones as UserMilestone[] | null;
+    const achievedIds = new Set(typedAchievedMilestones?.map((m) => m.milestone_id) || []);
 
     // Format response
-    const formattedReferrals = (referrals || []).map((r: any) => ({
+    const typedReferrals = referrals as Referral[] | null;
+    const formattedReferrals = (typedReferrals || []).map((r) => ({
       id: r.id,
       status: r.status,
       pointsAwarded: r.points_awarded,
@@ -103,7 +140,8 @@ export async function GET() {
         : null,
     }));
 
-    const formattedMilestones = (milestones || []).map((m: any) => ({
+    const typedMilestones = milestones as ReferralMilestone[] | null;
+    const formattedMilestones = (typedMilestones || []).map((m) => ({
       id: m.id,
       name: m.name,
       description: m.description,
@@ -126,13 +164,13 @@ export async function GET() {
       referrals: formattedReferrals,
       milestones: formattedMilestones,
       stats: {
-        totalReferrals: referrals?.length || 0,
-        convertedReferrals: referrals?.filter((r: any) => r.status === "converted").length || 0,
+        totalReferrals: typedReferrals?.length || 0,
+        convertedReferrals: typedReferrals?.filter((r) => r.status === "converted").length || 0,
         totalPointsEarned: code?.total_points_earned || 0,
       },
     });
-  } catch (error) {
-    console.error("Referrals error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

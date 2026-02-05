@@ -12,7 +12,7 @@ interface JournalHistoryState {
   error: string;
 }
 type currentJournalType = {
-  entries: any[];
+  entries: JournalData[];
   entryDate?: string;
   entryType?: string;
   isDailyJournal: boolean;

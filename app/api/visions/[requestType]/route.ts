@@ -26,6 +26,44 @@ type PostRequestJson = {
   vision: UserVision;
   images: ImageRawData[];
 };
+
+// Type definitions for type safety
+interface FetcherErrorResponse {
+  error: string;
+  details?: z.ZodIssue[];
+}
+
+interface VisionDbRecord {
+  id: string;
+  session_id: string;
+  user_id: string;
+  images?: (string | { error: string })[];
+  name?: string | null;
+  abilities?: string | null;
+  purpose?: string | null;
+  traits?: string | null;
+  symbols?: string | { error: string } | null;
+  is_completed?: boolean;
+  vision_type?: string;
+  creed?: string | null;
+  mantra?: string | null;
+  self_values?: string | null;
+  self_evaluation?: string | null;
+  qualities?: string | null;
+  achievements?: string | null;
+  importance?: string | null;
+  lifestyle?: string | null;
+  foreseen?: string | null;
+  relationships?: string | null;
+  legacy?: string | null;
+  improvement?: string | null;
+  interests?: string | null;
+  triggers?: string | null;
+  envision?: string | null;
+  milestones?: string | null;
+  contributions?: string | null;
+}
+
 export async function GET(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
@@ -39,41 +77,30 @@ export async function GET(request: Request, { params }: { params: { requestType:
     error: authError,
   } = await supabase.auth.getUser();
 
-  console.log({ authError });
-  console.log({ user });
-
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const sessionId = new URL(request.url).searchParams.get("sessionId");
 
-  let fetcherHandler: ((args: Partial<UserVisionRequestDataTypes>) => Promise<any>) | null = null;
-  let args: Partial<UserVisionRequestDataTypes> | {} = {};
-  let responseName;
-
   if (requestType === visionRequestTypes.userVisions) {
     if (!sessionId) {
       return NextResponse.json({ error: "Session id is requried" }, { status: 400 });
     }
-    fetcherHandler = getUserVisions;
-    args = {
+
+    const data = await getUserVisions({
       userId: user.id,
       sessionId,
-    };
-    responseName = "visions";
-  }
-  if (!fetcherHandler || !responseName) {
-    return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
-  }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
-  } else {
-    return NextResponse.json({
-      [responseName]: data,
     });
+
+    if ("error" in data) {
+      return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    }
+
+    return NextResponse.json({ visions: data });
   }
+
+  return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
 }
 
 export async function PUT(request: Request, { params }: { params: { requestType: string } }) {
@@ -97,9 +124,6 @@ export async function PUT(request: Request, { params }: { params: { requestType:
     return NextResponse.json({ error: serverErrorTypes.invalidRequest }, { status: 400 });
   }
 
-  let fetcherHandler: ((args: any) => Promise<any>) | null = null;
-  let args: any | {} = {};
-  const responseName = "vision";
   if (
     [
       visionRequestTypes.updateVisionHighestSelf,
@@ -108,21 +132,16 @@ export async function PUT(request: Request, { params }: { params: { requestType:
       visionRequestTypes.updateVisionDiscovery,
     ].includes(requestType)
   ) {
-    fetcherHandler = upsertVision;
-    args = { requestType, sessionId, userId: user.id, vision, images };
+    const data = await upsertVision({ requestType, sessionId, userId: user.id, vision, images });
+    if ("error" in data) {
+      return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    }
+    return NextResponse.json({ vision: data });
   }
-  if (!fetcherHandler || !responseName) {
-    return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
-  }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
-  } else {
-    return NextResponse.json({
-      [responseName]: data,
-    });
-  }
+
+  return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
 }
+
 const upsertVision = async ({
   requestType,
   sessionId,
@@ -135,7 +154,7 @@ const upsertVision = async ({
   userId: string;
   vision: UserVision;
   images: ImageRawData[];
-}>) => {
+}>): Promise<FetcherErrorResponse | Record<string, unknown>> => {
   try {
     const supabaseAdmin = createServiceClient();
     if (!sessionId || !userId || !vision) {
@@ -155,7 +174,7 @@ const upsertVision = async ({
 
     const visionId = vision?.id ?? uuidv4();
 
-    const uploadedImages = [];
+    const uploadedImages: (string | { error: string })[] = [];
     if (images?.length) {
       for (let index = 0; index < images.length; index++) {
         const path = await uploadFileToStorage({
@@ -168,7 +187,7 @@ const upsertVision = async ({
         uploadedImages.push(path);
       }
     }
-    let data: any = {
+    let data: VisionDbRecord = {
       id: visionId,
       session_id: sessionData.id,
       user_id: userId,
@@ -180,7 +199,7 @@ const upsertVision = async ({
       };
     }
     if (requestType === visionRequestTypes.updateVisionHighestSelf) {
-      let symbolsPath = null;
+      let symbolsPath: string | { error: string } | null = null;
       if (parsedVision?.symbols?.file) {
         symbolsPath = await uploadFileToStorage({
           file: parsedVision?.symbols?.file,
@@ -259,8 +278,7 @@ const upsertVision = async ({
     if (visionError || !visionData) return { error: serverErrorTypes.serverError };
 
     return camelcaseKeys(visionData);
-  } catch (error: any) {
-    console.log("upsert vision error", error.errors);
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return {
         error: serverErrorTypes.invalidRequest,
@@ -268,13 +286,16 @@ const upsertVision = async ({
       };
     }
 
-    return { error: error.message };
+    const message = error instanceof Error ? error.message : "Unknown error occurred";
+    return { error: message };
   }
 };
 
-const getUserVisions = async ({ userId, sessionId }: Partial<UserVisionRequestDataTypes>) => {
+const getUserVisions = async ({
+  userId,
+  sessionId,
+}: Partial<UserVisionRequestDataTypes>): Promise<FetcherErrorResponse | Record<string, unknown>[]> => {
   const supabase = createClient();
-  console.log({ userId, sessionId });
 
   try {
     if (!userId || !sessionId) {
@@ -289,7 +310,8 @@ const getUserVisions = async ({ userId, sessionId }: Partial<UserVisionRequestDa
     if (error) return { error: error.message };
 
     return camelcaseKeys(data);
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };

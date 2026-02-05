@@ -20,7 +20,6 @@ export default function Error({
   const router = useRouter();
   const { messagePopupObj } = usePopup();
   useEffect(() => {
-    console.log({ error });
     messagePopupObj.open({
       popupData: {
         heading: "Something Went Wrong",

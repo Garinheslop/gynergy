@@ -4,6 +4,37 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { createClient } from "@lib/supabase-server";
 
+// Type definitions for type safety
+interface CommentAuthor {
+  id: string;
+  first_name: string;
+  last_name: string;
+  profile_image: string | null;
+}
+
+interface CommentReply {
+  id: string;
+  post_id: string;
+  user_id: string;
+  parent_id: string | null;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  author: CommentAuthor | null;
+}
+
+interface PostComment {
+  id: string;
+  post_id: string;
+  user_id: string;
+  parent_id: string | null;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  author: CommentAuthor | null;
+  replies: CommentReply[];
+}
+
 // GET: Fetch comments for a post
 export async function GET(request: NextRequest) {
   try {
@@ -60,12 +91,12 @@ export async function GET(request: NextRequest) {
     const { data: comments, error } = await query;
 
     if (error) {
-      console.error("Error fetching comments:", error);
       return NextResponse.json({ error: "Failed to fetch comments" }, { status: 500 });
     }
 
     // Format response
-    const formattedComments = (comments || []).map((comment: any) => ({
+    const typedComments = comments as PostComment[] | null;
+    const formattedComments = (typedComments || []).map((comment) => ({
       id: comment.id,
       postId: comment.post_id,
       userId: comment.user_id,
@@ -81,7 +112,7 @@ export async function GET(request: NextRequest) {
             profileImage: comment.author.profile_image,
           }
         : null,
-      replies: (comment.replies || []).map((reply: any) => ({
+      replies: (comment.replies || []).map((reply) => ({
         id: reply.id,
         postId: reply.post_id,
         userId: reply.user_id,
@@ -100,17 +131,17 @@ export async function GET(request: NextRequest) {
       })),
     }));
 
-    const hasMore = comments && comments.length === limit;
-    const nextCursor = hasMore ? comments[comments.length - 1]?.created_at : null;
+    const hasMore = typedComments && typedComments.length === limit;
+    const nextCursor = hasMore ? typedComments[typedComments.length - 1]?.created_at : null;
 
     return NextResponse.json({
       comments: formattedComments,
       hasMore,
       nextCursor,
     });
-  } catch (error) {
-    console.error("Comments fetch error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -185,7 +216,6 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error("Error creating comment:", error);
       return NextResponse.json({ error: "Failed to create comment" }, { status: 500 });
     }
 
@@ -231,9 +261,9 @@ export async function POST(request: NextRequest) {
         replies: [],
       },
     });
-  } catch (error) {
-    console.error("Create comment error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -275,7 +305,6 @@ export async function DELETE(request: NextRequest) {
     const { error } = await supabase.from("post_comments").delete().eq("id", commentId);
 
     if (error) {
-      console.error("Error deleting comment:", error);
       return NextResponse.json({ error: "Failed to delete comment" }, { status: 500 });
     }
 
@@ -283,8 +312,8 @@ export async function DELETE(request: NextRequest) {
     await supabase.rpc("decrement_comment_count", { p_post_id: comment.post_id });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("Delete comment error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

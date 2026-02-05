@@ -17,6 +17,22 @@ type GetDailyQuoteRequestDataTypes = {
   enrollmentId: string;
   userTimezone: string;
 };
+
+// Type definitions for type safety
+interface FetcherErrorResponse {
+  error: string;
+}
+
+interface EnrollmentDataRow {
+  enrollment_date: string;
+  session: Array<{
+    id: string;
+    book: Array<{
+      id: string;
+    }>;
+  }>;
+}
+
 export async function GET(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
@@ -30,9 +46,6 @@ export async function GET(request: Request, { params }: { params: { requestType:
     error: authError,
   } = await supabase.auth.getUser();
 
-  console.log({ authError });
-  console.log({ user });
-
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -40,41 +53,32 @@ export async function GET(request: Request, { params }: { params: { requestType:
   const enrollmentId = new URL(request.url).searchParams.get("enrollmentId");
   const timezone = request.headers.get("x-user-timezone");
 
-  let fetcherHandler: ((args: Partial<GetDailyQuoteRequestDataTypes>) => Promise<any>) | null =
-    null;
-  let args: Partial<GetDailyQuoteRequestDataTypes> | {} = {};
-  let responseName;
-
   if (requestType === quotesRequestTypes.dailyQuote) {
     if (!timezone) {
       return NextResponse.json({ error: "Timezone is requried" }, { status: 400 });
     }
-    fetcherHandler = getUserDailtyQuote;
-    args = {
+
+    const data = await getUserDailtyQuote({
       userId: user.id,
-      enrollmentId,
+      enrollmentId: enrollmentId ?? undefined,
       userTimezone: timezone,
-    };
-    responseName = "quote";
-  }
-  if (!fetcherHandler || !responseName) {
-    return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
-  }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
-  } else {
-    return NextResponse.json({
-      [responseName]: data,
     });
+
+    if (data && "error" in data) {
+      return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    }
+
+    return NextResponse.json({ quote: data });
   }
+
+  return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
 }
 
 const getUserDailtyQuote = async ({
   userId,
   enrollmentId,
   userTimezone,
-}: Partial<GetDailyQuoteRequestDataTypes>) => {
+}: Partial<GetDailyQuoteRequestDataTypes>): Promise<FetcherErrorResponse | Record<string, unknown>> => {
   const supabase = createClient();
   if (!enrollmentId || !userId) {
     return { error: "bad-request" };
@@ -87,27 +91,35 @@ const getUserDailtyQuote = async ({
       .eq("id", enrollmentId)
       .limit(1);
 
-    if (enrollmentDataError || !enrollmentData) return { error: "no-user-book-session" };
+    if (enrollmentDataError || !enrollmentData || !enrollmentData[0]) {
+      return { error: "no-user-book-session" };
+    }
+
+    const enrollment = enrollmentData[0] as unknown as EnrollmentDataRow;
+    const session = enrollment.session?.[0];
+    const book = session?.book?.[0];
+    if (!book?.id) {
+      return { error: "no-user-book-session" };
+    }
 
     const currentSessionDay =
       dayjs()
         .tz(userTimezone)
         .startOf("d")
-        .diff(dayjs(enrollmentData[0].enrollment_date).tz(userTimezone).startOf("d"), "d") + 1;
+        .diff(dayjs(enrollment.enrollment_date).tz(userTimezone).startOf("d"), "d") + 1;
 
     const { data, error } = await supabase
       .from("quotes")
       .select("*")
       .eq("day", currentSessionDay)
-      .eq("book_id", (enrollmentData[0] as any).session.book.id)
+      .eq("book_id", book.id)
       .limit(1);
 
     if (error || !data) return { error: "no-quotes" };
 
     return data[0];
-  } catch (err: any) {
-    console.log({ err });
-
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };

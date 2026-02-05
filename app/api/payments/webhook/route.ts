@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        // Unhandled event type - no action needed
     }
 
     return NextResponse.json({ received: true });
@@ -126,21 +126,14 @@ async function handleCheckoutCompleted(
     });
 
     if (purchaseError) {
-      console.error("Error creating purchase record:", purchaseError);
       throw purchaseError;
     }
 
-    // If user exists, also update their profile with Stripe customer ID
-    if (userId) {
-      // The database trigger will automatically:
-      // 1. Create 2 friend codes
-      // 2. Grant challenge access via user_entitlements
-
-      console.log(`Challenge purchase completed for user ${userId}`);
-    }
+    // If user exists, the database trigger will automatically:
+    // 1. Create 2 friend codes
+    // 2. Grant challenge access via user_entitlements
   } else if (productType === "journal_subscription") {
     // Subscription is handled by invoice.paid event
-    console.log("Journal subscription checkout completed");
   }
 }
 
@@ -157,7 +150,6 @@ async function handleInvoicePaid(
   // Get userId from subscription metadata
   const userId = invoice.subscription_details?.metadata?.userId;
   if (!userId) {
-    console.error("No userId in subscription metadata");
     return;
   }
 

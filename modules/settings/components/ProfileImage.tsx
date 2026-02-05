@@ -23,8 +23,6 @@ function ProfileImage({ onFileChangeHandler }: ProfileImageProps) {
   }, [profile?.current]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("handleImageChange");
-
     const file = e.target.files?.[0];
     if (file?.name) {
       const compressedFile = await handleImageCompress(file);

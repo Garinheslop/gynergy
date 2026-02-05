@@ -50,8 +50,8 @@ export const createUserActionLog = ({
 }: {
   actionId: string;
   sessionId: string;
-  actionLog: any;
-  images: any;
+  actionLog: Record<string, unknown>;
+  images: Record<string, unknown>[];
   actionRequestType: string;
 }) =>
   apiCallBegan({

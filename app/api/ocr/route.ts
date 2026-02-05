@@ -58,7 +58,6 @@ export async function POST(request: Request) {
       store: true,
     });
     const content = choices?.[0]?.message?.content;
-    console.log(content);
 
     if (!content) throw new Error("Missing content in response");
 
@@ -69,10 +68,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ journal: JSON.parse(content.slice(start, end + 1)) });
     // return NextResponse.json({ journal: mockData });
-  } catch (err: any) {
-    console.log("ocr errror", err);
-
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

@@ -26,9 +26,6 @@ export async function POST(request: Request) {
       error: authError,
     } = await supabase.auth.getUser();
 
-    console.log({ authError });
-    console.log({ user });
-
     if (authError || !user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -46,7 +43,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: { message: response?.error } }, { status: 500 });
     }
     return new Response(JSON.stringify({ path: response.path }), { status: 200 });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

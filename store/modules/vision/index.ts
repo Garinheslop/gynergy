@@ -1,9 +1,6 @@
-import { profileRequestTypes } from "@resources/types/profile";
 import * as urls from "../../configs/urls";
 import enrollments from "./reducers";
 import { apiCallBegan } from "@store/resources/apiActionTypes";
-import { AppDispatch } from "@store/configureStore";
-import { booksRequestTypes } from "@resources/types/book";
 import { visionRequestTypes } from "@resources/types/vision";
 
 const {
@@ -31,8 +28,8 @@ export const updateUserVisions = ({
   visionRequestType,
 }: {
   sessionId: string;
-  vision: any;
-  images: any;
+  vision: Record<string, unknown>;
+  images: Record<string, unknown>[];
   visionRequestType: string;
 }) =>
   apiCallBegan({

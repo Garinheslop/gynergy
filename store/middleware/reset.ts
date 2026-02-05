@@ -3,7 +3,7 @@ import { successReducerTypes } from "@store/resources/reducerActionTypes";
 
 interface ActionWithPayload {
   type: string;
-  payload?: any;
+  payload?: Record<string, unknown>;
 }
 
 const resetDataMiddleware: Middleware =

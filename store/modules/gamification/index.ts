@@ -149,7 +149,7 @@ export const toggleBadgeShowcase = (badgeId: string, sessionId: string) =>
 /**
  * Check and award badges after completing an activity
  */
-export const checkBadges = (sessionId: string, context: any) =>
+export const checkBadges = (sessionId: string, context: Record<string, unknown>) =>
   apiCallBegan({
     url: `${urls.gamification}/${gamificationRequestTypes.checkBadges}`,
     method: "POST",

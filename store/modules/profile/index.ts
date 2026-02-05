@@ -25,7 +25,7 @@ export const getUserProfile = () =>
     onError: userProfileRequestFailed.type,
   });
 
-export const updateUserProfileData = (data: any) =>
+export const updateUserProfileData = (data: Record<string, unknown>) =>
   apiCallBegan({
     url: `${urls.users}/${profileRequestTypes.updateUserData}`,
     data,
@@ -35,9 +35,9 @@ export const updateUserProfileData = (data: any) =>
     onError: userProfileRequestFailed.type,
   });
 
-export const setCurrentProfile = (payload: any) => {
+export const setCurrentProfile = (payload: Record<string, unknown>) => {
   return (dispatch: AppDispatch): Promise<void> => {
-    dispatch(setCurrentProfileState(payload));
+    dispatch(setCurrentProfileState(payload as unknown as Parameters<typeof setCurrentProfileState>[0]));
     return Promise.resolve();
   };
 };

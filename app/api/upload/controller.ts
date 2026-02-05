@@ -34,7 +34,6 @@ export const uploadToStorage = async ({
   });
 
   if (error) {
-    console.error("Supabase upload error:", error);
     return { error };
   }
   return { path: data.fullPath };
@@ -46,8 +45,7 @@ export const uploadFileToStorage = async ({
   path,
   contentType,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  file: any;
+  file: Buffer | ArrayBuffer | Uint8Array;
   name?: string;
   path: string;
   contentType: string | null;
@@ -58,13 +56,12 @@ export const uploadFileToStorage = async ({
     return { error: "No file data provided" };
   }
 
-  const buffer = Buffer.from(file);
-  const fileName = `${path}/${name ?? `${new Date().getTime()}.jpeg`}`;
+  const buffer = file instanceof Buffer ? file : Buffer.from(new Uint8Array(file));
+  const fileName = `${path}/${name ?? `${Date.now()}.jpeg`}`;
   const { data, error } = await supabase.storage.from("gynergy").upload(fileName, buffer, {
     contentType: contentType ?? "image/jpeg",
   });
   if (error) {
-    console.log("Supabase upload error:", error);
     return { error: error.message };
   }
   return data.path;

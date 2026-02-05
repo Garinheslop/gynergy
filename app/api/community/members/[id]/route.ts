@@ -4,6 +4,18 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { createClient } from "@lib/supabase-server";
 
+// Type definitions for type safety
+interface CohortData {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface MembershipWithCohort {
+  role: string;
+  cohort: CohortData | null;
+}
+
 // GET: Fetch a specific member's profile
 export async function GET(
   request: NextRequest,
@@ -146,6 +158,9 @@ export async function GET(
       commentCount: commentCountMap.get(post.id) || 0,
     }));
 
+    // Cast membership to typed interface
+    const typedMembership = membership as MembershipWithCohort | null;
+
     // Format member profile
     const member = {
       id: memberData.id,
@@ -154,14 +169,14 @@ export async function GET(
       profileImage: memberData.profile_image,
       bio: memberData.bio,
       location: memberData.location,
-      cohort: membership?.cohort
+      cohort: typedMembership?.cohort
         ? {
-            id: (membership.cohort as any).id,
-            name: (membership.cohort as any).name,
-            slug: (membership.cohort as any).slug,
+            id: typedMembership.cohort.id,
+            name: typedMembership.cohort.name,
+            slug: typedMembership.cohort.slug,
           }
         : null,
-      role: membership?.role || "member",
+      role: typedMembership?.role || "member",
       streak: maxStreak,
       points: enrollment?.total_points || 0,
       badgesCount: badgesCount || 0,
@@ -176,8 +191,8 @@ export async function GET(
       member,
       posts: formattedPosts,
     });
-  } catch (error) {
-    console.error("Member profile error:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

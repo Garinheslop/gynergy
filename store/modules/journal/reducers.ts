@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { JournalDataFields } from "@resources/types/journal";
 
 type currentJournalType = {
-  entries: any[];
+  entries: JournalDataFields[];
   isDailyJournal: boolean;
   isWeeklyJournal: boolean;
   isVisionJournal: boolean;
@@ -62,7 +62,7 @@ const slice = createSlice({
       state.fetched = true;
       state.loading = false;
     },
-    journalCreated: (state, action: PayloadAction<{ journal: any }>) => {
+    journalCreated: (state, action: PayloadAction<{ journal: JournalDataFields }>) => {
       state.data = state.data.concat(action.payload.journal);
       state.fetched = true;
       state.loading = false;

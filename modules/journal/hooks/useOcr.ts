@@ -1,10 +1,7 @@
 import { useState } from "react";
 
-import toast from "react-hot-toast";
-
-import { usePopup } from "@contexts/UsePopup";
 import { journalErrorMessages, JournalErrorMessageType } from "@resources/messages/error";
-import { errorTypes, fileErrorTypes } from "@resources/types/error";
+import { fileErrorTypes } from "@resources/types/error";
 import { EditorData, journalTypes } from "@resources/types/journal";
 import { ImageRawData } from "@resources/types/ocr";
 import { visionTypes } from "@resources/types/vision";
@@ -47,19 +44,15 @@ const useOcr = <T extends EditorData>(
       );
       setIsRead(true);
       setIsReading(false);
-    } catch (error: any) {
-      console.log("Error reading journal:", error);
-      if (onFailed) {
-        onFailed({ error: error });
-      }
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
       if (
-        error?.message &&
-        journalErrorMessages[error.message as keyof JournalErrorMessageType] &&
+        journalErrorMessages[errorMessage as keyof JournalErrorMessageType] &&
         onFailed
       ) {
-        onFailed(journalErrorMessages[error.message as keyof JournalErrorMessageType]);
-      } else {
-        onFailed && onFailed({ error: error });
+        onFailed(journalErrorMessages[errorMessage as keyof JournalErrorMessageType]);
+      } else if (onFailed) {
+        onFailed({ error: errorMessage });
       }
       setIsReading(false);
     }

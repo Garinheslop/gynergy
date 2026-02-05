@@ -13,6 +13,33 @@ import { journalTypes } from "@resources/types/journal";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+// Type definitions for type safety
+interface FetcherErrorResponse {
+  error: string;
+}
+
+interface UserHistoryArgs {
+  userId: string;
+  sessionId: string;
+  userTimezone: string;
+}
+
+interface UserDailyHistoryArgs {
+  userId: string;
+  sessionId: string;
+  historyType: string;
+  userTimezone: string;
+  entryDate: string;
+}
+
+interface UserWeeklyHistoryArgs {
+  userId: string;
+  sessionId: string;
+  historyType: string;
+  userTimezone: string;
+  entryDate: string;
+}
+
 export async function GET(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
@@ -30,35 +57,37 @@ export async function GET(request: Request, { params }: { params: { requestType:
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const timezone = request.headers.get("x-user-timezone");
+  const userTimezone = request.headers.get("x-user-timezone");
   const sessionId = new URL(request.url).searchParams.get("sessionId");
   const historyType = new URL(request.url).searchParams.get("historyType");
   const entryDate = new URL(request.url).searchParams.get("entryDate");
-
-  let fetcherHandler: ((args: any) => Promise<any>) | null = null;
-  let args: any = {};
-  let responseName;
 
   if (requestType === historyRequestTypes.userJournalHistory) {
     if (!sessionId) {
       return NextResponse.json({ error: "Session id is requried" }, { status: 400 });
     }
-    if (!timezone) {
+    if (!userTimezone) {
       return NextResponse.json({ error: "user timezone is requried" }, { status: 400 });
     }
-    fetcherHandler = getUserHistory;
-    args = {
+
+    const data = await getUserHistory({
       userId: user.id,
       sessionId,
-      userTimezone: timezone,
-    };
-    responseName = "histories";
+      userTimezone,
+    });
+
+    if ("error" in data) {
+      return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    }
+
+    return NextResponse.json({ histories: data });
   }
+
   if (requestType === historyRequestTypes.userDailyHistory) {
     if (!sessionId) {
       return NextResponse.json({ error: "Session id is requried" }, { status: 400 });
     }
-    if (!timezone) {
+    if (!userTimezone) {
       return NextResponse.json({ error: "User Time zone is required." }, { status: 400 });
     }
     if (!historyType) {
@@ -67,20 +96,27 @@ export async function GET(request: Request, { params }: { params: { requestType:
     if (!entryDate) {
       return NextResponse.json({ error: "Entry date type is required." }, { status: 400 });
     }
-    fetcherHandler = getUserDailyHistory;
-    args = {
+
+    const data = await getUserDailyHistory({
       userId: user.id,
       sessionId,
       historyType,
       entryDate,
-      userTimezone: timezone,
-    };
-    responseName = "histories";
-  } else if (requestType === historyRequestTypes.userWeeklyHistory) {
+      userTimezone,
+    });
+
+    if (data && "error" in data) {
+      return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    }
+
+    return NextResponse.json({ histories: data });
+  }
+
+  if (requestType === historyRequestTypes.userWeeklyHistory) {
     if (!sessionId) {
       return NextResponse.json({ error: "Session id is requried" }, { status: 400 });
     }
-    if (!timezone) {
+    if (!userTimezone) {
       return NextResponse.json({ error: "User Time zone is required." }, { status: 400 });
     }
     if (!historyType) {
@@ -89,39 +125,30 @@ export async function GET(request: Request, { params }: { params: { requestType:
     if (!entryDate) {
       return NextResponse.json({ error: "Entry date type is required." }, { status: 400 });
     }
-    fetcherHandler = getUserWeeklyHistory;
-    args = {
+
+    const data = await getUserWeeklyHistory({
       userId: user.id,
       sessionId,
       historyType,
       entryDate,
-      userTimezone: timezone,
-    };
-    responseName = "histories";
+      userTimezone,
+    });
+
+    if (data && "error" in data) {
+      return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    }
+
+    return NextResponse.json({ histories: data });
   }
 
-  if (!fetcherHandler || !responseName) {
-    return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
-  }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
-  } else {
-    return NextResponse.json({
-      [responseName]: data,
-    });
-  }
+  return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
 }
 
 const getUserHistory = async ({
   userId,
   sessionId,
   userTimezone,
-}: {
-  userId: string;
-  sessionId: string;
-  userTimezone: string;
-}) => {
+}: UserHistoryArgs): Promise<FetcherErrorResponse | Record<string, unknown>[]> => {
   try {
     const supabase = createClient();
     const supabaseAdmin = createServiceClient();
@@ -152,9 +179,6 @@ const getUserHistory = async ({
       .utc()
       .toISOString();
 
-    console.log({ startDate });
-    console.log({ endDate });
-
     const { data, error } = await supabase.rpc("get_journal_history", {
       p_user_id: userId,
       p_session_id: sessionId,
@@ -165,23 +189,19 @@ const getUserHistory = async ({
     if (error) return { error: error.message };
 
     return camelcaseKeys(data, { deep: true });
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
+
 const getUserDailyHistory = async ({
   userId,
   sessionId,
   historyType,
   entryDate,
   userTimezone,
-}: {
-  userId: string;
-  sessionId: string;
-  historyType: string;
-  userTimezone: string;
-  entryDate: string;
-}) => {
+}: UserDailyHistoryArgs): Promise<FetcherErrorResponse | Record<string, unknown>[] | undefined> => {
   const supabase = createClient();
   try {
     if (!userId || !sessionId) {
@@ -216,23 +236,19 @@ const getUserDailyHistory = async ({
 
       return camelcaseKeys(journalData.concat(actionData), { deep: true });
     }
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
+
 const getUserWeeklyHistory = async ({
   userId,
   sessionId,
   historyType,
   entryDate,
   userTimezone,
-}: {
-  userId: string;
-  sessionId: string;
-  historyType: string;
-  userTimezone: string;
-  entryDate: string;
-}) => {
+}: UserWeeklyHistoryArgs): Promise<FetcherErrorResponse | Record<string, unknown>[] | undefined> => {
   const supabase = createClient();
   const supabaseAdmin = createServiceClient();
   try {
@@ -309,7 +325,8 @@ const getUserWeeklyHistory = async ({
 
       return camelcaseKeys(actionData, { deep: true });
     }
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };

@@ -1,4 +1,4 @@
-import { Middleware, Dispatch } from "@reduxjs/toolkit";
+import { Middleware } from "@reduxjs/toolkit";
 import * as actions from "@store/resources/apiActionTypes";
 import { axiosRequest } from "@lib/api/axios";
 import {
@@ -11,8 +11,10 @@ interface ApiCallPayload {
   onSuccess?: string;
   onError?: string;
   onStart?: string;
-  // Additional properties expected by axiosRequest can be added here
-  [key: string]: any;
+  url?: string;
+  method?: string;
+  headers?: Record<string, string>;
+  data?: Record<string, unknown>;
 }
 
 interface ApiCallAction {
@@ -21,7 +23,7 @@ interface ApiCallAction {
 }
 
 const api: Middleware =
-  ({ dispatch, getState }) =>
+  ({ dispatch, getState: _getState }) =>
   (next) =>
   async (action: unknown) => {
     const typedAction = action as ApiCallAction;
@@ -45,15 +47,14 @@ const api: Middleware =
         dispatchSuccessToasts(dispatch, onSuccess, response);
         dispatchOnSuccessAction(dispatch, onSuccess, response);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const axiosError = error as { message?: string; response?: { data?: Record<string, unknown>; status?: number } };
       dispatchErrorToasts(dispatch, onError, error);
       // General error action
       dispatch(
         actions.apiCallFailed({
-          error: error?.message,
-          systemError: error.response?.data,
-          status: error.response?.status,
-          message: error.response?.data?.error?.message,
+          error: axiosError?.message || "Unknown error occurred",
+          message: (axiosError.response?.data?.error as { message?: string })?.message,
         })
       );
       // Specific error action
@@ -61,11 +62,11 @@ const api: Middleware =
         dispatch({
           type: onError,
           payload: {
-            error: error?.message,
-            systemError: error.response?.data,
-            errors: error.response?.data?.errors,
-            status: error.response?.status,
-            message: error.response?.data?.error?.message,
+            error: axiosError?.message || "Unknown error occurred",
+            systemError: axiosError.response?.data,
+            errors: axiosError.response?.data?.errors,
+            status: axiosError.response?.status,
+            message: (axiosError.response?.data?.error as { message?: string })?.message,
           },
         });
       }

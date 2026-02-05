@@ -30,7 +30,7 @@ export const createUserMeditations = ({
   reflection,
 }: {
   sessionId: string;
-  reflection: any;
+  reflection: string;
 }) =>
   apiCallBegan({
     url: `${urls.meditations}/${meditationRequestTypes.createUserMeditations}`,

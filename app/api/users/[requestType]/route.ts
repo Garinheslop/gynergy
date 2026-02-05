@@ -27,20 +27,6 @@ type UserUpdateImage = {
   contentType: string;
 };
 
-// Type definitions for type safety
-interface FetcherErrorResponse {
-  error: string;
-}
-
-interface UserProfileResponse {
-  id: string;
-  supabaseId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  profileImage: string | null;
-}
-
 interface UserDataToUpdate {
   first_name?: string;
   last_name?: string;
@@ -59,9 +45,6 @@ export async function GET(request: Request, { params }: { params: { requestType:
     data: { user },
     error: authError,
   } = await supabase.auth.getUser();
-
-  console.log({ authError });
-  console.log({ user });
 
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -130,8 +113,6 @@ export async function PUT(request: Request, { params }: { params: { requestType:
 }
 
 const getUserData = async ({ userId }: Partial<UserProfileData>) => {
-  console.log({ userId });
-
   const supabase = createClient();
   try {
     const { data, error } = await supabase.from("users").select("*").eq("id", userId).single();

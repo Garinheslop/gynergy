@@ -12,6 +12,31 @@ import { leaderboardFilterTypes, leaderboardRequestTypes } from "@resources/type
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+// Type definitions for type safety
+interface FetcherErrorResponse {
+  error: string;
+}
+
+interface LeaderboardArgs {
+  userId: string;
+  sessionId: string;
+  filter: string;
+  userTimezone: string;
+  skip: number;
+  limit: number;
+}
+
+interface UserRankArgs {
+  userId: string;
+  sessionId: string;
+  filter: string;
+  userTimezone: string;
+}
+
+interface CountResult {
+  count: number;
+}
+
 export async function GET(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
@@ -25,9 +50,6 @@ export async function GET(request: Request, { params }: { params: { requestType:
     error: authError,
   } = await supabase.auth.getUser();
 
-  console.log({ authError });
-  console.log({ user });
-
   if (authError || !user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -38,10 +60,6 @@ export async function GET(request: Request, { params }: { params: { requestType:
   const skip = new URL(request.url).searchParams.get("skip");
   const limit = new URL(request.url).searchParams.get("limit");
   const initial = new URL(request.url).searchParams.get("initial") ? true : false;
-
-  let fetcherHandler: ((args: any) => Promise<any>) | null = null;
-  let args: any = {};
-  let responseName;
 
   if (requestType === leaderboardRequestTypes.leaderboardData) {
     if (!sessionId) {
@@ -54,17 +72,46 @@ export async function GET(request: Request, { params }: { params: { requestType:
       return NextResponse.json({ error: "user filter is requried" }, { status: 400 });
     }
 
-    fetcherHandler = getLeaderboardData;
-    args = {
+    const leaderboardArgs: LeaderboardArgs = {
       userId: user.id,
       sessionId,
-      filter: filter,
+      filter,
       userTimezone: timezone,
-      skip: skip ? parseInt(skip) : 0,
-      limit: limit ? parseInt(limit) : 0,
+      skip: skip ? Number.parseInt(skip) : 0,
+      limit: limit ? Number.parseInt(limit) : 0,
     };
-    responseName = "leaderboard";
-  } else if (requestType === leaderboardRequestTypes.userRank) {
+
+    const data = await getLeaderboardData(leaderboardArgs);
+    if ("error" in data) {
+      return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    }
+
+    let total = 0;
+    if (initial) {
+      const countResult = await getTotalSessionUsers({
+        userId: user.id,
+        sessionId,
+        filter,
+        userTimezone: timezone,
+      });
+      if ("error" in countResult) {
+        return NextResponse.json({ error: { message: countResult.error } }, { status: 500 });
+      }
+      total = countResult.count;
+    }
+
+    if (skip && limit) {
+      return NextResponse.json({
+        leaderboard: data,
+        total,
+        filter,
+        skip: Number.parseInt(skip) + Number.parseInt(limit),
+      });
+    }
+    return NextResponse.json({ leaderboard: data, filter, total });
+  }
+
+  if (requestType === leaderboardRequestTypes.userRank) {
     if (!sessionId) {
       return NextResponse.json({ error: "Session id is requried" }, { status: 400 });
     }
@@ -74,46 +121,23 @@ export async function GET(request: Request, { params }: { params: { requestType:
     if (!timezone) {
       return NextResponse.json({ error: "user timezone is requried" }, { status: 400 });
     }
-    fetcherHandler = getUserRank;
-    args = {
+
+    const rankArgs: UserRankArgs = {
       sessionId,
       userTimezone: timezone,
       userId: user.id,
       filter,
     };
-    responseName = "rank";
+
+    const data = await getUserRank(rankArgs);
+    if ("error" in data) {
+      return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    }
+
+    return NextResponse.json({ rank: data, filter, total: 0 });
   }
 
-  if (!fetcherHandler || !responseName) {
-    return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
-  }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
-  } else {
-    let total = 0;
-    if (initial) {
-      const countResult = await getTotalSessionUsers(args);
-      if (countResult?.error) {
-        return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
-      } else {
-        total = countResult.count!;
-      }
-    }
-    if (skip && limit) {
-      return NextResponse.json({
-        [responseName]: data,
-        total,
-        filter,
-        skip: parseInt(skip) + parseInt(limit),
-      });
-    }
-    return NextResponse.json({
-      [responseName]: data,
-      filter,
-      total,
-    });
-  }
+  return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
 }
 
 const getLeaderboardData = async ({
@@ -123,14 +147,7 @@ const getLeaderboardData = async ({
   userTimezone,
   skip,
   limit,
-}: {
-  userId: string;
-  sessionId: string;
-  filter: string;
-  userTimezone: string;
-  skip: number;
-  limit: number;
-}) => {
+}: LeaderboardArgs): Promise<FetcherErrorResponse | Record<string, unknown>[]> => {
   try {
     const _supabase = createClient();
     const supabaseAdmin = createServiceClient();
@@ -184,21 +201,18 @@ const getLeaderboardData = async ({
     if (leaderboardDataError) return { error: leaderboardDataError.message };
 
     return camelcaseKeys(leaderboardData, { deep: true });
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
+
 const getUserRank = async ({
   userId,
   sessionId,
   filter,
   userTimezone,
-}: {
-  userId: string;
-  sessionId: string;
-  filter: string;
-  userTimezone: string;
-}) => {
+}: UserRankArgs): Promise<FetcherErrorResponse | Record<string, unknown>> => {
   try {
     const supabaseAdmin = createServiceClient();
 
@@ -242,21 +256,18 @@ const getUserRank = async ({
     if (userPositionDataError) return { error: userPositionDataError.message };
 
     return camelcaseKeys(userPositionData[0], { deep: true });
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
+
 const getTotalSessionUsers = async ({
   userId,
   sessionId,
   filter,
   userTimezone,
-}: {
-  userId: string;
-  sessionId: string;
-  filter: string;
-  userTimezone: string;
-}) => {
+}: UserRankArgs): Promise<FetcherErrorResponse | CountResult> => {
   try {
     const supabaseAdmin = createServiceClient();
 
@@ -325,12 +336,11 @@ const getTotalSessionUsers = async ({
       .gte("updated_at", startDate)
       .lte("updated_at", endDate);
 
-    console.log(error);
-
     if (error) return { error: error.message };
 
-    return { count: count ? count : 0 };
-  } catch (err: any) {
-    return { error: err.message };
+    return { count: count ?? 0 };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };

@@ -1,4 +1,3 @@
-import { Dispatch } from "redux";
 import { successReducerTypes } from "@store/resources/reducerActionTypes";
 import { AppDispatch } from "@store/configureStore";
 import { editorContentCreated } from "@store/modules/editor";
@@ -9,15 +8,13 @@ import { resetLeaderboardLastFetch } from "@store/modules/leaderboard";
 export const dispatchOnSuccessAction = (
   dispatch: AppDispatch,
   onSuccess: string,
-  payload: any
+  payload: Record<string, unknown>
 ): void => {
   dispatch({ type: onSuccess, payload: payload });
 
   switch (onSuccess) {
     case successReducerTypes.userAuthenticated: {
-      const userData = payload || {};
-      if (userData.authenticated) {
-      }
+      // Authentication handled elsewhere
       break;
     }
     case successReducerTypes.signOutUser: {
@@ -30,9 +27,10 @@ export const dispatchOnSuccessAction = (
     case successReducerTypes.journalCreated:
     case successReducerTypes.actionLogCreated:
     case successReducerTypes.visionCreated: {
+      const actionPayload = payload as { action?: { isCompleted?: boolean }; journal?: { isCompleted?: boolean } };
       dispatch(
         editorContentCreated({
-          isCompleted: payload?.action?.isCompleted ?? payload?.journal?.isCompleted,
+          isCompleted: actionPayload?.action?.isCompleted ?? actionPayload?.journal?.isCompleted,
         })
       );
       dispatch(resetHistoryLastFetch());

@@ -11,12 +11,12 @@ dayjs.extend(timezone);
 const {
   journalRequested,
   journalCreationRequested,
-  journalUpdateRequested,
+  journalUpdateRequested: _journalUpdateRequested,
   journalRequestFailed,
   journalFetched,
-  userJournalsFetched,
+  userJournalsFetched: _userJournalsFetched,
   journalCreated,
-  journalUpdated,
+  journalUpdated: _journalUpdated,
 } = journals.actions;
 export const { setJournalCurrentStates } = journals.actions;
 
@@ -40,8 +40,8 @@ export const createUserjournal = ({
   journalRequestType,
 }: {
   sessionId: string;
-  journal: any;
-  images: any;
+  journal: Record<string, unknown>;
+  images: Record<string, unknown>[];
   journalRequestType: string;
 }) =>
   apiCallBegan({

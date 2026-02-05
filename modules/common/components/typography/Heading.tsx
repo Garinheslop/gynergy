@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import React from "react";
 
 import useGetHeadingVariant from "@modules/common/hooks/variants/useGetHeadingVariant";
@@ -27,7 +28,7 @@ const Heading = ({
       <div
         onClick={onClick}
         className={componentStyle}
-        dangerouslySetInnerHTML={{ __html: htmlContent }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(htmlContent) }}
       />
     );
   }

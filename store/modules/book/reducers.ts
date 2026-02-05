@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { BookSessionData } from "@resources/types/book";
-import { User, UserStats } from "@resources/types/profile";
 
-const dayZeroBookData = {
+const _dayZeroBookData = {
   milestones: [
     {
       id: "f1effcf4-3e68-47e3-9ef1-680569f67865",
@@ -102,7 +101,7 @@ interface bookData {
   weeklyActionPoints: number;
   createdAt: string;
   updatedAt: string;
-  milestones: any[];
+  milestones: Record<string, unknown>[];
 }
 interface bookState {
   current: bookData | null;

@@ -18,8 +18,9 @@ export const fetchEntitlements = () => async (dispatch: AppDispatch) => {
   try {
     const response = await axios.get("/api/payments/entitlements");
     dispatch(fetchEntitlementsSuccess(response.data));
-  } catch (error: any) {
-    const message = error.response?.data?.error || "Failed to fetch entitlements";
+  } catch (error: unknown) {
+    const axiosError = error as { response?: { data?: { error?: string } } };
+    const message = axiosError.response?.data?.error || "Failed to fetch entitlements";
     dispatch(fetchEntitlementsFailure(message));
   }
 };
@@ -32,10 +33,12 @@ export const redeemFriendCode = (code: string) => async (dispatch: AppDispatch) 
     const response = await axios.post("/api/payments/friend-code", { code });
     dispatch(redeemCodeSuccess(response.data.message));
     // Refresh entitlements after successful redemption
-    dispatch(fetchEntitlements() as any);
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    (dispatch as Function)(fetchEntitlements());
     return { success: true };
-  } catch (error: any) {
-    const message = error.response?.data?.error || "Failed to redeem friend code";
+  } catch (error: unknown) {
+    const axiosError = error as { response?: { data?: { error?: string } } };
+    const message = axiosError.response?.data?.error || "Failed to redeem friend code";
     dispatch(redeemCodeFailure(message));
     return { success: false, error: message };
   }
@@ -48,8 +51,9 @@ export const validateFriendCode = async (
   try {
     const response = await axios.put("/api/payments/friend-code", { code });
     return response.data;
-  } catch (error: any) {
-    return { valid: false, reason: error.response?.data?.error || "Failed to validate code" };
+  } catch (error: unknown) {
+    const axiosError = error as { response?: { data?: { error?: string } } };
+    return { valid: false, reason: axiosError.response?.data?.error || "Failed to validate code" };
   }
 };
 

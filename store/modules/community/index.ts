@@ -1,6 +1,7 @@
 // Community Redux Module
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+import { AppDispatch, RootState } from "@store/configureStore";
 import {
   CommunityPost,
   CohortMember,
@@ -245,7 +246,7 @@ export default communitySlice.reducer;
 // Thunk actions
 export const fetchFeed =
   (options?: { append?: boolean; postType?: string }) =>
-  async (dispatch: any, getState: () => any) => {
+  async (dispatch: AppDispatch, getState: () => RootState) => {
     const state = getState().community;
 
     if (state.feedLoading) return;
@@ -277,8 +278,9 @@ export const fetchFeed =
           append: options?.append,
         })
       );
-    } catch (error: any) {
-      dispatch(setFeedError(error.message));
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to fetch feed";
+      dispatch(setFeedError(message));
     } finally {
       dispatch(setFeedLoading(false));
     }
@@ -292,7 +294,7 @@ export const createPost =
     mediaUrls?: string[];
     visibility?: string;
   }) =>
-  async (dispatch: any) => {
+  async (dispatch: AppDispatch) => {
     try {
       const response = await fetch("/api/community/feed", {
         method: "POST",
@@ -310,13 +312,15 @@ export const createPost =
       dispatch(setCreatePostOpen(false));
 
       return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to create post";
+      return { success: false, error: message };
     }
   };
 
 export const toggleReaction =
-  (postId: string, reactionType: ReactionType) => async (dispatch: any, getState: () => any) => {
+  (postId: string, reactionType: ReactionType) =>
+  async (dispatch: AppDispatch, getState: () => RootState) => {
     const state = getState().community;
     const post = state.posts.find((p: CommunityPost) => p.id === postId);
 
@@ -353,19 +357,19 @@ export const toggleReaction =
           body: JSON.stringify({ postId, reactionType }),
         });
       }
-    } catch (error) {
+    } catch {
       // Revert on error
       dispatch(
         updatePostReaction({
           postId,
-          reaction: post.userReaction,
+          reaction: post.userReaction ?? null,
           delta: sameReaction ? 1 : hadReaction ? 0 : -1,
         })
       );
     }
   };
 
-export const fetchMembers = () => async (dispatch: any) => {
+export const fetchMembers = () => async (dispatch: AppDispatch) => {
   dispatch(setMembersLoading(true));
 
   try {
@@ -382,14 +386,14 @@ export const fetchMembers = () => async (dispatch: any) => {
         cohort: data.cohort,
       })
     );
-  } catch (error) {
-    console.error("Fetch members error:", error);
+  } catch {
+    // Error is logged server-side
   } finally {
     dispatch(setMembersLoading(false));
   }
 };
 
-export const fetchReferrals = () => async (dispatch: any) => {
+export const fetchReferrals = () => async (dispatch: AppDispatch) => {
   dispatch(setReferralsLoading(true));
 
   try {
@@ -408,38 +412,39 @@ export const fetchReferrals = () => async (dispatch: any) => {
         stats: data.stats,
       })
     );
-  } catch (error) {
-    console.error("Fetch referrals error:", error);
+  } catch {
+    // Error is logged server-side
   } finally {
     dispatch(setReferralsLoading(false));
   }
 };
 
 // Comment thunks
-export const fetchComments = (postId: string) => async (dispatch: any, getState: () => any) => {
-  const state = getState().community;
-  if (state.commentsLoading[postId]) return;
+export const fetchComments =
+  (postId: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
+    const state = getState().community;
+    if (state.commentsLoading[postId]) return;
 
-  dispatch(setCommentsLoading({ postId, loading: true }));
+    dispatch(setCommentsLoading({ postId, loading: true }));
 
-  try {
-    const response = await fetch(`/api/community/comments?postId=${postId}`);
-    const data = await response.json();
+    try {
+      const response = await fetch(`/api/community/comments?postId=${postId}`);
+      const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to fetch comments");
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch comments");
+      }
+
+      dispatch(setComments({ postId, comments: data.comments }));
+    } catch {
+      // Error is logged server-side
+    } finally {
+      dispatch(setCommentsLoading({ postId, loading: false }));
     }
-
-    dispatch(setComments({ postId, comments: data.comments }));
-  } catch (error) {
-    console.error("Fetch comments error:", error);
-  } finally {
-    dispatch(setCommentsLoading({ postId, loading: false }));
-  }
-};
+  };
 
 export const createComment =
-  (postId: string, content: string, parentId?: string) => async (dispatch: any) => {
+  (postId: string, content: string, parentId?: string) => async (dispatch: AppDispatch) => {
     try {
       const response = await fetch("/api/community/comments", {
         method: "POST",
@@ -457,13 +462,14 @@ export const createComment =
       dispatch(updatePostCommentCount({ postId, delta: 1 }));
 
       return { success: true, comment: data.comment };
-    } catch (error: any) {
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to create comment";
+      return { success: false, error: message };
     }
   };
 
 export const deleteComment =
-  (postId: string, commentId: string) => async (dispatch: any) => {
+  (postId: string, commentId: string) => async (dispatch: AppDispatch) => {
     try {
       const response = await fetch(`/api/community/comments?commentId=${commentId}`, {
         method: "DELETE",
@@ -478,8 +484,9 @@ export const deleteComment =
       dispatch(updatePostCommentCount({ postId, delta: -1 }));
 
       return { success: true };
-    } catch (error: any) {
-      return { success: false, error: error.message };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to delete comment";
+      return { success: false, error: message };
     }
   };
 
@@ -490,8 +497,8 @@ export const incrementShareCount = (postId: string) => async () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ postId }),
     });
-  } catch (error) {
-    console.error("Share count error:", error);
+  } catch {
+    // Silent fail for share count
   }
 };
 
@@ -510,7 +517,8 @@ export const sendEncouragement = (memberId: string) => async () => {
     }
 
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to send encouragement";
+    return { success: false, error: message };
   }
 };
