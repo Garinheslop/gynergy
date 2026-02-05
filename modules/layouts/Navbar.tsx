@@ -43,15 +43,11 @@ const Navbar: FC = () => {
         {session?.user ? (
           <div className="flex items-center gap-5">
             <ActionButton
-              label={"Join Gynergy Community"}
+              label={"Community"}
               icon={"people"}
               paragraphVariant={paragraphVariants.meta}
               onClick={() => {
-                window.open(
-                  "https://glxu7q1mylasl0ssnlqn.app.clientclub.net",
-                  "_blank",
-                  "noopener,noreferrer"
-                );
+                router.push("/community");
               }}
               sx={
                 "bg-action-50 border border-border-light rounded-[10px] px-[10px] flex-row-reverse hidden sm:flex"
@@ -149,7 +145,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
       </li>
       <li className="flex items-center gap-[16px]">
         <div className="flex items-center gap-[10px]">
-          <Image src={icons.point} className="h-[25px] w-auto" />
+          <Image src={icons.point} className="h-[25px] w-auto" alt="Points" />
           <Paragraph
             variant={paragraphVariants.regular}
             content={userEnrollment?.totalPoints}
@@ -157,7 +153,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
           />
         </div>
         <div className="flex items-center gap-[10px]">
-          <Image src={icons.streak} className="h-[25px] w-auto" />
+          <Image src={icons.streak} className="h-[25px] w-auto" alt="Streak" />
           <Paragraph
             variant={paragraphVariants.regular}
             content={Math.max(
@@ -219,18 +215,14 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
       <li
         className="flex cursor-pointer items-center gap-[10px] sm:hidden"
         onClick={() => {
-          window.open(
-            "https://glxu7q1mylasl0ssnlqn.app.clientclub.net",
-            "_blank",
-            "noopener,noreferrer"
-          );
+          router.push("/community");
           onItemClick();
         }}
       >
         <i className="gng-people text-content-secondary text-[20px]" />
         <Paragraph
           variant={paragraphVariants.regular}
-          content={"Join Gynergy Community"}
+          content={"Community"}
           sx={"text-content-dark"}
         />
       </li>

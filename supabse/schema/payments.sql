@@ -214,27 +214,32 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION create_friend_code_for_purchase()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Only create friend codes for completed challenge purchases
-    IF NEW.status = 'completed' AND NEW.purchase_type = 'challenge' AND OLD.status != 'completed' THEN
-        -- Create TWO friend codes per purchase (Accountability Trio model)
-        -- This creates optimal group dynamics: purchaser + 2 friends = trio
-        INSERT INTO friend_codes (code, creator_id, purchase_id)
-        VALUES
-            (generate_friend_code(), NEW.user_id, NEW.id),
-            (generate_friend_code(), NEW.user_id, NEW.id);
+    -- Only create friend codes for completed challenge purchases with a user_id
+    -- Handle both INSERT (new completed purchase) and UPDATE (status changed to completed)
+    IF NEW.status = 'completed' AND NEW.purchase_type = 'challenge' AND NEW.user_id IS NOT NULL THEN
+        -- For UPDATE: only trigger if status actually changed to completed
+        -- For INSERT: always trigger for completed purchases
+        IF TG_OP = 'INSERT' OR (TG_OP = 'UPDATE' AND OLD.status != 'completed') THEN
+            -- Create TWO friend codes per purchase (Accountability Trio model)
+            -- This creates optimal group dynamics: purchaser + 2 friends = trio
+            INSERT INTO friend_codes (code, creator_id, purchase_id)
+            VALUES
+                (generate_friend_code(), NEW.user_id, NEW.id),
+                (generate_friend_code(), NEW.user_id, NEW.id);
 
-        -- Grant challenge access to purchaser
-        PERFORM grant_challenge_access(NEW.user_id, 'purchased');
+            -- Grant challenge access to purchaser
+            PERFORM grant_challenge_access(NEW.user_id, 'purchased');
+        END IF;
     END IF;
 
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Trigger to create friend code on purchase completion
+-- Trigger to create friend code on purchase completion (fires on both INSERT and UPDATE)
 DROP TRIGGER IF EXISTS create_friend_code_trigger ON purchases;
 CREATE TRIGGER create_friend_code_trigger
-    AFTER UPDATE ON purchases
+    AFTER INSERT OR UPDATE ON purchases
     FOR EACH ROW
     EXECUTE FUNCTION create_friend_code_for_purchase();
 

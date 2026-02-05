@@ -23,7 +23,9 @@
     "db:test": "npx tsx lib/db/test-connection.ts",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@100mslive/hms-virtual-background": "^1.14.1",
@@ -97,6 +99,12 @@
     "prettier-plugin-tailwindcss": "^0.6.11",
     "tailwind-scrollbar": "^4.0.0",
     "tailwindcss": "^4.0.6",
-    "vitest": "^1.3.0"
+    "vitest": "^1.3.0",
+    "storybook": "^10.2.6",
+    "@storybook/nextjs": "^10.2.6",
+    "@storybook/addon-a11y": "^10.2.6",
+    "@storybook/addon-docs": "^10.2.6",
+    "@storybook/addon-onboarding": "^10.2.6",
+    "eslint-plugin-storybook": "^10.2.6"
   }
 }

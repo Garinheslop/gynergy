@@ -191,7 +191,8 @@ describe("Image Utilities", () => {
 
       const result = base64ToArrayBuffer(base64);
 
-      expect(result.file).toBeInstanceOf(Buffer);
+      // Uses Uint8Array for proper Blob compatibility (not Buffer)
+      expect(result.file).toBeInstanceOf(Uint8Array);
       expect(result.file.length).toBeGreaterThan(0);
     });
 

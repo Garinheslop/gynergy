@@ -1,10 +1,12 @@
 import { combineReducers } from "redux";
 import { persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage";
+
+import storage from "./storage";
 
 import actionReducer from "@store/modules/action";
 import aiReducer from "@store/modules/ai/reducers";
 import bookReducer from "@store/modules/book";
+import communityReducer from "@store/modules/community";
 import editorReducer from "@store/modules/editor";
 import enrollmentReducer from "@store/modules/enrollment";
 import gamificationReducer from "@store/modules/gamification";
@@ -100,9 +102,16 @@ const persistPaymentConfig = {
   blacklist: ["loading", "redeemingCode", "redeemError", "redeemSuccess"],
 };
 
+const persistCommunityConfig = {
+  key: "community",
+  storage,
+  blacklist: ["feedLoading", "feedError", "membersLoading", "referralsLoading", "createPostOpen"],
+};
+
 const appReducer = combineReducers({
   actions: actionReducer,
   books: persistReducer(persistBooksConfig, bookReducer),
+  community: persistReducer(persistCommunityConfig, communityReducer),
   enrollments: persistReducer(persistEnrollmentsConfig, enrollmentReducer),
   editor: editorReducer,
   visions: persistReducer(persistVisionsConfig, visionReducer),
