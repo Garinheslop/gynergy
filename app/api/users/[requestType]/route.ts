@@ -27,6 +27,26 @@ type UserUpdateImage = {
   contentType: string;
 };
 
+// Type definitions for type safety
+interface FetcherErrorResponse {
+  error: string;
+}
+
+interface UserProfileResponse {
+  id: string;
+  supabaseId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  profileImage: string | null;
+}
+
+interface UserDataToUpdate {
+  first_name?: string;
+  last_name?: string;
+  profile_image?: string;
+}
+
 export async function GET(request: Request, { params }: { params: { requestType: string } }) {
   const { requestType } = params;
 
@@ -47,27 +67,17 @@ export async function GET(request: Request, { params }: { params: { requestType:
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let fetcherHandler: ((args: Partial<UserProfileData>) => Promise<any>) | null = null;
-  let args: Partial<UserProfileData> | {} = {};
   const responseName = "user";
 
   if (requestType === profileRequestTypes.userProfile) {
-    fetcherHandler = getUserData;
-    args = {
-      userId: user.id,
-    };
+    const data = await getUserData({ userId: user.id });
+    if ("error" in data) {
+      return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    }
+    return NextResponse.json({ [responseName]: data });
   }
-  if (!fetcherHandler || !responseName) {
-    return NextResponse.json({ error: "invalid-request" }, { status: 400 });
-  }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
-  } else {
-    return NextResponse.json({
-      [responseName]: data,
-    });
-  }
+
+  return NextResponse.json({ error: "invalid-request" }, { status: 400 });
 }
 
 export async function PUT(request: Request, { params }: { params: { requestType: string } }) {
@@ -89,46 +99,34 @@ export async function PUT(request: Request, { params }: { params: { requestType:
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let fetcherHandler: ((args: Partial<UserProfileData>) => Promise<any>) | null = null;
-  let args: Partial<UserProfileData> | {} = {};
   const responseName = "user";
 
   if (requestType === profileRequestTypes.updateUserData) {
     if (!firstName && !lastName && !fileStr && !fileName && !contentType) {
       return NextResponse.json({ error: "Invalid update body" }, { status: 400 });
     }
-    fetcherHandler = updateUserProfile;
-    args = { userId: user.id };
+
+    const updateArgs: Partial<UserUpdateData> = { userId: user.id };
     if (firstName && lastName) {
-      args = {
-        ...args,
-        firstName,
-        lastName,
-      };
+      updateArgs.firstName = firstName;
+      updateArgs.lastName = lastName;
     }
     if (fileStr && fileName && contentType) {
-      args = {
-        ...args,
-        imageFile: {
-          fileStr,
-          name: fileName,
-          contentType,
-        },
+      updateArgs.imageFile = {
+        fileStr,
+        name: fileName,
+        contentType,
       };
     }
+
+    const data = await updateUserProfile(updateArgs);
+    if ("error" in data) {
+      return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    }
+    return NextResponse.json({ [responseName]: data });
   }
 
-  if (!fetcherHandler || !responseName) {
-    return NextResponse.json({ error: "invalid-request" }, { status: 400 });
-  }
-  const data = await fetcherHandler(args);
-  if (data?.error) {
-    return NextResponse.json({ error: { message: data?.error } }, { status: 500 });
-  } else {
-    return NextResponse.json({
-      [responseName]: data,
-    });
-  }
+  return NextResponse.json({ error: "invalid-request" }, { status: 400 });
 }
 
 const getUserData = async ({ userId }: Partial<UserProfileData>) => {
@@ -150,8 +148,9 @@ const getUserData = async ({ userId }: Partial<UserProfileData>) => {
       email: data.email,
       profileImage: data.profile_image,
     };
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
 
@@ -177,12 +176,12 @@ const updateUserProfile = async ({
         });
         if (typeof path === "object" && path?.error) {
           return { error: path?.error };
-        } else {
+        } else if (typeof path === "string") {
           imagePath = path;
         }
       }
     }
-    const dataToUpdate: any = {
+    const dataToUpdate: UserDataToUpdate = {
       first_name: firstName,
       last_name: lastName,
     };
@@ -221,8 +220,9 @@ const updateUserProfile = async ({
       email: updatedUserData.email,
       profileImage: updatedUserData.profile_image,
     };
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
 
@@ -269,7 +269,8 @@ const updateUserProfileImage = async ({
       return { error: path?.error };
     }
     return path;
-  } catch (err: any) {
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
   }
 };
