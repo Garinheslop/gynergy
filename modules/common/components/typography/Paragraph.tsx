@@ -1,5 +1,6 @@
+import React, { forwardRef } from "react";
+
 import DOMPurify from "dompurify";
-import { forwardRef } from "react";
 
 import useGetParagraphVariant from "@modules/common/hooks/variants/useGetParagraphVariant";
 import { paragraphVariants } from "@resources/variants";

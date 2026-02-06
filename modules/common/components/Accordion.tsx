@@ -1,4 +1,4 @@
-import { ReactNode, MouseEvent, useEffect, useRef, useState } from "react";
+import React, { ReactNode, MouseEvent, useEffect, useRef, useState } from "react";
 
 import { cn } from "@lib/utils/style";
 import { headingVariants, paragraphVariants } from "@resources/variants";
