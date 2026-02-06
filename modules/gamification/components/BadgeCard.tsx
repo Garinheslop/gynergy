@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { memo } from "react";
 
 import { cn } from "@lib/utils/style";
 import Paragraph from "@modules/common/components/typography/Paragraph";
@@ -242,4 +242,4 @@ export const BadgeCardDetailed: React.FC<BadgeCardDetailedProps> = ({
   );
 };
 
-export default BadgeCard;
+export default memo(BadgeCard);

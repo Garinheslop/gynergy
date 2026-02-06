@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 
 import { usePopup } from "@contexts/UsePopup";
 import { cn } from "@lib/utils/style";
@@ -257,4 +257,4 @@ const JournalCard: React.FC<JournalCardProps> = ({
   );
 };
 
-export default JournalCard;
+export default memo(JournalCard);

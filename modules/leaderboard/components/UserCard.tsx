@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 
 import dayjs from "dayjs";
 
@@ -115,4 +115,4 @@ const RankImg = ({ sx }: { sx: string }) => {
   );
 };
 
-export default UserCard;
+export default memo(UserCard);

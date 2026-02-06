@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 
 import dayjs from "dayjs";
 
@@ -133,4 +133,4 @@ const JournalHistoryCard = ({ data, onCardClick, isMeditation, isMeditationCompl
   );
 };
 
-export default JournalHistoryCard;
+export default memo(JournalHistoryCard);
