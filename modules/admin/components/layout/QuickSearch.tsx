@@ -8,12 +8,13 @@ import { cn } from "@lib/utils/style";
 
 interface SearchResult {
   id: string;
-  type: "page" | "user" | "action";
+  type: "page" | "user" | "action" | "recent";
   title: string;
   description?: string;
   href?: string;
   icon: string;
   action?: () => void;
+  keywords?: string[];
 }
 
 const ADMIN_PAGES: SearchResult[] = [
@@ -24,6 +25,7 @@ const ADMIN_PAGES: SearchResult[] = [
     description: "Overview and key metrics",
     href: "/admin",
     icon: "gng-home",
+    keywords: ["home", "overview", "stats", "kpi", "metrics"],
   },
   {
     id: "users",
@@ -32,6 +34,7 @@ const ADMIN_PAGES: SearchResult[] = [
     description: "View and manage users",
     href: "/admin/users",
     icon: "gng-users",
+    keywords: ["members", "accounts", "profiles", "suspend", "customers"],
   },
   {
     id: "payments",
@@ -40,6 +43,7 @@ const ADMIN_PAGES: SearchResult[] = [
     description: "Revenue and sales data",
     href: "/admin/payments",
     icon: "gng-dollar",
+    keywords: ["revenue", "money", "transactions", "stripe", "purchases", "mrr", "sales"],
   },
   {
     id: "analytics",
@@ -48,6 +52,16 @@ const ADMIN_PAGES: SearchResult[] = [
     description: "Engagement and growth metrics",
     href: "/admin/analytics",
     icon: "gng-bar-chart",
+    keywords: ["metrics", "data", "reports", "insights", "charts", "growth", "retention"],
+  },
+  {
+    id: "content",
+    type: "page",
+    title: "Content Library",
+    description: "Videos and media management",
+    href: "/admin/content",
+    icon: "gng-video",
+    keywords: ["videos", "media", "library", "courses", "bunny", "uploads"],
   },
   {
     id: "community",
@@ -56,6 +70,16 @@ const ADMIN_PAGES: SearchResult[] = [
     description: "Content review and moderation",
     href: "/admin/community",
     icon: "gng-shield",
+    keywords: ["posts", "moderation", "social", "feed", "flagged", "reports"],
+  },
+  {
+    id: "gamification",
+    type: "page",
+    title: "Gamification",
+    description: "Points, badges and streaks",
+    href: "/admin/gamification",
+    icon: "gng-trophy",
+    keywords: ["badges", "points", "streaks", "rewards", "achievements", "leaderboard"],
   },
   {
     id: "system",
@@ -64,6 +88,16 @@ const ADMIN_PAGES: SearchResult[] = [
     description: "Infrastructure and audit logs",
     href: "/admin/system",
     icon: "gng-activity",
+    keywords: ["health", "logs", "audit", "performance", "api", "errors", "monitoring"],
+  },
+  {
+    id: "settings",
+    type: "page",
+    title: "Admin Settings",
+    description: "Preferences and configuration",
+    href: "/admin/settings",
+    icon: "gng-settings",
+    keywords: ["preferences", "config", "options", "aria", "theme"],
   },
 ];
 
@@ -74,6 +108,7 @@ const QUICK_ACTIONS: SearchResult[] = [
     title: "Refresh Data",
     description: "Reload current page data",
     icon: "gng-refresh",
+    keywords: ["reload", "update", "sync"],
   },
   {
     id: "export-users",
@@ -81,8 +116,79 @@ const QUICK_ACTIONS: SearchResult[] = [
     title: "Export Users",
     description: "Download user data as CSV",
     icon: "gng-download",
+    keywords: ["download", "csv", "export"],
+  },
+  {
+    id: "export-payments",
+    type: "action",
+    title: "Export Payments",
+    description: "Download payment history",
+    icon: "gng-download",
+    keywords: ["download", "csv", "revenue", "export"],
+  },
+  {
+    id: "view-logs",
+    type: "action",
+    title: "View Audit Logs",
+    description: "Recent admin activity",
+    icon: "gng-file-text",
+    href: "/admin/system?tab=logs",
+    keywords: ["audit", "history", "activity", "trail"],
+  },
+  {
+    id: "aria",
+    type: "action",
+    title: "Open Aria AI",
+    description: "AI assistant for insights",
+    icon: "gng-sparkles",
+    keywords: ["ai", "assistant", "chat", "help", "insights"],
   },
 ];
+
+// Fuzzy match implementation
+function fuzzyMatch(text: string, query: string): boolean {
+  const lowerText = text.toLowerCase();
+  const lowerQuery = query.toLowerCase();
+
+  // Direct substring match (highest priority)
+  if (lowerText.includes(lowerQuery)) return true;
+
+  // Character sequence match for fuzzy finding
+  let queryIndex = 0;
+  for (let i = 0; i < lowerText.length && queryIndex < lowerQuery.length; i++) {
+    if (lowerText[i] === lowerQuery[queryIndex]) {
+      queryIndex++;
+    }
+  }
+  return queryIndex === lowerQuery.length;
+}
+
+// Score results for better ranking
+function scoreResult(result: SearchResult, query: string): number {
+  const lowerQuery = query.toLowerCase();
+  let score = 0;
+
+  // Title starts with query (highest)
+  if (result.title.toLowerCase().startsWith(lowerQuery)) score += 100;
+  // Title contains query
+  else if (result.title.toLowerCase().includes(lowerQuery)) score += 50;
+  // Fuzzy match on title
+  else if (fuzzyMatch(result.title, query)) score += 25;
+
+  // Description match
+  if (result.description?.toLowerCase().includes(lowerQuery)) score += 20;
+
+  // Keyword exact match
+  if (result.keywords?.some((kw) => kw.toLowerCase() === lowerQuery)) score += 40;
+  // Keyword partial match
+  else if (result.keywords?.some((kw) => kw.toLowerCase().includes(lowerQuery))) score += 15;
+
+  // Boost pages over actions for navigation
+  if (result.type === "page") score += 5;
+  if (result.type === "recent") score += 10;
+
+  return score;
+}
 
 interface QuickSearchProps {
   isOpen: boolean;
@@ -92,32 +198,96 @@ interface QuickSearchProps {
 export function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [recentSearches, setRecentSearches] = useState<SearchResult[]>([]);
 
-  // Filter results based on query
+  // Load recent searches from localStorage
   useEffect(() => {
+    try {
+      const stored = localStorage.getItem("admin-recent-searches");
+      if (stored) {
+        setRecentSearches(JSON.parse(stored));
+      }
+    } catch {
+      // Ignore localStorage errors
+    }
+  }, []);
+
+  // Filter and rank results based on query
+  useEffect(() => {
+    const allItems = [...ADMIN_PAGES, ...QUICK_ACTIONS];
+
     if (!query.trim()) {
-      setResults([...ADMIN_PAGES, ...QUICK_ACTIONS]);
+      // Show recent searches first, then pages
+      const recentIds = new Set(recentSearches.map((r) => r.id));
+      const nonRecent = allItems.filter((item) => !recentIds.has(item.id));
+      setResults([...recentSearches.slice(0, 3), ...nonRecent]);
     } else {
-      const lowerQuery = query.toLowerCase();
-      const filtered = [...ADMIN_PAGES, ...QUICK_ACTIONS].filter(
-        (item) =>
-          item.title.toLowerCase().includes(lowerQuery) ||
-          item.description?.toLowerCase().includes(lowerQuery)
-      );
+      // Filter by fuzzy match on title, description, or keywords
+      const filtered = allItems.filter((item) => {
+        if (fuzzyMatch(item.title, query)) return true;
+        if (item.description && fuzzyMatch(item.description, query)) return true;
+        if (item.keywords?.some((kw) => fuzzyMatch(kw, query))) return true;
+        return false;
+      });
+
+      // Sort by relevance score
+      filtered.sort((a, b) => scoreResult(b, query) - scoreResult(a, query));
       setResults(filtered);
     }
     setSelectedIndex(0);
-  }, [query]);
+  }, [query, recentSearches]);
 
   // Focus input when opened
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+    if (isOpen) {
+      setQuery("");
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [isOpen]);
+
+  // Scroll selected item into view
+  useEffect(() => {
+    if (listRef.current && results.length > 0) {
+      const selected = listRef.current.children[selectedIndex] as HTMLElement;
+      if (selected) {
+        selected.scrollIntoView({ block: "nearest" });
+      }
+    }
+  }, [selectedIndex, results.length]);
+
+  // Save to recent searches
+  const addToRecent = useCallback((result: SearchResult) => {
+    setRecentSearches((prev) => {
+      const filtered = prev.filter((r) => r.id !== result.id);
+      const recentResult = { ...result, type: "recent" as const };
+      const updated = [recentResult, ...filtered].slice(0, 5);
+      try {
+        localStorage.setItem("admin-recent-searches", JSON.stringify(updated));
+      } catch {
+        // Ignore localStorage errors
+      }
+      return updated;
+    });
+  }, []);
+
+  const handleSelect = useCallback(
+    (result: SearchResult) => {
+      addToRecent(result);
+      onClose();
+      setQuery("");
+
+      if (result.href) {
+        router.push(result.href);
+      } else if (result.action) {
+        result.action();
+      }
+    },
+    [router, onClose, addToRecent]
+  );
 
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
@@ -125,11 +295,11 @@ export function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
       switch (e.key) {
         case "ArrowDown":
           e.preventDefault();
-          setSelectedIndex((prev) => (prev + 1) % results.length);
+          setSelectedIndex((prev) => Math.min(prev + 1, results.length - 1));
           break;
         case "ArrowUp":
           e.preventDefault();
-          setSelectedIndex((prev) => (prev - 1 + results.length) % results.length);
+          setSelectedIndex((prev) => Math.max(prev - 1, 0));
           break;
         case "Enter":
           e.preventDefault();
@@ -143,18 +313,8 @@ export function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
           break;
       }
     },
-    [results, selectedIndex, onClose]
+    [results, selectedIndex, onClose, handleSelect]
   );
-
-  const handleSelect = (result: SearchResult) => {
-    if (result.href) {
-      router.push(result.href);
-    } else if (result.action) {
-      result.action();
-    }
-    onClose();
-    setQuery("");
-  };
 
   if (!isOpen) return null;
 
@@ -185,7 +345,7 @@ export function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
         {/* Results */}
         <div className="max-h-80 overflow-y-auto p-2">
           {results.length > 0 ? (
-            <div className="space-y-1">
+            <div ref={listRef} className="space-y-1">
               {results.map((result, index) => (
                 <button
                   key={result.id}
@@ -234,15 +394,17 @@ export function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
                   </div>
                   <div
                     className={cn(
-                      "rounded-full px-2 py-0.5 text-xs",
+                      "rounded-full px-2 py-0.5 text-xs font-medium uppercase",
                       selectedIndex === index
                         ? "bg-action-700 text-white"
                         : result.type === "page"
                           ? "bg-grey-800 text-grey-400"
-                          : "bg-purple/20 text-purple"
+                          : result.type === "recent"
+                            ? "bg-warning/20 text-warning"
+                            : "bg-purple/20 text-purple"
                     )}
                   >
-                    {result.type}
+                    {result.type === "recent" ? "recent" : result.type}
                   </div>
                 </button>
               ))}
