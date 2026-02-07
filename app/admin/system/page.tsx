@@ -3,25 +3,21 @@
 import { useState, useEffect, useCallback } from "react";
 
 import { cn } from "@lib/utils/style";
-import { AdminLayout, StatCard } from "@modules/admin";
+import {
+  AdminLayout,
+  StatCard,
+  ChartContainer,
+  LineChartWidget,
+  AreaChartWidget,
+  AuditLogViewer,
+} from "@modules/admin";
+import type { ChartDataPoint } from "@modules/admin";
 
 interface ServiceStatus {
   database: "healthy" | "degraded" | "down";
   api: "healthy" | "degraded" | "down";
   auth: "healthy" | "degraded" | "down";
   storage: "healthy" | "degraded" | "down";
-}
-
-interface AuditLog {
-  id: string;
-  adminId: string;
-  actionType: string;
-  actionCategory: string;
-  resourceType: string;
-  resourceId?: string;
-  metadata?: Record<string, unknown>;
-  status: string;
-  createdAt: string;
 }
 
 interface SystemData {
@@ -38,11 +34,15 @@ interface SystemData {
     activeUsersNow: number;
   };
   metrics: Record<string, Array<{ name: string; value: number; recorded_at: string }>>;
-  auditLogs: AuditLog[];
   uptime: {
     api: string;
     database: string;
     lastRestart: string;
+  };
+  performance?: {
+    apiLatency: ChartDataPoint[];
+    errorRate: ChartDataPoint[];
+    requestVolume: ChartDataPoint[];
   };
 }
 
@@ -65,18 +65,22 @@ const defaultData: SystemData = {
     activeUsersNow: 0,
   },
   metrics: {},
-  auditLogs: [],
   uptime: {
     api: "N/A",
     database: "N/A",
     lastRestart: "N/A",
+  },
+  performance: {
+    apiLatency: [],
+    errorRate: [],
+    requestVolume: [],
   },
 };
 
 export default function SystemHealthPage() {
   const [data, setData] = useState<SystemData>(defaultData);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "logs">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "performance" | "logs">("overview");
 
   const fetchSystemData = useCallback(async () => {
     setIsLoading(true);
@@ -125,27 +129,6 @@ export default function SystemHealthPage() {
         return "bg-error/20 text-error";
       default:
         return "bg-grey-700 text-grey-400";
-    }
-  };
-
-  const getActionTypeIcon = (type: string) => {
-    switch (type) {
-      case "view":
-        return "gng-eye";
-      case "create":
-        return "gng-plus";
-      case "update":
-        return "gng-edit";
-      case "delete":
-        return "gng-trash";
-      case "export":
-        return "gng-download";
-      case "approve":
-        return "gng-check";
-      case "reject":
-        return "gng-x";
-      default:
-        return "gng-activity";
     }
   };
 
@@ -248,6 +231,17 @@ export default function SystemHealthPage() {
           Overview
         </button>
         <button
+          onClick={() => setActiveTab("performance")}
+          className={cn(
+            "border-b-2 px-4 py-2 text-sm font-medium transition-colors",
+            activeTab === "performance"
+              ? "border-action-500 text-white"
+              : "text-grey-400 hover:text-grey-300 border-transparent"
+          )}
+        >
+          Performance
+        </button>
+        <button
           onClick={() => setActiveTab("logs")}
           className={cn(
             "border-b-2 px-4 py-2 text-sm font-medium transition-colors",
@@ -260,7 +254,7 @@ export default function SystemHealthPage() {
         </button>
       </div>
 
-      {activeTab === "overview" ? (
+      {activeTab === "overview" && (
         <>
           {/* Service Status */}
           <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -339,80 +333,113 @@ export default function SystemHealthPage() {
             </div>
           )}
         </>
-      ) : (
-        /* Audit Logs Tab */
-        <div className="border-grey-800 bg-grey-900 rounded-xl border">
-          <div className="border-grey-800 border-b p-4">
-            <h3 className="font-semibold text-white">Recent Admin Actions</h3>
-            <p className="text-grey-400 text-sm">
-              All administrative actions are logged for security and compliance.
-            </p>
+      )}
+
+      {/* Performance Tab */}
+      {activeTab === "performance" && (
+        <>
+          {/* Performance Metrics Cards */}
+          <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="border-grey-800 bg-grey-900 rounded-xl border p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-grey-400 text-sm">Avg Response Time</span>
+                <span className="text-action-400 text-xs">Last 1h</span>
+              </div>
+              <p className="text-action-400 mt-2 text-2xl font-bold">
+                {data.performance?.apiLatency.length
+                  ? `${Math.round(data.performance.apiLatency.reduce((a, b) => a + b.value, 0) / data.performance.apiLatency.length)}ms`
+                  : "—"}
+              </p>
+            </div>
+            <div className="border-grey-800 bg-grey-900 rounded-xl border p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-grey-400 text-sm">Error Rate</span>
+                <span className="text-action-400 text-xs">Last 1h</span>
+              </div>
+              <p className="mt-2 text-2xl font-bold text-white">
+                {data.performance?.errorRate.length
+                  ? `${(data.performance.errorRate.reduce((a, b) => a + b.value, 0) / data.performance.errorRate.length).toFixed(2)}%`
+                  : "—"}
+              </p>
+            </div>
+            <div className="border-grey-800 bg-grey-900 rounded-xl border p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-grey-400 text-sm">Total Requests</span>
+                <span className="text-action-400 text-xs">Last 1h</span>
+              </div>
+              <p className="mt-2 text-2xl font-bold text-white">
+                {data.performance?.requestVolume.length
+                  ? data.performance.requestVolume.reduce((a, b) => a + b.value, 0).toLocaleString()
+                  : "—"}
+              </p>
+            </div>
+            <div className="border-grey-800 bg-grey-900 rounded-xl border p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-grey-400 text-sm">Success Rate</span>
+                <span className="text-action-400 text-xs">Last 1h</span>
+              </div>
+              <p className="text-action-400 mt-2 text-2xl font-bold">
+                {data.performance?.errorRate.length
+                  ? `${(100 - data.performance.errorRate.reduce((a, b) => a + b.value, 0) / data.performance.errorRate.length).toFixed(1)}%`
+                  : "—"}
+              </p>
+            </div>
           </div>
 
-          {data.auditLogs.length > 0 ? (
-            <div className="divide-grey-800 divide-y">
-              {data.auditLogs.map((log) => (
-                <div key={log.id} className="flex items-start gap-4 p-4">
-                  <div
-                    className={cn(
-                      "flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg",
-                      log.actionType === "delete" || log.actionType === "reject"
-                        ? "bg-error/20 text-error"
-                        : log.actionType === "create" || log.actionType === "approve"
-                          ? "bg-action-900 text-action-400"
-                          : "bg-grey-800 text-grey-400"
-                    )}
-                  >
-                    <i className={getActionTypeIcon(log.actionType)} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-white capitalize">{log.actionType}</span>
-                      <span className="bg-grey-800 text-grey-400 rounded px-2 py-0.5 text-xs">
-                        {log.resourceType}
-                      </span>
-                      {log.resourceId && (
-                        <span className="text-grey-500 truncate text-xs">{log.resourceId}</span>
-                      )}
-                    </div>
-                    <p className="text-grey-400 text-sm">{log.actionCategory.replace("_", " ")}</p>
-                    {log.metadata && Object.keys(log.metadata).length > 0 && (
-                      <p className="text-grey-500 mt-1 text-xs">
-                        {JSON.stringify(log.metadata).slice(0, 100)}...
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex-shrink-0 text-right">
-                    <p className="text-grey-400 text-sm">
-                      {new Date(log.createdAt).toLocaleDateString()}
-                    </p>
-                    <p className="text-grey-500 text-xs">
-                      {new Date(log.createdAt).toLocaleTimeString()}
-                    </p>
-                    <span
-                      className={cn(
-                        "mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium",
-                        log.status === "success"
-                          ? "bg-action-900 text-action-400"
-                          : log.status === "failure"
-                            ? "bg-error/20 text-error"
-                            : "bg-warning/20 text-warning"
-                      )}
-                    >
-                      {log.status}
-                    </span>
-                  </div>
+          {/* Performance Charts */}
+          <div className="mb-6 grid gap-6 lg:grid-cols-2">
+            <ChartContainer title="API Response Time" subtitle="Average latency (ms)">
+              {data.performance?.apiLatency && data.performance.apiLatency.length > 0 ? (
+                <LineChartWidget
+                  data={data.performance.apiLatency}
+                  xKey="name"
+                  lines={[{ dataKey: "value", name: "Latency", color: "#15b79e", strokeWidth: 2 }]}
+                  referenceLines={[{ y: 200, label: "Target", color: "#fbbf24" }]}
+                />
+              ) : (
+                <div className="text-grey-500 flex h-full items-center justify-center">
+                  No latency data available
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-grey-500 p-8 text-center">
-              <i className="gng-file-text mb-2 text-3xl" />
-              <p>No audit logs available</p>
-            </div>
-          )}
-        </div>
+              )}
+            </ChartContainer>
+
+            <ChartContainer title="Request Volume" subtitle="Requests per minute">
+              {data.performance?.requestVolume && data.performance.requestVolume.length > 0 ? (
+                <AreaChartWidget
+                  data={data.performance.requestVolume}
+                  xKey="name"
+                  yKey="value"
+                  color="#a86cff"
+                />
+              ) : (
+                <div className="text-grey-500 flex h-full items-center justify-center">
+                  No request data available
+                </div>
+              )}
+            </ChartContainer>
+          </div>
+
+          {/* Error Rate Chart */}
+          <ChartContainer title="Error Rate" subtitle="Percentage of failed requests">
+            {data.performance?.errorRate && data.performance.errorRate.length > 0 ? (
+              <LineChartWidget
+                data={data.performance.errorRate}
+                xKey="name"
+                lines={[{ dataKey: "value", name: "Error %", color: "#ef4444", strokeWidth: 2 }]}
+                referenceLines={[{ y: 1, label: "Threshold", color: "#fbbf24" }]}
+                formatYAxis={(v) => `${v}%`}
+              />
+            ) : (
+              <div className="text-grey-500 flex h-full items-center justify-center">
+                No error data available
+              </div>
+            )}
+          </ChartContainer>
+        </>
       )}
+
+      {/* Audit Logs Tab */}
+      {activeTab === "logs" && <AuditLogViewer showFilters maxHeight="calc(100vh - 320px)" />}
     </AdminLayout>
   );
 }
