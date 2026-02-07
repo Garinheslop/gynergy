@@ -112,6 +112,22 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Check if route requires admin access
+  if (pathname.startsWith("/admin")) {
+    // Query user_roles to check for admin role
+    const { data: adminRole } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .single();
+
+    // If not admin, redirect to home
+    if (!adminRole) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
+
   return response;
 }
 
