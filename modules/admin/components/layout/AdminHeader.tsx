@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@lib/utils/style";
 
 import NotificationsDropdown from "./NotificationsDropdown";
+import QuickStatsBar from "./QuickStatsBar";
 
 interface AdminHeaderProps {
   title: string;
@@ -56,6 +57,9 @@ export default function AdminHeader({
         <h1 className="text-lg font-semibold text-white">{title}</h1>
         {subtitle && <p className="text-grey-500 text-sm">{subtitle}</p>}
       </div>
+
+      {/* Quick Stats - Real-time metrics */}
+      <QuickStatsBar className="mx-4" />
 
       {/* Actions */}
       <div className="flex items-center gap-3">

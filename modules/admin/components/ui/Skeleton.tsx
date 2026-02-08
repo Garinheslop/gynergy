@@ -4,10 +4,21 @@ import { cn } from "@lib/utils/style";
 
 interface SkeletonProps {
   className?: string;
+  variant?: "pulse" | "shimmer";
 }
 
-export function Skeleton({ className }: SkeletonProps) {
-  return <div className={cn("bg-grey-800 animate-pulse rounded-lg", className)} />;
+export function Skeleton({ className, variant = "shimmer" }: SkeletonProps) {
+  return (
+    <div
+      className={cn(
+        "bg-grey-800 rounded-lg",
+        variant === "pulse" && "animate-pulse",
+        variant === "shimmer" &&
+          "before:via-grey-700/50 relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:to-transparent",
+        className
+      )}
+    />
+  );
 }
 
 // Stat card skeleton for dashboard KPIs
