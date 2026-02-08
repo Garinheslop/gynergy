@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { createServerClient } from "@supabase/ssr";
 
+import { sendWelcomeEmail } from "@lib/email";
+
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
@@ -45,7 +47,8 @@ export async function GET(request: NextRequest) {
     );
 
     // Exchange the code for a session
-    const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+    const { data: sessionData, error: exchangeError } =
+      await supabase.auth.exchangeCodeForSession(code);
 
     if (exchangeError) {
       console.error("Auth callback error:", exchangeError);
@@ -55,6 +58,39 @@ export async function GET(request: NextRequest) {
           requestUrl.origin
         )
       );
+    }
+
+    // Check if this is a new user and send welcome email
+    if (sessionData?.user) {
+      const userId = sessionData.user.id;
+      const userEmail = sessionData.user.email;
+
+      // Get user profile to check if they're new
+      const { data: userData } = await supabase
+        .from("users")
+        .select("id, first_name, created_at, welcome_email_sent")
+        .eq("id", userId)
+        .single();
+
+      // Send welcome email if user exists and hasn't received one yet
+      if (userData && userEmail && !userData.welcome_email_sent) {
+        const firstName = userData.first_name || userEmail.split("@")[0];
+
+        // Send welcome email (fire and forget - don't block redirect)
+        sendWelcomeEmail({
+          to: userEmail,
+          firstName,
+        })
+          .then(async (result) => {
+            if (result.success) {
+              // Mark that we've sent the welcome email
+              await supabase.from("users").update({ welcome_email_sent: true }).eq("id", userId);
+            }
+          })
+          .catch((err) => {
+            console.error("Failed to send welcome email:", err);
+          });
+      }
     }
   }
 
