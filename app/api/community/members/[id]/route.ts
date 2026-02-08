@@ -17,10 +17,7 @@ interface MembershipWithCohort {
 }
 
 // GET: Fetch a specific member's profile
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const supabase = createClient();
     const {

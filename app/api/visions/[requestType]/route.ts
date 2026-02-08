@@ -294,7 +294,9 @@ const upsertVision = async ({
 const getUserVisions = async ({
   userId,
   sessionId,
-}: Partial<UserVisionRequestDataTypes>): Promise<FetcherErrorResponse | Record<string, unknown>[]> => {
+}: Partial<UserVisionRequestDataTypes>): Promise<
+  FetcherErrorResponse | Record<string, unknown>[]
+> => {
   const supabase = createClient();
 
   try {

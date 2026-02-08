@@ -165,7 +165,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { postType, title, content, mediaUrls, visibility, linkedJournalId, linkedBadgeId } = body;
+    const { postType, title, content, mediaUrls, visibility, linkedJournalId, linkedBadgeId } =
+      body;
 
     if (!content || content.trim().length === 0) {
       return NextResponse.json({ error: "Content is required" }, { status: 400 });

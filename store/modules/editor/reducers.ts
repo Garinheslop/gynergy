@@ -85,9 +85,13 @@ const slice = createSlice({
   },
 });
 
+// EditorFormData uses `any` intentionally for dynamic form field validation across
+// multiple journal types (morning, evening, weekly, visions) with varying field shapes
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+type EditorFormData = Record<string, any> & { isEulogy?: boolean; isJourneyTable?: boolean };
+
 const checkForEmptyField = (
-  editorData: Record<string, any> & { isEulogy?: boolean; isJourneyTable?: boolean },
+  editorData: EditorFormData,
   editorType: (typeof editorTypes)[keyof typeof editorTypes]
 ) => {
   if (!editorData) return false;

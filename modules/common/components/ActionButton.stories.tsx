@@ -198,19 +198,19 @@ export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">Default (Primary CTA)</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">Default (Primary CTA)</p>
         <ActionButton label="Get Started" buttonActionType={buttonActionTypes.default} />
       </div>
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">Outlined (Secondary)</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">Outlined (Secondary)</p>
         <ActionButton label="Cancel" buttonActionType={buttonActionTypes.outlined} />
       </div>
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">Text (Tertiary)</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">Text (Tertiary)</p>
         <ActionButton label="Learn More" buttonActionType={buttonActionTypes.text} />
       </div>
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">Checkbox</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">Checkbox</p>
         <ActionButton
           label="Accept terms"
           buttonActionType={buttonActionTypes.check}
@@ -218,7 +218,7 @@ export const AllVariants: Story = {
         />
       </div>
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">Slider Toggle</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">Slider Toggle</p>
         <ActionButton
           label="Notifications"
           buttonActionType={buttonActionTypes.slider}

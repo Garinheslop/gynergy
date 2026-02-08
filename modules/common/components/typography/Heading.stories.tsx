@@ -101,31 +101,29 @@ export const TypographyScale: Story = {
   render: () => (
     <div className="flex flex-col gap-8">
       <div>
-        <p className="mb-2 text-xs uppercase tracking-wide text-grey-500">
-          Heading (h1) - 48px
-        </p>
+        <p className="text-grey-500 mb-2 text-xs tracking-wide uppercase">Heading (h1) - 48px</p>
         <Heading variant={headingVariants.heading}>Welcome to Gynergy</Heading>
       </div>
       <div>
-        <p className="mb-2 text-xs uppercase tracking-wide text-grey-500">
+        <p className="text-grey-500 mb-2 text-xs tracking-wide uppercase">
           Section Heading (h2) - 48px
         </p>
         <Heading variant={headingVariants.sectionHeading}>Your Journey Begins</Heading>
       </div>
       <div>
-        <p className="mb-2 text-xs uppercase tracking-wide text-grey-500">
+        <p className="text-grey-500 mb-2 text-xs tracking-wide uppercase">
           Title Large (h2) - 36px
         </p>
         <Heading variant={headingVariants.titleLg}>Daily Practices</Heading>
       </div>
       <div>
-        <p className="mb-2 text-xs uppercase tracking-wide text-grey-500">
+        <p className="text-grey-500 mb-2 text-xs tracking-wide uppercase">
           Card Heading (h3) - 30px
         </p>
         <Heading variant={headingVariants.cardHeading}>Today's Focus</Heading>
       </div>
       <div>
-        <p className="mb-2 text-xs uppercase tracking-wide text-grey-500">Title (h3) - 24px</p>
+        <p className="text-grey-500 mb-2 text-xs tracking-wide uppercase">Title (h3) - 24px</p>
         <Heading variant={headingVariants.title}>Gratitude Entry</Heading>
       </div>
     </div>
@@ -135,20 +133,20 @@ export const TypographyScale: Story = {
 // In Context
 export const InContext: Story = {
   render: () => (
-    <div className="space-y-6 rounded border border-border-dark bg-bkg-dark-secondary p-6">
+    <div className="border-border-dark bg-bkg-dark-secondary space-y-6 rounded border p-6">
       <Heading variant={headingVariants.cardHeading}>Day 15 Progress</Heading>
       <div className="space-y-4">
         <div>
           <Heading variant={headingVariants.title} sx="text-action">
             Morning Routine
           </Heading>
-          <p className="mt-1 text-grey-400">Completed meditation and journaling</p>
+          <p className="text-grey-400 mt-1">Completed meditation and journaling</p>
         </div>
         <div>
           <Heading variant={headingVariants.title} sx="text-primary">
             Evening Reflection
           </Heading>
-          <p className="mt-1 text-grey-400">Gratitude practice pending</p>
+          <p className="text-grey-400 mt-1">Gratitude practice pending</p>
         </div>
       </div>
     </div>

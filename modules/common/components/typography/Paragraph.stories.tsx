@@ -102,26 +102,26 @@ export const TypographyScale: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="mb-2 text-xs uppercase tracking-wide text-grey-500">Title XL - 48px</p>
+        <p className="text-grey-500 mb-2 text-xs tracking-wide uppercase">Title XL - 48px</p>
         <Paragraph variant={paragraphVariants.titleXlg} content="Hero Statement" />
       </div>
       <div>
-        <p className="mb-2 text-xs uppercase tracking-wide text-grey-500">Title Large - 30px</p>
+        <p className="text-grey-500 mb-2 text-xs tracking-wide uppercase">Title Large - 30px</p>
         <Paragraph variant={paragraphVariants.titleLg} content="Section Introduction" />
       </div>
       <div>
-        <p className="mb-2 text-xs uppercase tracking-wide text-grey-500">Title - 24px</p>
+        <p className="text-grey-500 mb-2 text-xs tracking-wide uppercase">Title - 24px</p>
         <Paragraph variant={paragraphVariants.title} content="Card Title Text" />
       </div>
       <div>
-        <p className="mb-2 text-xs uppercase tracking-wide text-grey-500">Regular - 18px</p>
+        <p className="text-grey-500 mb-2 text-xs tracking-wide uppercase">Regular - 18px</p>
         <Paragraph
           variant={paragraphVariants.regular}
           content="Body text for longer content like descriptions, instructions, and general information."
         />
       </div>
       <div>
-        <p className="mb-2 text-xs uppercase tracking-wide text-grey-500">Meta - 16px</p>
+        <p className="text-grey-500 mb-2 text-xs tracking-wide uppercase">Meta - 16px</p>
         <Paragraph
           variant={paragraphVariants.meta}
           content="Smaller text for timestamps, labels, and secondary information."
@@ -168,7 +168,7 @@ export const ColorVariants: Story = {
 // In Context - Card
 export const InContext: Story = {
   render: () => (
-    <div className="space-y-3 rounded border border-border-dark bg-bkg-dark-secondary p-6">
+    <div className="border-border-dark bg-bkg-dark-secondary space-y-3 rounded border p-6">
       <Paragraph variant={paragraphVariants.title} content="Morning Meditation" sx="font-bold" />
       <Paragraph
         variant={paragraphVariants.regular}
@@ -176,11 +176,7 @@ export const InContext: Story = {
       />
       <div className="flex items-center gap-4">
         <Paragraph variant={paragraphVariants.meta} content="Duration: 10 min" sx="text-grey-500" />
-        <Paragraph
-          variant={paragraphVariants.meta}
-          content="Level: Beginner"
-          sx="text-action"
-        />
+        <Paragraph variant={paragraphVariants.meta} content="Level: Beginner" sx="text-action" />
       </div>
     </div>
   ),

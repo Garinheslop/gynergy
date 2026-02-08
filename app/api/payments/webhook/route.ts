@@ -4,7 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import Stripe from "stripe";
 
-import { verifyWebhookSignature } from "@lib/stripe";
+import { sendPurchaseConfirmationEmail } from "@lib/email";
+import { verifyWebhookSignature, formatPrice, STRIPE_PRODUCTS } from "@lib/stripe";
 import { createServiceClient } from "@lib/supabase-server";
 
 // ============================================================================
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        // Unhandled event type - no action needed
+      // Unhandled event type - no action needed
     }
 
     return NextResponse.json({ received: true });
@@ -132,6 +133,46 @@ async function handleCheckoutCompleted(
     // If user exists, the database trigger will automatically:
     // 1. Create 2 friend codes
     // 2. Grant challenge access via user_entitlements
+
+    // Send purchase confirmation email
+    if (session.customer_email) {
+      // Get user's first name if available
+      let firstName = "Friend";
+      if (userId) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("first_name")
+          .eq("id", userId)
+          .single();
+        if (profile?.first_name) {
+          firstName = profile.first_name;
+        }
+      }
+
+      // Get friend codes for this user (created by the database trigger)
+      let friendCodes: string[] = [];
+      if (userId) {
+        const { data: codes } = await supabase
+          .from("friend_codes")
+          .select("code")
+          .eq("owner_id", userId)
+          .eq("is_used", false);
+        if (codes) {
+          friendCodes = codes.map((c) => c.code);
+        }
+      }
+
+      // Send confirmation email (non-blocking)
+      sendPurchaseConfirmationEmail({
+        to: session.customer_email,
+        firstName,
+        productName: STRIPE_PRODUCTS.CHALLENGE.name,
+        amount: formatPrice(session.amount_total || STRIPE_PRODUCTS.CHALLENGE.amount),
+        friendCodes,
+      }).catch((err) => {
+        console.error("Failed to send purchase confirmation email:", err);
+      });
+    }
   } else if (productType === "journal_subscription") {
     // Subscription is handled by invoice.paid event
   }

@@ -27,7 +27,10 @@ export const dispatchOnSuccessAction = (
     case successReducerTypes.journalCreated:
     case successReducerTypes.actionLogCreated:
     case successReducerTypes.visionCreated: {
-      const actionPayload = payload as { action?: { isCompleted?: boolean }; journal?: { isCompleted?: boolean } };
+      const actionPayload = payload as {
+        action?: { isCompleted?: boolean };
+        journal?: { isCompleted?: boolean };
+      };
       dispatch(
         editorContentCreated({
           isCompleted: actionPayload?.action?.isCompleted ?? actionPayload?.journal?.isCompleted,

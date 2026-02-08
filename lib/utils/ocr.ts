@@ -1,5 +1,6 @@
 "use server";
 import OpenAI from "openai";
+import type { ChatCompletionContentPartImage } from "openai/resources/chat/completions";
 
 import journalSchemas from "@resources/ocr/journalSchemas";
 import { journalTypes } from "@resources/types/journal";
@@ -45,13 +46,10 @@ export async function OcrWithVision({
       ocrSchemaStr = JSON.stringify(journalSchemas.visionsDiscovery);
     }
 
-    const imgArr = images.map(
-      (img) =>
-        ({
-          type: "image_url",
-          image_url: { url: img },
-        }) as any
-    );
+    const imgArr: ChatCompletionContentPartImage[] = images.map((img) => ({
+      type: "image_url",
+      image_url: { url: img },
+    }));
 
     const { choices } = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -78,9 +76,8 @@ export async function OcrWithVision({
     if (start === -1 || end === -1) throw new Error("Invalid JSON format");
 
     return { journal: JSON.parse(content.slice(start, end + 1)) };
-  } catch (err: any) {
-    console.log("ocr errror", err);
-
-    return { error: err.message };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown OCR error";
+    return { error: message };
   }
 }

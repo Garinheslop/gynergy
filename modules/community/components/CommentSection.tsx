@@ -7,11 +7,7 @@ import Image from "next/image";
 import { Comment } from "@resources/types/community";
 import { RootState } from "@store/configureStore";
 import { useSelector, useDispatch } from "@store/hooks";
-import {
-  fetchComments,
-  createComment,
-  deleteComment,
-} from "@store/modules/community";
+import { fetchComments, createComment, deleteComment } from "@store/modules/community";
 
 interface CommentSectionProps {
   postId: string;
@@ -97,10 +93,10 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
   }
 
   return (
-    <div className="mt-4 border-t border-border-dark pt-4">
+    <div className="border-border-dark mt-4 border-t pt-4">
       {/* Comment Input */}
-      <div className="flex gap-3 mb-4">
-        <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-bkg-dark-800">
+      <div className="mb-4 flex gap-3">
+        <div className="bg-bkg-dark-800 relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-full">
           {profile?.profileImage ? (
             <Image
               src={profile.profileImage}
@@ -109,7 +105,7 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
               className="object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-action-400 to-action-600 text-xs font-semibold text-content-dark">
+            <div className="from-action-400 to-action-600 text-content-dark flex h-full w-full items-center justify-center bg-gradient-to-br text-xs font-semibold">
               {profile?.firstName?.[0] || "Y"}
             </div>
           )}
@@ -122,7 +118,7 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
             placeholder="Write a comment..."
             rows={1}
             aria-label="Write a comment"
-            className="w-full resize-none rounded border border-border-dark bg-bkg-dark px-3 py-2 text-sm text-content-light placeholder:text-grey-600 focus:border-action focus:outline-none focus:ring-1 focus:ring-action"
+            className="border-border-dark bg-bkg-dark text-content-light placeholder:text-grey-600 focus:border-action focus:ring-action w-full resize-none rounded border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -135,7 +131,7 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
               <button
                 onClick={handleSubmitComment}
                 disabled={isSubmitting}
-                className="min-h-[32px] rounded bg-action px-3 py-1 text-sm font-medium text-content-dark transition-colors hover:bg-action-100 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action"
+                className="bg-action text-content-dark hover:bg-action-100 focus-visible:ring-action min-h-[32px] rounded px-3 py-1 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
               >
                 {isSubmitting ? "Posting..." : "Post"}
               </button>
@@ -148,11 +144,11 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
       {isLoading && comments.length === 0 && (
         <div className="space-y-3">
           {[1, 2].map((i) => (
-            <div key={i} className="flex gap-3 animate-pulse">
-              <div className="h-8 w-8 rounded-full bg-bkg-dark-800" />
+            <div key={i} className="flex animate-pulse gap-3">
+              <div className="bg-bkg-dark-800 h-8 w-8 rounded-full" />
               <div className="flex-1 space-y-2">
-                <div className="h-3 w-24 rounded bg-bkg-dark-800" />
-                <div className="h-4 w-full rounded bg-bkg-dark-800" />
+                <div className="bg-bkg-dark-800 h-3 w-24 rounded" />
+                <div className="bg-bkg-dark-800 h-4 w-full rounded" />
               </div>
             </div>
           ))}
@@ -161,7 +157,7 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
 
       {/* Comments List */}
       {!isLoading && comments.length === 0 && (
-        <p className="text-center text-sm text-grey-500 py-4">
+        <p className="text-grey-500 py-4 text-center text-sm">
           No comments yet. Be the first to comment!
         </p>
       )}
@@ -228,7 +224,7 @@ const CommentItem: FC<CommentItemProps> = ({
     <div className="group">
       <div className="flex gap-3">
         {/* Avatar */}
-        <div className="relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-bkg-dark-800">
+        <div className="bg-bkg-dark-800 relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-full">
           {comment.author?.profileImage ? (
             <Image
               src={comment.author.profileImage}
@@ -237,22 +233,22 @@ const CommentItem: FC<CommentItemProps> = ({
               className="object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-action-400 to-action-600 text-xs font-semibold text-content-dark">
+            <div className="from-action-400 to-action-600 text-content-dark flex h-full w-full items-center justify-center bg-gradient-to-br text-xs font-semibold">
               {comment.author?.firstName?.[0] || "?"}
             </div>
           )}
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="rounded bg-bkg-dark-800 px-3 py-2">
+        <div className="min-w-0 flex-1">
+          <div className="bg-bkg-dark-800 rounded px-3 py-2">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-content-light">
+              <span className="text-content-light text-sm font-semibold">
                 {comment.author?.firstName} {comment.author?.lastName}
               </span>
-              <span className="text-xs text-grey-500">{formatDate(comment.createdAt)}</span>
+              <span className="text-grey-500 text-xs">{formatDate(comment.createdAt)}</span>
             </div>
-            <p className="mt-1 text-sm text-grey-300 whitespace-pre-wrap break-words">
+            <p className="text-grey-300 mt-1 text-sm break-words whitespace-pre-wrap">
               {comment.content}
             </p>
           </div>
@@ -261,14 +257,14 @@ const CommentItem: FC<CommentItemProps> = ({
           <div className="mt-1 flex items-center gap-4">
             <button
               onClick={() => onReply(comment.id)}
-              className="text-xs font-medium text-grey-500 hover:text-action focus-visible:outline-none focus-visible:text-action"
+              className="text-grey-500 hover:text-action focus-visible:text-action text-xs font-medium focus-visible:outline-none"
             >
               Reply
             </button>
             {isOwner && (
               <button
                 onClick={() => onDelete(comment.id)}
-                className="text-xs font-medium text-grey-500 hover:text-danger focus-visible:outline-none focus-visible:text-danger"
+                className="text-grey-500 hover:text-danger focus-visible:text-danger text-xs font-medium focus-visible:outline-none"
               >
                 Delete
               </button>
@@ -285,7 +281,7 @@ const CommentItem: FC<CommentItemProps> = ({
                 placeholder={`Reply to ${comment.author?.firstName}...`}
                 rows={1}
                 aria-label={`Reply to ${comment.author?.firstName}`}
-                className="flex-1 resize-none rounded border border-border-dark bg-bkg-dark px-3 py-2 text-sm text-content-light placeholder:text-grey-600 focus:border-action focus:outline-none focus:ring-1 focus:ring-action"
+                className="border-border-dark bg-bkg-dark text-content-light placeholder:text-grey-600 focus:border-action focus:ring-action flex-1 resize-none rounded border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -299,7 +295,7 @@ const CommentItem: FC<CommentItemProps> = ({
               <button
                 onClick={() => onSubmitReply(comment.id)}
                 disabled={isSubmitting || !replyContent.trim()}
-                className="min-h-[32px] rounded bg-action px-3 py-1 text-sm font-medium text-content-dark transition-colors hover:bg-action-100 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action"
+                className="bg-action text-content-dark hover:bg-action-100 focus-visible:ring-action min-h-[32px] rounded px-3 py-1 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
               >
                 Reply
               </button>
@@ -308,10 +304,10 @@ const CommentItem: FC<CommentItemProps> = ({
 
           {/* Nested Replies */}
           {comment.replies && comment.replies.length > 0 && (
-            <div className="mt-3 space-y-3 pl-4 border-l-2 border-border-dark">
+            <div className="border-border-dark mt-3 space-y-3 border-l-2 pl-4">
               {comment.replies.map((reply) => (
                 <div key={reply.id} className="flex gap-2">
-                  <div className="relative h-6 w-6 flex-shrink-0 overflow-hidden rounded-full bg-bkg-dark-800">
+                  <div className="bg-bkg-dark-800 relative h-6 w-6 flex-shrink-0 overflow-hidden rounded-full">
                     {reply.author?.profileImage ? (
                       <Image
                         src={reply.author.profileImage}
@@ -320,27 +316,27 @@ const CommentItem: FC<CommentItemProps> = ({
                         className="object-cover"
                       />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-action-400 to-action-600 text-[10px] font-semibold text-content-dark">
+                      <div className="from-action-400 to-action-600 text-content-dark flex h-full w-full items-center justify-center bg-gradient-to-br text-[10px] font-semibold">
                         {reply.author?.firstName?.[0] || "?"}
                       </div>
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="rounded bg-bkg-dark-800 px-3 py-2">
+                  <div className="min-w-0 flex-1">
+                    <div className="bg-bkg-dark-800 rounded px-3 py-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-content-light">
+                        <span className="text-content-light text-xs font-semibold">
                           {reply.author?.firstName} {reply.author?.lastName}
                         </span>
-                        <span className="text-xs text-grey-500">{formatDate(reply.createdAt)}</span>
+                        <span className="text-grey-500 text-xs">{formatDate(reply.createdAt)}</span>
                       </div>
-                      <p className="mt-1 text-xs text-grey-300 whitespace-pre-wrap break-words">
+                      <p className="text-grey-300 mt-1 text-xs break-words whitespace-pre-wrap">
                         {reply.content}
                       </p>
                     </div>
                     {currentUserId === reply.userId && (
                       <button
                         onClick={() => onDelete(reply.id)}
-                        className="mt-1 text-xs font-medium text-grey-500 hover:text-danger focus-visible:outline-none focus-visible:text-danger"
+                        className="text-grey-500 hover:text-danger focus-visible:text-danger mt-1 text-xs font-medium focus-visible:outline-none"
                       >
                         Delete
                       </button>

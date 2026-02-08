@@ -12,13 +12,18 @@ import {
   type ColumnDef,
   type SortingState,
   type ColumnFiltersState,
+  type Table,
+  type Row,
+  type HeaderGroup,
+  type Header,
+  type Cell,
 } from "@tanstack/react-table";
 
 import { cn } from "@lib/utils/style";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 interface DataTableProps<T> {
   data: T[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Column value types vary (string, number, boolean, etc.)
   columns: ColumnDef<T, any>[];
   searchPlaceholder?: string;
   searchKey?: string;
@@ -52,10 +57,9 @@ export default function DataTable<T extends { id: string }>({
   const tableColumns = useMemo(() => {
     if (!bulkActions?.length) return columns;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const selectionColumn: ColumnDef<T, any> = {
+    const selectionColumn: ColumnDef<T, unknown> = {
       id: "select",
-      header: ({ table }) => (
+      header: ({ table }: { table: Table<T> }) => (
         <input
           type="checkbox"
           checked={table.getIsAllPageRowsSelected()}
@@ -63,7 +67,7 @@ export default function DataTable<T extends { id: string }>({
           className="border-grey-600 bg-grey-800 text-action-500 focus:ring-action-500 h-4 w-4 rounded"
         />
       ),
-      cell: ({ row }) => (
+      cell: ({ row }: { row: Row<T> }) => (
         <input
           type="checkbox"
           checked={row.getIsSelected()}
@@ -102,7 +106,7 @@ export default function DataTable<T extends { id: string }>({
     enableRowSelection: !!bulkActions?.length,
   });
 
-  const selectedRows = table.getSelectedRowModel().rows.map((r) => r.original);
+  const selectedRows = table.getSelectedRowModel().rows.map((r: Row<T>) => r.original);
 
   return (
     <div className="border-grey-800 bg-grey-900 rounded-xl border">
@@ -147,9 +151,9 @@ export default function DataTable<T extends { id: string }>({
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map((headerGroup: HeaderGroup<T>) => (
               <tr key={headerGroup.id} className="border-grey-800 border-b">
-                {headerGroup.headers.map((header) => (
+                {headerGroup.headers.map((header: Header<T, unknown>) => (
                   <th
                     key={header.id}
                     className={cn(
@@ -194,7 +198,7 @@ export default function DataTable<T extends { id: string }>({
                 </td>
               </tr>
             ) : (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row: Row<T>) => (
                 <tr
                   key={row.id}
                   onClick={() => onRowClick?.(row.original)}
@@ -204,7 +208,7 @@ export default function DataTable<T extends { id: string }>({
                     row.getIsSelected() && "bg-action-900/30"
                   )}
                 >
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map((cell: Cell<T, unknown>) => (
                     <td key={cell.id} className="text-grey-300 px-4 py-3 text-sm">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>

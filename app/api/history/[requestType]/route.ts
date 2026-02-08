@@ -248,7 +248,9 @@ const getUserWeeklyHistory = async ({
   historyType,
   entryDate,
   userTimezone,
-}: UserWeeklyHistoryArgs): Promise<FetcherErrorResponse | Record<string, unknown>[] | undefined> => {
+}: UserWeeklyHistoryArgs): Promise<
+  FetcherErrorResponse | Record<string, unknown>[] | undefined
+> => {
   const supabase = createClient();
   const supabaseAdmin = createServiceClient();
   try {

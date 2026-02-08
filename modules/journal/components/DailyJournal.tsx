@@ -40,19 +40,25 @@ const DailyJournal = ({ day }: { day: number }) => {
 
   useEffect(() => {
     const morning = histories.current.entries.find(
-      (journal) => (journal as MorningJournalData & { journalType?: string })?.journalType === journalTypes.morningJournal
+      (journal) =>
+        (journal as MorningJournalData & { journalType?: string })?.journalType ===
+        journalTypes.morningJournal
     );
-    setMorningData(morning as (MorningJournalData & { entries: any[] }) | null ?? null);
+    setMorningData((morning as (MorningJournalData & { entries: any[] }) | null) ?? null);
 
     const evening = histories.current.entries.find(
-      (journal) => (journal as EveningJournalData & { journalType?: string })?.journalType === journalTypes.eveningJournal
+      (journal) =>
+        (journal as EveningJournalData & { journalType?: string })?.journalType ===
+        journalTypes.eveningJournal
     );
-    setEveningData(evening as (EveningJournalData & { entries: any[] }) | null ?? null);
+    setEveningData((evening as (EveningJournalData & { entries: any[] }) | null) ?? null);
 
     const action = histories.current.entries.find(
-      (journal) => (journal as ActionLogData & { actionType?: string })?.actionType === journalTypes.gratitudeAction
+      (journal) =>
+        (journal as ActionLogData & { actionType?: string })?.actionType ===
+        journalTypes.gratitudeAction
     );
-    setActionData(action as (ActionLogData & { action: any }) | null ?? null);
+    setActionData((action as (ActionLogData & { action: any }) | null) ?? null);
   }, [histories.current]);
   useEffect(() => {
     if (histories.current?.entryDate && !histories.loading && userEnrollment?.session?.id) {

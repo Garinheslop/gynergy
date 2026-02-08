@@ -158,19 +158,19 @@ export const AllStates: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">Default</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">Default</p>
         <Input value="" inputPlaceholder="Enter text..." />
       </div>
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">With Label</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">With Label</p>
         <Input label="Full Name" value="" inputPlaceholder="Jane Doe" />
       </div>
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">Password</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">Password</p>
         <Input label="Password" value="secret" type="password" inputPlaceholder="••••••••" />
       </div>
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">Error State</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">Error State</p>
         <Input
           label="Email"
           value="invalid"
@@ -179,7 +179,7 @@ export const AllStates: Story = {
         />
       </div>
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">Disabled</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">Disabled</p>
         <Input label="Disabled" value="Cannot edit" inputPlaceholder="..." disabled />
       </div>
     </div>

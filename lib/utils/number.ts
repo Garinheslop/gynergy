@@ -1,4 +1,4 @@
-const numbersToWords: any = {
+const numbersToWords: Record<number, string> = {
   0: "zero",
   1: "one",
   2: "two",

@@ -5,7 +5,13 @@ import {
   ThunkAction,
   ThunkDispatch,
 } from "@reduxjs/toolkit";
-import { persistReducer, persistStore, PersistConfig, createMigrate } from "redux-persist";
+import {
+  persistReducer,
+  persistStore,
+  PersistConfig,
+  createMigrate,
+  PersistedState,
+} from "redux-persist";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 
 import storage from "./storage";
@@ -19,16 +25,21 @@ import { streakDefaultStates } from "./modules/enrollment/reducers";
 export type RootState = ReturnType<typeof reducer>;
 
 const migrations = {
-  0: (state: any) => {
+  0: (state: PersistedState) => {
+    if (!state) return state;
+    const enrollments = (state as Record<string, unknown>).enrollments as
+      | Record<string, unknown>
+      | undefined;
     return {
       ...state,
       enrollments: {
-        ...state.enrollments,
+        ...enrollments,
         streak: streakDefaultStates,
       },
     };
   },
-  1: (state: any) => {
+  1: (state: PersistedState) => {
+    if (!state) return state;
     // Migration v1: Add gamification, cohort, and notifications modules
     return {
       ...state,

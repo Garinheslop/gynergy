@@ -17,62 +17,62 @@
 
 ### Primary Palette
 
-| Token | Value | CSS Variable | Usage |
-|-------|-------|--------------|-------|
-| **Action (Teal)** | `#99f6e0` | `--color-action` | Primary CTAs, interactive elements, links |
-| **Primary (Orange)** | `#ffc878` | `--color-primary` | Highlights, achievements, streaks |
-| **Purple** | `#a86cff` | `--color-purple` | Badges, accents, admin roles |
+| Token                | Value     | CSS Variable      | Usage                                     |
+| -------------------- | --------- | ----------------- | ----------------------------------------- |
+| **Action (Teal)**    | `#99f6e0` | `--color-action`  | Primary CTAs, interactive elements, links |
+| **Primary (Orange)** | `#ffc878` | `--color-primary` | Highlights, achievements, streaks         |
+| **Purple**           | `#a86cff` | `--color-purple`  | Badges, accents, admin roles              |
 
 ### Action Color Scale
 
 ```css
---color-action-25: #f1fefa;   /* Lightest - backgrounds */
+--color-action-25: #f1fefa; /* Lightest - backgrounds */
 --color-action-50: #d8fcf2;
 --color-action-100: #9af6e1;
 --color-action-200: #6eecd0;
 --color-action-300: #41d9bb;
 --color-action-400: #1ec2a3;
---color-action-500: #07a78a;   /* Default interactive */
+--color-action-500: #07a78a; /* Default interactive */
 --color-action-600: #008572;
 --color-action-700: #006b5e;
 --color-action-800: #00544c;
 --color-action-900: #00453f;
---color-action-950: #002824;   /* Darkest */
+--color-action-950: #002824; /* Darkest */
 ```
 
 ### Semantic Colors
 
-| Token | Value | Usage |
-|-------|-------|-------|
+| Token   | Value     | Usage                               |
+| ------- | --------- | ----------------------------------- |
 | Success | `#7ef698` | Positive feedback, completed states |
-| Danger | `#fd6a6a` | Errors, destructive actions |
-| Warning | `#f69859` | Caution states, alerts |
+| Danger  | `#fd6a6a` | Errors, destructive actions         |
+| Warning | `#f69859` | Caution states, alerts              |
 
 ### Background Colors
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `bkg-dark` | `#131313` | Primary dark background |
-| `bkg-dark-secondary` | `#27282a` | Card backgrounds, elevated surfaces |
-| `bkg-dark-tertiary` | `#000000` | Deepest backgrounds |
-| `bkg-light` | `#ffffff` | Light mode primary |
-| `bkg-light-secondary` | `#f5f5f5` | Light mode cards |
+| Token                 | Value     | Usage                               |
+| --------------------- | --------- | ----------------------------------- |
+| `bkg-dark`            | `#131313` | Primary dark background             |
+| `bkg-dark-secondary`  | `#27282a` | Card backgrounds, elevated surfaces |
+| `bkg-dark-tertiary`   | `#000000` | Deepest backgrounds                 |
+| `bkg-light`           | `#ffffff` | Light mode primary                  |
+| `bkg-light-secondary` | `#f5f5f5` | Light mode cards                    |
 
 ### Content Colors
 
-| Token | Usage |
-|-------|-------|
-| `content-dark` | Primary text on light backgrounds |
-| `content-light` | Primary text on dark backgrounds |
-| `grey-400` | Secondary text |
-| `grey-500` | Muted text, placeholders |
-| `grey-600` | Disabled states |
+| Token           | Usage                             |
+| --------------- | --------------------------------- |
+| `content-dark`  | Primary text on light backgrounds |
+| `content-light` | Primary text on dark backgrounds  |
+| `grey-400`      | Secondary text                    |
+| `grey-500`      | Muted text, placeholders          |
+| `grey-600`      | Disabled states                   |
 
 ### Border Colors
 
-| Token | Usage |
-|-------|-------|
-| `border-dark` | Borders on dark backgrounds |
+| Token          | Usage                        |
+| -------------- | ---------------------------- |
+| `border-dark`  | Borders on dark backgrounds  |
 | `border-light` | Borders on light backgrounds |
 
 ---
@@ -91,23 +91,23 @@ font-family: "Work Sans", system-ui, sans-serif;
 
 #### Headings
 
-| Variant | Size | Weight | Element | Usage |
-|---------|------|--------|---------|-------|
-| `heading` | 48px | Bold | `<h1>` | Page titles |
-| `section-heading` | 48px | Bold | `<h2>` | Section headers |
-| `title-lg` | 36px | Semibold | `<h2>` | Large card titles |
-| `card-heading` | 30px | Semibold | `<h3>` | Card headers |
-| `title` | 24px | Semibold | `<h3>` | Small headings |
+| Variant           | Size | Weight   | Element | Usage             |
+| ----------------- | ---- | -------- | ------- | ----------------- |
+| `heading`         | 48px | Bold     | `<h1>`  | Page titles       |
+| `section-heading` | 48px | Bold     | `<h2>`  | Section headers   |
+| `title-lg`        | 36px | Semibold | `<h2>`  | Large card titles |
+| `card-heading`    | 30px | Semibold | `<h3>`  | Card headers      |
+| `title`           | 24px | Semibold | `<h3>`  | Small headings    |
 
 #### Paragraphs
 
-| Variant | Size | Usage |
-|---------|------|-------|
-| `title-xlg` | 48px | Hero statements |
-| `title-lg` | 30px | Section intros |
-| `title` | 24px | Card titles |
-| `regular` | 18px | Body text (default) |
-| `meta` | 16px | Timestamps, labels, secondary info |
+| Variant     | Size | Usage                              |
+| ----------- | ---- | ---------------------------------- |
+| `title-xlg` | 48px | Hero statements                    |
+| `title-lg`  | 30px | Section intros                     |
+| `title`     | 24px | Card titles                        |
+| `regular`   | 18px | Body text (default)                |
+| `meta`      | 16px | Timestamps, labels, secondary info |
 
 ### Usage Example
 
@@ -135,24 +135,24 @@ import { headingVariants, paragraphVariants } from "@resources/variants";
 
 ### Border Radius
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `rounded-sm` | 5px | Small elements, badges |
-| `rounded` | 10px | Cards, buttons, inputs |
-| `rounded-large` | 20px | Large cards, modals |
-| `rounded-full` | 9999px | Avatars, pills |
+| Token           | Value  | Usage                  |
+| --------------- | ------ | ---------------------- |
+| `rounded-sm`    | 5px    | Small elements, badges |
+| `rounded`       | 10px   | Cards, buttons, inputs |
+| `rounded-large` | 20px   | Large cards, modals    |
+| `rounded-full`  | 9999px | Avatars, pills         |
 
 ### Breakpoints
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `xsm` | 450px | Small mobile |
-| `sm` | 640px | Mobile |
-| `md` | 768px | Tablet |
-| `lg` | 1024px | Desktop |
-| `xl` | 1280px | Large desktop |
-| `2xl` | 1400px | Wide screens |
-| `3xl` | 1600px | Ultra-wide |
+| Token | Value  | Usage         |
+| ----- | ------ | ------------- |
+| `xsm` | 450px  | Small mobile  |
+| `sm`  | 640px  | Mobile        |
+| `md`  | 768px  | Tablet        |
+| `lg`  | 1024px | Desktop       |
+| `xl`  | 1280px | Large desktop |
+| `2xl` | 1400px | Wide screens  |
+| `3xl` | 1600px | Ultra-wide    |
 
 ### Touch Targets
 
@@ -166,26 +166,26 @@ import { headingVariants, paragraphVariants } from "@resources/variants";
 
 ### Interactive Components
 
-| Component | Import | Description |
-|-----------|--------|-------------|
-| `ActionButton` | `@modules/common/components/ActionButton` | Primary button with variants |
-| `Input` | `@modules/common/components/Input` | Text input with labels/errors |
-| `TextArea` | `@modules/common/components/TextArea` | Multi-line input |
+| Component      | Import                                    | Description                   |
+| -------------- | ----------------------------------------- | ----------------------------- |
+| `ActionButton` | `@modules/common/components/ActionButton` | Primary button with variants  |
+| `Input`        | `@modules/common/components/Input`        | Text input with labels/errors |
+| `TextArea`     | `@modules/common/components/TextArea`     | Multi-line input              |
 
 ### Typography Components
 
-| Component | Import | Description |
-|-----------|--------|-------------|
-| `Heading` | `@modules/common/components/typography/Heading` | Semantic headings |
-| `Paragraph` | `@modules/common/components/typography/Paragraph` | Body text |
+| Component   | Import                                            | Description       |
+| ----------- | ------------------------------------------------- | ----------------- |
+| `Heading`   | `@modules/common/components/typography/Heading`   | Semantic headings |
+| `Paragraph` | `@modules/common/components/typography/Paragraph` | Body text         |
 
 ### Community Components
 
-| Component | Import | Description |
-|-----------|--------|-------------|
-| `PostCard` | `@modules/community/components/PostCard` | Community feed post |
-| `MemberCard` | `@modules/community/components/MemberCard` | Member profile card |
-| `CommentSection` | `@modules/community/components/CommentSection` | Nested comments |
+| Component        | Import                                         | Description         |
+| ---------------- | ---------------------------------------------- | ------------------- |
+| `PostCard`       | `@modules/community/components/PostCard`       | Community feed post |
+| `MemberCard`     | `@modules/community/components/MemberCard`     | Member profile card |
+| `CommentSection` | `@modules/community/components/CommentSection` | Nested comments     |
 
 ### View in Storybook
 
@@ -206,7 +206,8 @@ Run `npm run storybook` to see interactive examples of all components.
 
 ```tsx
 // Default focus-visible pattern
-className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action focus-visible:ring-offset-2"
+className =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action focus-visible:ring-offset-2";
 ```
 
 ### ARIA Patterns

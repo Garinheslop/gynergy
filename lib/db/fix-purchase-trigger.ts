@@ -101,18 +101,28 @@ async function fixPurchaseTrigger() {
     // 4. Show current state
     console.log("\n--- Current State ---");
 
-    const purchases = await sql`SELECT id, user_id, status, purchase_type, created_at FROM purchases ORDER BY created_at DESC LIMIT 5`;
+    const purchases =
+      await sql`SELECT id, user_id, status, purchase_type, created_at FROM purchases ORDER BY created_at DESC LIMIT 5`;
     console.log("\nRecent purchases:");
-    purchases.forEach((p) => console.log(`  - ${p.id} | user: ${p.user_id} | ${p.status} | ${p.purchase_type}`));
+    purchases.forEach((p) =>
+      console.log(`  - ${p.id} | user: ${p.user_id} | ${p.status} | ${p.purchase_type}`)
+    );
 
-    const friendCodes = await sql`SELECT code, creator_id, used_by_id, created_at FROM friend_codes ORDER BY created_at DESC LIMIT 5`;
+    const friendCodes =
+      await sql`SELECT code, creator_id, used_by_id, created_at FROM friend_codes ORDER BY created_at DESC LIMIT 5`;
     console.log("\nRecent friend codes:");
-    friendCodes.forEach((fc) => console.log(`  - ${fc.code} | creator: ${fc.creator_id} | used: ${fc.used_by_id || 'no'}`));
+    friendCodes.forEach((fc) =>
+      console.log(`  - ${fc.code} | creator: ${fc.creator_id} | used: ${fc.used_by_id || "no"}`)
+    );
 
-    const entitlements = await sql`SELECT user_id, has_challenge_access, challenge_access_type FROM user_entitlements LIMIT 5`;
+    const entitlements =
+      await sql`SELECT user_id, has_challenge_access, challenge_access_type FROM user_entitlements LIMIT 5`;
     console.log("\nUser entitlements:");
-    entitlements.forEach((e) => console.log(`  - user: ${e.user_id} | challenge: ${e.has_challenge_access} (${e.challenge_access_type})`));
-
+    entitlements.forEach((e) =>
+      console.log(
+        `  - user: ${e.user_id} | challenge: ${e.has_challenge_access} (${e.challenge_access_type})`
+      )
+    );
   } catch (error: any) {
     console.error("Error:", error.message);
     process.exit(1);

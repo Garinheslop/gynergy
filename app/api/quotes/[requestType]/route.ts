@@ -78,7 +78,9 @@ const getUserDailtyQuote = async ({
   userId,
   enrollmentId,
   userTimezone,
-}: Partial<GetDailyQuoteRequestDataTypes>): Promise<FetcherErrorResponse | Record<string, unknown>> => {
+}: Partial<GetDailyQuoteRequestDataTypes>): Promise<
+  FetcherErrorResponse | Record<string, unknown>
+> => {
   const supabase = createClient();
   if (!enrollmentId || !userId) {
     return { error: "bad-request" };

@@ -79,7 +79,10 @@ const MemberProfilePage: FC = () => {
         throw new Error(data.error || "Failed to send encouragement");
       }
 
-      messagePopupObj.open({ popupData: `Encouragement sent to ${member.firstName}! 💪`, popupType: "success" });
+      messagePopupObj.open({
+        popupData: `Encouragement sent to ${member.firstName}! 💪`,
+        popupType: "success",
+      });
       triggerHaptic("success");
     } catch (err: any) {
       messagePopupObj.open({ popupData: err.message, popupType: "error" });
@@ -90,21 +93,21 @@ const MemberProfilePage: FC = () => {
 
   if (authenticating || isLoading) {
     return (
-      <div className="min-h-screen bg-bkg-dark">
+      <div className="bg-bkg-dark min-h-screen">
         <div className="mx-auto max-w-4xl px-4 py-8">
           <div className="animate-pulse">
             {/* Header skeleton */}
             <div className="mb-8 flex items-center gap-6">
-              <div className="h-24 w-24 rounded-full bg-bkg-dark-800" />
+              <div className="bg-bkg-dark-800 h-24 w-24 rounded-full" />
               <div className="space-y-3">
-                <div className="h-6 w-48 rounded bg-bkg-dark-800" />
-                <div className="h-4 w-32 rounded bg-bkg-dark-800" />
+                <div className="bg-bkg-dark-800 h-6 w-48 rounded" />
+                <div className="bg-bkg-dark-800 h-4 w-32 rounded" />
               </div>
             </div>
             {/* Stats skeleton */}
-            <div className="grid grid-cols-3 gap-4 mb-8">
+            <div className="mb-8 grid grid-cols-3 gap-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-24 rounded bg-bkg-dark-800" />
+                <div key={i} className="bg-bkg-dark-800 h-24 rounded" />
               ))}
             </div>
           </div>
@@ -115,14 +118,11 @@ const MemberProfilePage: FC = () => {
 
   if (error || !member) {
     return (
-      <div className="min-h-screen bg-bkg-dark">
+      <div className="bg-bkg-dark min-h-screen">
         <div className="mx-auto max-w-4xl px-4 py-8">
-          <div className="rounded border border-danger/30 bg-danger/10 p-6 text-center">
+          <div className="border-danger/30 bg-danger/10 rounded border p-6 text-center">
             <p className="text-danger">{error || "Member not found"}</p>
-            <Link
-              href="/community"
-              className="mt-4 inline-block text-action hover:text-action-100"
-            >
+            <Link href="/community" className="text-action hover:text-action-100 mt-4 inline-block">
               Back to Community
             </Link>
           </div>
@@ -134,16 +134,21 @@ const MemberProfilePage: FC = () => {
   const isOwnProfile = session?.user?.id === member.id;
 
   return (
-    <div className="min-h-screen bg-bkg-dark">
+    <div className="bg-bkg-dark min-h-screen">
       {/* Back Button */}
-      <div className="border-b border-border-dark bg-bkg-dark-secondary">
+      <div className="border-border-dark bg-bkg-dark-secondary border-b">
         <div className="mx-auto max-w-4xl px-4 py-4">
           <Link
             href="/community"
-            className="inline-flex items-center gap-2 text-grey-400 hover:text-content-light transition-colors"
+            className="text-grey-400 hover:text-content-light inline-flex items-center gap-2 transition-colors"
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Back to Community
           </Link>
@@ -152,9 +157,9 @@ const MemberProfilePage: FC = () => {
 
       <div className="mx-auto max-w-4xl px-4 py-8">
         {/* Profile Header */}
-        <div className="mb-8 flex flex-col sm:flex-row items-center sm:items-start gap-6">
+        <div className="mb-8 flex flex-col items-center gap-6 sm:flex-row sm:items-start">
           {/* Avatar */}
-          <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-full bg-bkg-dark-800">
+          <div className="bg-bkg-dark-800 relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-full">
             {member.profileImage ? (
               <Image
                 src={member.profileImage}
@@ -163,7 +168,7 @@ const MemberProfilePage: FC = () => {
                 className="object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-action-400 to-action-600 text-3xl font-semibold text-content-dark">
+              <div className="from-action-400 to-action-600 text-content-dark flex h-full w-full items-center justify-center bg-gradient-to-br text-3xl font-semibold">
                 {member.firstName?.[0]}
               </div>
             )}
@@ -171,22 +176,30 @@ const MemberProfilePage: FC = () => {
 
           {/* Info */}
           <div className="flex-1 text-center sm:text-left">
-            <h1 className="text-2xl font-bold text-content-light">
+            <h1 className="text-content-light text-2xl font-bold">
               {member.firstName} {member.lastName}
             </h1>
             {member.cohort && (
-              <p className="mt-1 text-grey-400">
+              <p className="text-grey-400 mt-1">
                 Member of <span className="text-action">{member.cohort.name}</span>
               </p>
             )}
-            {member.bio && (
-              <p className="mt-2 text-grey-300">{member.bio}</p>
-            )}
+            {member.bio && <p className="text-grey-300 mt-2">{member.bio}</p>}
             {member.location && (
-              <p className="mt-1 text-sm text-grey-500 flex items-center justify-center sm:justify-start gap-1">
+              <p className="text-grey-500 mt-1 flex items-center justify-center gap-1 text-sm sm:justify-start">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
                 </svg>
                 {member.location}
               </p>
@@ -197,7 +210,7 @@ const MemberProfilePage: FC = () => {
               <button
                 onClick={handleEncourage}
                 disabled={isEncouraging}
-                className="mt-4 min-h-[44px] rounded bg-gradient-to-r from-primary to-primary-500 px-6 py-2 font-medium text-content-dark transition-opacity hover:opacity-90 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action focus-visible:ring-offset-2"
+                className="from-primary to-primary-500 text-content-dark focus-visible:ring-action mt-4 min-h-[44px] rounded bg-gradient-to-r px-6 py-2 font-medium transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:opacity-50"
               >
                 {isEncouraging ? "Sending..." : "💪 Send Encouragement"}
               </button>
@@ -206,62 +219,62 @@ const MemberProfilePage: FC = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {member.showStreak !== false && (
-            <div className="rounded border border-border-dark bg-bkg-dark-secondary p-4 text-center">
+            <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4 text-center">
               <div className="flex items-center justify-center gap-1">
                 <span className="text-xl">🔥</span>
-                <span className="text-2xl font-bold text-primary">{member.streak}</span>
+                <span className="text-primary text-2xl font-bold">{member.streak}</span>
               </div>
-              <p className="text-xs text-grey-500 mt-1">Day Streak</p>
+              <p className="text-grey-500 mt-1 text-xs">Day Streak</p>
             </div>
           )}
           {member.showPoints !== false && (
-            <div className="rounded border border-border-dark bg-bkg-dark-secondary p-4 text-center">
+            <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4 text-center">
               <div className="flex items-center justify-center gap-1">
                 <span className="text-xl">⭐</span>
-                <span className="text-2xl font-bold text-action">{member.points}</span>
+                <span className="text-action text-2xl font-bold">{member.points}</span>
               </div>
-              <p className="text-xs text-grey-500 mt-1">Points</p>
+              <p className="text-grey-500 mt-1 text-xs">Points</p>
             </div>
           )}
           {member.showBadges !== false && (
-            <div className="rounded border border-border-dark bg-bkg-dark-secondary p-4 text-center">
+            <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4 text-center">
               <div className="flex items-center justify-center gap-1">
                 <span className="text-xl">🏅</span>
-                <span className="text-2xl font-bold text-purple">{member.badgesCount}</span>
+                <span className="text-purple text-2xl font-bold">{member.badgesCount}</span>
               </div>
-              <p className="text-xs text-grey-500 mt-1">Badges</p>
+              <p className="text-grey-500 mt-1 text-xs">Badges</p>
             </div>
           )}
-          <div className="rounded border border-border-dark bg-bkg-dark-secondary p-4 text-center">
+          <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4 text-center">
             <div className="flex items-center justify-center gap-1">
               <span className="text-xl">📝</span>
-              <span className="text-2xl font-bold text-content-light">{member.postsCount}</span>
+              <span className="text-content-light text-2xl font-bold">{member.postsCount}</span>
             </div>
-            <p className="text-xs text-grey-500 mt-1">Posts</p>
+            <p className="text-grey-500 mt-1 text-xs">Posts</p>
           </div>
         </div>
 
         {/* Recent Posts */}
         {posts.length > 0 && (
           <div>
-            <h2 className="text-lg font-semibold text-content-light mb-4">Recent Activity</h2>
+            <h2 className="text-content-light mb-4 text-lg font-semibold">Recent Activity</h2>
             <div className="space-y-4">
               {posts.map((post) => (
                 <div
                   key={post.id}
-                  className="rounded border border-border-dark bg-bkg-dark-secondary p-4"
+                  className="border-border-dark bg-bkg-dark-secondary rounded border p-4"
                 >
-                  <div className="flex items-center gap-2 text-sm text-grey-500 mb-2">
+                  <div className="text-grey-500 mb-2 flex items-center gap-2 text-sm">
                     <span>{post.postType === "win" ? "🏆" : "💭"}</span>
                     <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                   </div>
                   {post.title && (
-                    <h3 className="font-semibold text-content-light mb-1">{post.title}</h3>
+                    <h3 className="text-content-light mb-1 font-semibold">{post.title}</h3>
                   )}
                   <p className="text-grey-300 line-clamp-3">{post.content}</p>
-                  <div className="mt-2 flex items-center gap-4 text-xs text-grey-500">
+                  <div className="text-grey-500 mt-2 flex items-center gap-4 text-xs">
                     <span>{post.reactionCount} reactions</span>
                     <span>{post.commentCount} comments</span>
                   </div>
@@ -272,7 +285,7 @@ const MemberProfilePage: FC = () => {
         )}
 
         {posts.length === 0 && (
-          <div className="text-center py-8">
+          <div className="py-8 text-center">
             <p className="text-grey-500">No posts yet</p>
           </div>
         )}

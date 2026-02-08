@@ -262,12 +262,12 @@ The compounding effect is real. Small daily deposits of self-care are adding up 
 export const AllPostTypes: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
-      <p className="text-sm font-semibold text-grey-400">Win</p>
+      <p className="text-grey-400 text-sm font-semibold">Win</p>
       <PostCard
         post={createMockPost({ postType: "win", title: "Morning routine complete!" })}
         onReact={fn()}
       />
-      <p className="mt-4 text-sm font-semibold text-grey-400">Reflection</p>
+      <p className="text-grey-400 mt-4 text-sm font-semibold">Reflection</p>
       <PostCard
         post={createMockPost({
           postType: "reflection",
@@ -276,7 +276,7 @@ export const AllPostTypes: Story = {
         })}
         onReact={fn()}
       />
-      <p className="mt-4 text-sm font-semibold text-grey-400">Milestone</p>
+      <p className="text-grey-400 mt-4 text-sm font-semibold">Milestone</p>
       <PostCard
         post={createMockPost({ postType: "milestone", title: "14-Day Streak! 🔥" })}
         onReact={fn()}

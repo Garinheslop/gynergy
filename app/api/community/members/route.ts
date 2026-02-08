@@ -94,10 +94,13 @@ export async function GET(request: NextRequest) {
 
     // Get enrollment stats for each user
     const typedMembers = members as unknown as CohortMembership[] | null;
-    const userIds = typedMembers?.map((m) => {
-      const user = Array.isArray(m.user) ? m.user[0] : m.user;
-      return user?.id;
-    }).filter((id): id is string => Boolean(id)) || [];
+    const userIds =
+      typedMembers
+        ?.map((m) => {
+          const user = Array.isArray(m.user) ? m.user[0] : m.user;
+          return user?.id;
+        })
+        .filter((id): id is string => Boolean(id)) || [];
 
     const { data: enrollments } = await supabase
       .from("session_enrollments")

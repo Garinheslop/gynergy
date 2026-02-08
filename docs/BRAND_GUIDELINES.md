@@ -49,12 +49,12 @@ Maintain minimum clear space equal to the height of the "G" around all sides of 
 
 ### Logo Variations
 
-| Variation | Usage |
-|-----------|-------|
-| Full color | Primary usage on light backgrounds |
-| White | On dark backgrounds |
-| Teal/Action | Monochrome applications |
-| Icon only | App icons, favicons |
+| Variation   | Usage                              |
+| ----------- | ---------------------------------- |
+| Full color  | Primary usage on light backgrounds |
+| White       | On dark backgrounds                |
+| Teal/Action | Monochrome applications            |
+| Icon only   | App icons, favicons                |
 
 ### Prohibited Uses
 
@@ -72,18 +72,21 @@ Maintain minimum clear space equal to the height of the "G" around all sides of 
 ### Primary Colors
 
 #### Action (Teal)
+
 **#99f6e0** - Our signature color
 
 - Use for: CTAs, links, interactive elements
 - Conveys: Energy, growth, possibility
 
 #### Primary (Orange)
+
 **#ffc878** - Warmth and achievement
 
 - Use for: Streaks, achievements, highlights
 - Conveys: Warmth, accomplishment, celebration
 
 #### Purple
+
 **#a86cff** - Distinction and creativity
 
 - Use for: Badges, admin roles, accents
@@ -91,18 +94,18 @@ Maintain minimum clear space equal to the height of the "G" around all sides of 
 
 ### Secondary Colors
 
-| Color | Hex | Usage |
-|-------|-----|-------|
-| Success | #7ef698 | Completed states, positive feedback |
-| Danger | #fd6a6a | Errors, warnings, destructive actions |
-| Warning | #f69859 | Caution, pending states |
+| Color   | Hex     | Usage                                 |
+| ------- | ------- | ------------------------------------- |
+| Success | #7ef698 | Completed states, positive feedback   |
+| Danger  | #fd6a6a | Errors, warnings, destructive actions |
+| Warning | #f69859 | Caution, pending states               |
 
 ### Background Colors
 
-| Light Mode | Dark Mode | Usage |
-|------------|-----------|-------|
-| #ffffff | #131313 | Primary background |
-| #f5f5f5 | #27282a | Card/surface background |
+| Light Mode | Dark Mode | Usage                   |
+| ---------- | --------- | ----------------------- |
+| #ffffff    | #131313   | Primary background      |
+| #f5f5f5    | #27282a   | Card/surface background |
 
 ### Color Accessibility
 
@@ -115,12 +118,14 @@ All color combinations must meet WCAG 2.1 AA standards:
 ### Color Do's and Don'ts
 
 **Do:**
+
 - ✅ Use teal (#99f6e0) for primary actions
 - ✅ Use orange (#ffc878) for achievements
 - ✅ Maintain sufficient contrast ratios
 - ✅ Use semantic colors for states (success, danger)
 
 **Don't:**
+
 - ❌ Use red for non-error states
 - ❌ Use color as the only indicator of meaning
 - ❌ Use low-contrast color combinations
@@ -142,25 +147,27 @@ font-family: "Work Sans", system-ui, sans-serif;
 
 ### Type Scale
 
-| Purpose | Size | Weight | Line Height |
-|---------|------|--------|-------------|
-| Hero | 48px | Bold | 1.1 |
-| H1 | 48px | Bold | 1.2 |
-| H2 | 36px | Semibold | 1.2 |
-| H3 | 24px | Semibold | 1.3 |
-| Body | 18px | Regular | 1.5 |
-| Small | 16px | Regular | 1.5 |
-| Caption | 14px | Regular | 1.4 |
+| Purpose | Size | Weight   | Line Height |
+| ------- | ---- | -------- | ----------- |
+| Hero    | 48px | Bold     | 1.1         |
+| H1      | 48px | Bold     | 1.2         |
+| H2      | 36px | Semibold | 1.2         |
+| H3      | 24px | Semibold | 1.3         |
+| Body    | 18px | Regular  | 1.5         |
+| Small   | 16px | Regular  | 1.5         |
+| Caption | 14px | Regular  | 1.4         |
 
 ### Typography Guidelines
 
 **Do:**
+
 - ✅ Use sentence case for headlines
 - ✅ Keep line lengths to 60-80 characters
 - ✅ Use adequate line spacing (1.5 for body)
 - ✅ Left-align body text
 
 **Don't:**
+
 - ❌ Use ALL CAPS for more than 2-3 words
 - ❌ Use light font weights below 18px
 - ❌ Mix more than 2 font weights in one context
@@ -176,31 +183,36 @@ Gynergy speaks with **encouragement, clarity, and authenticity**.
 
 ### Voice Characteristics
 
-| Characteristic | We Are | We're Not |
-|----------------|--------|-----------|
-| Empowering | "You've got this" | Preachy or lecturing |
-| Supportive | "We're here with you" | Judgmental |
-| Authentic | "Real progress takes time" | Fake or hyped |
-| Clear | "Here's what to do next" | Vague or jargon-heavy |
-| Warm | "Welcome back, Sarah" | Cold or corporate |
+| Characteristic | We Are                     | We're Not             |
+| -------------- | -------------------------- | --------------------- |
+| Empowering     | "You've got this"          | Preachy or lecturing  |
+| Supportive     | "We're here with you"      | Judgmental            |
+| Authentic      | "Real progress takes time" | Fake or hyped         |
+| Clear          | "Here's what to do next"   | Vague or jargon-heavy |
+| Warm           | "Welcome back, Sarah"      | Cold or corporate     |
 
 ### Tone Variations
 
 **Celebration**
+
 > "Amazing! You've completed a 7-day streak. Your consistency is inspiring! 🔥"
 
 **Encouragement**
+
 > "Progress isn't always linear. Taking a break doesn't erase your growth."
 
 **Instruction**
+
 > "Find a quiet space, close your eyes, and take three deep breaths."
 
 **Community**
+
 > "Your cohort is cheering you on. 12 members shared encouragement today."
 
 ### Writing Guidelines
 
 **Do:**
+
 - ✅ Use "you" and "your" (direct address)
 - ✅ Write in active voice
 - ✅ Keep sentences concise
@@ -208,6 +220,7 @@ Gynergy speaks with **encouragement, clarity, and authenticity**.
 - ✅ Celebrate small wins
 
 **Don't:**
+
 - ❌ Use guilt or shame ("You failed to...")
 - ❌ Overpromise results
 - ❌ Use excessive exclamation marks
@@ -216,12 +229,12 @@ Gynergy speaks with **encouragement, clarity, and authenticity**.
 
 ### Example Copy
 
-| Context | Good | Avoid |
-|---------|------|-------|
-| Login | "Welcome back, Sarah" | "User login successful" |
-| Streak | "12 days strong! 🔥" | "Streak: 12" |
-| Error | "Couldn't save. Let's try again." | "Error 500: Save failed" |
-| Empty | "Your journey begins with one step" | "No data available" |
+| Context | Good                                | Avoid                    |
+| ------- | ----------------------------------- | ------------------------ |
+| Login   | "Welcome back, Sarah"               | "User login successful"  |
+| Streak  | "12 days strong! 🔥"                | "Streak: 12"             |
+| Error   | "Couldn't save. Let's try again."   | "Error 500: Save failed" |
+| Empty   | "Your journey begins with one step" | "No data available"      |
 
 ---
 
@@ -230,18 +243,21 @@ Gynergy speaks with **encouragement, clarity, and authenticity**.
 ### Photography Guidelines
 
 **Subject Matter:**
+
 - Real people in authentic moments
 - Diverse representation
 - Natural settings (nature, home)
 - Calm, focused environments
 
 **Visual Treatment:**
+
 - Warm, natural lighting
 - Soft, inviting color tones
 - Minimal post-processing
 - Avoid overly staged shots
 
 **Themes:**
+
 - Morning routines
 - Meditation and mindfulness
 - Journaling and reflection
@@ -289,11 +305,11 @@ Gynergy speaks with **encouragement, clarity, and authenticity**.
 
 ### Buttons
 
-| Type | Background | Text | Usage |
-|------|------------|------|-------|
-| Primary | `bg-action` | Dark | Main CTAs |
-| Secondary | `bg-bkg-dark-secondary` + border | Light | Secondary actions |
-| Text | Transparent | Action color | Tertiary actions |
+| Type      | Background                       | Text         | Usage             |
+| --------- | -------------------------------- | ------------ | ----------------- |
+| Primary   | `bg-action`                      | Dark         | Main CTAs         |
+| Secondary | `bg-bkg-dark-secondary` + border | Light        | Secondary actions |
+| Text      | Transparent                      | Action color | Tertiary actions  |
 
 ### Form Fields
 

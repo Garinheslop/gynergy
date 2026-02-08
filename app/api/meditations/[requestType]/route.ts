@@ -159,7 +159,9 @@ const getUserMeditations = async ({
   userId,
   sessionId,
   userTimezone,
-}: Partial<UserMeditationRequestDataTypes>): Promise<FetcherErrorResponse | Record<string, unknown>[]> => {
+}: Partial<UserMeditationRequestDataTypes>): Promise<
+  FetcherErrorResponse | Record<string, unknown>[]
+> => {
   const supabase = createClient();
 
   const _startOfDay = dayjs().tz(userTimezone).startOf("day").utc().toISOString();

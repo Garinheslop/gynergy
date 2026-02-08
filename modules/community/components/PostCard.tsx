@@ -30,9 +30,7 @@ const PostCard: FC<PostCardProps> = ({ post, onReact }) => {
   const [showReactions, setShowReactions] = useState(false);
   const [shareLoading, setShareLoading] = useState(false);
 
-  const expandedComments = useSelector(
-    (state: RootState) => state.community.expandedComments
-  );
+  const expandedComments = useSelector((state: RootState) => state.community.expandedComments);
   const isCommentsExpanded = expandedComments.includes(post.id);
 
   const handleToggleComments = () => {
@@ -94,12 +92,12 @@ const PostCard: FC<PostCardProps> = ({ post, onReact }) => {
   const postTypeInfo = POST_TYPE_LABELS[post.postType];
 
   return (
-    <article className="rounded border border-border-dark bg-bkg-dark-secondary p-5 transition-shadow hover:shadow-md">
+    <article className="border-border-dark bg-bkg-dark-secondary rounded border p-5 transition-shadow hover:shadow-md">
       {/* Header */}
       <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center gap-3">
           {/* Avatar */}
-          <div className="relative h-12 w-12 overflow-hidden rounded-full bg-bkg-dark-800">
+          <div className="bg-bkg-dark-800 relative h-12 w-12 overflow-hidden rounded-full">
             {post.author?.profileImage ? (
               <Image
                 src={post.author.profileImage}
@@ -108,7 +106,7 @@ const PostCard: FC<PostCardProps> = ({ post, onReact }) => {
                 className="object-cover"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-action-400 to-action-600 text-lg font-semibold text-content-dark">
+              <div className="from-action-400 to-action-600 text-content-dark flex h-full w-full items-center justify-center bg-gradient-to-br text-lg font-semibold">
                 {post.author?.firstName?.[0] || "?"}
               </div>
             )}
@@ -117,21 +115,21 @@ const PostCard: FC<PostCardProps> = ({ post, onReact }) => {
           {/* Name & Time */}
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-content-light">
+              <span className="text-content-light font-semibold">
                 {post.author?.firstName} {post.author?.lastName}
               </span>
               {post.isPinned && (
-                <span className="rounded bg-primary/20 px-2 py-0.5 text-xs font-medium text-primary">
+                <span className="bg-primary/20 text-primary rounded px-2 py-0.5 text-xs font-medium">
                   Pinned
                 </span>
               )}
               {post.isFeatured && (
-                <span className="rounded bg-action/20 px-2 py-0.5 text-xs font-medium text-action">
+                <span className="bg-action/20 text-action rounded px-2 py-0.5 text-xs font-medium">
                   Featured
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2 text-sm text-grey-500">
+            <div className="text-grey-500 flex items-center gap-2 text-sm">
               <span>{formatDate(post.createdAt)}</span>
               <span>·</span>
               <span className="flex items-center gap-1">
@@ -144,10 +142,12 @@ const PostCard: FC<PostCardProps> = ({ post, onReact }) => {
       </div>
 
       {/* Title */}
-      {post.title && <h3 className="mb-2 text-lg font-semibold text-content-light">{post.title}</h3>}
+      {post.title && (
+        <h3 className="text-content-light mb-2 text-lg font-semibold">{post.title}</h3>
+      )}
 
       {/* Content */}
-      <p className="mb-4 whitespace-pre-wrap text-grey-300">{post.content}</p>
+      <p className="text-grey-300 mb-4 whitespace-pre-wrap">{post.content}</p>
 
       {/* Media */}
       {post.mediaUrls && post.mediaUrls.length > 0 && (
@@ -163,7 +163,7 @@ const PostCard: FC<PostCardProps> = ({ post, onReact }) => {
             <div
               key={url}
               className={cn(
-                "relative aspect-video overflow-hidden rounded bg-bkg-dark-800",
+                "bg-bkg-dark-800 relative aspect-video overflow-hidden rounded",
                 post.mediaUrls.length === 1 && "max-h-96"
               )}
             >
@@ -179,7 +179,7 @@ const PostCard: FC<PostCardProps> = ({ post, onReact }) => {
       )}
 
       {/* Engagement Stats */}
-      <div className="mb-3 flex items-center gap-4 text-sm text-grey-500">
+      <div className="text-grey-500 mb-3 flex items-center gap-4 text-sm">
         {post.reactionCount > 0 && (
           <span className="flex items-center gap-1">
             <span className="flex">
@@ -199,17 +199,15 @@ const PostCard: FC<PostCardProps> = ({ post, onReact }) => {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-1 border-t border-border-dark pt-3">
+      <div className="border-border-dark flex items-center gap-1 border-t pt-3">
         {/* Reaction Button */}
         <div className="relative">
           <button
             aria-label={post.userReaction ? `Remove ${post.userReaction} reaction` : "Add reaction"}
             aria-pressed={!!post.userReaction}
             className={cn(
-              "flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action",
-              post.userReaction
-                ? "bg-action/20 text-action"
-                : "text-grey-400 hover:bg-bkg-dark-800"
+              "focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
+              post.userReaction ? "bg-action/20 text-action" : "text-grey-400 hover:bg-bkg-dark-800"
             )}
             onClick={() => {
               if (post.userReaction) {
@@ -230,7 +228,7 @@ const PostCard: FC<PostCardProps> = ({ post, onReact }) => {
           {/* Reaction Picker */}
           {showReactions && (
             <fieldset
-              className="absolute bottom-full left-0 mb-2 flex gap-1 rounded-full border border-border-dark bg-bkg-dark-secondary p-2 shadow-lg m-0"
+              className="border-border-dark bg-bkg-dark-secondary absolute bottom-full left-0 m-0 mb-2 flex gap-1 rounded-full border p-2 shadow-lg"
               onMouseEnter={() => setShowReactions(true)}
               onMouseLeave={() => setShowReactions(false)}
             >
@@ -241,7 +239,7 @@ const PostCard: FC<PostCardProps> = ({ post, onReact }) => {
                   aria-label={`React with ${type}`}
                   aria-pressed={post.userReaction === type}
                   className={cn(
-                    "min-h-[44px] min-w-[44px] rounded-full p-2 text-xl transition-transform hover:scale-125 hover:bg-bkg-dark-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action",
+                    "hover:bg-bkg-dark-800 focus-visible:ring-action min-h-[44px] min-w-[44px] rounded-full p-2 text-xl transition-transform hover:scale-125 focus-visible:ring-2 focus-visible:outline-none",
                     post.userReaction === type && "bg-action/20"
                   )}
                   onClick={() => {
@@ -261,14 +259,18 @@ const PostCard: FC<PostCardProps> = ({ post, onReact }) => {
           aria-label={`Comment on post, ${post.commentCount} comments`}
           aria-expanded={isCommentsExpanded}
           className={cn(
-            "flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action",
-            isCommentsExpanded
-              ? "bg-action/20 text-action"
-              : "text-grey-400 hover:bg-bkg-dark-800"
+            "focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
+            isCommentsExpanded ? "bg-action/20 text-action" : "text-grey-400 hover:bg-bkg-dark-800"
           )}
           onClick={handleToggleComments}
         >
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -283,10 +285,16 @@ const PostCard: FC<PostCardProps> = ({ post, onReact }) => {
         <button
           aria-label="Share post"
           disabled={shareLoading}
-          className="flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium text-grey-400 transition-colors hover:bg-bkg-dark-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action disabled:opacity-50"
+          className="text-grey-400 hover:bg-bkg-dark-800 focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
           onClick={handleShare}
         >
-          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <svg
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            aria-hidden="true"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

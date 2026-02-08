@@ -36,10 +36,7 @@ async function deployAllSchemas() {
       await sql.unsafe(schemaSql);
       console.log(`  ✓ ${schema.name} deployed successfully\n`);
     } catch (error: any) {
-      if (
-        error.message?.includes("already exists") ||
-        error.message?.includes("duplicate key")
-      ) {
+      if (error.message?.includes("already exists") || error.message?.includes("duplicate key")) {
         console.log(`  ⚠ ${schema.name} - objects already exist, continuing...\n`);
       } else {
         console.error(`  ✗ ${schema.name} failed:`, error.message, "\n");

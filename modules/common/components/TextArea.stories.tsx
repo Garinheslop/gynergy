@@ -136,7 +136,7 @@ export const Interactive: Story = {
           wordLimit={100}
           rows={4}
         />
-        <p className="text-sm text-grey-500">
+        <p className="text-grey-500 text-sm">
           Words: {value ? value.split(/\s+/).filter(Boolean).length : 0} / 100
         </p>
       </div>
@@ -149,22 +149,22 @@ export const AllStates: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">Default</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">Default</p>
         <TextArea placeholder="Write here..." rows={3} />
       </div>
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">With Content</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">With Content</p>
         <TextArea
           value="Today I'm grateful for the small moments of peace I found between meetings."
           rows={3}
         />
       </div>
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">With Word Limit</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">With Word Limit</p>
         <TextArea placeholder="Max 25 words..." wordLimit={25} rows={3} />
       </div>
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">Disabled</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">Disabled</p>
         <TextArea value="Cannot edit this content" disabled rows={2} />
       </div>
     </div>

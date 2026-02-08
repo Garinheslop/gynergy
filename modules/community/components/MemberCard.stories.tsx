@@ -128,7 +128,7 @@ export const Compact: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="w-[300px] rounded border border-border-dark bg-bkg-dark-secondary p-2">
+      <div className="border-border-dark bg-bkg-dark-secondary w-[300px] rounded border p-2">
         <Story />
       </div>
     ),
@@ -146,7 +146,7 @@ export const CompactNoStreak: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="w-[300px] rounded border border-border-dark bg-bkg-dark-secondary p-2">
+      <div className="border-border-dark bg-bkg-dark-secondary w-[300px] rounded border p-2">
         <Story />
       </div>
     ),
@@ -156,17 +156,23 @@ export const CompactNoStreak: Story = {
 // Leaderboard List
 export const LeaderboardList: Story = {
   render: () => (
-    <div className="w-[350px] space-y-1 rounded border border-border-dark bg-bkg-dark-secondary p-4">
-      <h3 className="mb-3 font-semibold text-content-light">Top Streakers</h3>
+    <div className="border-border-dark bg-bkg-dark-secondary w-[350px] space-y-1 rounded border p-4">
+      <h3 className="text-content-light mb-3 font-semibold">Top Streakers</h3>
       {[
         createMockMember({ id: "1", firstName: "Alex", lastName: "R.", streak: 45, points: 5680 }),
         createMockMember({ id: "2", firstName: "Sam", lastName: "J.", streak: 38, points: 4200 }),
-        createMockMember({ id: "3", firstName: "Jordan", lastName: "T.", streak: 32, points: 3800 }),
+        createMockMember({
+          id: "3",
+          firstName: "Jordan",
+          lastName: "T.",
+          streak: 32,
+          points: 3800,
+        }),
         createMockMember({ id: "4", firstName: "Casey", lastName: "M.", streak: 28, points: 3100 }),
         createMockMember({ id: "5", firstName: "Riley", lastName: "K.", streak: 21, points: 2500 }),
       ].map((member, index) => (
         <div key={member.id} className="flex items-center gap-2">
-          <span className="w-6 text-center text-sm font-bold text-grey-500">{index + 1}</span>
+          <span className="text-grey-500 w-6 text-center text-sm font-bold">{index + 1}</span>
           <MemberCard member={member} isCompact onViewProfile={fn()} />
         </div>
       ))}
@@ -179,7 +185,12 @@ export const MemberGrid: Story = {
   render: () => (
     <div className="grid max-w-[800px] gap-4 sm:grid-cols-2">
       <MemberCard
-        member={createMockMember({ firstName: "Sarah", lastName: "Chen", streak: 12, points: 1250 })}
+        member={createMockMember({
+          firstName: "Sarah",
+          lastName: "Chen",
+          streak: 12,
+          points: 1250,
+        })}
         onSendEncouragement={fn()}
         onViewProfile={fn()}
       />
@@ -195,7 +206,12 @@ export const MemberGrid: Story = {
         onViewProfile={fn()}
       />
       <MemberCard
-        member={createMockMember({ firstName: "Jordan", lastName: "Taylor", streak: 5, points: 420 })}
+        member={createMockMember({
+          firstName: "Jordan",
+          lastName: "Taylor",
+          streak: 5,
+          points: 420,
+        })}
         onSendEncouragement={fn()}
         onViewProfile={fn()}
       />
@@ -219,7 +235,7 @@ export const RoleBadges: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">Admin</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">Admin</p>
         <MemberCard
           member={createMockMember({ firstName: "Coach", lastName: "Maya", role: "admin" })}
           onSendEncouragement={fn()}
@@ -227,7 +243,7 @@ export const RoleBadges: Story = {
         />
       </div>
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">Moderator</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">Moderator</p>
         <MemberCard
           member={createMockMember({ firstName: "Sam", lastName: "Johnson", role: "moderator" })}
           onSendEncouragement={fn()}
@@ -235,7 +251,7 @@ export const RoleBadges: Story = {
         />
       </div>
       <div>
-        <p className="mb-2 text-sm font-semibold text-grey-400">Member (no badge)</p>
+        <p className="text-grey-400 mb-2 text-sm font-semibold">Member (no badge)</p>
         <MemberCard
           member={createMockMember({ firstName: "Sarah", lastName: "Chen", role: "member" })}
           onSendEncouragement={fn()}

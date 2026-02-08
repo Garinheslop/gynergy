@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS "users" (
   email TEXT,
   profile_image TEXT,
   is_anonymous BOOLEAN DEFAULT FALSE,
+  welcome_email_sent BOOLEAN DEFAULT FALSE,
 
   created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP

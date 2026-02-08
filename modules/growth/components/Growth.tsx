@@ -31,9 +31,11 @@ const Growth = forwardRef<HTMLDivElement>(({}, ref) => {
       <MountainProgress
         totalPoints={
           currentBook?.milestones?.length
-            ? (currentBook.milestones as Array<{ order: number; startPoint: number }>).reduce((highest, current) => {
-                return current.order > highest.order ? current : highest;
-              }).startPoint
+            ? (currentBook.milestones as Array<{ order: number; startPoint: number }>).reduce(
+                (highest, current) => {
+                  return current.order > highest.order ? current : highest;
+                }
+              ).startPoint
             : 0
         }
         currentPoints={enrollments.current?.totalPoints ?? 0}

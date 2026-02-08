@@ -74,24 +74,27 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  const handlePhotoSelect = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const validFiles = files
-      .filter((f) => f.size <= 5 * 1024 * 1024 && f.type.startsWith("image/"))
-      .slice(0, 4 - mediaFiles.length);
+  const handlePhotoSelect = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const files = Array.from(e.target.files || []);
+      const validFiles = files
+        .filter((f) => f.size <= 5 * 1024 * 1024 && f.type.startsWith("image/"))
+        .slice(0, 4 - mediaFiles.length);
 
-    if (validFiles.length === 0) return;
+      if (validFiles.length === 0) return;
 
-    setMediaFiles((prev) => [...prev, ...validFiles]);
+      setMediaFiles((prev) => [...prev, ...validFiles]);
 
-    validFiles.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setMediaPreview((prev) => [...prev, event.target?.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
-  }, [mediaFiles.length]);
+      validFiles.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setMediaPreview((prev) => [...prev, event.target?.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+    },
+    [mediaFiles.length]
+  );
 
   const removeMedia = (index: number) => {
     setMediaFiles((prev) => prev.filter((_, i) => i !== index));
@@ -147,20 +150,26 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-post-title"
-        className="relative w-full max-w-lg overflow-hidden rounded-large bg-bkg-dark-secondary shadow-2xl"
+        className="rounded-large bg-bkg-dark-secondary relative w-full max-w-lg overflow-hidden shadow-2xl"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border-dark px-6 py-4">
-          <h2 id="create-post-title" className="text-xl font-bold text-content-light">
+        <div className="border-border-dark flex items-center justify-between border-b px-6 py-4">
+          <h2 id="create-post-title" className="text-content-light text-xl font-bold">
             Share Your {postTypeLabel}
           </h2>
           <button
             ref={firstFocusableRef}
             onClick={onClose}
             aria-label="Close modal"
-            className="min-h-[44px] min-w-[44px] rounded-full p-2 text-grey-400 transition-colors hover:bg-bkg-dark-800 hover:text-grey-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action"
+            className="text-grey-400 hover:bg-bkg-dark-800 hover:text-grey-300 focus-visible:ring-action min-h-[44px] min-w-[44px] rounded-full p-2 transition-colors focus-visible:ring-2 focus-visible:outline-none"
           >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <svg
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -175,22 +184,22 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
         <div className="p-6">
           {/* User Info */}
           <div className="mb-4 flex items-center gap-3">
-            <div className="relative h-12 w-12 overflow-hidden rounded-full bg-bkg-dark-800">
+            <div className="bg-bkg-dark-800 relative h-12 w-12 overflow-hidden rounded-full">
               {userImage ? (
                 <Image src={userImage} alt={userName || "You"} fill className="object-cover" />
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-action-400 to-action-600 text-lg font-semibold text-content-dark">
+                <div className="from-action-400 to-action-600 text-content-dark flex h-full w-full items-center justify-center bg-gradient-to-br text-lg font-semibold">
                   {userName?.[0] || "Y"}
                 </div>
               )}
             </div>
             <div>
-              <p className="font-semibold text-content-light">{userName || "You"}</p>
+              <p className="text-content-light font-semibold">{userName || "You"}</p>
               <select
                 value={visibility}
                 onChange={(e) => setVisibility(e.target.value as PostVisibility)}
                 aria-label="Post visibility"
-                className="min-h-[32px] rounded border-none bg-bkg-dark-800 px-2 py-1 text-xs text-grey-400 focus:ring-2 focus:ring-action focus-visible:outline-none"
+                className="bg-bkg-dark-800 text-grey-400 focus:ring-action min-h-[32px] rounded border-none px-2 py-1 text-xs focus:ring-2 focus-visible:outline-none"
               >
                 <option value="cohort">Cohort Only</option>
                 <option value="public">Public</option>
@@ -200,26 +209,26 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
           </div>
 
           {/* Post Type Selector */}
-          <fieldset className="mb-4 flex flex-wrap gap-2 border-none p-0 m-0">
+          <fieldset className="m-0 mb-4 flex flex-wrap gap-2 border-none p-0">
             <legend className="sr-only">Select post type</legend>
-            {(Object.entries(POST_TYPE_LABELS) as [PostType, { label: string; emoji: string }][]).map(
-              ([type, info]) => (
-                <button
-                  key={type}
-                  onClick={() => setPostType(type)}
-                  aria-pressed={postType === type}
-                  className={cn(
-                    "flex min-h-[44px] items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action",
-                    postType === type
-                      ? "bg-action/20 text-action"
-                      : "bg-bkg-dark-800 text-grey-400 hover:bg-bkg-dark"
-                  )}
-                >
-                  <span>{info.emoji}</span>
-                  <span>{info.label}</span>
-                </button>
-              )
-            )}
+            {(
+              Object.entries(POST_TYPE_LABELS) as [PostType, { label: string; emoji: string }][]
+            ).map(([type, info]) => (
+              <button
+                key={type}
+                onClick={() => setPostType(type)}
+                aria-pressed={postType === type}
+                className={cn(
+                  "focus-visible:ring-action flex min-h-[44px] items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
+                  postType === type
+                    ? "bg-action/20 text-action"
+                    : "bg-bkg-dark-800 text-grey-400 hover:bg-bkg-dark"
+                )}
+              >
+                <span>{info.emoji}</span>
+                <span>{info.label}</span>
+              </button>
+            ))}
           </fieldset>
 
           {/* Title (optional) */}
@@ -229,7 +238,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             aria-label="Post title (optional)"
-            className="mb-3 w-full rounded border border-border-dark bg-bkg-dark px-4 py-2 text-lg font-semibold text-content-light placeholder:text-grey-600 focus:border-action focus:outline-none focus:ring-2 focus:ring-action/20"
+            className="border-border-dark bg-bkg-dark text-content-light placeholder:text-grey-600 focus:border-action focus:ring-action/20 mb-3 w-full rounded border px-4 py-2 text-lg font-semibold focus:ring-2 focus:outline-none"
           />
 
           {/* Content */}
@@ -240,22 +249,41 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
             rows={5}
             aria-label="Post content"
             aria-required="true"
-            className="mb-4 w-full resize-none rounded border border-border-dark bg-bkg-dark px-4 py-3 text-content-light placeholder:text-grey-600 focus:border-action focus:outline-none focus:ring-2 focus:ring-action/20"
+            className="border-border-dark bg-bkg-dark text-content-light placeholder:text-grey-600 focus:border-action focus:ring-action/20 mb-4 w-full resize-none rounded border px-4 py-3 focus:ring-2 focus:outline-none"
           />
 
           {/* Media Preview */}
           {mediaPreview.length > 0 && (
             <div className="mb-4 grid grid-cols-2 gap-2">
               {mediaPreview.map((preview, index) => (
-                <div key={preview} className="relative aspect-video rounded overflow-hidden bg-bkg-dark-800">
-                  <Image src={preview} alt={`Upload preview ${index + 1}`} fill className="object-cover" />
+                <div
+                  key={preview}
+                  className="bg-bkg-dark-800 relative aspect-video overflow-hidden rounded"
+                >
+                  <Image
+                    src={preview}
+                    alt={`Upload preview ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
                   <button
                     onClick={() => removeMedia(index)}
                     aria-label={`Remove image ${index + 1}`}
-                    className="absolute top-2 right-2 min-h-[32px] min-w-[32px] rounded-full bg-black/60 p-1 text-white hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action"
+                    className="focus-visible:ring-action absolute top-2 right-2 min-h-[32px] min-w-[32px] rounded-full bg-black/60 p-1 text-white hover:bg-black/80 focus-visible:ring-2 focus-visible:outline-none"
                   >
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -265,15 +293,15 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
 
           {/* Error */}
           {error && (
-            <div className="mb-4 rounded bg-danger/10 px-4 py-2 text-sm text-danger" role="alert">
+            <div className="bg-danger/10 text-danger mb-4 rounded px-4 py-2 text-sm" role="alert">
               {error}
             </div>
           )}
 
           {/* Prompts */}
-          <div className="mb-4 rounded bg-gradient-to-r from-primary/20 to-primary-500/20 p-4">
-            <p className="text-sm font-medium text-primary">Need inspiration?</p>
-            <ul className="mt-2 space-y-1 text-sm text-primary/80">
+          <div className="from-primary/20 to-primary-500/20 mb-4 rounded bg-gradient-to-r p-4">
+            <p className="text-primary text-sm font-medium">Need inspiration?</p>
+            <ul className="text-primary/80 mt-2 space-y-1 text-sm">
               {getPrompts(postType).map((prompt) => (
                 <li key={prompt} className="flex items-start gap-2">
                   <span className="text-primary/60">•</span>
@@ -285,7 +313,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between border-t border-border-dark bg-bkg-dark px-6 py-4">
+        <div className="border-border-dark bg-bkg-dark flex items-center justify-between border-t px-6 py-4">
           <div className="flex items-center gap-2">
             <input
               ref={fileInputRef}
@@ -301,13 +329,19 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
               disabled={mediaFiles.length >= 4}
               aria-label={mediaFiles.length >= 4 ? "Maximum 4 photos allowed" : "Add photo"}
               className={cn(
-                "min-h-[44px] min-w-[44px] rounded p-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action",
+                "focus-visible:ring-action min-h-[44px] min-w-[44px] rounded p-2 transition-colors focus-visible:ring-2 focus-visible:outline-none",
                 mediaFiles.length >= 4
-                  ? "cursor-not-allowed text-grey-600"
+                  ? "text-grey-600 cursor-not-allowed"
                   : "text-grey-400 hover:bg-bkg-dark-800"
               )}
             >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -316,7 +350,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                 />
               </svg>
             </button>
-            <span className="text-xs text-grey-500">
+            <span className="text-grey-500 text-xs">
               {mediaFiles.length > 0 ? `${mediaFiles.length}/4 photos` : "Add photo"}
             </span>
           </div>
@@ -325,9 +359,9 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
             onClick={handleSubmit}
             disabled={isSubmitting || !content.trim()}
             className={cn(
-              "min-h-[44px] rounded px-6 py-2 font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action focus-visible:ring-offset-2",
+              "focus-visible:ring-action min-h-[44px] rounded px-6 py-2 font-semibold transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
               isSubmitting || !content.trim()
-                ? "cursor-not-allowed bg-bkg-disabled/20 text-grey-600"
+                ? "bg-bkg-disabled/20 text-grey-600 cursor-not-allowed"
                 : "bg-action text-content-dark hover:bg-action-100 active:scale-95"
             )}
           >

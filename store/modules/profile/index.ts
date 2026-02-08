@@ -37,7 +37,9 @@ export const updateUserProfileData = (data: Record<string, unknown>) =>
 
 export const setCurrentProfile = (payload: Record<string, unknown>) => {
   return (dispatch: AppDispatch): Promise<void> => {
-    dispatch(setCurrentProfileState(payload as unknown as Parameters<typeof setCurrentProfileState>[0]));
+    dispatch(
+      setCurrentProfileState(payload as unknown as Parameters<typeof setCurrentProfileState>[0])
+    );
     return Promise.resolve();
   };
 };

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-import { createColumnHelper } from "@tanstack/react-table";
+import { createColumnHelper, CellContext } from "@tanstack/react-table";
 
 import { cn } from "@lib/utils/style";
 import { AdminLayout } from "@modules/admin";
@@ -31,7 +31,7 @@ const columnHelper = createColumnHelper<User>();
 const columns = [
   columnHelper.accessor("fullName", {
     header: "User",
-    cell: (info) => {
+    cell: (info: CellContext<User, string>) => {
       const user = info.row.original;
       return (
         <div className="flex items-center gap-3">
@@ -54,7 +54,7 @@ const columns = [
   }),
   columnHelper.accessor("hasChallengeAccess", {
     header: "Access",
-    cell: (info) => {
+    cell: (info: CellContext<User, boolean>) => {
       const user = info.row.original;
       return (
         <div className="flex flex-col gap-1">
@@ -73,13 +73,13 @@ const columns = [
   }),
   columnHelper.accessor("totalPoints", {
     header: "Points",
-    cell: (info) => (
+    cell: (info: CellContext<User, number>) => (
       <span className="text-primary font-medium">{info.getValue().toLocaleString()}</span>
     ),
   }),
   columnHelper.accessor("currentStreak", {
     header: "Streak",
-    cell: (info) => (
+    cell: (info: CellContext<User, number>) => (
       <div className="flex items-center gap-1">
         <i className="gng-fire text-warning" />
         <span>{info.getValue()} days</span>
@@ -88,7 +88,7 @@ const columns = [
   }),
   columnHelper.accessor("level", {
     header: "Level",
-    cell: (info) => (
+    cell: (info: CellContext<User, number>) => (
       <span className="bg-purple/20 text-purple rounded-full px-2 py-0.5 text-xs font-medium">
         Lvl {info.getValue()}
       </span>
@@ -96,7 +96,7 @@ const columns = [
   }),
   columnHelper.accessor("createdAt", {
     header: "Joined",
-    cell: (info) => new Date(info.getValue()).toLocaleDateString(),
+    cell: (info: CellContext<User, string>) => new Date(info.getValue()).toLocaleDateString(),
   }),
   columnHelper.display({
     id: "actions",

@@ -46,10 +46,7 @@ const useOcr = <T extends EditorData>(
       setIsReading(false);
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      if (
-        journalErrorMessages[errorMessage as keyof JournalErrorMessageType] &&
-        onFailed
-      ) {
+      if (journalErrorMessages[errorMessage as keyof JournalErrorMessageType] && onFailed) {
         onFailed(journalErrorMessages[errorMessage as keyof JournalErrorMessageType]);
       } else if (onFailed) {
         onFailed({ error: errorMessage });

@@ -48,7 +48,10 @@ const api: Middleware =
         dispatchOnSuccessAction(dispatch, onSuccess, response);
       }
     } catch (error: unknown) {
-      const axiosError = error as { message?: string; response?: { data?: Record<string, unknown>; status?: number } };
+      const axiosError = error as {
+        message?: string;
+        response?: { data?: Record<string, unknown>; status?: number };
+      };
       dispatchErrorToasts(dispatch, onError, error);
       // General error action
       dispatch(
