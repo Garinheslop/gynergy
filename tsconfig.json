@@ -16,7 +16,7 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@components/*": ["./components/*"],
+      "@components/*": ["./modules/common/components/*"],
       "@configs/*": ["./configs/*"],
       "@contexts/*": ["./contexts/*"],
       "@resources/*": ["./resources/*"],
@@ -24,7 +24,8 @@
       "@modules/*": ["./modules/*"],
       "@public/*": ["./public/*"],
       "@store/*": ["./store/*"],
-      "@styles/*": ["./styles/*"]
+      "@styles/*": ["./styles/*"],
+      "@tests/*": ["./__tests__/*"]
     },
     "module": "esnext",
     "moduleResolution": "node",
@@ -39,5 +40,13 @@
     "postcss.config.js",
     "tailwind.config.js"
   ],
-  "exclude": ["node_modules", "**/*.stories.ts", "**/*.stories.tsx", "stories"]
+  "exclude": [
+    "node_modules",
+    "**/*.stories.ts",
+    "**/*.stories.tsx",
+    "stories",
+    "__tests__",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
 }
