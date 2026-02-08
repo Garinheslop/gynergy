@@ -26,6 +26,8 @@ export { default as AlertsWidget } from "./components/widgets/AlertsWidget";
 // UI Components
 export { default as DateRangePicker } from "./components/ui/DateRangePicker";
 export { default as AuditLogViewer } from "./components/ui/AuditLogViewer";
+export { ToastProvider, useToast, toast } from "./components/ui/Toast";
+export type { Toast, ToastType } from "./components/ui/Toast";
 
 // Aria AI
 export { default as AriaPanel } from "./components/aria/AriaPanel";
