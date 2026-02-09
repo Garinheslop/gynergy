@@ -70,11 +70,14 @@ export default function AdminDashboard() {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
   // Update URL when date range changes
-  const setDateRange = useCallback((range: DateRange) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("range", range);
-    router.push(`?${params.toString()}`, { scroll: false });
-  }, [router, searchParams]);
+  const setDateRange = useCallback(
+    (range: DateRange) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("range", range);
+      router.push(`?${params.toString()}`, { scroll: false });
+    },
+    [router, searchParams]
+  );
 
   // Fetch all dashboard data
   const fetchDashboardData = useCallback(async () => {
