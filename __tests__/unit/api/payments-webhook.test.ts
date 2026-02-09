@@ -86,7 +86,9 @@ function createMockSupabase(tableResponses?: {
 
     return {
       select: vi.fn().mockReturnValue(chainable),
-      insert: vi.fn().mockResolvedValue({ error: tableName === "purchases" ? responses.purchases.error : null }),
+      insert: vi
+        .fn()
+        .mockResolvedValue({ error: tableName === "purchases" ? responses.purchases.error : null }),
       update: vi.fn().mockReturnValue(chainable),
     };
   });
