@@ -17,10 +17,18 @@ vi.mock("@lib/logger", () => ({
 
 vi.mock("@lib/stripe", () => ({
   verifyWebhookSignature: vi.fn(),
+  formatPrice: vi.fn().mockReturnValue("$997.00"),
+  STRIPE_PRODUCTS: {
+    CHALLENGE: { name: "45-Day Challenge", amount: 99700 },
+  },
 }));
 
 vi.mock("@lib/supabase-server", () => ({
   createServiceClient: vi.fn(),
+}));
+
+vi.mock("@lib/email", () => ({
+  sendPurchaseConfirmationEmail: vi.fn().mockResolvedValue({ success: true }),
 }));
 
 import { verifyWebhookSignature } from "@lib/stripe";
@@ -40,29 +48,52 @@ function createRequest(body: string, signature: string | null): NextRequest {
   });
 }
 
-// Helper to create mock Supabase client
-function createMockSupabase() {
+// Helper to create mock Supabase client with table-specific responses
+function createMockSupabase(tableResponses?: {
+  profiles?: { data: unknown; error: unknown };
+  friend_codes?: { data: unknown; error: unknown };
+  purchases?: { error: unknown };
+  subscriptions?: { data: unknown; error: unknown };
+}) {
   const mockFrom = vi.fn();
-  const mockSelect = vi.fn();
-  const mockInsert = vi.fn();
-  const mockUpdate = vi.fn();
-  const mockEq = vi.fn();
-  const mockSingle = vi.fn();
 
-  mockFrom.mockReturnValue({
-    select: mockSelect,
-    insert: mockInsert,
-    update: mockUpdate,
+  // Default responses
+  const defaults = {
+    profiles: { data: { first_name: "Test" }, error: null },
+    friend_codes: { data: [{ code: "FRIEND123" }, { code: "FRIEND456" }], error: null },
+    purchases: { error: null },
+    subscriptions: { data: null, error: null },
+  };
+
+  const responses = { ...defaults, ...tableResponses };
+
+  // Create chainable object that supports .eq().eq().single() pattern
+  const createChainable = (tableData: { data?: unknown; error?: unknown }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const chainable: any = {
+      eq: vi.fn(),
+      single: vi.fn().mockResolvedValue(tableData),
+    };
+    // Make eq return itself for chaining .eq().eq()
+    chainable.eq.mockReturnValue(chainable);
+    return chainable;
+  };
+
+  // Table-specific behavior
+  mockFrom.mockImplementation((tableName: string) => {
+    const tableData = responses[tableName as keyof typeof responses] || { data: null, error: null };
+    const chainable = createChainable(tableData);
+
+    return {
+      select: vi.fn().mockReturnValue(chainable),
+      insert: vi.fn().mockResolvedValue({ error: tableName === "purchases" ? responses.purchases.error : null }),
+      update: vi.fn().mockReturnValue(chainable),
+    };
   });
-  mockSelect.mockReturnValue({ eq: mockEq, single: mockSingle });
-  mockInsert.mockResolvedValue({ error: null });
-  mockUpdate.mockReturnValue({ eq: mockEq });
-  mockEq.mockReturnValue({ single: mockSingle });
-  mockSingle.mockResolvedValue({ data: null, error: null });
 
   return {
     from: mockFrom,
-    _mocks: { mockFrom, mockSelect, mockInsert, mockUpdate, mockEq, mockSingle },
+    _mocks: { mockFrom },
   };
 }
 
@@ -132,8 +163,10 @@ describe("Payments Webhook API Route", () => {
     });
 
     it("handles invoice.paid event for subscription", async () => {
-      const mockSupabase = createMockSupabase();
-      mockSupabase._mocks.mockSingle.mockResolvedValue({ data: null, error: { code: "PGRST116" } });
+      // Simulate subscription not existing yet (PGRST116 = not found)
+      const mockSupabase = createMockSupabase({
+        subscriptions: { data: null, error: { code: "PGRST116" } },
+      });
       mockCreateServiceClient.mockReturnValue(
         mockSupabase as unknown as ReturnType<typeof createServiceClient>
       );
@@ -284,9 +317,10 @@ describe("Payments Webhook API Route", () => {
     });
 
     it("returns 500 when handler throws error", async () => {
-      // Mock supabase to throw during insert operation
-      const mockSupabase = createMockSupabase();
-      mockSupabase._mocks.mockInsert.mockRejectedValue(new Error("Database connection failed"));
+      // Mock supabase to return error during insert operation (route throws on error)
+      const mockSupabase = createMockSupabase({
+        purchases: { error: new Error("Database connection failed") },
+      });
       mockCreateServiceClient.mockReturnValue(
         mockSupabase as unknown as ReturnType<typeof createServiceClient>
       );
