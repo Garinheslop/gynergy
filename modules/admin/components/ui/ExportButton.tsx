@@ -103,6 +103,9 @@ export default function ExportButton({
           "disabled:cursor-not-allowed disabled:opacity-50",
           isOpen && "ring-action-500 ring-2"
         )}
+        aria-label="Export data"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
       >
         {isExporting ? (
           <>
@@ -124,7 +127,11 @@ export default function ExportButton({
       </button>
 
       {isOpen && (
-        <div className="bg-grey-900 border-grey-700 absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-lg border shadow-xl">
+        <div
+          className="bg-grey-900 border-grey-700 absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-lg border shadow-xl"
+          role="menu"
+          aria-label="Export format options"
+        >
           {availableOptions.map((option) => (
             <button
               key={option.format}
@@ -134,6 +141,7 @@ export default function ExportButton({
                 "hover:bg-grey-800 flex w-full items-center gap-3 px-4 py-3 text-left transition-colors",
                 "disabled:cursor-wait disabled:opacity-50"
               )}
+              role="menuitem"
             >
               <div
                 className={cn(

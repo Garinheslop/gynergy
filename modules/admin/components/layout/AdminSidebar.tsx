@@ -61,7 +61,7 @@ export default function AdminSidebar({
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4">
+      <nav className="flex-1 overflow-y-auto py-4" aria-label="Admin navigation">
         <ul className="flex flex-col gap-1 px-3">
           {navItems.map((item) => {
             const active = isActive(item.href);

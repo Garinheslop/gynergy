@@ -106,7 +106,12 @@ export default function AriaPanel({ isOpen, onClose, insights = [] }: AriaPanelP
     <>
       {/* Backdrop */}
       {isOpen && (
-        <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+        <button
+          type="button"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+          onClick={onClose}
+          aria-label="Close Aria panel"
+        />
       )}
 
       {/* Panel */}

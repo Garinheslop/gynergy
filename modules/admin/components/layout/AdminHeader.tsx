@@ -74,6 +74,7 @@ export default function AdminHeader({
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="border-grey-700 bg-grey-800 placeholder-grey-500 focus:border-action-500 focus:ring-action-500 h-9 w-64 rounded-lg border px-3 text-sm text-white outline-none focus:ring-1"
                 autoFocus
+                aria-label="Search admin panel"
               />
               <button
                 onClick={() => {
@@ -81,6 +82,7 @@ export default function AdminHeader({
                   setSearchQuery("");
                 }}
                 className="text-grey-400 hover:bg-grey-800 flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-white"
+                aria-label="Close search"
               >
                 <i className="gng-close text-lg" />
               </button>
@@ -89,6 +91,7 @@ export default function AdminHeader({
             <button
               onClick={() => setSearchOpen(true)}
               className="border-grey-700 bg-grey-800 text-grey-400 hover:border-grey-600 hover:text-grey-300 flex h-9 items-center gap-2 rounded-lg border px-3 text-sm transition-colors"
+              aria-label="Open search (Cmd+K)"
             >
               <i className="gng-search" />
               <span className="hidden sm:inline">Search...</span>
@@ -109,6 +112,8 @@ export default function AdminHeader({
                 ? "bg-grey-800 text-white"
                 : "text-grey-400 hover:bg-grey-800 hover:text-white"
             )}
+            aria-label={unreadCount > 0 ? `Notifications (${unreadCount} unread)` : "Notifications"}
+            aria-expanded={notificationsOpen}
           >
             <i className="gng-bell text-lg" />
             {unreadCount > 0 && (
@@ -129,13 +134,18 @@ export default function AdminHeader({
               ? "border-action-500 bg-action-900/50 text-action-300"
               : "border-purple bg-purple/10 text-purple hover:bg-purple/20"
           )}
+          aria-label={ariaOpen ? "Close Aria AI assistant" : "Open Aria AI assistant"}
+          aria-expanded={ariaOpen}
         >
           <i className="gng-sparkle" />
           <span className="hidden sm:inline">Aria</span>
         </button>
 
         {/* User Avatar */}
-        <button className="from-action-400 to-action-600 flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br">
+        <button
+          className="from-action-400 to-action-600 flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br"
+          aria-label="User menu"
+        >
           <span className="text-sm font-semibold text-white">A</span>
         </button>
       </div>

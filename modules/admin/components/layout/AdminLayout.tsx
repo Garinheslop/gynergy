@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import { cn } from "@lib/utils/style";
 
 import AdminHeader from "./AdminHeader";
 import AdminSidebar from "./AdminSidebar";
 import { QuickSearch } from "./QuickSearch";
+import KeyboardShortcutsModal, { useKeyboardShortcuts } from "../ui/KeyboardShortcutsModal";
 import type { AriaInsight } from "../../types/admin";
 import AriaPanel from "../aria/AriaPanel";
 
@@ -17,38 +19,25 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children, title, subtitle }: AdminLayoutProps) {
+  const router = useRouter();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [ariaOpen, setAriaOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [pendingModeration, setPendingModeration] = useState(0);
   const [proactiveInsights, setProactiveInsights] = useState<AriaInsight[]>([]);
+  const { handleGlobalShortcuts } = useKeyboardShortcuts();
 
-  // Handle keyboard shortcuts
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      // Cmd/Ctrl + K for search
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setSearchOpen((prev) => !prev);
-      }
-      // Cmd/Ctrl + . for Aria
-      if ((e.metaKey || e.ctrlKey) && e.key === ".") {
-        e.preventDefault();
-        setAriaOpen((prev) => !prev);
-      }
-      // Escape to close panels
-      if (e.key === "Escape") {
-        if (searchOpen) setSearchOpen(false);
-        else if (ariaOpen) setAriaOpen(false);
-      }
-    },
-    [ariaOpen, searchOpen]
-  );
-
+  // Set up keyboard shortcuts with the hook
   useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
+    return handleGlobalShortcuts({
+      onSearch: () => setSearchOpen((prev) => !prev),
+      onAria: () => setAriaOpen((prev) => !prev),
+      onShortcuts: () => setShortcutsOpen((prev) => !prev),
+      onRefresh: () => globalThis.location.reload(),
+      onNavigate: (path) => router.push(path),
+    });
+  }, [handleGlobalShortcuts, router]);
 
   // Fetch pending moderation count
   useEffect(() => {
@@ -154,6 +143,9 @@ export default function AdminLayout({ children, title, subtitle }: AdminLayoutPr
 
       {/* Quick Search Modal */}
       <QuickSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+
+      {/* Keyboard Shortcuts Modal */}
+      <KeyboardShortcutsModal isOpen={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
     </div>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 
+import { useSearchParams, useRouter } from "next/navigation";
+
 import {
   AdminLayout,
   StatCard,
@@ -45,15 +47,34 @@ interface Alert {
   createdAt: string;
 }
 
+type DateRange = "7d" | "30d" | "90d";
+
+const isValidDateRange = (value: string | null): value is DateRange => {
+  return value === "7d" || value === "30d" || value === "90d";
+};
+
 export default function AdminDashboard() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Read date range from URL params with fallback to "30d"
+  const urlRange = searchParams.get("range");
+  const dateRange: DateRange = isValidDateRange(urlRange) ? urlRange : "30d";
+
   const [metrics, setMetrics] = useState<DashboardMetrics>(defaultMetrics);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [userGrowthData, setUserGrowthData] = useState<ChartDataPoint[]>([]);
   const [revenueData, setRevenueData] = useState<ChartDataPoint[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [dateRange, setDateRange] = useState<"7d" | "30d" | "90d">("30d");
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  // Update URL when date range changes
+  const setDateRange = useCallback((range: DateRange) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("range", range);
+    router.push(`?${params.toString()}`, { scroll: false });
+  }, [router, searchParams]);
 
   // Fetch all dashboard data
   const fetchDashboardData = useCallback(async () => {

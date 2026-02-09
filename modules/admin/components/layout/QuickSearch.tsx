@@ -321,7 +321,12 @@ export function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh]">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+        aria-label="Close search"
+      />
 
       {/* Search Modal */}
       <div className="border-grey-800 bg-grey-900 relative w-full max-w-lg rounded-xl border shadow-2xl">

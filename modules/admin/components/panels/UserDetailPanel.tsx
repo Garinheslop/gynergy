@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 
 import { cn } from "@lib/utils/style";
+import { useToast } from "../ui/Toast";
+
+type ActionType = "grant_access" | "reset_streak" | "add_points" | "send_email";
 
 interface UserDetail {
   id: string;
@@ -64,6 +67,9 @@ export default function UserDetailPanel({ userId, isOpen, onClose }: UserDetailP
   const [user, setUser] = useState<UserDetail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"overview" | "activity" | "purchases">("overview");
+  const [actionLoading, setActionLoading] = useState<ActionType | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const { addToast } = useToast();
 
   useEffect(() => {
     if (userId && isOpen) {
@@ -73,24 +79,35 @@ export default function UserDetailPanel({ userId, isOpen, onClose }: UserDetailP
 
   const fetchUserDetail = async (id: string) => {
     setIsLoading(true);
+    setError(null);
     try {
       const res = await fetch(`/api/admin/users/${id}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          setUser(data.data);
-        }
+      if (!res.ok) {
+        throw new Error(`Failed to fetch user: ${res.status}`);
       }
-    } catch (error) {
-      console.error("Error fetching user detail:", error);
+      const data = await res.json();
+      if (data.success) {
+        setUser(data.data);
+      } else {
+        throw new Error(data.error || "Failed to load user data");
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load user";
+      setError(message);
+      addToast({
+        type: "error",
+        title: "Error loading user",
+        message,
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleAction = async (action: string) => {
-    if (!user) return;
+  const handleAction = async (action: ActionType) => {
+    if (!user || actionLoading) return;
 
+    setActionLoading(action);
     try {
       const res = await fetch(`/api/admin/users/${user.id}`, {
         method: "POST",
@@ -98,12 +115,31 @@ export default function UserDetailPanel({ userId, isOpen, onClose }: UserDetailP
         body: JSON.stringify({ action }),
       });
 
-      if (res.ok) {
+      if (!res.ok) {
+        throw new Error(`Action failed: ${res.status}`);
+      }
+
+      const data = await res.json();
+      if (data.success) {
+        addToast({
+          type: "success",
+          title: "Action completed",
+          message: `Successfully performed ${action.replace("_", " ")}`,
+        });
         // Refresh user data
         fetchUserDetail(user.id);
+      } else {
+        throw new Error(data.error || "Action failed");
       }
-    } catch (error) {
-      console.error("Error performing action:", error);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Action failed";
+      addToast({
+        type: "error",
+        title: "Action failed",
+        message,
+      });
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -150,7 +186,12 @@ export default function UserDetailPanel({ userId, isOpen, onClose }: UserDetailP
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <button
+        type="button"
+        className="fixed inset-0 z-40 cursor-default bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+        aria-label="Close panel"
+      />
 
       {/* Panel */}
       <div className="border-grey-800 bg-grey-900 fixed top-0 right-0 z-50 h-full w-full max-w-lg overflow-y-auto border-l shadow-2xl">
@@ -169,6 +210,19 @@ export default function UserDetailPanel({ userId, isOpen, onClose }: UserDetailP
           <div className="flex h-64 items-center justify-center">
             <div className="border-action-500 h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
           </div>
+        ) : error ? (
+          <div className="flex h-64 flex-col items-center justify-center gap-4 p-6">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-900/30">
+              <i className="gng-alert-circle text-2xl text-red-400" />
+            </div>
+            <p className="text-grey-400 text-center text-sm">{error}</p>
+            <button
+              onClick={() => userId && fetchUserDetail(userId)}
+              className="bg-grey-800 hover:bg-grey-700 rounded-lg px-4 py-2 text-sm font-medium text-white"
+            >
+              Try again
+            </button>
+          </div>
         ) : user ? (
           <div className="p-4">
             {/* Profile Header */}
@@ -178,7 +232,7 @@ export default function UserDetailPanel({ userId, isOpen, onClose }: UserDetailP
                   <img src={user.profileImage} alt="" className="h-full w-full object-cover" />
                 ) : (
                   <span className="text-2xl font-bold text-white">
-                    {user.firstName?.[0] || user.email?.[0]?.toUpperCase() || "?"}
+                    {user.firstName?.[0] ?? user.email?.[0]?.toUpperCase() ?? "?"}
                   </span>
                 )}
               </div>
@@ -324,30 +378,50 @@ export default function UserDetailPanel({ userId, isOpen, onClose }: UserDetailP
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => handleAction("grant_access")}
-                      className="bg-action-600 hover:bg-action-700 flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white"
+                      disabled={actionLoading !== null}
+                      className="bg-action-600 hover:bg-action-700 flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <i className="gng-key" />
+                      {actionLoading === "grant_access" ? (
+                        <i className="gng-loader animate-spin" />
+                      ) : (
+                        <i className="gng-key" />
+                      )}
                       Grant Access
                     </button>
                     <button
                       onClick={() => handleAction("reset_streak")}
-                      className="bg-grey-800 text-grey-300 hover:bg-grey-700 flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium"
+                      disabled={actionLoading !== null}
+                      className="bg-grey-800 text-grey-300 hover:bg-grey-700 flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <i className="gng-refresh" />
+                      {actionLoading === "reset_streak" ? (
+                        <i className="gng-loader animate-spin" />
+                      ) : (
+                        <i className="gng-refresh" />
+                      )}
                       Reset Streak
                     </button>
                     <button
                       onClick={() => handleAction("add_points")}
-                      className="bg-grey-800 text-grey-300 hover:bg-grey-700 flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium"
+                      disabled={actionLoading !== null}
+                      className="bg-grey-800 text-grey-300 hover:bg-grey-700 flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <i className="gng-plus" />
+                      {actionLoading === "add_points" ? (
+                        <i className="gng-loader animate-spin" />
+                      ) : (
+                        <i className="gng-plus" />
+                      )}
                       Add Points
                     </button>
                     <button
                       onClick={() => handleAction("send_email")}
-                      className="bg-grey-800 text-grey-300 hover:bg-grey-700 flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium"
+                      disabled={actionLoading !== null}
+                      className="bg-grey-800 text-grey-300 hover:bg-grey-700 flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <i className="gng-mail" />
+                      {actionLoading === "send_email" ? (
+                        <i className="gng-loader animate-spin" />
+                      ) : (
+                        <i className="gng-mail" />
+                      )}
                       Send Email
                     </button>
                   </div>
