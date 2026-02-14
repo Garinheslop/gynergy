@@ -1,5 +1,8 @@
 import Link from "next/link";
 
+// Force dynamic rendering to avoid static generation issues
+export const dynamic = "force-dynamic";
+
 export default function NotFound() {
   return (
     <div className="bg-bkg-light-secondary flex min-h-screen items-center justify-center p-4">

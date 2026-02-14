@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { AppDispatch } from "@store/configureStore";
+import type { AppThunk } from "@store/configureStore";
 
 import {
   fetchEntitlementsStart,
@@ -12,37 +12,40 @@ import {
 } from "./reducers";
 
 // Fetch user entitlements
-export const fetchEntitlements = () => async (dispatch: AppDispatch) => {
-  dispatch(fetchEntitlementsStart());
+export const fetchEntitlements =
+  (): AppThunk =>
+  async (dispatch): Promise<void> => {
+    dispatch(fetchEntitlementsStart());
 
-  try {
-    const response = await axios.get("/api/payments/entitlements");
-    dispatch(fetchEntitlementsSuccess(response.data));
-  } catch (error: unknown) {
-    const axiosError = error as { response?: { data?: { error?: string } } };
-    const message = axiosError.response?.data?.error || "Failed to fetch entitlements";
-    dispatch(fetchEntitlementsFailure(message));
-  }
-};
+    try {
+      const response = await axios.get("/api/payments/entitlements");
+      dispatch(fetchEntitlementsSuccess(response.data));
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { error?: string } } };
+      const message = axiosError.response?.data?.error || "Failed to fetch entitlements";
+      dispatch(fetchEntitlementsFailure(message));
+    }
+  };
 
 // Redeem friend code
-export const redeemFriendCode = (code: string) => async (dispatch: AppDispatch) => {
-  dispatch(redeemCodeStart());
+export const redeemFriendCode =
+  (code: string): AppThunk<Promise<{ success: boolean; error?: string }>> =>
+  async (dispatch) => {
+    dispatch(redeemCodeStart());
 
-  try {
-    const response = await axios.post("/api/payments/friend-code", { code });
-    dispatch(redeemCodeSuccess(response.data.message));
-    // Refresh entitlements after successful redemption
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    (dispatch as Function)(fetchEntitlements());
-    return { success: true };
-  } catch (error: unknown) {
-    const axiosError = error as { response?: { data?: { error?: string } } };
-    const message = axiosError.response?.data?.error || "Failed to redeem friend code";
-    dispatch(redeemCodeFailure(message));
-    return { success: false, error: message };
-  }
-};
+    try {
+      const response = await axios.post("/api/payments/friend-code", { code });
+      dispatch(redeemCodeSuccess(response.data.message));
+      // Refresh entitlements after successful redemption
+      dispatch(fetchEntitlements());
+      return { success: true };
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { data?: { error?: string } } };
+      const message = axiosError.response?.data?.error || "Failed to redeem friend code";
+      dispatch(redeemCodeFailure(message));
+      return { success: false, error: message };
+    }
+  };
 
 // Validate friend code (without redeeming)
 export const validateFriendCode = async (

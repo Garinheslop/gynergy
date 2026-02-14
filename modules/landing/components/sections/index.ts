@@ -1,0 +1,16 @@
+export { default as HeroSection } from "./HeroSection";
+export { default as MortalityMathSection } from "./MortalityMathSection";
+export { default as VSLSection } from "./VSLSection";
+export { default as ProblemSection } from "./ProblemSection";
+export { default as FivePillarsSection } from "./FivePillarsSection";
+export { default as QualificationSection } from "./QualificationSection";
+export { default as SocialProofSection } from "./SocialProofSection";
+export { default as WhatsIncludedSection } from "./WhatsIncludedSection";
+export { default as TimelineSection } from "./TimelineSection";
+export { default as GrandPrizeSection } from "./GrandPrizeSection";
+export { default as BringAFriendSection } from "./BringAFriendSection";
+export { default as AboutSection } from "./AboutSection";
+export { default as PricingSection } from "./PricingSection";
+export { default as GuaranteeSection } from "./GuaranteeSection";
+export { default as FAQSection } from "./FAQSection";
+export { default as FinalCTASection } from "./FinalCTASection";

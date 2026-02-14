@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@200;300;400;500;600;700&display=swap");
 
 @theme {
   /* Colors */
@@ -112,6 +113,25 @@
   --list-style-decimal: decimal;
   --list-style-square: square;
   --list-style-roman: upper-roman;
+
+  /* Landing Page Colors */
+  --color-lp-black: #050505;
+  --color-lp-dark: #0a0a09;
+  --color-lp-card: #0f0f0e;
+  --color-lp-border: #1a1917;
+  --color-lp-gold: #b8943e;
+  --color-lp-gold-light: #d4a843;
+  --color-lp-gold-dim: rgba(184, 148, 62, 0.15);
+  --color-lp-gold-glow: rgba(184, 148, 62, 0.08);
+  --color-lp-white: #f0ede8;
+  --color-lp-gray: rgba(240, 237, 232, 0.55);
+  --color-lp-muted: rgba(240, 237, 232, 0.35);
+  --color-lp-green: #2e8b57;
+  --color-lp-green-dim: rgba(46, 139, 87, 0.15);
+
+  /* Landing Page Fonts */
+  --font-bebas: "Bebas Neue", sans-serif;
+  --font-oswald: "Oswald", sans-serif;
 }
 
 html {
@@ -358,6 +378,73 @@ a {
   100% {
     opacity: 0.2;
   }
+}
+
+/* Landing Page Animations */
+@keyframes lp-reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes lp-reveal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes lp-gold-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(184, 148, 62, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(184, 148, 62, 0.5);
+  }
+}
+
+@keyframes lp-gold-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.lp-reveal-up {
+  animation: lp-reveal-up 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.lp-reveal-scale {
+  animation: lp-reveal-scale 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.lp-gold-pulse {
+  animation: lp-gold-pulse 2s ease-in-out infinite;
+}
+
+.lp-gold-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-lp-gold) 0%,
+    var(--color-lp-gold-light) 50%,
+    var(--color-lp-gold) 100%
+  );
+  background-size: 200% auto;
+  animation: lp-gold-shimmer 3s linear infinite;
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 @plugin "tailwind-scrollbar";
