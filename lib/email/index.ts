@@ -164,6 +164,28 @@ export async function sendFriendCodeEmail(params: {
   });
 }
 
+/**
+ * Send notification when a friend code is redeemed
+ */
+export async function sendFriendCodeRedeemedEmail(params: {
+  to: string;
+  creatorFirstName: string;
+  redeemerFirstName: string;
+  code: string;
+}): Promise<EmailResult> {
+  const { to, creatorFirstName, redeemerFirstName, code } = params;
+
+  const html = generateFriendCodeRedeemedHtml(creatorFirstName, redeemerFirstName, code);
+  const text = generateFriendCodeRedeemedText(creatorFirstName, redeemerFirstName, code);
+
+  return sendEmail({
+    to,
+    subject: `${redeemerFirstName} just joined using your friend code!`,
+    html,
+    text,
+  });
+}
+
 // ============================================================================
 // Email HTML Templates
 // ============================================================================
@@ -396,6 +418,51 @@ How to share:
 3. They enter the code and get instant access
 
 Tip: Choose people who are ready for transformation!
+
+— The Gynergy Team
+  `.trim();
+}
+
+function generateFriendCodeRedeemedHtml(
+  creatorFirstName: string,
+  redeemerFirstName: string,
+  code: string
+): string {
+  return emailWrapper(`
+    <h1>Great News, ${creatorFirstName}!</h1>
+    <p><span class="highlight">${redeemerFirstName}</span> just joined Gynergy using your friend code!</p>
+    <div class="code-box">
+      <span class="code">${code}</span>
+      <p style="margin-top: 8px; font-size: 14px; color: #888;">Code redeemed</p>
+    </div>
+    <div class="divider"></div>
+    <p>Your gift of transformation is already making a difference. ${redeemerFirstName} is now part of our community and ready to begin their 45-day journey.</p>
+    <p>Consider reaching out to support them along the way — accountability partners see <span class="highlight">3x better results!</span></p>
+    <div style="text-align: center;">
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://app.gynergy.com"}/community" class="button">Visit Community</a>
+    </div>
+    <div class="divider"></div>
+    <p style="font-size: 14px; color: #888;">Thank you for spreading the gift of gratitude.</p>
+  `);
+}
+
+function generateFriendCodeRedeemedText(
+  creatorFirstName: string,
+  redeemerFirstName: string,
+  code: string
+): string {
+  return `
+Great News, ${creatorFirstName}!
+
+${redeemerFirstName} just joined Gynergy using your friend code: ${code}
+
+Your gift of transformation is already making a difference. ${redeemerFirstName} is now part of our community and ready to begin their 45-day journey.
+
+Consider reaching out to support them along the way — accountability partners see 3x better results!
+
+Visit the Community: ${process.env.NEXT_PUBLIC_APP_URL || "https://app.gynergy.com"}/community
+
+Thank you for spreading the gift of gratitude.
 
 — The Gynergy Team
   `.trim();

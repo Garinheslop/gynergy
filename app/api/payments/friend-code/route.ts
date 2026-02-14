@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
         creatorFirstName: creator.first_name || "Friend",
         redeemerFirstName,
         code: normalizedCode,
-      }).catch((err) => {
+      }).catch((err: unknown) => {
         console.error("Failed to send friend code redeemed email:", err);
       });
     }
