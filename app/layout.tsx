@@ -5,6 +5,7 @@ import "@public/iconfonts/style.css";
 
 import type { Metadata, Viewport } from "next";
 
+import { OfflineBanner } from "@modules/common/components/OfflineIndicator";
 import { CelebrationRenderer } from "@modules/gamification/components";
 import DefaultLayout from "@modules/layouts/Default";
 import Navbar from "@modules/layouts/Navbar";
@@ -71,6 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <DefaultLayout>{children}</DefaultLayout>
           </main>
           <CelebrationRenderer />
+          <OfflineBanner position="bottom" />
         </Providers>
       </body>
     </html>
