@@ -6,3 +6,4 @@ export { default as PointsDisplay, PointsEarned } from "./PointsDisplay";
 export { default as StreakDisplay, StreakMilestone } from "./StreakDisplay";
 export { default as MultiplierBadge, MultiplierProgress } from "./MultiplierBadge";
 export { default as BadgeUnlockPopup } from "./BadgeUnlockPopup";
+export { default as CelebrationRenderer } from "./CelebrationRenderer";

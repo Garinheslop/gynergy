@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FC } from "react";
+import React, { FC, useEffect, useCallback } from "react";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -89,13 +89,41 @@ const DropdownMenu: FC = () => {
   const { ref, isComponentVisible, setIsComponentVisible } =
     useComponentVisible<HTMLDivElement>(false);
   const currentProfile = useSelector((state: RootState) => state.profile.current);
+
+  // Handle escape key to close menu
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isComponentVisible) {
+        setIsComponentVisible(false);
+      }
+    };
+
+    if (isComponentVisible) {
+      document.addEventListener("keydown", handleEscape);
+      // Prevent body scroll on mobile when menu is open
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "";
+    };
+  }, [isComponentVisible, setIsComponentVisible]);
+
+  const closeMenu = useCallback(() => {
+    setIsComponentVisible(false);
+  }, [setIsComponentVisible]);
+
   return (
     <div className={cn("group relative shrink-0")} ref={ref}>
       <button
-        className="group relative flex shrink-0 cursor-pointer items-center justify-center"
+        className="group focus-visible:ring-action-500 relative flex shrink-0 cursor-pointer items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
         onClick={() => {
           setIsComponentVisible(!isComponentVisible);
         }}
+        aria-expanded={isComponentVisible}
+        aria-haspopup="true"
+        aria-label="Open user menu"
       >
         <Image
           className="border-dark-pure group-hover:border-action-secondary h-[50px] w-[50px] shrink-0 rounded-full border-2 object-cover duration-300"
@@ -107,13 +135,27 @@ const DropdownMenu: FC = () => {
           <i className="gng-arrow-down-thin text-action-secondary text-[10px]" />
         </div>
       </button>
+
+      {/* Mobile backdrop */}
+      {isComponentVisible && (
+        <div
+          className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm sm:hidden"
+          onClick={closeMenu}
+          aria-hidden="true"
+        />
+      )}
+
       <TransitionWrapper
         isOpen={isComponentVisible}
-        sx={
-          "fixed sm:absolute right-0 top-[65px] w-screen sm:w-max h-screen sm:min-w-[370px] sm:h-[345px] z-[10000]"
-        }
+        sx={cn(
+          "z-[10000]",
+          // Mobile: slide-up drawer from bottom
+          "fixed bottom-0 left-0 right-0 max-h-[80vh] overflow-y-auto rounded-t-2xl",
+          // Desktop: dropdown menu
+          "sm:absolute sm:bottom-auto sm:left-auto sm:right-0 sm:top-[65px] sm:w-max sm:min-w-[370px] sm:max-h-none sm:rounded-lg sm:overflow-visible"
+        )}
       >
-        <UserMenuItems onItemClick={() => setIsComponentVisible(!isComponentVisible)} />
+        <UserMenuItems onItemClick={closeMenu} />
       </TransitionWrapper>
     </div>
   );
@@ -129,7 +171,11 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
   const userEnrollment = useSelector((state) => state.enrollments.current);
   const currentProfile = useSelector((state: RootState) => state.profile.current);
   return (
-    <ul className="bg-bkg-light border-border-light [&>li]:hover:[&>i]:text-action-secondary relative flex h-full w-full flex-col items-start gap-[30px] overflow-hidden rounded border px-[30px] py-[20px] sm:justify-between sm:gap-0 [&>li]:w-full [&>li]:hover:[&>i]:mr-[2px] [&>li>i]:duration-150">
+    <ul className="bg-bkg-light border-border-light [&>li]:hover:[&>i]:text-action-secondary relative flex h-full w-full flex-col items-start gap-[20px] overflow-hidden rounded-t-2xl border px-[30px] py-[20px] pb-[env(safe-area-inset-bottom,20px)] sm:justify-between sm:gap-0 sm:rounded sm:pb-[20px] [&>li]:w-full [&>li]:hover:[&>i]:mr-[2px] [&>li>i]:duration-150">
+      {/* Mobile close indicator */}
+      <li className="flex w-full justify-center pb-2 sm:hidden">
+        <div className="h-1 w-12 rounded-full bg-gray-300" />
+      </li>
       <li className="flex items-center gap-[10px]">
         <Image
           className="border-dark-pure h-[50px] w-[50px] shrink-0 rounded-full border-2 object-cover"

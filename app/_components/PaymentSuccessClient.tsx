@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState, useMemo } from "react";
 
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,6 +10,58 @@ import FriendCodeShare from "@modules/payment/components/FriendCodeShare";
 import icons from "@resources/icons";
 import { useDispatch, useSelector } from "@store/hooks";
 import { fetchEntitlements } from "@store/modules/payment";
+
+// Confetti celebration component
+function Confetti({ show }: Readonly<{ show: boolean }>) {
+  const particles = useMemo(() => {
+    const colors = ["#10b981", "#6366f1", "#f59e0b", "#ec4899", "#3b82f6", "#8b5cf6"];
+    return Array.from({ length: 100 }, (_, i) => ({
+      id: i,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      left: Math.random() * 100,
+      delay: Math.random() * 0.8,
+      duration: 2 + Math.random() * 2,
+      rotation: Math.random() * 360,
+      size: 6 + Math.random() * 8,
+    }));
+  }, []);
+
+  if (!show) return null;
+
+  return (
+    <>
+      <style jsx global>{`
+        @keyframes confetti-fall {
+          0% {
+            transform: translateY(-20px) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+          }
+        }
+      `}</style>
+      <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+        {particles.map((p) => (
+          <div
+            key={p.id}
+            className="absolute rounded-sm"
+            style={{
+              backgroundColor: p.color,
+              left: `${p.left}%`,
+              top: "-20px",
+              width: `${p.size}px`,
+              height: `${p.size}px`,
+              transform: `rotate(${p.rotation}deg)`,
+              animation: `confetti-fall ${p.duration}s ease-out ${p.delay}s forwards`,
+            }}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
 
 type PollingStatus = "waiting" | "polling" | "success" | "timeout" | "error";
 
@@ -23,6 +75,7 @@ function PaymentSuccessContent() {
   const [loading, setLoading] = useState(true);
   const [pollingStatus, setPollingStatus] = useState<PollingStatus>("waiting");
   const [pollCount, setPollCount] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const _sessionId = searchParams.get("session_id");
 
@@ -82,8 +135,21 @@ function PaymentSuccessContent() {
     }
   }, [payment.friendCodes.length]);
 
+  // Trigger confetti celebration when loading completes
+  useEffect(() => {
+    if (!loading) {
+      setShowConfetti(true);
+      // Stop confetti after animation completes
+      const timer = setTimeout(() => setShowConfetti(false), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [loading]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+      {/* Celebration Confetti */}
+      <Confetti show={showConfetti} />
+
       {/* Header */}
       <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

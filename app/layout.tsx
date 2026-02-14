@@ -5,6 +5,7 @@ import "@public/iconfonts/style.css";
 
 import type { Metadata, Viewport } from "next";
 
+import { CelebrationRenderer } from "@modules/gamification/components";
 import DefaultLayout from "@modules/layouts/Default";
 import Navbar from "@modules/layouts/Navbar";
 import Providers from "@modules/providers";
@@ -69,6 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main className="bg-bkg-light-secondary min-h-screen">
             <DefaultLayout>{children}</DefaultLayout>
           </main>
+          <CelebrationRenderer />
         </Providers>
       </body>
     </html>

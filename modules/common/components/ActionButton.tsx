@@ -246,6 +246,7 @@ const Button: React.FC<ButtonProps> = ({
     <button
       className={cn(
         "text-content-dark flex w-full cursor-pointer items-center justify-center gap-[10px] rounded px-[25px] py-[5px] duration-150 disabled:cursor-default",
+        "focus-visible:ring-action-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         disabled || isLoading
           ? "bg-bkg-disabled/20 text-content-dark/40 [&>p]:text-content-dark/40"
           : "bg-action hover:bg-action-100",
@@ -315,6 +316,7 @@ const TextButton: React.FC<TextButtonProps> = ({
     <button
       className={cn(
         "group group flex w-full items-center gap-[10px] rounded py-2 duration-150",
+        "focus-visible:ring-action-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         disabled ? "[&>p,i]:text-content-dark/30" : "hover:bg-action cursor-pointer hover:px-4",
         sx
       )}
@@ -349,6 +351,7 @@ const RadioBtn: React.FC<RadioBtnProps> = ({
     <button
       className={cn(
         "text-content-dark flex cursor-pointer items-center justify-between gap-4 px-4 py-2",
+        "focus-visible:ring-action-500 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         sx
       )}
       onClick={onClick}
@@ -362,7 +365,7 @@ const RadioBtn: React.FC<RadioBtnProps> = ({
   );
 };
 
-const RadioQuizBtn: React.FC<RadioQuizBtnProps> = ({
+const _RadioQuizBtn: React.FC<RadioQuizBtnProps> = ({
   label,
   paragraphVariant = paragraphVariants.meta,
   onClick,
@@ -413,6 +416,7 @@ const CheckButton: React.FC<CheckButtonProps> = ({
     <button
       className={cn(
         "flex w-full items-center justify-start gap-4 rounded p-4",
+        "focus-visible:ring-action-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         isActive ? "bg-bkg-light" : "bg-transparent",
         sx
       )}
@@ -462,7 +466,8 @@ const SliderBtn: React.FC<SliderBtnProps> = ({
       <button
         id="slider"
         className={cn(
-          "relative flex h-[24px] w-[46px] flex-shrink-0 cursor-pointer items-center rounded-[73px] duration-150 outline-none",
+          "relative flex h-[24px] w-[46px] flex-shrink-0 cursor-pointer items-center rounded-[73px] duration-150",
+          "focus-visible:ring-action-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
           !sliderState ? "bg-border-light-secondary" : "bg-action",
           {
             "bg-bkg-disabled/40 text-content-dark/60 cursor-default": disabled,
@@ -523,7 +528,8 @@ const ToggleBtn: React.FC<ToggleBtnProps> = ({
     <section className={cn("flex items-center", sx)}>
       <button
         className={cn(
-          "relative flex h-7 w-[62px] flex-shrink-0 cursor-pointer items-center rounded-[73px] duration-150 outline-none",
+          "relative flex h-7 w-[62px] flex-shrink-0 cursor-pointer items-center rounded-[73px] duration-150",
+          "focus-visible:ring-action-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
           sliderState ? "bg-danger-light" : "bg-action",
           { "bg-bkg-disabled/40 text-content-dark/60 cursor-default": disabled }
         )}
