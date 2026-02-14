@@ -131,7 +131,7 @@ async function handleCheckoutCompleted(
     }
 
     // If user exists, the database trigger will automatically:
-    // 1. Create 2 friend codes
+    // 1. Create 1 friend code
     // 2. Grant challenge access via user_entitlements
 
     // Send purchase confirmation email

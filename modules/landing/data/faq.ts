@@ -22,9 +22,9 @@ export const FAQ_ITEMS: FAQItem[] = [
       "Each weekly call is 60-90 minutes, focused on one of the five pillars. Garin teaches the core concepts, then opens the floor for hot seat coaching. You can bring specific challenges from your week. All calls are recorded if you can't make it live.",
   },
   {
-    question: "How does the Accountability Trio work?",
+    question: "How does the Accountability Duo work?",
     answer:
-      "When you enroll, you receive 2 friend codes to share with men you trust. They get full access to the challenge at no cost. Research shows groups of three have 95% higher completion rates than individuals. You'll hold each other accountable through the WhatsApp community.",
+      "When you enroll, you receive 1 friend code to share with a man you trust. They get full access to the challenge at no cost. Research shows pairs have 85% higher completion rates than individuals. You'll hold each other accountable through the WhatsApp community.",
   },
   {
     question: "What happens after the 45 days?",
@@ -39,7 +39,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "Why does this cost $997?",
     answer:
-      "The price reflects the value and commitment required. You're getting 8 live coaching calls ($2,000 value), a structured transformation system, and a brotherhood of men at your level. Plus, your investment includes 2 friend codes ($1,994 value) — so you're effectively paying $332 per person when you bring your Accountability Trio. We also offer a 3-payment plan of $349/month for those who prefer flexibility. The real question: what's another year of feeling disconnected worth?",
+      "The price reflects the value and commitment required. You're getting 8 live coaching calls ($2,000 value), a structured transformation system, and a brotherhood of men at your level. Plus, your investment includes 1 friend code ($997 value) — so you're effectively paying $498.50 per person when you bring your Accountability Duo. We also offer a 3-payment plan of $349/month for those who prefer flexibility. The real question: what's another year of feeling disconnected worth?",
   },
   {
     question: "Who is this NOT for?",

@@ -67,7 +67,7 @@ export const TESTIMONIALS: Testimonial[] = [
     initials: "M.S.",
     role: "CEO, Healthcare · Cohort 3",
     quote:
-      "The Accountability Trio was everything. My two friends and I held each other to a standard none of us could have maintained alone. All three of us completed the challenge. Two of us improved every pillar. This works.",
+      "The Accountability Duo was everything. My friend and I held each other to a standard neither of us could have maintained alone. Both of us completed the challenge. Both of us improved every pillar. This works.",
     pillarChanges: [
       { pillar: "Growth", before: 5, after: 9 },
       { pillar: "Purpose", before: 4, after: 8 },
