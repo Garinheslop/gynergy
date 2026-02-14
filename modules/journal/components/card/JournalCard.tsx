@@ -27,6 +27,8 @@ interface JournalCardProps {
   isTimeRestricted?: boolean;
   isLoading?: boolean;
   isCompleted: boolean;
+  /** Show warning when streak is at risk (has streak but not completed today) */
+  isStreakAtRisk?: boolean;
 }
 const JournalCard: React.FC<JournalCardProps> = ({
   journalType,
@@ -43,6 +45,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
   isTimeRestricted,
   isLoading = false,
   isCompleted,
+  isStreakAtRisk = false,
 }) => {
   const { journalPopupObj } = usePopup();
 
@@ -222,14 +225,38 @@ const JournalCard: React.FC<JournalCardProps> = ({
             {isLoading ? (
               <TextSkeleton sx="w-[60%]" />
             ) : (
-              <div className="flex gap-[5px]">
-                <Image src={icons.streak} className="h-[25px] w-auto" />
-                <Paragraph
-                  isHtml
-                  content={`<span>${streak > 0 ? streak.toString().padStart(2, "0") : 0}<span/> Days Streak`}
-                  variant={paragraphVariants.regular}
-                  sx="[&>span]:!font-bold"
-                />
+              <div className="flex flex-col gap-2">
+                <div
+                  className={cn("flex items-center gap-[5px]", {
+                    "text-red-400": isStreakAtRisk && streak > 0 && !isCompleted,
+                  })}
+                >
+                  <Image
+                    src={icons.streak}
+                    alt="Streak"
+                    className={cn("h-[25px] w-auto", {
+                      "animate-pulse": isStreakAtRisk && streak > 0 && !isCompleted,
+                    })}
+                  />
+                  <Paragraph
+                    isHtml
+                    content={`<span>${streak > 0 ? streak.toString().padStart(2, "0") : 0}<span/> Days Streak`}
+                    variant={paragraphVariants.regular}
+                    sx={cn("[&>span]:!font-bold", {
+                      "[&>span]:text-red-400": isStreakAtRisk && streak > 0 && !isCompleted,
+                    })}
+                  />
+                  {isStreakAtRisk && streak > 0 && !isCompleted && (
+                    <i className="gng-alert animate-pulse text-[16px] text-red-400" />
+                  )}
+                </div>
+                {isStreakAtRisk && streak > 0 && !isCompleted && (
+                  <Paragraph
+                    content="Complete now to keep your streak!"
+                    variant={paragraphVariants.meta}
+                    sx="text-red-400"
+                  />
+                )}
               </div>
             )}
           </>
@@ -242,7 +269,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
             <TextSkeleton sx="w-[70%]" />
           ) : (
             <>
-              <Image src={icons.point} className="h-[25px] w-auto" />
+              <Image src={icons.point} alt="Points" className="h-[25px] w-auto" />
               <Paragraph
                 isHtml
                 content={`Complete & Earn <span>${points} Pts<span/>`}

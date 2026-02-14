@@ -10,14 +10,12 @@ import Heading from "@modules/common/components/typography/Heading";
 import MeditationCard from "@modules/journal/components/card/MeditationCard";
 import { pagePaths } from "@resources/paths";
 import { journalTypes } from "@resources/types/journal";
-import { headingVariants, paragraphVariants } from "@resources/variants";
+import { headingVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
 import { getUserActions, getUserDailyActionLogs } from "@store/modules/action";
 import { setEditorDataStates } from "@store/modules/editor";
-import { updateUserStreak } from "@store/modules/enrollment";
 import { getUserJournals } from "@store/modules/journal";
 import { getUserMeditations } from "@store/modules/meditation";
-import { getUserVisions } from "@store/modules/vision";
 
 import Highlights from "./Highlights";
 import Quote from "./Quote";
@@ -232,25 +230,31 @@ const Tasks = ({ heading, type, journalCardContents, onJournalWrite, isLoading }
             "xmd:grid-cols-2 gap-[20px] lg:grid-cols-3": type === sectionTypes.daily,
           })}
         >
-          {journalCardContents.map((content: any, index: number) => (
-            <JournalCard
-              key={index}
-              heading={content.heading}
-              subHeading={content.subHeading}
-              description={content.description}
-              subDescription={content.subDescription}
-              hyperlink={content.hyperlink}
-              journalType={content.journalType}
-              icon={content.icon}
-              isDisabled={content?.isDisabled}
-              isTimeRestricted={content?.isTimeRestricted}
-              points={content.points}
-              streak={content.streak}
-              onWrite={onJournalWrite}
-              isLoading={isLoading}
-              isCompleted={content?.data?.id ? true : false}
-            />
-          ))}
+          {journalCardContents.map((content: any, index: number) => {
+            const isCompleted = content?.data?.id ? true : false;
+            // Streak is at risk when user has a streak but hasn't completed today
+            const isStreakAtRisk = !isCompleted && (content.streak ?? 0) > 0;
+            return (
+              <JournalCard
+                key={index}
+                heading={content.heading}
+                subHeading={content.subHeading}
+                description={content.description}
+                subDescription={content.subDescription}
+                hyperlink={content.hyperlink}
+                journalType={content.journalType}
+                icon={content.icon}
+                isDisabled={content?.isDisabled}
+                isTimeRestricted={content?.isTimeRestricted}
+                points={content.points}
+                streak={content.streak}
+                onWrite={onJournalWrite}
+                isLoading={isLoading}
+                isCompleted={isCompleted}
+                isStreakAtRisk={isStreakAtRisk}
+              />
+            );
+          })}
         </div>
       )}
       {type === sectionTypes.daily &&

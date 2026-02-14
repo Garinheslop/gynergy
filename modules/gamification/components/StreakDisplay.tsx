@@ -17,6 +17,10 @@ interface StreakDisplayProps {
     evening: number;
     gratitude: number;
   };
+  /** Show warning indicator when streak is at risk */
+  isAtRisk?: boolean;
+  /** Optional message to show when at risk */
+  riskMessage?: string;
   sx?: string;
 }
 
@@ -28,6 +32,8 @@ const StreakDisplay: React.FC<StreakDisplayProps> = ({
   size = "medium",
   variant = "default",
   streakTypes,
+  isAtRisk = false,
+  riskMessage,
   sx,
 }) => {
   const sizeClasses = {
@@ -73,12 +79,18 @@ const StreakDisplay: React.FC<StreakDisplayProps> = ({
             className={cn(
               "gng-fire",
               config.icon,
-              getFlameColor(streak),
-              shouldAnimate && "animate-pulse"
+              isAtRisk && streak > 0 ? "animate-pulse text-red-400" : getFlameColor(streak),
+              shouldAnimate && !isAtRisk && "animate-pulse"
             )}
           />
         )}
         <span className={cn(config.number, "text-content-dark")}>{streak}</span>
+        {isAtRisk && streak > 0 && (
+          <i
+            className="gng-alert animate-pulse text-[14px] text-red-400"
+            title={riskMessage || "Streak at risk!"}
+          />
+        )}
       </div>
     );
   }
@@ -93,8 +105,8 @@ const StreakDisplay: React.FC<StreakDisplayProps> = ({
               className={cn(
                 "gng-fire",
                 config.icon,
-                getFlameColor(streak),
-                shouldAnimate && "animate-pulse"
+                isAtRisk && streak > 0 ? "animate-pulse text-red-400" : getFlameColor(streak),
+                shouldAnimate && !isAtRisk && "animate-pulse"
               )}
             />
           )}
@@ -102,7 +114,22 @@ const StreakDisplay: React.FC<StreakDisplayProps> = ({
           {showLabel && (
             <Paragraph content={label} variant={config.label} sx="text-content-dark-secondary" />
           )}
+          {isAtRisk && streak > 0 && (
+            <i
+              className="gng-alert animate-pulse text-[14px] text-red-400"
+              title={riskMessage || "Streak at risk!"}
+            />
+          )}
         </div>
+
+        {/* Warning message */}
+        {isAtRisk && streak > 0 && riskMessage && (
+          <Paragraph
+            content={riskMessage}
+            variant={paragraphVariants.meta}
+            sx="text-red-400 mt-1"
+          />
+        )}
 
         {/* Individual streaks */}
         <div className="mt-2 flex gap-4">
@@ -131,15 +158,28 @@ const StreakDisplay: React.FC<StreakDisplayProps> = ({
             className={cn(
               "gng-fire",
               config.icon,
-              getFlameColor(streak),
-              shouldAnimate && "animate-pulse"
+              isAtRisk && streak > 0 ? "animate-pulse text-red-400" : getFlameColor(streak),
+              shouldAnimate && !isAtRisk && "animate-pulse"
             )}
           />
         )}
         <span className={cn(config.number, "text-content-dark")}>{streak}</span>
+        {isAtRisk && streak > 0 && (
+          <i
+            className="gng-alert animate-pulse text-[14px] text-red-400"
+            title={riskMessage || "Streak at risk!"}
+          />
+        )}
       </div>
       {showLabel && (
         <Paragraph content={label} variant={config.label} sx="text-content-dark-secondary" />
+      )}
+      {isAtRisk && streak > 0 && riskMessage && (
+        <Paragraph
+          content={riskMessage}
+          variant={paragraphVariants.meta}
+          sx="text-red-400 mt-1 text-center"
+        />
       )}
     </div>
   );
@@ -174,6 +214,40 @@ export const StreakMilestone: React.FC<StreakMilestoneProps> = ({
           className="h-full rounded-full bg-gradient-to-r from-orange-400 to-amber-400 transition-all duration-500"
           style={{ width: `${Math.min(progress, 100)}%` }}
         />
+      </div>
+    </div>
+  );
+};
+
+// Streak warning badge for inline use
+interface StreakWarningBadgeProps {
+  streak: number;
+  message?: string;
+  sx?: string;
+}
+
+export const StreakWarningBadge: React.FC<StreakWarningBadgeProps> = ({
+  streak,
+  message = "Complete now to keep your streak!",
+  sx,
+}) => {
+  if (streak === 0) return null;
+
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2",
+        sx
+      )}
+    >
+      <div className="flex items-center gap-1.5">
+        <i className="gng-fire animate-pulse text-[18px] text-red-400" />
+        <span className="text-sm font-bold text-red-400">{streak}</span>
+      </div>
+      <div className="h-4 w-px bg-red-400/30" />
+      <div className="flex items-center gap-1.5">
+        <i className="gng-alert text-[14px] text-red-400" />
+        <span className="text-sm text-red-300">{message}</span>
       </div>
     </div>
   );

@@ -213,11 +213,16 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
       </li>
       <div className="border-border-light w-full border-b" />
       <li
-        className="flex cursor-pointer items-center gap-[10px] sm:hidden"
+        role="button"
+        tabIndex={0}
+        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-[10px] rounded py-2 sm:hidden"
         onClick={() => {
           router.push(`${currentBook?.slug}/${pagePaths.history}`);
           onItemClick();
         }}
+        onKeyDown={(e) =>
+          e.key === "Enter" && router.push(`${currentBook?.slug}/${pagePaths.history}`)
+        }
       >
         <i className="gng-journal text-content-secondary text-[20px]" />
         <Paragraph
@@ -227,11 +232,16 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
         />
       </li>
       <li
-        className="flex cursor-pointer items-center gap-[10px]"
+        role="button"
+        tabIndex={0}
+        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-[10px] rounded py-2"
         onClick={() => {
           router.push(`/${currentBook?.slug}/${pagePaths.settings}`);
           onItemClick();
         }}
+        onKeyDown={(e) =>
+          e.key === "Enter" && router.push(`/${currentBook?.slug}/${pagePaths.settings}`)
+        }
       >
         <i className="gng-settings text-content-secondary text-[20px]" />
         <Paragraph
@@ -241,7 +251,9 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
         />
       </li>
       <li
-        className="flex cursor-pointer items-center gap-[10px]"
+        role="button"
+        tabIndex={0}
+        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-[10px] rounded py-2"
         onClick={() => {
           window.open(
             "mailto:bitechxconnect+kojwp6mtw4hinjw7vdoe@boards.trello.com",
@@ -250,6 +262,14 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
           );
           onItemClick();
         }}
+        onKeyDown={(e) =>
+          e.key === "Enter" &&
+          window.open(
+            "mailto:bitechxconnect+kojwp6mtw4hinjw7vdoe@boards.trello.com",
+            "_blank",
+            "noopener,noreferrer"
+          )
+        }
       >
         <i className="gng-alert text-content-secondary text-[20px]" />
         <Paragraph
@@ -259,11 +279,14 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
         />
       </li>
       <li
-        className="flex cursor-pointer items-center gap-[10px] sm:hidden"
+        role="button"
+        tabIndex={0}
+        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-[10px] rounded py-2 sm:hidden"
         onClick={() => {
           router.push("/community");
           onItemClick();
         }}
+        onKeyDown={(e) => e.key === "Enter" && router.push("/community")}
       >
         <i className="gng-people text-content-secondary text-[20px]" />
         <Paragraph
@@ -273,11 +296,14 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
         />
       </li>
       <li
-        className="flex cursor-pointer items-center gap-[10px]"
+        role="button"
+        tabIndex={0}
+        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-[10px] rounded py-2"
         onClick={() => {
           logout();
           onItemClick();
         }}
+        onKeyDown={(e) => e.key === "Enter" && logout()}
       >
         <i className="gng-sign-out text-content-secondary text-[20px]" />
         <Paragraph
