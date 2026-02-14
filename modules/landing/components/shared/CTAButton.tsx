@@ -2,9 +2,10 @@
 
 import { cn } from "@lib/utils/style";
 
-interface CTAButtonProps {
+export interface CTAButtonProps {
   children: React.ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
+  type?: "button" | "submit" | "reset";
   variant?: "primary" | "secondary" | "outline";
   size?: "default" | "large" | "small";
   isLoading?: boolean;
@@ -16,6 +17,7 @@ interface CTAButtonProps {
 export default function CTAButton({
   children,
   onClick,
+  type = "button",
   variant = "primary",
   size = "default",
   isLoading = false,
@@ -49,6 +51,7 @@ export default function CTAButton({
 
   return (
     <button
+      type={type}
       onClick={onClick}
       disabled={disabled || isLoading}
       className={cn(

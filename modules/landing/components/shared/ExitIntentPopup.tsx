@@ -4,13 +4,51 @@ import { useState, useEffect, useRef } from "react";
 
 import { cn } from "@lib/utils/style";
 
+type PopupVariant = "challenge" | "webinar";
+
+interface VariantContent {
+  headline: string;
+  subheadline: string;
+  buttonText: string;
+  successHeadline: string;
+  successMessage: string;
+}
+
+const VARIANT_CONTENT: Record<PopupVariant, VariantContent> = {
+  challenge: {
+    headline: "Wait — Before You Go",
+    subheadline:
+      'Get the free "5 Pillar Assessment" to discover which area of your life is silently sabotaging the others.',
+    buttonText: "Get It Free",
+    successHeadline: "You're In!",
+    successMessage: "Check your email for exclusive details.",
+  },
+  webinar: {
+    headline: "Before You Go...",
+    subheadline:
+      "Take the Five Pillar Assessment. 5 questions. 2 minutes. No registration required.",
+    buttonText: "Take the Assessment",
+    successHeadline: "Let's Go!",
+    successMessage: "Redirecting to your assessment...",
+  },
+};
+
 interface ExitIntentPopupProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit?: (email: string) => Promise<void>;
+  variant?: PopupVariant;
+  redirectOnSubmit?: string;
 }
 
-export default function ExitIntentPopup({ isOpen, onClose, onSubmit }: ExitIntentPopupProps) {
+export default function ExitIntentPopup({
+  isOpen,
+  onClose,
+  onSubmit,
+  variant = "challenge",
+  redirectOnSubmit,
+}: ExitIntentPopupProps) {
+  const content = VARIANT_CONTENT[variant];
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -58,10 +96,14 @@ export default function ExitIntentPopup({ isOpen, onClose, onSubmit }: ExitInten
       await onSubmit?.(email);
       setSubmitted(true);
       setTimeout(() => {
-        onClose();
-        setSubmitted(false);
-        setEmail("");
-      }, 2000);
+        if (redirectOnSubmit) {
+          globalThis.location.href = redirectOnSubmit;
+        } else {
+          onClose();
+          setSubmitted(false);
+          setEmail("");
+        }
+      }, 1500);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -111,11 +153,9 @@ export default function ExitIntentPopup({ isOpen, onClose, onSubmit }: ExitInten
         {submitted ? (
           <>
             <h3 id="exit-intent-title" className="font-bebas text-lp-gold-light mb-2 text-2xl">
-              You&apos;re In!
+              {content.successHeadline}
             </h3>
-            <p className="font-oswald text-lp-gray text-sm font-light">
-              Check your email for exclusive details.
-            </p>
+            <p className="font-oswald text-lp-gray text-sm font-light">{content.successMessage}</p>
           </>
         ) : (
           <>
@@ -123,11 +163,10 @@ export default function ExitIntentPopup({ isOpen, onClose, onSubmit }: ExitInten
               id="exit-intent-title"
               className="font-bebas text-lp-white mb-2 text-2xl md:text-3xl"
             >
-              Wait — Before You Go
+              {content.headline}
             </h3>
             <p className="font-oswald text-lp-gray mb-6 text-sm leading-relaxed font-light md:text-base">
-              Get the free &ldquo;5 Pillar Assessment&rdquo; to discover which area of your life is
-              silently sabotaging the others.
+              {content.subheadline}
             </p>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
@@ -163,7 +202,7 @@ export default function ExitIntentPopup({ isOpen, onClose, onSubmit }: ExitInten
                   "focus-visible:ring-lp-gold-light focus-visible:ring-offset-lp-card focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                 )}
               >
-                {isSubmitting ? "..." : "Get It Free"}
+                {isSubmitting ? "..." : content.buttonText}
               </button>
             </form>
 

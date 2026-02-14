@@ -7,3 +7,4 @@ export { default as CTAButton } from "./CTAButton";
 export { default as GoldLine } from "./GoldLine";
 export { default as SectionLabel } from "./SectionLabel";
 export { default as SectionTitle } from "./SectionTitle";
+export { default as WebinarVideo } from "./WebinarVideo";

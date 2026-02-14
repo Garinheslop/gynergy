@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 
+import Link from "next/link";
+
 import { cn } from "@lib/utils/style";
 
 interface LandingNavProps {
@@ -50,6 +52,18 @@ export default function LandingNav({
             {seatsRemaining} Seats Left
           </span>
         )}
+
+        {/* Sign In Link for returning users - visible on all screen sizes */}
+        <Link
+          href="/login"
+          className={cn(
+            "font-oswald text-[10px] tracking-widest uppercase sm:text-xs",
+            "text-lp-gold/80 hover:text-lp-gold",
+            "transition-colors duration-300"
+          )}
+        >
+          Sign In
+        </Link>
 
         {/* CTA Button */}
         <button
