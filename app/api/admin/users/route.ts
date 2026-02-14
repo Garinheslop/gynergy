@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { createAuditLog, getCategoryFromAction, AuditAction } from "@lib/services/auditLog";
 import { createClient, createServiceClient } from "@lib/supabase-server";
 
 export async function GET(request: NextRequest) {
@@ -169,9 +170,29 @@ export async function POST(request: NextRequest) {
       }
 
       case "updateUser": {
+        // Get previous state for audit
+        const { data: prevUser } = await serviceClient
+          .from("users")
+          .select("*")
+          .eq("id", userId)
+          .single();
+
         const { error } = await serviceClient.from("users").update(data).eq("id", userId);
 
         if (error) throw error;
+
+        // Log audit
+        const auditAction: AuditAction = "user.update";
+        await createAuditLog(supabase, {
+          adminId: user.id,
+          action: auditAction,
+          category: getCategoryFromAction(auditAction),
+          resourceType: "user",
+          resourceId: userId,
+          previousState: prevUser || undefined,
+          newState: data,
+          status: "success",
+        });
 
         return NextResponse.json({ success: true, message: "User updated" });
       }
@@ -186,6 +207,18 @@ export async function POST(request: NextRequest) {
 
         if (error) throw error;
 
+        // Log audit
+        const auditAction: AuditAction = "user.grant_access";
+        await createAuditLog(supabase, {
+          adminId: user.id,
+          action: auditAction,
+          category: getCategoryFromAction(auditAction),
+          resourceType: "user",
+          resourceId: userId,
+          newState: { has_challenge_access: true, challenge_access_type: "admin_granted" },
+          status: "success",
+        });
+
         return NextResponse.json({ success: true, message: "Access granted" });
       }
 
@@ -199,6 +232,19 @@ export async function POST(request: NextRequest) {
           .eq("user_id", userId);
 
         if (error) throw error;
+
+        // Log audit
+        const auditAction: AuditAction = "user.grant_access";
+        await createAuditLog(supabase, {
+          adminId: user.id,
+          action: auditAction,
+          category: getCategoryFromAction(auditAction),
+          resourceType: "user",
+          resourceId: userId,
+          newState: { has_challenge_access: false, challenge_access_type: null },
+          metadata: { action: "revoke" },
+          status: "success",
+        });
 
         return NextResponse.json({ success: true, message: "Access revoked" });
       }

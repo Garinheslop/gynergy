@@ -1,4 +1,5 @@
 export const leaderboardFilterTypes = {
+  daily: "daily",
   weekly: "weekly",
   monthly: "monthly",
   session: "session",

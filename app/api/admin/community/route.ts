@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { createAuditLog, getCategoryFromAction, AuditAction } from "@lib/services/auditLog";
 import { createClient, createServiceClient } from "@lib/supabase-server";
 
 export async function GET(request: NextRequest) {
@@ -215,6 +216,13 @@ export async function POST(request: NextRequest) {
       delete updateData.resolved_at;
     }
 
+    // Get item details before update for audit
+    const { data: itemBefore } = await serviceClient
+      .from("moderation_queue")
+      .select("*")
+      .eq("id", itemId)
+      .single();
+
     const { error } = await serviceClient
       .from("moderation_queue")
       .update(updateData)
@@ -242,6 +250,27 @@ export async function POST(request: NextRequest) {
         }
       }
     }
+
+    // Log audit entry
+    const auditActionMap: Record<string, AuditAction> = {
+      approve: "moderation.approve",
+      reject: "moderation.reject",
+      escalate: "moderation.escalate",
+      start_review: "moderation.approve", // Using approve as closest match
+    };
+    const auditAction = auditActionMap[action] || "moderation.approve";
+
+    await createAuditLog(supabase, {
+      adminId: user.id,
+      action: auditAction,
+      category: getCategoryFromAction(auditAction),
+      resourceType: itemBefore?.content_type || "moderation_item",
+      resourceId: itemId,
+      previousState: itemBefore || undefined,
+      newState: updateData,
+      metadata: { moderationAction: action, note },
+      status: "success",
+    });
 
     return NextResponse.json({
       success: true,

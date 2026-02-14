@@ -457,3 +457,98 @@ export interface VideoStatusResponse {
   streamUrl?: string;
   thumbnailUrl?: string;
 }
+
+// =============================================================================
+// QUIZ TYPES
+// =============================================================================
+
+export type QuestionType = "multiple_choice" | "true_false" | "short_answer" | "multi_select";
+
+export interface Quiz {
+  id: string;
+  lessonId?: string;
+  courseId?: string;
+  title: string;
+  description?: string;
+  passingScore: number;
+  maxAttempts: number;
+  timeLimitMinutes?: number;
+  shuffleQuestions: boolean;
+  shuffleAnswers: boolean;
+  showCorrectAnswers: boolean;
+  isRequired: boolean;
+  pointsReward: number;
+  orderIndex: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface QuizQuestion {
+  id: string;
+  quizId: string;
+  questionText: string;
+  questionType: QuestionType;
+  explanation?: string;
+  points: number;
+  orderIndex: number;
+  isActive: boolean;
+  answers?: QuizAnswer[];
+}
+
+export interface QuizAnswer {
+  id: string;
+  questionId: string;
+  answerText: string;
+  isCorrect?: boolean;
+  orderIndex: number;
+}
+
+export interface QuizAttempt {
+  id: string;
+  userId: string;
+  quizId: string;
+  startedAt: string;
+  completedAt?: string;
+  score?: number;
+  totalPoints?: number;
+  percentage?: number;
+  passed?: boolean;
+  timeTakenSeconds?: number;
+  attemptNumber: number;
+}
+
+export interface QuizResponse {
+  id: string;
+  attemptId: string;
+  questionId: string;
+  selectedAnswerIds?: string[];
+  textAnswer?: string;
+  isCorrect?: boolean;
+  pointsEarned: number;
+  answeredAt: string;
+}
+
+export interface CourseCertificate {
+  id: string;
+  userId: string;
+  courseId: string;
+  certificateNumber: string;
+  issuedAt: string;
+  pdfUrl?: string;
+  metadata?: Record<string, unknown>;
+}
+
+// Quiz API request types
+export const quizRequestTypes = {
+  getQuizByLesson: "get-quiz-by-lesson",
+  getQuestions: "get-questions",
+  getAttempts: "get-attempts",
+  getAttemptDetails: "get-attempt-details",
+  getCertificates: "get-certificates",
+  startAttempt: "start-attempt",
+  submitResponse: "submit-response",
+  finalizeAttempt: "finalize-attempt",
+} as const;
+
+export type QuizRequestType = (typeof quizRequestTypes)[keyof typeof quizRequestTypes];

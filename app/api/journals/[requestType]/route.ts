@@ -132,6 +132,32 @@ export async function GET(request: Request, { params }: { params: { requestType:
     };
     responseName = "journals";
   }
+
+  // GET: Journal history with pagination and filtering
+  if (requestType === journalRequestTypes.getUserJournalHistory) {
+    const url = new URL(request.url);
+    const limit = Number.parseInt(url.searchParams.get("limit") || "20", 10);
+    const offset = Number.parseInt(url.searchParams.get("offset") || "0", 10);
+    const journalType = url.searchParams.get("journalType");
+    const startDate = url.searchParams.get("startDate");
+    const endDate = url.searchParams.get("endDate");
+
+    const result = await getUserJournalHistory({
+      userId: user.id,
+      sessionId: sessionId || undefined,
+      limit,
+      offset,
+      journalType: journalType || undefined,
+      startDate: startDate || undefined,
+      endDate: endDate || undefined,
+    });
+
+    if ("error" in result) {
+      return NextResponse.json({ error: { message: result.error } }, { status: 500 });
+    }
+    return NextResponse.json(result);
+  }
+
   if (!fetcherHandler || !responseName || !args) {
     return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
   }
@@ -195,6 +221,152 @@ export async function POST(request: Request, { params }: { params: { requestType
   }
 }
 
+// PATCH: Update an existing journal
+export async function PATCH(request: Request, { params }: { params: { requestType: string } }) {
+  const { requestType } = params;
+
+  if (requestType !== journalRequestTypes.updateJournal) {
+    return NextResponse.json({ error: "Invalid request type for PATCH" }, { status: 400 });
+  }
+
+  const supabase = createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const { journalId, updates } = await request.json();
+
+    if (!journalId || !updates) {
+      return NextResponse.json({ error: "Journal ID and updates are required" }, { status: 400 });
+    }
+
+    // Verify ownership
+    const { data: existingJournal, error: fetchError } = await supabase
+      .from("journals")
+      .select("id, user_id")
+      .eq("id", journalId)
+      .single();
+
+    if (fetchError || !existingJournal) {
+      return NextResponse.json({ error: "Journal not found" }, { status: 404 });
+    }
+
+    if (existingJournal.user_id !== user.id) {
+      return NextResponse.json({ error: "Not authorized to update this journal" }, { status: 403 });
+    }
+
+    // Only allow updating certain fields
+    const allowedFields = new Set([
+      "mood_score",
+      "captured_essence",
+      "mood_contribution",
+      "mantra",
+      "insight",
+      "insight_impact",
+      "success",
+      "changes",
+      "freeflow",
+      "wins",
+      "challenges",
+      "lessons",
+    ]);
+
+    const sanitizedUpdates: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(updates)) {
+      if (allowedFields.has(key)) {
+        sanitizedUpdates[key] = value;
+      }
+    }
+
+    if (Object.keys(sanitizedUpdates).length === 0) {
+      return NextResponse.json({ error: "No valid fields to update" }, { status: 400 });
+    }
+
+    // Add updated_at timestamp
+    sanitizedUpdates.updated_at = new Date().toISOString();
+
+    const { data: updatedJournal, error: updateError } = await supabase
+      .from("journals")
+      .update(sanitizedUpdates)
+      .eq("id", journalId)
+      .select()
+      .single();
+
+    if (updateError) {
+      return NextResponse.json({ error: updateError.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ journal: camelcaseKeys(updatedJournal) });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error occurred";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+// DELETE: Soft delete a journal
+export async function DELETE(request: Request, { params }: { params: { requestType: string } }) {
+  const { requestType } = params;
+
+  if (requestType !== journalRequestTypes.deleteJournal) {
+    return NextResponse.json({ error: "Invalid request type for DELETE" }, { status: 400 });
+  }
+
+  const supabase = createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const url = new URL(request.url);
+    const journalId = url.searchParams.get("journalId");
+
+    if (!journalId) {
+      return NextResponse.json({ error: "Journal ID is required" }, { status: 400 });
+    }
+
+    // Verify ownership
+    const { data: existingJournal, error: fetchError } = await supabase
+      .from("journals")
+      .select("id, user_id")
+      .eq("id", journalId)
+      .single();
+
+    if (fetchError || !existingJournal) {
+      return NextResponse.json({ error: "Journal not found" }, { status: 404 });
+    }
+
+    if (existingJournal.user_id !== user.id) {
+      return NextResponse.json({ error: "Not authorized to delete this journal" }, { status: 403 });
+    }
+
+    // Soft delete by setting deleted_at
+    const { error: deleteError } = await supabase
+      .from("journals")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("id", journalId);
+
+    if (deleteError) {
+      return NextResponse.json({ error: deleteError.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, message: "Journal deleted successfully" });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error occurred";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
 const getUserDailyJournals = async ({
   userId,
   sessionId,
@@ -225,6 +397,79 @@ const getUserDailyJournals = async ({
     if (error) return { error: error.message };
 
     return camelcaseKeys(data);
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return { error: message };
+  }
+};
+
+const getUserJournalHistory = async ({
+  userId,
+  sessionId,
+  limit = 20,
+  offset = 0,
+  journalType,
+  startDate,
+  endDate,
+}: {
+  userId: string;
+  sessionId?: string;
+  limit?: number;
+  offset?: number;
+  journalType?: string;
+  startDate?: string;
+  endDate?: string;
+}): Promise<
+  { error: string } | { journals: Record<string, unknown>[]; total: number; hasMore: boolean }
+> => {
+  const supabase = createClient();
+  try {
+    if (!userId) {
+      return { error: "User ID is required" };
+    }
+
+    // Build query
+    let query = supabase
+      .from("journals")
+      .select("*, journal_entries(*)", { count: "exact" })
+      .eq("user_id", userId)
+      .is("deleted_at", null)
+      .order("entry_date", { ascending: false });
+
+    // Apply filters
+    if (sessionId) {
+      query = query.eq("session_id", sessionId);
+    }
+
+    if (journalType) {
+      query = query.eq("journal_type", journalType);
+    }
+
+    if (startDate) {
+      query = query.gte("entry_date", startDate);
+    }
+
+    if (endDate) {
+      query = query.lte("entry_date", endDate);
+    }
+
+    // Apply pagination
+    query = query.range(offset, offset + limit - 1);
+
+    const { data, error, count } = await query;
+
+    if (error) {
+      return { error: error.message };
+    }
+
+    const total = count || 0;
+    const hasMore = offset + limit < total;
+
+    return {
+      journals: camelcaseKeys(data || []),
+      total,
+      hasMore,
+    };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error occurred";
     return { error: message };

@@ -40,18 +40,20 @@ const Leaderboard = () => {
         >
           {Object.values(leaderboardFilterTypes).map((type: string) => {
             let content;
-            if (type === leaderboardFilterTypes.weekly) content = "Last 7 Days";
-            if (type === leaderboardFilterTypes.monthly) content = "Last 30 Days";
-            if (type === leaderboardFilterTypes.session) content = "Lifetime";
+            if (type === leaderboardFilterTypes.daily) content = "Today";
+            if (type === leaderboardFilterTypes.weekly) content = "7 Days";
+            if (type === leaderboardFilterTypes.monthly) content = "30 Days";
+            if (type === leaderboardFilterTypes.session) content = "All Time";
             return (
               <Paragraph
                 key={type}
                 variant={paragraphVariants.regular}
                 content={content}
                 sx={cn(
-                  "text-content-dark text-center py-3 w-full px-2 sm:px-8 rounded-[10px] cursor-pointer text-nowrap",
+                  "text-content-dark text-center py-3 w-full px-2 sm:px-6 rounded-[10px] cursor-pointer text-nowrap transition-all duration-200",
                   {
-                    "text-white bg-grey-900": type === leaderboard.filter,
+                    "text-white bg-grey-900 shadow-md": type === leaderboard.filter,
+                    "hover:bg-grey-100": type !== leaderboard.filter && !leaderboard.loading,
                     "text-content-dark/40 [&>p]:text-content-dark/40 cursor-default":
                       leaderboard.loading,
                     "bg-bkg-disabled/60": leaderboard.loading && type === leaderboard.filter,
@@ -74,14 +76,29 @@ const Leaderboard = () => {
             </SkeletonWrapper>
           ) : (
             <>
-              <UserCard
-                key={"x"}
-                rank={leaderboard.current.userRank!}
-                data={{ ...leaderboard.current, userData: currentProfile }}
-                sx={cn({
-                  "grayscale card-loading": leaderboard.current.fetching,
-                })}
-              />
+              {/* Current User Rank Card - Always Visible */}
+              <div className="relative">
+                {leaderboard.current.userRank && leaderboard.current.userRank > 10 && (
+                  <div className="bg-action-900/20 border-action-500/30 mb-2 rounded-lg border px-3 py-2 text-center">
+                    <span className="text-action-400 text-sm">
+                      You&apos;re ranked <strong>#{leaderboard.current.userRank}</strong>
+                      {leaderboard.total > 0 && ` of ${leaderboard.total}`}
+                      {leaderboard.current.userRank <= 50 && " - Keep going!"}
+                      {leaderboard.current.userRank > 50 &&
+                        leaderboard.current.userRank <= 100 &&
+                        " - You're making progress!"}
+                    </span>
+                  </div>
+                )}
+                <UserCard
+                  key={"x"}
+                  rank={leaderboard.current.userRank!}
+                  data={{ ...leaderboard.current, userData: currentProfile }}
+                  sx={cn("ring-2 ring-action-500/50", {
+                    "grayscale card-loading": leaderboard.current.fetching,
+                  })}
+                />
+              </div>
 
               {!(leaderboardData.length > 0) ? (
                 <Paragraph

@@ -13,7 +13,12 @@ import {
   buildUserContextString,
 } from "@lib/ai";
 import { createClient } from "@lib/supabase-server";
-import { aiRequestTypes, CharacterKey } from "@resources/types/ai";
+import {
+  aiRequestTypes,
+  CharacterKey,
+  ConversationExportFormat,
+  ConversationExportData,
+} from "@resources/types/ai";
 
 // GET handlers
 export async function GET(request: Request, { params }: { params: { requestType: string } }) {
@@ -204,6 +209,105 @@ export async function POST(request: Request, { params }: { params: { requestType
       return NextResponse.json({ success: true });
     }
 
+    // POST: Export conversation
+    if (requestType === aiRequestTypes.exportConversation) {
+      const {
+        chatSessionId,
+        characterKey,
+        format = "json" as ConversationExportFormat,
+        startDate,
+        endDate,
+      } = body;
+
+      if (!characterKey) {
+        return NextResponse.json({ error: "Character key is required" }, { status: 400 });
+      }
+
+      // Get character info
+      const character = getCharacter(characterKey);
+
+      // Get character ID from database
+      const { data: dbCharacter } = await supabase
+        .from("ai_characters")
+        .select("id")
+        .eq("key", characterKey)
+        .single();
+
+      if (!dbCharacter) {
+        return NextResponse.json({ error: "Character not found" }, { status: 404 });
+      }
+
+      // Build query for conversations
+      let query = supabase
+        .from("ai_conversations")
+        .select("role, content, created_at")
+        .eq("user_id", user.id)
+        .eq("character_id", dbCharacter.id)
+        .order("created_at", { ascending: true });
+
+      if (chatSessionId) {
+        query = query.eq("session_id", chatSessionId);
+      }
+
+      if (startDate) {
+        query = query.gte("created_at", startDate);
+      }
+
+      if (endDate) {
+        query = query.lte("created_at", endDate);
+      }
+
+      const { data: conversations, error: convError } = await query;
+
+      if (convError) {
+        return NextResponse.json({ error: convError.message }, { status: 500 });
+      }
+
+      const messages = (conversations || []).map((c) => ({
+        role: c.role as "user" | "assistant" | "system",
+        content: c.content,
+        timestamp: c.created_at,
+      }));
+
+      const exportData: ConversationExportData = {
+        characterName: character.name,
+        characterKey: character.key,
+        exportedAt: new Date().toISOString(),
+        messages,
+        metadata: {
+          totalMessages: messages.length,
+          dateRange: {
+            start: messages[0]?.timestamp || new Date().toISOString(),
+            end: messages[messages.length - 1]?.timestamp || new Date().toISOString(),
+          },
+        },
+      };
+
+      // Format based on requested format
+      if (format === "markdown") {
+        const markdown = formatAsMarkdown(exportData);
+        return new NextResponse(markdown, {
+          headers: {
+            "Content-Type": "text/markdown",
+            "Content-Disposition": `attachment; filename="conversation-${characterKey}-${Date.now()}.md"`,
+          },
+        });
+      }
+
+      if (format === "text") {
+        const text = formatAsText(exportData);
+        return new NextResponse(text, {
+          headers: {
+            "Content-Type": "text/plain",
+            "Content-Disposition": `attachment; filename="conversation-${characterKey}-${Date.now()}.txt"`,
+          },
+        });
+      }
+
+      // Default: JSON
+      return NextResponse.json(exportData);
+    }
+
     return NextResponse.json({ error: "Invalid request type" }, { status: 400 });
   } catch (error: unknown) {
     console.error("AI API error:", error);
@@ -212,4 +316,44 @@ export async function POST(request: Request, { params }: { params: { requestType
       { status: 500 }
     );
   }
+}
+
+// Helper functions for export formatting
+function formatAsMarkdown(data: ConversationExportData): string {
+  const header = [
+    `# Conversation with ${data.characterName}`,
+    "",
+    `**Exported:** ${new Date(data.exportedAt).toLocaleString()}`,
+    `**Total Messages:** ${data.metadata.totalMessages}`,
+    `**Date Range:** ${new Date(data.metadata.dateRange.start).toLocaleDateString()} - ${new Date(data.metadata.dateRange.end).toLocaleDateString()}`,
+    "",
+    "---",
+    "",
+  ];
+
+  const messageLines = data.messages.flatMap((msg) => {
+    const time = new Date(msg.timestamp).toLocaleString();
+    const speaker = msg.role === "user" ? "You" : data.characterName;
+    return [`### ${speaker} (${time})`, "", msg.content, ""];
+  });
+
+  return [...header, ...messageLines].join("\n");
+}
+
+function formatAsText(data: ConversationExportData): string {
+  const header = [
+    `Conversation with ${data.characterName}`,
+    `Exported: ${new Date(data.exportedAt).toLocaleString()}`,
+    `Total Messages: ${data.metadata.totalMessages}`,
+    "=".repeat(50),
+    "",
+  ];
+
+  const messageLines = data.messages.flatMap((msg) => {
+    const time = new Date(msg.timestamp).toLocaleString();
+    const speaker = msg.role === "user" ? "You" : data.characterName;
+    return [`[${time}] ${speaker}:`, msg.content, ""];
+  });
+
+  return [...header, ...messageLines].join("\n");
 }

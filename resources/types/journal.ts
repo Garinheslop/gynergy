@@ -22,10 +22,19 @@ export const journalRequestTypes = {
   weeklyJournals: "weekly-journals",
   weeklyChallenge: "weekly-challenge",
 
-  //create
+  // Read
+  getUserJournalHistory: "user-journal-history",
+
+  // Create
   createMorningJournal: "create-morning-journal",
   createEveningJournal: "create-evening-journal",
   createWeeklyJournal: "create-weekly-journal",
+
+  // Update
+  updateJournal: "update-journal",
+
+  // Delete
+  deleteJournal: "delete-journal",
 };
 export const actionRequestTypes = {
   completeDailyAction: "complete-daily-action",

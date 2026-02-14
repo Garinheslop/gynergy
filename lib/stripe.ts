@@ -229,3 +229,50 @@ export function formatPrice(amountCents: number, currency = "usd"): string {
     currency: currency.toUpperCase(),
   }).format(amountCents / 100);
 }
+
+/**
+ * Get subscription details from Stripe
+ */
+export async function getSubscription(subscriptionId: string): Promise<Stripe.Subscription> {
+  const stripe = getStripe();
+  return await stripe.subscriptions.retrieve(subscriptionId);
+}
+
+/**
+ * Resume a paused subscription (remove cancel_at_period_end)
+ */
+export async function resumeSubscription(subscriptionId: string): Promise<Stripe.Subscription> {
+  const stripe = getStripe();
+  return await stripe.subscriptions.update(subscriptionId, {
+    cancel_at_period_end: false,
+  });
+}
+
+/**
+ * Get customer's payment methods
+ */
+export async function getCustomerPaymentMethods(
+  customerId: string
+): Promise<Stripe.PaymentMethod[]> {
+  const stripe = getStripe();
+  const paymentMethods = await stripe.paymentMethods.list({
+    customer: customerId,
+    type: "card",
+  });
+  return paymentMethods.data;
+}
+
+/**
+ * Get customer's invoices
+ */
+export async function getCustomerInvoices(
+  customerId: string,
+  limit = 10
+): Promise<Stripe.Invoice[]> {
+  const stripe = getStripe();
+  const invoices = await stripe.invoices.list({
+    customer: customerId,
+    limit,
+  });
+  return invoices.data;
+}

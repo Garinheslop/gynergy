@@ -166,7 +166,39 @@ export const aiRequestTypes = {
   rateChatSession: "rate-session",
   getUserContext: "user-context",
   updateUserContext: "update-context",
+  exportConversation: "export-conversation",
 } as const;
+
+// Export formats
+export type ConversationExportFormat = "json" | "markdown" | "text";
+
+// Export request
+export interface ConversationExportRequest {
+  chatSessionId?: string;
+  characterKey?: CharacterKey;
+  format: ConversationExportFormat;
+  startDate?: string;
+  endDate?: string;
+}
+
+// Export response
+export interface ConversationExportData {
+  characterName: string;
+  characterKey: CharacterKey;
+  exportedAt: string;
+  messages: {
+    role: ConversationRole;
+    content: string;
+    timestamp: string;
+  }[];
+  metadata: {
+    totalMessages: number;
+    dateRange: {
+      start: string;
+      end: string;
+    };
+  };
+}
 
 // Token budget configuration
 export const TOKEN_BUDGET = {
