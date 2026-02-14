@@ -190,7 +190,7 @@ function AwakeningChallengePageContent() {
       {/* Skip to main content link */}
       <a
         href="#pricing"
-        className="bg-lp-gold text-lp-black font-oswald focus:ring-lp-gold-light sr-only fixed top-4 left-4 z-[100] px-4 py-2 text-sm font-medium focus:not-sr-only focus:ring-2 focus:outline-none"
+        className="bg-lp-gold text-lp-black font-oswald focus:ring-lp-gold-light z-fixed sr-only fixed top-4 left-4 px-4 py-2 text-sm font-medium focus:not-sr-only focus:ring-2 focus:outline-none"
       >
         Skip to pricing
       </a>

@@ -32,7 +32,7 @@ const Navbar: FC = () => {
   return (
     <nav
       className={cn(
-        "border-border-light bg-bkg-light text-light fixed z-[1001] h-[70px] w-full items-center justify-between border-b px-5"
+        "border-border-light bg-bkg-light text-light z-sticky fixed h-[70px] w-full items-center justify-between border-b px-5"
       )}
     >
       <section className="mx-auto flex w-full max-w-[1256px] items-center justify-between px-4 py-[10px]">
@@ -139,7 +139,7 @@ const DropdownMenu: FC = () => {
       {/* Mobile backdrop */}
       {isComponentVisible && (
         <div
-          className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm sm:hidden"
+          className="z-modal-backdrop fixed inset-0 bg-black/50 backdrop-blur-sm sm:hidden"
           onClick={closeMenu}
           aria-hidden="true"
         />
@@ -148,7 +148,7 @@ const DropdownMenu: FC = () => {
       <TransitionWrapper
         isOpen={isComponentVisible}
         sx={cn(
-          "z-[10000]",
+          "z-modal",
           // Mobile: slide-up drawer from bottom
           "fixed bottom-0 left-0 right-0 max-h-[80vh] overflow-y-auto rounded-t-2xl",
           // Desktop: dropdown menu

@@ -540,6 +540,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         {/* Progress Bar */}
         <div className="mb-2 px-4">
           <div
+            role="slider"
+            tabIndex={0}
+            aria-label="Video progress"
+            aria-valuemin={0}
+            aria-valuemax={Math.round(duration)}
+            aria-valuenow={Math.round(currentTime)}
+            aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
             className="group/progress h-1 cursor-pointer rounded bg-white/30"
             onClick={handleProgressClick}
           >
@@ -565,8 +572,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             onClick={togglePlay}
             className="hover:text-action text-white transition-colors"
             title={isPlaying ? "Pause (k)" : "Play (k)"}
+            aria-label={isPlaying ? "Pause video" : "Play video"}
           >
-            <i className={`text-xl ${isPlaying ? "gng-pause" : "gng-play"}`} />
+            <i className={`text-xl ${isPlaying ? "gng-pause" : "gng-play"}`} aria-hidden="true" />
           </button>
 
           {/* Skip Back */}
@@ -574,8 +582,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             onClick={() => seekRelative(-10)}
             className="hover:text-action text-white transition-colors"
             title="Back 10s"
+            aria-label="Skip back 10 seconds"
           >
-            <i className="gng-skip-back text-lg" />
+            <i className="gng-skip-back text-lg" aria-hidden="true" />
           </button>
 
           {/* Skip Forward */}
@@ -583,8 +592,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             onClick={() => seekRelative(10)}
             className="hover:text-action text-white transition-colors"
             title="Forward 10s"
+            aria-label="Skip forward 10 seconds"
           >
-            <i className="gng-skip-forward text-lg" />
+            <i className="gng-skip-forward text-lg" aria-hidden="true" />
           </button>
 
           {/* Volume */}
@@ -593,9 +603,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               onClick={toggleMute}
               className="hover:text-action text-white transition-colors"
               title={isMuted ? "Unmute (m)" : "Mute (m)"}
+              aria-label={isMuted ? "Unmute" : "Mute"}
+              aria-pressed={isMuted}
             >
               <i
                 className={`text-lg ${isMuted || volume === 0 ? "gng-volume-x" : "gng-volume-2"}`}
+                aria-hidden="true"
               />
             </button>
             <input
@@ -606,6 +619,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               value={isMuted ? 0 : volume}
               onChange={(e) => changeVolume(parseFloat(e.target.value))}
               className="accent-action w-0 transition-all duration-200 group-hover/volume:w-20"
+              aria-label="Volume"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round((isMuted ? 0 : volume) * 100)}
             />
           </div>
 
@@ -623,8 +640,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               onClick={() => setShowSettings(!showSettings)}
               className="hover:text-action text-white transition-colors"
               title="Settings"
+              aria-label="Video settings"
+              aria-expanded={showSettings}
+              aria-haspopup="menu"
             >
-              <i className="gng-settings text-lg" />
+              <i className="gng-settings text-lg" aria-hidden="true" />
             </button>
 
             {showSettings && (
@@ -692,8 +712,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             onClick={toggleFullscreen}
             className="hover:text-action text-white transition-colors"
             title={isFullscreen ? "Exit fullscreen (f)" : "Fullscreen (f)"}
+            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
           >
-            <i className={`text-lg ${isFullscreen ? "gng-minimize" : "gng-maximize"}`} />
+            <i
+              className={`text-lg ${isFullscreen ? "gng-minimize" : "gng-maximize"}`}
+              aria-hidden="true"
+            />
           </button>
         </div>
       </div>

@@ -32,7 +32,7 @@ const Modal = ({ children, open, onClose }: ModalProps) => {
         return (
           <div
             className={cn(
-              `bg-bkg-dark/10 fixed top-0 left-0 z-[10000] h-screen w-screen backdrop-blur-[5px] backdrop-brightness-[100%] transition-all`,
+              `bg-bkg-dark/10 z-modal fixed top-0 left-0 h-screen w-screen backdrop-blur-[5px] backdrop-brightness-[100%] transition-all`,
               {
                 "opacity-0": ["entering", "exiting", "exited"].includes(state),
                 "opacity-100": state === "entered",

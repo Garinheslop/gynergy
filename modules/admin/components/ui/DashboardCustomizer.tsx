@@ -50,7 +50,7 @@ export default function DashboardCustomizer({ isOpen, onClose }: DashboardCustom
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[150] flex items-start justify-end">
+    <div className="z-modal fixed inset-0 flex items-start justify-end">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"

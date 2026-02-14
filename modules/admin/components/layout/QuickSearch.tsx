@@ -332,7 +332,7 @@ export function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
       <div className="border-grey-800 bg-grey-900 relative w-full max-w-lg rounded-xl border shadow-2xl">
         {/* Search Input */}
         <div className="border-grey-800 flex items-center gap-3 border-b p-4">
-          <i className="gng-search text-grey-400" />
+          <i className="gng-search text-grey-400" aria-hidden="true" />
           <input
             ref={inputRef}
             type="text"
@@ -341,6 +341,14 @@ export function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
             onKeyDown={handleKeyDown}
             placeholder="Search pages, users, or actions..."
             className="placeholder-grey-500 flex-1 bg-transparent text-white outline-none"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded={results.length > 0}
+            aria-controls="quick-search-results"
+            aria-activedescendant={
+              results[selectedIndex] ? `search-result-${results[selectedIndex].id}` : undefined
+            }
+            aria-label="Search admin pages and actions"
           />
           <kbd className="bg-grey-800 text-grey-400 hidden rounded px-2 py-1 text-xs sm:inline-block">
             ESC
@@ -350,10 +358,19 @@ export function QuickSearch({ isOpen, onClose }: QuickSearchProps) {
         {/* Results */}
         <div className="max-h-80 overflow-y-auto p-2">
           {results.length > 0 ? (
-            <div ref={listRef} className="space-y-1">
+            <div
+              ref={listRef}
+              id="quick-search-results"
+              role="listbox"
+              aria-label="Search results"
+              className="space-y-1"
+            >
               {results.map((result, index) => (
                 <button
                   key={result.id}
+                  id={`search-result-${result.id}`}
+                  role="option"
+                  aria-selected={selectedIndex === index}
                   onClick={() => handleSelect(result)}
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={cn(

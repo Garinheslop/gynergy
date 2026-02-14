@@ -101,6 +101,8 @@ const Input: FC<InputProps> = ({
           onWheel={(e) => e.currentTarget.blur()}
           placeholder={inputPlaceholder}
           disabled={disabled}
+          aria-invalid={!!error}
+          aria-describedby={error ? "input-error" : undefined}
           onFocus={onFocusHandler as ((e: FocusEvent<HTMLInputElement>) => void) | undefined}
           onBlur={onBlurHandler}
         />
@@ -115,18 +117,25 @@ const Input: FC<InputProps> = ({
           />
         )}
         {type === "password" && (
-          <i
-            className="gng-eye text-content-dark-secondary absolute right-[10px] cursor-pointer"
+          <button
+            type="button"
+            aria-pressed={show}
+            aria-label={show ? "Hide password" : "Show password"}
+            className="absolute right-[10px] flex h-[44px] w-[44px] cursor-pointer items-center justify-center bg-transparent"
             onClick={() => setShow((prev) => !prev)}
           >
-            {!show && (
-              <span className="absolute top-[8px] right-[-2px] w-[20px] -rotate-45 border-t border-[#8F9194]" />
-            )}
-          </i>
+            <i className="gng-eye text-content-dark-secondary relative">
+              {!show && (
+                <span className="absolute top-[8px] right-[-2px] w-[20px] -rotate-45 border-t border-[#8F9194]" />
+              )}
+            </i>
+          </button>
         )}
       </section>
       {error && (
         <Paragraph
+          id="input-error"
+          role="alert"
           content={error}
           variant={paragraphVariants.meta}
           sx="text-sm text-danger text-start"

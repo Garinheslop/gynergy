@@ -14,13 +14,12 @@ import {
 } from "redux-persist";
 import autoMergeLevel2 from "redux-persist/lib/stateReconciler/autoMergeLevel2";
 
-import storage from "./storage";
-
 import reducer from "@store/reducer";
 
 import api from "./middleware/api";
 import resetDataMiddleware from "./middleware/reset";
 import { streakDefaultStates } from "./modules/enrollment/reducers";
+import storage from "./storage";
 
 export type RootState = ReturnType<typeof reducer>;
 
@@ -146,8 +145,14 @@ export default configureModifiedStore;
 export const store = configureModifiedStore();
 export const persistor = persistStore(store);
 
+// Dispatch type that properly handles thunks
 export type AppThunkDispatch = ThunkDispatch<RootState, unknown, ApiCallAction>;
-export type AppDispatch = typeof store.dispatch;
+
+// This type is intentionally set to ThunkDispatch for proper async thunk support
+// The store.dispatch type doesn't include thunk return types by default
+export type AppDispatch = ThunkDispatch<RootState, unknown, Action<string>>;
+
+// Thunk action creator type - use this when defining async actions
 export type AppThunk<ReturnType = void> = ThunkAction<
   ReturnType,
   RootState,

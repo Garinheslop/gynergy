@@ -101,7 +101,7 @@ function ToastContainer({ toasts, onRemove }: { toasts: Toast[]; onRemove: (id: 
 
   return (
     <div
-      className="pointer-events-none fixed right-0 bottom-0 z-[100] flex flex-col gap-2 p-4 sm:max-w-md"
+      className="z-toast pointer-events-none fixed right-0 bottom-0 flex flex-col gap-2 p-4 sm:max-w-md"
       aria-live="polite"
       aria-label="Notifications"
     >

@@ -88,7 +88,7 @@ function WebinarLandingPageContent() {
         href="#register"
         className={cn(
           "sr-only focus:not-sr-only",
-          "fixed top-4 left-4 z-[100]",
+          "z-fixed fixed top-4 left-4",
           "bg-lp-gold text-lp-black",
           "font-oswald px-4 py-2 text-sm font-medium",
           "focus:ring-lp-gold-light focus:ring-2 focus:outline-none"

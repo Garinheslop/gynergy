@@ -116,7 +116,7 @@ export default function ExitIntentPopup({
   return (
     <div
       className={cn(
-        "fixed inset-0 z-[200]",
+        "z-modal fixed inset-0",
         "flex items-center justify-center",
         "bg-black/85 backdrop-blur-sm",
         "p-4"

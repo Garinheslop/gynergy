@@ -11,22 +11,29 @@ interface ParagraphProps {
   sx?: string;
   onClick?: React.MouseEventHandler<HTMLElement>;
   isHtml?: boolean;
+  id?: string;
+  role?: string;
 }
 
 const Paragraph = forwardRef<HTMLParagraphElement | HTMLDivElement, ParagraphProps>(
-  ({ content, variant = paragraphVariants.regular, sx = "", onClick, isHtml = false }, ref) => {
+  (
+    { content, variant = paragraphVariants.regular, sx = "", onClick, isHtml = false, id, role },
+    ref
+  ) => {
     const componentStyle = useGetParagraphVariant({ variant, sx });
     if (isHtml && content)
       return (
         <div
           ref={ref}
+          id={id}
+          role={role}
           onClick={onClick}
           className={componentStyle}
           dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(String(content)) }}
         />
       );
     return (
-      <p ref={ref} onClick={onClick} className={componentStyle}>
+      <p ref={ref} id={id} role={role} onClick={onClick} className={componentStyle}>
         {content}
       </p>
     );

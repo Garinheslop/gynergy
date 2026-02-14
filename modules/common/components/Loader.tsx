@@ -11,7 +11,7 @@ const Loader = ({
   label,
   heading,
   type,
-  children,
+  children: _children,
   sx,
 }: {
   heading?: string;
@@ -47,7 +47,7 @@ const Loader = ({
     return (
       <section
         className={cn(
-          "bg-bkg-light/90 fixed top-0 left-0 z-[1000] flex h-screen w-screen items-center justify-center overflow-hidden p-4 backdrop-blur-sm",
+          "bg-bkg-light/90 z-modal fixed top-0 left-0 flex h-screen w-screen items-center justify-center overflow-hidden p-4 backdrop-blur-sm",
           sx
         )}
       >

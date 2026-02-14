@@ -45,7 +45,7 @@ export function SkipLink({
         // Hidden by default, visible on focus
         "sr-only focus:not-sr-only",
         // Positioning when visible
-        "focus:fixed focus:top-4 focus:left-4 focus:z-[100]",
+        "focus:z-fixed focus:fixed focus:top-4 focus:left-4",
         // Styling
         "focus:bg-action-600 focus:rounded-lg focus:px-4 focus:py-2 focus:text-white",
         "focus:ring-action-400 focus:ring-offset-grey-900 focus:ring-2 focus:ring-offset-2 focus:outline-none",
@@ -72,7 +72,7 @@ interface SkipLinksProps {
 export function SkipLinks({ links, className }: SkipLinksProps) {
   return (
     <div className={cn("sr-only focus-within:not-sr-only", className)}>
-      <nav aria-label="Skip links" className="fixed top-4 left-4 z-[100] flex flex-col gap-2">
+      <nav aria-label="Skip links" className="z-fixed fixed top-4 left-4 flex flex-col gap-2">
         {links.map((link) => (
           <a
             key={link.targetId}
