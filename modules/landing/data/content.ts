@@ -181,11 +181,6 @@ export const PRICING_CONTENT: PricingContent = {
   wasPrice: "$3,297",
   nowPrice: "$997",
   priceNote: "One-time investment · No recurring fees",
-  paymentPlan: {
-    payments: 3,
-    amount: "$349",
-    totalWithPlan: "$1,047",
-  },
   earlyBirdBonus: {
     title: "Early Bird Bonus",
     description: "First 10 enrollees receive a 1:1 strategy call with Garin (value: $500)",

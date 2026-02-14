@@ -39,7 +39,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "Why does this cost $997?",
     answer:
-      "The price reflects the value and commitment required. You're getting 8 live coaching calls ($2,000 value), a structured transformation system, and a brotherhood of men at your level. Plus, your investment includes 1 friend code ($997 value) — so you're effectively paying $498.50 per person when you bring your Accountability Duo. We also offer a 3-payment plan of $349/month for those who prefer flexibility. The real question: what's another year of feeling disconnected worth?",
+      "The price reflects the value and commitment required. You're getting 8 live coaching calls ($2,000 value), a structured transformation system, and a brotherhood of men at your level. Plus, your investment includes 1 friend code ($997 value) — so you're effectively paying $498.50 per person when you bring your Accountability Duo. The real question: what's another year of feeling disconnected worth?",
   },
   {
     question: "Who is this NOT for?",

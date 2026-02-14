@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import { cn } from "@lib/utils/style";
 
 import { PRICING_CONTENT } from "../../data/content";
@@ -14,10 +12,6 @@ interface PricingSectionProps {
 }
 
 export default function PricingSection({ cta, isLoading = false }: PricingSectionProps) {
-  const [paymentType, setPaymentType] = useState<"full" | "plan">("full");
-
-  const showPaymentPlan = paymentType === "plan" && PRICING_CONTENT.paymentPlan;
-
   return (
     <SectionWrapper id="pricing">
       <div className="text-center">
@@ -88,75 +82,21 @@ export default function PricingSection({ cta, isLoading = false }: PricingSectio
             </div>
           )}
 
-          {/* Payment Option Toggle */}
-          {PRICING_CONTENT.paymentPlan && (
-            <div className="mb-4 flex justify-center gap-2">
-              <button
-                onClick={() => setPaymentType("full")}
-                className={cn(
-                  "font-oswald px-4 py-2 text-xs tracking-wider uppercase",
-                  "border transition-all duration-300",
-                  "focus-visible:ring-lp-gold focus:outline-none focus-visible:ring-2",
-                  paymentType === "full"
-                    ? "border-lp-gold bg-lp-gold-dim text-lp-gold-light"
-                    : "border-lp-border text-lp-muted hover:border-lp-gold/50"
-                )}
-                aria-pressed={paymentType === "full"}
-              >
-                Pay in Full
-                <span className="text-lp-green ml-2 text-[10px]">Save $50</span>
-              </button>
-              <button
-                onClick={() => setPaymentType("plan")}
-                className={cn(
-                  "font-oswald px-4 py-2 text-xs tracking-wider uppercase",
-                  "border transition-all duration-300",
-                  "focus-visible:ring-lp-gold focus:outline-none focus-visible:ring-2",
-                  paymentType === "plan"
-                    ? "border-lp-gold bg-lp-gold-dim text-lp-gold-light"
-                    : "border-lp-border text-lp-muted hover:border-lp-gold/50"
-                )}
-                aria-pressed={paymentType === "plan"}
-              >
-                3 Payments
-              </button>
-            </div>
-          )}
-
           {/* Price Anchor */}
           <div className="py-6 text-center">
             <div className="font-oswald text-lp-muted mb-2 text-base font-light line-through">
               {PRICING_CONTENT.wasPrice}
             </div>
 
-            {showPaymentPlan && PRICING_CONTENT.paymentPlan ? (
-              <>
-                <div className="font-oswald text-lp-gray mb-1 text-sm font-light">
-                  {PRICING_CONTENT.paymentPlan.payments} payments of
-                </div>
-                <div
-                  className="font-bebas text-lp-gold-light text-6xl leading-none"
-                  style={{ textShadow: "0 0 30px rgba(212,168,67,0.1)" }}
-                >
-                  {PRICING_CONTENT.paymentPlan.amount}
-                </div>
-                <div className="font-oswald text-lp-muted mt-2 text-sm font-extralight tracking-wide">
-                  Total: {PRICING_CONTENT.paymentPlan.totalWithPlan} · Billed monthly
-                </div>
-              </>
-            ) : (
-              <>
-                <div
-                  className="font-bebas text-lp-gold-light text-6xl leading-none"
-                  style={{ textShadow: "0 0 30px rgba(212,168,67,0.1)" }}
-                >
-                  {PRICING_CONTENT.nowPrice}
-                </div>
-                <div className="font-oswald text-lp-muted mt-2 text-sm font-extralight tracking-wide">
-                  {PRICING_CONTENT.priceNote}
-                </div>
-              </>
-            )}
+            <div
+              className="font-bebas text-lp-gold-light text-6xl leading-none"
+              style={{ textShadow: "0 0 30px rgba(212,168,67,0.1)" }}
+            >
+              {PRICING_CONTENT.nowPrice}
+            </div>
+            <div className="font-oswald text-lp-muted mt-2 text-sm font-extralight tracking-wide">
+              {PRICING_CONTENT.priceNote}
+            </div>
           </div>
 
           {/* CTA */}
