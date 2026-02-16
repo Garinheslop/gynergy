@@ -1,31 +1,33 @@
 //context
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback as _useCallback, useEffect, useRef as _useRef, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
-import ReactConfetti from "react-confetti";
-import Webcam from "react-webcam";
+import _ReactConfetti from "react-confetti";
+import _Webcam from "react-webcam";
 
 import { usePopup } from "@contexts/UsePopup";
-import { base64ToArrayBuffer, getBase64 } from "@lib/utils/image";
+import {
+  base64ToArrayBuffer as _base64ToArrayBuffer,
+  getBase64 as _getBase64,
+} from "@lib/utils/image";
 import { cn } from "@lib/utils/style";
 import ActionButton from "@modules/common/components/ActionButton";
-import FileInput from "@modules/common/components/FileInput";
+import _FileInput from "@modules/common/components/FileInput";
 import Image from "@modules/common/components/Image";
 import Modal from "@modules/common/components/modal";
-
 import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import icons from "@resources/icons";
 import { buttonActionTypes } from "@resources/types/button";
 import { journalTypes } from "@resources/types/journal";
-import { ImageRawData } from "@resources/types/ocr";
+import { ImageRawData as _ImageRawData } from "@resources/types/ocr";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useSelector } from "@store/hooks";
 
 const JournalPopup = () => {
-  const router = useRouter();
-  const currentBook = useSelector((state) => state.books.current);
+  const _router = useRouter();
+  const _currentBook = useSelector((state) => state.books.current);
   const { journalPopupObj } = usePopup();
 
   const [popupContents, setPopupContents] = useState<any | null>(null);
@@ -45,10 +47,14 @@ const JournalPopup = () => {
   return (
     <Modal open={journalPopupObj.show} onClose={journalPopupObj.close}>
       <section className="items-between bg-bkg-light relative mx-auto flex h-screen w-screen flex-col justify-center overflow-auto rounded px-8 py-[60px] sm:h-[692px] sm:w-[620px] sm:p-8">
-        <i
-          className="gng-close absolute top-2 right-2 cursor-pointer p-6 text-[18px]"
+        <button
+          type="button"
+          aria-label="Close journal popup"
+          className="absolute top-2 right-2 cursor-pointer p-6"
           onClick={journalPopupObj.close}
-        />
+        >
+          <i className="gng-close text-[18px]" aria-hidden="true" />
+        </button>
         <div className="flex h-full w-full flex-col gap-5">
           <div className="flex flex-col gap-2.5">
             <i

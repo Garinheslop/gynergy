@@ -44,7 +44,7 @@ function LandingPageContent() {
   // Fetch entitlements when logged in
   useEffect(() => {
     if (session) {
-      dispatch(fetchEntitlements() as any);
+      dispatch(fetchEntitlements());
     }
   }, [session, dispatch]);
 
@@ -88,7 +88,7 @@ function LandingPageContent() {
       return { success: false, error: "Please sign in first" };
     }
 
-    const result = await dispatch(redeemFriendCode(code) as any);
+    const result = await dispatch(redeemFriendCode(code));
     return result;
   };
 

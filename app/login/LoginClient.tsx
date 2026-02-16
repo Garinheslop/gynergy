@@ -217,7 +217,7 @@ function LoginPageContent() {
   // Name input form for new users
   if (authMode === "name-input") {
     return (
-      <section className="bg-bkg-light flex h-screen grid-cols-2 flex-col items-center justify-center gap-[50px] overflow-hidden md:grid md:gap-0">
+      <section className="bg-bkg-light flex h-screen grid-cols-2 flex-col items-center justify-center gap-12 overflow-hidden md:grid md:gap-0">
         <Image
           className="hidden h-full object-cover md:order-1 md:flex"
           src={images.banner.login}
@@ -226,10 +226,10 @@ function LoginPageContent() {
           width={1}
           alt="Welcome"
         />
-        <div className="mx-auto flex w-full flex-col items-start justify-center gap-[40px] px-5 lg:gap-[50px] xl:w-[640px]">
-          <div className="flex w-full flex-col items-center justify-center gap-5 md:items-start md:justify-start md:gap-[10px]">
+        <div className="mx-auto flex w-full flex-col items-start justify-center gap-10 px-5 lg:gap-12 xl:w-[640px]">
+          <div className="flex w-full flex-col items-center justify-center gap-5 md:items-start md:justify-start md:gap-2.5">
             <Image
-              className="h-[40px] w-auto"
+              className="h-10 w-auto"
               src={icons.dateZeroLogo}
               unoptimized
               height={1}
@@ -246,8 +246,8 @@ function LoginPageContent() {
             />
           </div>
 
-          <form onSubmit={handleNameSubmit} className="flex w-full flex-col gap-5 md:gap-[30px]">
-            <div className="flex w-full flex-col gap-[15px] md:flex-row">
+          <form onSubmit={handleNameSubmit} className="flex w-full flex-col gap-5 md:gap-8">
+            <div className="flex w-full flex-col gap-4 md:flex-row">
               <Input
                 label="First Name"
                 value={firstName}
@@ -282,7 +282,7 @@ function LoginPageContent() {
   // Forgot password form
   if (authMode === "forgot-password") {
     return (
-      <section className="bg-bkg-light flex h-screen grid-cols-2 flex-col items-center justify-center gap-[50px] overflow-hidden md:grid md:gap-0">
+      <section className="bg-bkg-light flex h-screen grid-cols-2 flex-col items-center justify-center gap-12 overflow-hidden md:grid md:gap-0">
         <Image
           className="h-[300px] w-full object-contain md:h-full md:object-cover"
           src={images.banner.login}
@@ -291,10 +291,10 @@ function LoginPageContent() {
           width={1}
           alt="Welcome"
         />
-        <div className="mx-auto flex w-full flex-col items-start justify-center gap-[30px] px-5 lg:gap-[40px] xl:w-[640px]">
-          <div className="flex w-full flex-col items-center justify-center gap-5 md:items-start md:justify-start md:gap-[10px]">
+        <div className="mx-auto flex w-full flex-col items-start justify-center gap-8 px-5 lg:gap-10 xl:w-[640px]">
+          <div className="flex w-full flex-col items-center justify-center gap-5 md:items-start md:justify-start md:gap-2.5">
             <Image
-              className="h-[40px] w-auto"
+              className="h-10 w-auto"
               src={icons.dateZeroLogo}
               unoptimized
               height={1}
@@ -388,7 +388,7 @@ function LoginPageContent() {
 
   // Main login/signup form
   return (
-    <section className="bg-bkg-light flex h-screen grid-cols-2 flex-col items-center justify-center gap-[50px] overflow-hidden md:grid md:gap-0">
+    <section className="bg-bkg-light flex h-screen grid-cols-2 flex-col items-center justify-center gap-12 overflow-hidden md:grid md:gap-0">
       <Image
         className="h-[300px] w-full object-contain md:h-full md:object-cover"
         src={images.banner.login}
@@ -397,7 +397,7 @@ function LoginPageContent() {
         width={1}
         alt="Welcome"
       />
-      <div className="mx-auto flex w-full flex-col items-start justify-center gap-[30px] px-5 lg:gap-[40px] xl:w-[640px]">
+      <div className="mx-auto flex w-full flex-col items-start justify-center gap-8 px-5 lg:gap-10 xl:w-[640px]">
         {/* Back to home link */}
         <Link
           href="/"
@@ -414,9 +414,9 @@ function LoginPageContent() {
           Back to home
         </Link>
 
-        <div className="flex w-full flex-col items-center justify-center gap-5 md:items-start md:justify-start md:gap-[10px]">
+        <div className="flex w-full flex-col items-center justify-center gap-5 md:items-start md:justify-start md:gap-2.5">
           <Image
-            className="h-[40px] w-auto"
+            className="h-10 w-auto"
             src={icons.dateZeroLogo}
             unoptimized
             height={1}

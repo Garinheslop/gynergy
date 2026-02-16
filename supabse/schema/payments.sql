@@ -210,6 +210,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Default expiration for friend codes (90 days)
+-- This can be configured via environment or adjusted here
+CREATE OR REPLACE FUNCTION get_friend_code_expiration()
+RETURNS TIMESTAMPTZ AS $$
+BEGIN
+    -- Default: 90 days from creation
+    RETURN NOW() + INTERVAL '90 days';
+END;
+$$ LANGUAGE plpgsql;
+
 -- Function to create friend codes after purchase (2 codes per purchase = Accountability Trio)
 CREATE OR REPLACE FUNCTION create_friend_code_for_purchase()
 RETURNS TRIGGER AS $$
@@ -222,10 +232,11 @@ BEGIN
         IF TG_OP = 'INSERT' OR (TG_OP = 'UPDATE' AND OLD.status != 'completed') THEN
             -- Create TWO friend codes per purchase (Accountability Trio model)
             -- This creates optimal group dynamics: purchaser + 2 friends = trio
-            INSERT INTO friend_codes (code, creator_id, purchase_id)
+            -- Each code expires in 90 days by default
+            INSERT INTO friend_codes (code, creator_id, purchase_id, expires_at)
             VALUES
-                (generate_friend_code(), NEW.user_id, NEW.id),
-                (generate_friend_code(), NEW.user_id, NEW.id);
+                (generate_friend_code(), NEW.user_id, NEW.id, get_friend_code_expiration()),
+                (generate_friend_code(), NEW.user_id, NEW.id, get_friend_code_expiration());
 
             -- Grant challenge access to purchaser
             PERFORM grant_challenge_access(NEW.user_id, 'purchased');

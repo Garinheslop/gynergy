@@ -24,14 +24,18 @@ const MeditationPopup = () => {
   return (
     <Modal open={meditationPopupObj.show} onClose={meditationPopupObj.close}>
       <section className="items-between bg-bkg-light relative mx-auto flex h-screen w-screen flex-col justify-center gap-8 overflow-auto rounded p-8 sm:h-max sm:w-[620px]">
-        <i
-          className="gng-close absolute top-2 right-2 cursor-pointer p-6 text-lg"
+        <button
+          type="button"
+          aria-label="Close meditation popup"
+          className="absolute top-2 right-2 cursor-pointer p-6"
           onClick={meditationPopupObj.close}
-        />
+        >
+          <i className="gng-close text-lg" aria-hidden="true" />
+        </button>
         <div className="flex h-full w-full flex-col gap-5">
           <div className="flex flex-col gap-2.5">
             <i
-              className={cn(`gng-meditation py-1 text-2xl text-meditation`, {
+              className={cn(`gng-meditation text-meditation py-1 text-2xl`, {
                 "text-primary": popupType === journalTypes.morningJournal,
                 "text-action-secondary": popupType === journalTypes.eveningJournal,
                 "text-primary-500": popupType === journalTypes.gratitudeAction,

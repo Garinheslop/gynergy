@@ -252,6 +252,7 @@ const VideoControls: React.FC<VideoControlsProps> = ({
           <Tooltip label="End call for everyone">
             <button
               onClick={onEndRoom}
+              aria-label="End call for everyone"
               className={cn(
                 "flex h-14 w-14 items-center justify-center rounded-full",
                 "text-danger border-danger/50 border-2 bg-transparent",
@@ -259,7 +260,7 @@ const VideoControls: React.FC<VideoControlsProps> = ({
                 "transform hover:scale-105 active:scale-95"
               )}
             >
-              <i className="gng-close text-xl" />
+              <i className="gng-close text-xl" aria-hidden="true" />
             </button>
           </Tooltip>
         )}

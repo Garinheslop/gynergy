@@ -130,6 +130,8 @@
   --color-lp-green-dim: rgba(46, 139, 87, 0.15);
   --color-lp-gold-hover: #e0be5a;
   --color-lp-danger: #d4735e;
+  --color-lp-danger-dark: #6b3a1f;
+  --color-lp-danger-light: #8b4513;
   --color-lp-input: #1a1918;
 
   /* Landing Page Fonts */

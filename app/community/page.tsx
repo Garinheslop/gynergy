@@ -66,7 +66,7 @@ const CommunityPage: FC = () => {
 
   // Handle encouragement
   const handleSendEncouragement = async (memberId: string) => {
-    const result = await dispatch(sendEncouragement(memberId) as any);
+    const result = await dispatch(sendEncouragement(memberId));
     if (result.success) {
       messagePopupObj.open({ popupData: "Encouragement sent! 💪", popupType: "success" });
       triggerHaptic("success");
@@ -111,9 +111,9 @@ const CommunityPage: FC = () => {
   // Fetch data on mount
   useEffect(() => {
     if (session?.user) {
-      dispatch(fetchFeed() as any);
-      dispatch(fetchMembers() as any);
-      dispatch(fetchReferrals() as any);
+      dispatch(fetchFeed());
+      dispatch(fetchMembers());
+      dispatch(fetchReferrals());
     }
   }, [dispatch, session?.user]);
 
@@ -129,26 +129,26 @@ const CommunityPage: FC = () => {
     content: string;
     visibility: PostVisibility;
   }) => {
-    const result = await dispatch(createPost(data) as any);
+    const result = await dispatch(createPost(data));
     return result as { success: boolean; error?: string };
   };
 
   // Handle reaction
   const handleReaction = (postId: string, reactionType: ReactionType) => {
-    dispatch(toggleReaction(postId, reactionType) as any);
+    dispatch(toggleReaction(postId, reactionType));
   };
 
   // Handle load more
   const handleLoadMore = () => {
     if (hasMore && !feedLoading) {
-      dispatch(fetchFeed({ append: true, postType: postTypeFilter || undefined }) as any);
+      dispatch(fetchFeed({ append: true, postType: postTypeFilter || undefined }));
     }
   };
 
   // Handle filter change
   const handleFilterChange = (type: string | null) => {
     setPostTypeFilter(type);
-    dispatch(fetchFeed({ postType: type || undefined }) as any);
+    dispatch(fetchFeed({ postType: type || undefined }));
   };
 
   if (authenticating) {
@@ -324,7 +324,7 @@ const CommunityPage: FC = () => {
                 <div className="border-danger/30 bg-danger/10 rounded border p-6 text-center">
                   <p className="text-danger">{feedError}</p>
                   <button
-                    onClick={() => dispatch(fetchFeed() as any)}
+                    onClick={() => dispatch(fetchFeed())}
                     className="text-danger focus-visible:ring-action mt-2 text-sm font-medium underline focus-visible:ring-2 focus-visible:outline-none"
                   >
                     Try again

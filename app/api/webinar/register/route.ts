@@ -35,17 +35,14 @@ export async function POST(request: Request) {
 
     const supabase = await createClient();
 
-    const { data, error } = await supabase
-      .from("webinar_registrations")
-      .insert({
-        email: normalizedEmail,
-        first_name: normalizedFirstName,
-        webinar_date: eventDate.toISOString().split("T")[0], // Just the date part
-        source,
-        registered_at: new Date().toISOString(),
-      })
-      .select("id")
-      .single();
+    // Insert without select - anon role doesn't have SELECT permission
+    const { error } = await supabase.from("webinar_registrations").insert({
+      email: normalizedEmail,
+      first_name: normalizedFirstName,
+      webinar_date: eventDate.toISOString().split("T")[0], // Just the date part
+      source,
+      registered_at: new Date().toISOString(),
+    });
 
     // Handle duplicate registration (unique constraint violation)
     if (error?.code === "23505") {
@@ -86,7 +83,6 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       message: "Registration complete! Redirecting to assessment...",
-      registrationId: data?.id,
     });
   } catch (error) {
     console.error("Webinar registration error:", error);

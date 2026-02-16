@@ -61,7 +61,7 @@ export default function ProblemSection() {
                   className={cn(
                     "relative h-6 rounded-sm transition-all duration-600",
                     isLow
-                      ? "bg-gradient-to-r from-[#6B3A1F] to-[#8B4513]"
+                      ? "from-lp-danger-dark to-lp-danger-light bg-gradient-to-r"
                       : "from-lp-gold to-lp-gold-light bg-gradient-to-r"
                   )}
                   style={{ width: `${score * 10}%` }}

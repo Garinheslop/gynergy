@@ -235,9 +235,10 @@ const VirtualBackground: React.FC<VirtualBackgroundProps> = ({ onClose, isOpen, 
           </div>
           <button
             onClick={onClose}
+            aria-label="Close virtual background settings"
             className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
           >
-            <i className="gng-close text-content-light" />
+            <i className="gng-close text-content-light" aria-hidden="true" />
           </button>
         </div>
 

@@ -82,7 +82,7 @@ function PaymentSuccessContent() {
   const fetchWithRetry = useCallback(async () => {
     if (!session) return;
     try {
-      await dispatch(fetchEntitlements() as any);
+      await dispatch(fetchEntitlements());
     } catch {
       setPollingStatus("error");
     }
