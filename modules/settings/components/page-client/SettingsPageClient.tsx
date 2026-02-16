@@ -167,7 +167,7 @@ const SettingsPageClient: React.FC = () => {
         </>
       </SectionCard>
 
-      <SectionCard sx={"gap-[30px]"}>
+      <SectionCard sx={"gap-8"}>
         <>
           <Heading variant={headingVariants.heading} sx="!font-bold text-center capitalize">
             Reset Your Journaling History
@@ -192,7 +192,7 @@ const SettingsPageClient: React.FC = () => {
             <Paragraph
               variant={paragraphVariants.regular}
               isHtml
-              sx={"[&>span]:text-[#FF2323]"}
+              sx={"[&>span]:text-danger"}
               content={"3. <span>This action cannot be undone</span>"}
             />
             <Paragraph

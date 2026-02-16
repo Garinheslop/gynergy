@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useDispatch } from "react-redux";
 
@@ -61,13 +61,13 @@ const MeditationCard: React.FC<MeditationCardProps> = ({
   return (
     <div
       className={cn(
-        "items-between relative flex flex-col justify-center gap-[20px] rounded bg-[#E5EDFA] p-5 md:p-[30px]",
+        "items-between relative flex flex-col justify-center gap-5 rounded-large bg-meditation-bg p-5 md:p-8",
         { "card-loading grayscale": isLoading }
       )}
     >
-      <div className="flex h-full flex-col gap-[20px]">
-        <div className={cn("flex flex-col gap-[10px]")}>
-          <i className={cn(`gng-meditation text-[25px] text-[#6699FF]`)} />
+      <div className="flex h-full flex-col gap-5">
+        <div className={cn("flex flex-col gap-2.5")}>
+          <i className={cn("gng-meditation text-2xl text-meditation")} />
           <Heading
             variant={headingVariants.cardHeading}
             sx={cn("!font-bold", {
@@ -84,9 +84,9 @@ const MeditationCard: React.FC<MeditationCardProps> = ({
             />
           )}
         </div>
-        <div className="flex aspect-video items-center justify-center overflow-hidden rounded bg-white sm:p-[10px]">
+        <div className="flex aspect-video items-center justify-center overflow-hidden rounded bg-white sm:p-2.5">
           <iframe
-            className="h-full w-full rounded-[6px]"
+            className="h-full w-full rounded-md"
             src={videoUrl}
             loading="lazy"
             allow="fullscreen; picture-in-picture"
@@ -95,8 +95,8 @@ const MeditationCard: React.FC<MeditationCardProps> = ({
         </div>
       </div>
       {!isStatic && (
-        <div className="flex w-full items-center gap-[10px] border-t border-[#CADBFD] pt-[15px]">
-          <i className="gng-info text-content-dark text-[21px]" />
+        <div className="flex w-full items-center gap-2.5 border-t border-meditation-border pt-4">
+          <i className="gng-info text-content-dark text-xl" />
           <Paragraph
             content={`Complete this meditation as part of this week’s challenge`}
             variant={paragraphVariants.regular}
@@ -105,10 +105,10 @@ const MeditationCard: React.FC<MeditationCardProps> = ({
         </div>
       )}
       {!isStatic && (
-        <div className="top-[30px] right-[30px] md:absolute">
+        <div className="top-8 right-[30px] md:absolute">
           {isCompleted ? (
-            <div className="flex gap-[10px]">
-              <i className="gng-complete-circle text-action-secondary text-[25px]" />
+            <div className="flex gap-2.5">
+              <i className="gng-complete-circle text-action-secondary text-2xl" />
               <Paragraph content={"Completed"} variant={paragraphVariants.regular} />
             </div>
           ) : (

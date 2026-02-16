@@ -23,15 +23,15 @@ const MeditationPopup = () => {
 
   return (
     <Modal open={meditationPopupObj.show} onClose={meditationPopupObj.close}>
-      <section className="items-between bg-bkg-light relative mx-auto flex h-screen w-screen flex-col justify-center gap-[30px] overflow-auto rounded p-[30px] sm:h-max sm:w-[620px]">
+      <section className="items-between bg-bkg-light relative mx-auto flex h-screen w-screen flex-col justify-center gap-8 overflow-auto rounded p-8 sm:h-max sm:w-[620px]">
         <i
-          className="gng-close absolute top-2 right-2 cursor-pointer p-6 text-[18px]"
+          className="gng-close absolute top-2 right-2 cursor-pointer p-6 text-lg"
           onClick={meditationPopupObj.close}
         />
         <div className="flex h-full w-full flex-col gap-5">
-          <div className="flex flex-col gap-[10px]">
+          <div className="flex flex-col gap-2.5">
             <i
-              className={cn(`gng-meditation py-[4px] text-[25px] text-[#6699FF]`, {
+              className={cn(`gng-meditation py-1 text-2xl text-meditation`, {
                 "text-primary": popupType === journalTypes.morningJournal,
                 "text-action-secondary": popupType === journalTypes.eveningJournal,
                 "text-primary-500": popupType === journalTypes.gratitudeAction,
@@ -42,7 +42,7 @@ const MeditationPopup = () => {
             </Heading>
           </div>
           <div className="border-border-light flex w-full border-t" />
-          <div className="flex flex-col gap-[5px]">
+          <div className="flex flex-col gap-1">
             <Paragraph
               variant={paragraphVariants.title}
               content={"Reflect on your Meditation"}
@@ -69,7 +69,7 @@ const MeditationPopup = () => {
                 window.open(popupData?.video, "_blank", "noopener,noreferrer");
               }}
               icon="hyperlink"
-              sx="[&>i]:text-[13px] [&>p,&>i]:text-[#007AFF] [&>p,&>i]:group-hover:opacity-90 hover:px-0 hover:bg-transparent [&>p]:underline gap-[5px] [&>p]:truncate sm:[&>p]:max-w-[85%] sm:[&>p]:max-w-max justify-end flex-row-reverse w-max group"
+              sx="[&>i]:text-sm [&>p,&>i]:text-link [&>p,&>i]:group-hover:opacity-90 hover:px-0 hover:bg-transparent [&>p]:underline gap-1 [&>p]:truncate sm:[&>p]:max-w-[85%] sm:[&>p]:max-w-max justify-end flex-row-reverse w-max group"
             />
           )}
           <ActionButton

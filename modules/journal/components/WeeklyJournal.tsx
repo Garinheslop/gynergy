@@ -47,8 +47,8 @@ const WeeklyJournal = () => {
   }, [histories.current?.entryDate, userEnrollment]);
 
   return (
-    <section className="bg-bkg-light flex w-full flex-col gap-[30px] rounded-[20px] sm:p-[30px]">
-      <div className="flex flex-col items-center justify-between gap-[10px] sm:flex-row sm:items-start">
+    <section className="bg-bkg-light flex w-full flex-col gap-8 rounded-[20px] sm:p-8">
+      <div className="flex flex-col items-center justify-between gap-2.5 sm:flex-row sm:items-start">
         <Heading variant={headingVariants.titleLg} sx={cn("!font-bold")}>
           {getHeaderData(histories.current?.entryType!)}
         </Heading>
@@ -58,7 +58,7 @@ const WeeklyJournal = () => {
         <Loader type={loaderTypes.spinner} sx={"h-[500px]"} />
       ) : (
         <>
-          <div className="flex flex-col gap-[10px]">
+          <div className="flex flex-col gap-2.5">
             <Heading variant={headingVariants.heading} sx={cn("!font-bold capitalize")}>
               {historyData?.action?.title.toLowerCase()}
             </Heading>
@@ -78,7 +78,7 @@ const WeeklyJournal = () => {
           )}
           <div className="flex flex-col gap-5">
             {historyData.action?.isEulogy && (
-              <div className="flex flex-col gap-[10px]">
+              <div className="flex flex-col gap-2.5">
                 <Heading variant={headingVariants.title} sx="!font-bold">
                   Eulogy
                 </Heading>
@@ -91,7 +91,7 @@ const WeeklyJournal = () => {
                   return null;
                 } else {
                   return (
-                    <div key={index} className="flex flex-col gap-[10px]">
+                    <div key={index} className="flex flex-col gap-2.5">
                       <Heading variant={headingVariants.title} sx="!font-bold">
                         {weeklyJournalInputData[field].heading}
                       </Heading>
@@ -102,7 +102,7 @@ const WeeklyJournal = () => {
               }
             )}
             {historyData?.freeflow && (
-              <div className="flex flex-col gap-[10px]">
+              <div className="flex flex-col gap-2.5">
                 <Heading variant={headingVariants.title} sx="!font-bold">
                   Free Flow
                 </Heading>
@@ -161,7 +161,7 @@ const getHeaderData = (type: string) => {
 
 const Question = ({ heading, isCompleted }: { heading: string; isCompleted: boolean }) => {
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-2.5">
       <Heading variant={headingVariants.title} sx="!font-bold">
         {heading}
       </Heading>
@@ -181,11 +181,11 @@ const MeditationCard = () => {
   return (
     <div
       className={cn(
-        "items-between relative flex flex-col justify-center gap-[20px] rounded bg-[#E5EDFA] p-5 md:p-[30px]"
+        "items-between relative flex flex-col justify-center gap-5 rounded bg-meditation-bg p-5 md:p-8"
       )}
     >
-      <div className={cn("flex flex-col gap-[10px]")}>
-        <i className={cn(`gng-meditation text-[25px] text-[#6699FF]`)} />
+      <div className={cn("flex flex-col gap-2.5")}>
+        <i className={cn(`gng-meditation text-2xl text-meditation`)} />
         <Heading variant={headingVariants.cardHeading} sx="font-bold">
           {meditations.total} out of 7 Daily Meditations Completed
         </Heading>

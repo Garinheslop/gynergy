@@ -146,7 +146,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         isSpinner={isSpinner}
         onHover={onHover}
         disabled={disabled}
-        sx={cn("bg-[#27282A] hover:bg-[#27282A]/80 border border-border-light", sx)}
+        sx={cn("bg-bkg-dark-secondary hover:bg-bkg-dark-secondary/80 border border-border-light", sx)}
       />
     );
   else if (buttonActionType === buttonActionTypes.text)
@@ -245,7 +245,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={cn(
-        "text-content-dark flex w-full cursor-pointer items-center justify-center gap-[10px] rounded px-[25px] py-[5px] duration-150 disabled:cursor-default",
+        "text-content-dark flex w-full cursor-pointer items-center justify-center gap-2.5 rounded px-[25px] py-[5px] duration-150 disabled:cursor-default",
         "focus-visible:ring-action-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         disabled || isLoading
           ? "bg-bkg-disabled/20 text-content-dark/40 [&>p]:text-content-dark/40"
@@ -315,7 +315,7 @@ const TextButton: React.FC<TextButtonProps> = ({
   return (
     <button
       className={cn(
-        "group group flex min-h-[44px] w-full items-center gap-[10px] rounded py-2 duration-150",
+        "group group flex min-h-[44px] w-full items-center gap-2.5 rounded py-2 duration-150",
         "focus-visible:ring-action-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         disabled ? "[&>p,i]:text-content-dark/30" : "hover:bg-action cursor-pointer hover:px-4",
         sx

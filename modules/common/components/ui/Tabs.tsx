@@ -67,6 +67,7 @@ const sizeStyles: Record<TabsSize, string> = {
 interface TabsProps {
   children: ReactNode;
   defaultTab?: string;
+  defaultValue?: string; // Alias for defaultTab
   value?: string;
   onChange?: (tabId: string) => void;
   variant?: TabsVariant;
@@ -74,16 +75,17 @@ interface TabsProps {
   className?: string;
 }
 
-export function Tabs({
+function TabsRoot({
   children,
   defaultTab,
+  defaultValue,
   value,
   onChange,
   variant = "underline",
   size = "md",
   className,
 }: TabsProps) {
-  const [internalActiveTab, setInternalActiveTab] = useState(defaultTab || "");
+  const [internalActiveTab, setInternalActiveTab] = useState(defaultTab || defaultValue || "");
   const [tabs, setTabs] = useState<string[]>([]);
   const baseId = useId();
 
@@ -256,9 +258,12 @@ function TabPanel({ children, value, className, forceMount = false }: TabPanelPr
   );
 }
 
-// Attach compound components
-Tabs.List = TabList;
-Tabs.Tab = Tab;
-Tabs.Panel = TabPanel;
+// Create compound component
+const Tabs = Object.assign(TabsRoot, {
+  List: TabList,
+  Tab: Tab,
+  Panel: TabPanel,
+});
 
-export { TabList, Tab, TabPanel };
+// Export all components
+export { Tabs, TabList, Tab, TabPanel };

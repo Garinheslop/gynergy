@@ -18,25 +18,25 @@ function UserCard({ rank, data, sx }: Props) {
   return (
     <div
       className={cn(
-        "border-border-light flex items-center rounded border p-2 sm:px-[15px] sm:py-2.5",
+        "border-border-light flex items-center rounded border p-2 sm:px-4 sm:py-2.5",
         sx
       )}
     >
       <div
         className={cn(
-          "relative mr-2 flex h-[50px] w-[60px] items-center justify-center rounded sm:mr-5 md:w-[84px]",
-          { "bg-gradient-to-r from-[#FFC878] to-[#F9E4B8]": rank == 1 },
-          { "bg-gradient-to-r from-[#F3F3F3] to-[#D8D8D8]": rank == 2 },
-          { "bg-gradient-to-r from-[#AC8D61] to-[#F6ECD8]": rank == 3 }
+          "relative mr-2 flex h-12 w-16 items-center justify-center rounded sm:mr-5 md:w-20",
+          { "bg-gradient-to-r from-rank-gold to-rank-gold-light": rank == 1 },
+          { "bg-gradient-to-r from-rank-silver to-rank-silver-dark": rank == 2 },
+          { "bg-gradient-to-r from-rank-bronze to-rank-bronze-light": rank == 3 }
         )}
       >
         {rank < 4 && (
           <RankImg
             sx={cn(
               "absolute",
-              { "[&>path]:fill-[#9D8153]": rank == 1 },
-              { "[&>path]:fill-[#858585]": rank == 2 },
-              { "[&>path]:fill-[#777572]": rank == 3 }
+              { "[&>path]:fill-rank-gold-text": rank == 1 },
+              { "[&>path]:fill-rank-silver-text": rank == 2 },
+              { "[&>path]:fill-rank-bronze-text": rank == 3 }
             )}
           />
         )}
@@ -44,10 +44,10 @@ function UserCard({ rank, data, sx }: Props) {
           content={rank}
           variant={paragraphVariants.title}
           sx={cn(
-            "!font-bold text-[#777572] mb-3",
-            { "text-[#9D8153]": rank == 1 },
-            { "text-[#858585]": rank == 2 },
-            { "text-[#777572]": rank == 3 }
+            "!font-bold text-rank-bronze-text mb-3",
+            { "text-rank-gold-text": rank == 1 },
+            { "text-rank-silver-text": rank == 2 },
+            { "text-rank-bronze-text": rank == 3 }
           )}
         />
       </div>
@@ -70,15 +70,15 @@ function UserCard({ rank, data, sx }: Props) {
           variant={paragraphVariants.regular}
           sx="text-content-dark-secondary truncate hidden sm:flex"
         />
-        <div className="flex flex-col items-end gap-[10px] sm:items-start">
-          <div className="flex w-max gap-[10px] sm:hidden">
+        <div className="flex flex-col items-end gap-2.5 sm:items-start">
+          <div className="flex w-max gap-2.5 sm:hidden">
             <Paragraph
               content={`${data?.totalPoints} Pts`}
               variant={paragraphVariants.regular}
               sx="text-content-dark-secondary truncate"
             />
           </div>
-          <div className="flex w-max justify-end gap-[10px] sm:w-full">
+          <div className="flex w-max justify-end gap-2.5 sm:w-full">
             <Paragraph
               content={dayjs(data?.enrollmentDate).format("MMM DD, YYYY")}
               variant={paragraphVariants.regular}

@@ -37,7 +37,7 @@ const HistoryPageClient: React.FC = () => {
   const { isLoading, historyData } = useGenerateHistoryCards();
 
   return (
-    <section className="mx-auto flex w-full max-w-[1253px] flex-col gap-[30px] px-4 py-[100px] md:py-[130px]">
+    <section className="mx-auto flex w-full max-w-[1253px] flex-col gap-8 px-4 py-[100px] md:py-[130px]">
       <div className="flex items-center gap-2.5">
         <Heading variant={headingVariants.heading} sx="!font-bold text-start capitalize">
           {currentBook?.shortName} Journal History
@@ -48,17 +48,17 @@ const HistoryPageClient: React.FC = () => {
           <Paragraph
             variant={paragraphVariants.meta}
             content={"Ended"}
-            sx={"bg-[#A4A7AE] px-2.5 py-[5px] rounded-[10px] w-fit h-fit"}
+            sx={"bg-grey-400 px-2.5 py-1 rounded-lg w-fit h-fit"}
           />
         )}
       </div>
 
-      <div className="flex flex-col items-center justify-between gap-[10px] sm:flex-row">
+      <div className="flex flex-col items-center justify-between gap-2.5 sm:flex-row">
         {enrollments.loading ? (
-          <div className="flex items-center gap-[10px]">
-            <TextSkeleton sx="h-[20px] w-[150px]" />
+          <div className="flex items-center gap-2.5">
+            <TextSkeleton sx="h-5 w-36" />
             -
-            <TextSkeleton sx="h-[20px] w-[150px]" />
+            <TextSkeleton sx="h-5 w-36" />
           </div>
         ) : (
           <Paragraph
@@ -71,21 +71,21 @@ const HistoryPageClient: React.FC = () => {
             sx="!font-bold"
           />
         )}
-        <div className="flex items-center gap-[5px]">
+        <div className="flex items-center gap-1">
           <Image src={icons.point} alt="star-icon" className="h-[30px] w-[30px]" />
 
           <Paragraph
             variant={paragraphVariants.title}
             isHtml
             content={`<span>${enrollments.current?.totalPoints ?? 0}</span> Points Earned`}
-            sx={cn("flex items-center gap-[5px] [&>span]:!font-bold", {
+            sx={cn("flex items-center gap-1 [&>span]:!font-bold", {
               "text-loading": enrollments?.loading,
             })}
           />
         </div>
       </div>
 
-      <div className="mx-auto grid w-full max-w-[1202px] grid-cols-2 gap-5 sm:grid-cols-3 sm:gap-[30px] lg:grid-cols-5">
+      <div className="mx-auto grid w-full max-w-[1202px] grid-cols-2 gap-5 sm:grid-cols-3 sm:gap-8 lg:grid-cols-5">
         {isLoading || histories.loading ? (
           <>
             <SkeletonWrapper renderTimes={4}>
@@ -152,7 +152,7 @@ const Onboardings = () => {
   return (
     <>
       <div
-        className="flex min-h-[178px] cursor-pointer flex-col gap-5 rounded bg-[#D1E9FF] p-5 shadow-2xs"
+        className="flex min-h-[178px] cursor-pointer flex-col gap-5 rounded bg-meditation-light p-5 shadow-2xs"
         onClick={() => openOnboardingHandler({ isOnboardingInspiration: true })}
       >
         <Paragraph
@@ -162,7 +162,7 @@ const Onboardings = () => {
         />
       </div>
       <div
-        className="flex min-h-[178px] cursor-pointer flex-col gap-5 rounded bg-[#D1E9FF] p-5 shadow-2xs"
+        className="flex min-h-[178px] cursor-pointer flex-col gap-5 rounded bg-meditation-light p-5 shadow-2xs"
         onClick={() => openOnboardingHandler({ isOnboardingPotentialSelf: true })}
       >
         <Paragraph

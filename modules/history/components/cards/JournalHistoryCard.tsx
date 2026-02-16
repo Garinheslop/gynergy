@@ -34,7 +34,7 @@ const JournalHistoryCard = ({ data, onCardClick, isMeditation, isMeditationCompl
       className={cn(
         "bg-action-25 flex cursor-pointer flex-col gap-5 rounded p-5 shadow-2xs duration-150 hover:translate-y-[-2px]",
         {
-          "bg-bkg-light gap-[10px]": data?.isDailyJournal,
+          "bg-bkg-light gap-2.5": data?.isDailyJournal,
           "bg-grey-50 cursor-default hover:translate-y-0":
             !data?.morningCompleted &&
             !data?.eveningCompleted &&
@@ -83,13 +83,13 @@ const JournalHistoryCard = ({ data, onCardClick, isMeditation, isMeditationCompl
               })}
             />
             <i
-              className={cn("gng-action text-primary-500 text-[25px]", {
+              className={cn("gng-action text-primary-500 text-2xl", {
                 "text-content-lighter": !data.gratitudeActionCompleted,
               })}
             />
             {isMeditation && (
               <i
-                className={cn("gng-meditation text-[21px] text-[#6699FF]", {
+                className={cn("gng-meditation text-xl text-meditation", {
                   "text-content-lighter": !isMeditationCompleted,
                 })}
               />
@@ -104,7 +104,7 @@ const JournalHistoryCard = ({ data, onCardClick, isMeditation, isMeditationCompl
         </>
       )}
       {data?.isWeeklyJournal && (
-        <div className="flex items-center gap-[5px]">
+        <div className="flex items-center gap-1">
           <i
             className={cn(
               `gng-${data?.weeklyChallengeCompleted || data?.weeklyReflectionCompleted ? "complete-circle" : "alert-circle"} text-action-secondary p-[3px] text-[24px]`,

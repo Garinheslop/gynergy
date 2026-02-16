@@ -15,7 +15,6 @@ import {
 } from "@resources/data/input/visions";
 import { pagePaths } from "@resources/paths";
 import { buttonActionTypes } from "@resources/types/button";
-import { journalTypes } from "@resources/types/journal";
 import { visionTypes, UserVision } from "@resources/types/vision";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
@@ -96,7 +95,7 @@ const Visions = ({ isStatic = false }: { isStatic?: boolean }) => {
   if (isStatic && visions.data.length > 0) {
     if (visionsCards.filter((visionsCard) => visionsCard?.value?.isCompleted).length > 0) {
       return (
-        <div className="flex w-full flex-col gap-[10px]">
+        <div className="flex w-full flex-col gap-2.5">
           {visionsCards
             .filter(
               (visionsCard) =>
@@ -133,7 +132,7 @@ const Visions = ({ isStatic = false }: { isStatic?: boolean }) => {
     visionsCards.filter((visionsCard) => visionsCard?.value?.isCompleted).length < 4
   ) {
     return (
-      <section className="flex flex-col items-center gap-[30px]">
+      <section className="flex flex-col items-center gap-8">
         <Heading variant={headingVariants.sectionHeading} sx="text-center !font-bold">
           Set Your Vision
         </Heading>
@@ -144,7 +143,7 @@ const Visions = ({ isStatic = false }: { isStatic?: boolean }) => {
           variant={paragraphVariants.regular}
           sx="text-center max-w-[800px]"
         />
-        <div className="flex w-full flex-col gap-[10px]">
+        <div className="flex w-full flex-col gap-2.5">
           {visionsCards
             .filter((visionsCard) => !visionsCard?.value?.isCompleted)
             .map((visionsCard, index) => (
@@ -264,7 +263,7 @@ const UserVisionData = ({
                 router.push(`/${currentBook?.slug}/${pagePaths.journalView}`);
               }}
               buttonActionType={buttonActionTypes.text}
-              sx="[&>P]:text-[#326FCF] hover:bg-transparent hover:px-0 hover:[&>p]:text-action-secondary [&>p]:duration-150"
+              sx="[&>P]:text-link hover:bg-transparent hover:px-0 hover:[&>p]:text-action-secondary [&>p]:duration-150"
             />
           )}
         </div>
@@ -272,14 +271,14 @@ const UserVisionData = ({
         <div className="flex flex-col gap-5">
           {fields.map((field, index) => {
             return (
-              <div key={index} className="flex flex-col gap-[10px]">
+              <div key={index} className="flex flex-col gap-2.5">
                 <Heading variant={headingVariants.title} sx="!font-bold">
                   {visionInputData[field].heading}
                 </Heading>
                 {field === "symbols" ? (
                   <div
                     className={
-                      "relative flex max-h-[270px] w-full max-w-[250px] gap-[10px] overflow-hidden rounded"
+                      "relative flex max-h-[270px] w-full max-w-[250px] gap-2.5 overflow-hidden rounded"
                     }
                   >
                     {userVision[field] ? (

@@ -5,12 +5,12 @@ import { cn } from "@lib/utils/style";
 
 const Footer = ({ sx }: { sx?: string }) => {
   return (
-    <footer className="flex w-full flex-col items-center justify-center pt-[50px] pb-5 sm:pt-[100px] sm:pb-[50px]">
-      <div className="flex flex-col items-center justify-center gap-[5px] sm:flex-row">
-        <div className={cn("text-content-dark flex gap-[5px] text-center text-[16px]", sx)}>
+    <footer className="flex w-full flex-col items-center justify-center pb-5 pt-12 sm:pb-12 sm:pt-24">
+      <div className="flex flex-col items-center justify-center gap-1 sm:flex-row">
+        <div className={cn("text-content-dark flex gap-1 text-center text-base", sx)}>
           Copyright © 2025 . Gynergy . All rights reserved.
         </div>
-        <div className={cn("text-content-dark flex gap-[5px] text-center text-[16px]", sx)}>
+        <div className={cn("text-content-dark flex gap-1 text-center text-base", sx)}>
           <Link
             className="!underline duration-200 hover:opacity-70"
             href={
@@ -32,20 +32,20 @@ const Footer = ({ sx }: { sx?: string }) => {
           </Link>
         </div>
       </div>
-      <p className={cn("text-content-dark hidden gap-[5px] text-center text-[16px] sm:flex", sx)}>
+      <p className={cn("text-content-dark hidden gap-1 text-center text-base sm:flex", sx)}>
         Software designed and developed by
         <Link
-          className="!text-[#5C92FF] duration-200 hover:opacity-70"
+          className="!text-link duration-200 hover:opacity-70"
           href={"https://www.bitechx.com/"}
           target="_blank"
         >
           BiTechX LLC
         </Link>
       </p>
-      <p className={cn("text-content-dark flex gap-[5px] text-center text-[16px] sm:hidden", sx)}>
+      <p className={cn("text-content-dark flex gap-1 text-center text-base sm:hidden", sx)}>
         Designed and Developed by
         <Link
-          className="!text-[#5C92FF] duration-200 hover:opacity-70"
+          className="!text-link duration-200 hover:opacity-70"
           href={"https://www.bitechx.com/"}
           target="_blank"
         >

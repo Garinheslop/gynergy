@@ -12,7 +12,7 @@ import Spinner from "@modules/common/components/Spinner";
 import TextArea from "@modules/common/components/TextArea";
 import TextAreaWithHeading from "@modules/common/components/TextAreaWithHeading";
 import useSetEditorData from "@modules/journal/hooks/useSetEditorData";
-import { EditorData, JourneyTableData, WeeklyChallengeData } from "@resources/types/journal";
+import { JourneyTableData, WeeklyChallengeData } from "@resources/types/journal";
 import { useSelector } from "@store/hooks";
 import { ImageRawData } from "@resources/types/ocr";
 import {
@@ -34,8 +34,6 @@ import Image from "@modules/common/components/Image";
 
 import EulogyIntro from "./EulogyIntro";
 import JourneyTable from "./JourneyTable";
-
-import { JournalCardData } from "@resources/types/history";
 
 const WeeklyChallengeJournalEditor: FC<{ intro?: boolean }> = ({ intro }) => {
   const { imageScanPopupObj } = usePopup();
@@ -111,7 +109,7 @@ const WeeklyChallengeJournalEditor: FC<{ intro?: boolean }> = ({ intro }) => {
         )}
       </EditorHeader>
       <div className="border-border-light w-full border-b" />
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         <Heading variant={headingVariants.sectionHeading} sx="!font-bold capitalize">
           {weeklyAction?.title.toLowerCase()}
         </Heading>
@@ -221,11 +219,11 @@ const ActionCompletion = ({
 }) => {
   // const [value, setValue] = useState<boolean | null>(null);
   return (
-    <div className={cn("flex flex-col gap-[10px]")}>
+    <div className={cn("flex flex-col gap-2.5")}>
       <Heading variant={headingVariants.cardHeading} sx="!font-bold">
         Did you complete the weekly challenge?
       </Heading>
-      <div className="flex gap-[10px]">
+      <div className="flex gap-2.5">
         <button
           className={cn(
             "border-border-light flex h-[57px] w-[73px] cursor-pointer items-center justify-center rounded border",
@@ -255,7 +253,7 @@ const ActionCompletion = ({
         </button>
       </div>
       {isMeditation && (
-        <div className="flex items-center gap-[10px]">
+        <div className="flex items-center gap-2.5">
           <i className="gng-info text-content-dark text-[21px]" />
           <Paragraph
             content={`Complete at least one meditation to complete this week’s challenge`}
@@ -274,11 +272,11 @@ const MeditationCard = () => {
   return (
     <div
       className={cn(
-        "items-between relative flex flex-col justify-center gap-[20px] rounded bg-[#E5EDFA] p-5 md:p-[30px]"
+        "items-between relative flex flex-col justify-center gap-5 rounded bg-meditation-bg p-5 md:p-8"
       )}
     >
-      <div className={cn("flex flex-col gap-[10px]")}>
-        <i className={cn(`gng-meditation text-[25px] text-[#6699FF]`)} />
+      <div className={cn("flex flex-col gap-2.5")}>
+        <i className={cn(`gng-meditation text-2xl text-meditation`)} />
         <Heading variant={headingVariants.cardHeading} sx="font-bold">
           {meditations.total} out of 7 Daily Meditations Completed
         </Heading>
@@ -335,7 +333,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
   };
 
   return (
-    <section className="flex flex-col gap-[5px]">
+    <section className="flex flex-col gap-1">
       <Heading variant={headingVariants.title} sx="!font-bold">
         {"Free Flow"}
       </Heading>
@@ -344,10 +342,10 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
         variant={paragraphVariants.meta}
         sx="text-content-dark-secondary"
       />
-      <div className="flex w-full grid-cols-3 flex-col gap-[30px] sm:grid sm:h-[280px] sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex w-full grid-cols-3 flex-col gap-8 sm:grid sm:h-[280px] sm:flex-row sm:items-start sm:justify-between">
         {image ? (
           <div
-            className={cn("relative flex max-h-[270px] w-full gap-[10px] overflow-hidden rounded")}
+            className={cn("relative flex max-h-[270px] w-full gap-2.5 overflow-hidden rounded")}
           >
             {!loading && (
               <button
@@ -364,7 +362,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
             {loading && (
               <div
                 className={cn(
-                  "bg-bkg-dark/50 border-border-light absolute top-0 left-0 flex h-[100px] w-full items-center justify-center gap-[10px] overflow-hidden rounded border md:h-full md:w-full"
+                  "bg-bkg-dark/50 border-border-light absolute top-0 left-0 flex h-[100px] w-full items-center justify-center gap-2.5 overflow-hidden rounded border md:h-full md:w-full"
                 )}
               >
                 <Spinner />
@@ -388,7 +386,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
                 }
               }}
             >
-              <div className="border-border-light flex h-full flex-col justify-center gap-[20px] rounded-[10px] border-[4px] border-dashed p-5 lg:p-10">
+              <div className="border-border-light flex h-full flex-col justify-center gap-5 rounded-[10px] border-[4px] border-dashed p-5 lg:p-10">
                 <div
                   className={cn(
                     "border-border-light mx-auto flex shrink-0 cursor-pointer items-center justify-center rounded-full md:size-[70px] md:border"
@@ -419,7 +417,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
               <Paragraph content={"or"} sx="text-content-dark-secondary" />
               <div className="border-border-light flex w-full border-t sm:h-full sm:w-[1px] sm:border-r" />
             </div>
-            <div className="flex h-full w-full flex-col gap-[5px]">
+            <div className="flex h-full w-full flex-col gap-1">
               <Paragraph content={"Explain your freeflow"} sx="text-content-dark" />
               <TextArea
                 value={value?.file ? "" : value}

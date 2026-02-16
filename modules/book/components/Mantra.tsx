@@ -7,7 +7,7 @@ import Card from "@modules/common/components/Card";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { pagePaths } from "@resources/paths";
 import { buttonActionTypes } from "@resources/types/button";
-import { visionTypes, VisionMantra, UserVision } from "@resources/types/vision";
+import { visionTypes, UserVision } from "@resources/types/vision";
 import { paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
 import { setEditorDataStates } from "@store/modules/editor";
@@ -66,7 +66,7 @@ const Mantra = ({ userVision }: { userVision: UserVision }) => {
               router.push(`/${currentBook?.slug}/${pagePaths.journalView}`);
             }}
             buttonActionType={buttonActionTypes.text}
-            sx="[&>P]:text-[#326FCF] hover:bg-transparent hover:px-0 hover:[&>p]:text-action-secondary [&>p]:duration-150"
+            sx="[&>P]:text-link hover:bg-transparent hover:px-0 hover:[&>p]:text-action-secondary [&>p]:duration-150"
           />
         )}
       </div>

@@ -60,19 +60,19 @@ const JournalCard: React.FC<JournalCardProps> = ({
   return (
     <div
       className={cn(
-        "items-between bg-bkg-light flex flex-col justify-center gap-[30px] rounded p-5 md:p-[30px]",
+        "items-between bg-bkg-light flex flex-col justify-center gap-8 rounded-large p-5 md:p-8",
         { "bg-grey-50": isCompleted || isDisabled }
       )}
     >
-      <div className="flex h-full flex-col gap-[30px]">
+      <div className="flex h-full flex-col gap-8">
         <div
-          className={cn("flex flex-col gap-[10px]", {
+          className={cn("flex flex-col gap-2.5", {
             "gap-5": journalType === journalTypes.weeklyChallenge,
           })}
         >
           {icon && (
             <i
-              className={cn(`gng-${icon} py-[4px] text-[32px]`, {
+              className={cn(`gng-${icon} py-1 text-3xl`, {
                 "text-primary": journalType === journalTypes.morningJournal,
                 "text-action-secondary": journalType === journalTypes.eveningJournal,
                 "text-primary-500": journalType === journalTypes.gratitudeAction,
@@ -90,7 +90,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
             {heading}
           </Heading>
           {isLoading && subDescription ? (
-            <div className="flex w-full flex-col gap-[5px]">
+            <div className="flex w-full flex-col gap-1.5">
               <TextSkeleton sx="w-[65%] h-[18px]" />
             </div>
           ) : (
@@ -105,7 +105,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
           )}
           <div
             className={cn("flex w-full flex-col", {
-              "gap-[10px]": journalType === journalTypes.weeklyChallenge,
+              "gap-2.5": journalType === journalTypes.weeklyChallenge,
             })}
           >
             {journalType === journalTypes.weeklyChallenge && !isDisabled && (
@@ -135,7 +135,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
             {isLoading &&
             (journalType === journalTypes.gratitudeAction ||
               journalType === journalTypes.weeklyChallenge) ? (
-              <div className="flex w-full flex-col gap-[5px]">
+              <div className="flex w-full flex-col gap-1.5">
                 <TextSkeleton sx="w-full h-[18px]" />
                 <TextSkeleton sx="w-[95%] h-[18px]" />
               </div>
@@ -177,7 +177,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
                   });
                 }}
                 buttonActionType={buttonActionTypes.text}
-                sx="[&>P]:text-[#326FCF] hover:bg-transparent hover:px-0 hover:[&>p]:text-action-secondary [&>p]:duration-150"
+                sx="[&>P]:text-link hover:bg-transparent hover:px-0 hover:[&>p]:text-action-secondary [&>p]:duration-150"
               />
             )}
           </div>
@@ -190,13 +190,13 @@ const JournalCard: React.FC<JournalCardProps> = ({
               }}
               disabled={isLoading}
               icon="hyperlink"
-              sx="[&>i]:text-[13px] [&>p,&>i]:text-[#007AFF] [&>p,&>i]:group-hover:opacity-90 hover:px-0 hover:bg-transparent [&>p]:underline gap-[5px] [&>p]:truncate [&>p]:max-w-[85%] sm:[&>p]:max-w-max justify-end flex-row-reverse w-max group"
+              sx="[&>i]:text-sm [&>p,&>i]:text-link [&>p,&>i]:group-hover:opacity-90 hover:px-0 hover:bg-transparent [&>p]:underline gap-1.5 [&>p]:truncate [&>p]:max-w-[85%] sm:[&>p]:max-w-max justify-end flex-row-reverse w-max group"
             />
           )}
         </div>
         {isCompleted && !isDisabled ? (
-          <div className="flex gap-[10px]">
-            <i className="gng-complete-circle text-action-secondary text-[25px]" />
+          <div className="flex gap-2.5">
+            <i className="gng-complete-circle text-action-secondary text-2xl" />
             <Paragraph content={"Completed"} variant={paragraphVariants.regular} />
           </div>
         ) : (
@@ -227,14 +227,14 @@ const JournalCard: React.FC<JournalCardProps> = ({
             ) : (
               <div className="flex flex-col gap-2">
                 <div
-                  className={cn("flex items-center gap-[5px]", {
+                  className={cn("flex items-center gap-1.5", {
                     "text-red-400": isStreakAtRisk && streak > 0 && !isCompleted,
                   })}
                 >
                   <Image
                     src={icons.streak}
                     alt="Streak"
-                    className={cn("h-[25px] w-auto", {
+                    className={cn("h-6 w-auto", {
                       "animate-pulse": isStreakAtRisk && streak > 0 && !isCompleted,
                     })}
                   />
@@ -247,7 +247,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
                     })}
                   />
                   {isStreakAtRisk && streak > 0 && !isCompleted && (
-                    <i className="gng-alert animate-pulse text-[16px] text-red-400" />
+                    <i className="gng-alert animate-pulse text-base text-red-400" />
                   )}
                 </div>
                 {isStreakAtRisk && streak > 0 && !isCompleted && (
@@ -264,12 +264,12 @@ const JournalCard: React.FC<JournalCardProps> = ({
       </div>
 
       {!isCompleted && !isDisabled && (
-        <div className="border-border-light flex gap-[10px] border-t pt-[15px]">
+        <div className="border-border-light flex gap-2.5 border-t pt-4">
           {isLoading ? (
             <TextSkeleton sx="w-[70%]" />
           ) : (
             <>
-              <Image src={icons.point} alt="Points" className="h-[25px] w-auto" />
+              <Image src={icons.point} alt="Points" className="h-6 w-auto" />
               <Paragraph
                 isHtml
                 content={`Complete & Earn <span>${points} Pts<span/>`}

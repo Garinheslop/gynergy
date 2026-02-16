@@ -163,7 +163,7 @@ const ReferralCard: FC<ReferralCardProps> = ({
                         );
                       }}
                       aria-label="Share on Facebook"
-                      className="focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded bg-[#1877F2] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
+                      className="focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded bg-facebook px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
                     >
                       <svg
                         className="h-4 w-4"
@@ -185,7 +185,7 @@ const ReferralCard: FC<ReferralCardProps> = ({
                         );
                       }}
                       aria-label="Share on WhatsApp"
-                      className="focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded bg-[#25D366] px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
+                      className="focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded bg-whatsapp px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
                     >
                       <svg
                         className="h-4 w-4"
