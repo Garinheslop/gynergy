@@ -19,13 +19,20 @@ async function addAdminRoleByUserId(
   email: string,
   userId: string
 ): Promise<AdminResult> {
-  // Only use user_id and role to match existing table schema
-  const { error } = await supabase
+  // First check if admin role already exists
+  const { data: existing } = await supabase
     .from("user_roles")
-    .upsert(
-      { user_id: userId, role: "admin" },
-      { onConflict: "user_id,role", ignoreDuplicates: true }
-    );
+    .select("id")
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .single();
+
+  if (existing) {
+    return { email, status: "already_admin" };
+  }
+
+  // Insert new admin role
+  const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: "admin" });
 
   return error ? { email, status: "error", error: error.message } : { email, status: "added" };
 }
