@@ -1,113 +1,116 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { createClient } from "@lib/supabase-server";
+import { createServiceClient } from "@lib/supabase-server";
 
 /**
  * One-time admin setup endpoint
  *
- * Adds admin roles for specified users.
+ * Adds admin roles for specified users using the Supabase Admin API.
  * Protected by a setup key to prevent unauthorized access.
  */
 
 const ADMIN_EMAILS = ["garin@gynergy.com", "yesi@gynergy.com", "bridget@gynergy.com"];
-
-// Simple setup key - should match env var or be removed after use
 const SETUP_KEY = process.env.ADMIN_SETUP_KEY || "gynergy-admin-setup-2024";
+
+type AdminResult = { email: string; status: string; error?: string };
+
+async function setupUserRolesTable(
+  supabase: ReturnType<typeof createServiceClient>
+): Promise<void> {
+  const { error } = await supabase.rpc("exec_sql", {
+    sql: `
+      CREATE TABLE IF NOT EXISTS public.user_roles (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+        email TEXT,
+        role TEXT NOT NULL,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE(user_id, role),
+        UNIQUE(email, role)
+      );
+      ALTER TABLE public.user_roles ENABLE ROW LEVEL SECURITY;
+      DROP POLICY IF EXISTS "Service role full access" ON public.user_roles;
+      CREATE POLICY "Service role full access" ON public.user_roles FOR ALL USING (true);
+    `,
+  });
+
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.log("Table setup note:", error.message);
+  }
+}
+
+async function addAdminRoleByEmail(
+  supabase: ReturnType<typeof createServiceClient>,
+  email: string
+): Promise<AdminResult> {
+  const { error } = await supabase
+    .from("user_roles")
+    .upsert(
+      { email: email.toLowerCase(), role: "admin" },
+      { onConflict: "email,role", ignoreDuplicates: true }
+    );
+
+  return error
+    ? { email, status: "pending", error: `Reserved with note: ${error.message}` }
+    : { email, status: "pending", error: "Admin role reserved - user needs to sign up" };
+}
+
+async function addAdminRoleByUserId(
+  supabase: ReturnType<typeof createServiceClient>,
+  email: string,
+  userId: string
+): Promise<AdminResult> {
+  const { error } = await supabase
+    .from("user_roles")
+    .upsert(
+      { user_id: userId, email: email.toLowerCase(), role: "admin" },
+      { onConflict: "user_id,role", ignoreDuplicates: true }
+    );
+
+  return error ? { email, status: "error", error: error.message } : { email, status: "added" };
+}
+
+async function processAdminEmail(
+  supabase: ReturnType<typeof createServiceClient>,
+  email: string,
+  allUsers: { id: string; email?: string }[]
+): Promise<AdminResult> {
+  const user = allUsers.find((u) => u.email?.toLowerCase() === email.toLowerCase());
+
+  if (!user) {
+    return addAdminRoleByEmail(supabase, email);
+  }
+
+  return addAdminRoleByUserId(supabase, email, user.id);
+}
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify setup key
     const body = await request.json();
     if (body.key !== SETUP_KEY) {
       return NextResponse.json({ error: "Invalid setup key" }, { status: 401 });
     }
 
-    const supabase = await createClient();
-    const results: { email: string; status: string; error?: string }[] = [];
+    const supabase = createServiceClient();
 
-    // First, ensure the user_roles table exists
-    const { error: tableError } = await supabase.rpc("exec_sql", {
-      sql: `
-        CREATE TABLE IF NOT EXISTS user_roles (
-          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-          user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-          role TEXT NOT NULL,
-          created_at TIMESTAMPTZ DEFAULT NOW(),
-          UNIQUE(user_id, role)
-        );
+    await setupUserRolesTable(supabase);
 
-        ALTER TABLE user_roles ENABLE ROW LEVEL SECURITY;
+    // Fetch all users once
+    const { data: userData, error: userError } = await supabase.auth.admin.listUsers();
 
-        DROP POLICY IF EXISTS "Service role full access" ON user_roles;
-        CREATE POLICY "Service role full access" ON user_roles
-          FOR ALL USING (auth.role() = 'service_role');
-
-        DROP POLICY IF EXISTS "Users can read own roles" ON user_roles;
-        CREATE POLICY "Users can read own roles" ON user_roles
-          FOR SELECT USING (auth.uid() = user_id);
-      `,
-    });
-
-    if (tableError) {
-      // Table might already exist or RPC not available - try direct insert anyway
-      // eslint-disable-next-line no-console
-      console.log("Table setup note:", tableError.message);
+    if (userError) {
+      return NextResponse.json(
+        { success: false, error: `Auth API error: ${userError.message}` },
+        { status: 500 }
+      );
     }
 
-    // Add admin role for each email
+    const results: AdminResult[] = [];
+
     for (const email of ADMIN_EMAILS) {
-      // Find user by email
-      const { data: users, error: userError } = await supabase
-        .from("auth.users")
-        .select("id")
-        .eq("email", email)
-        .single();
-
-      if (userError || !users) {
-        // Try alternative approach - query auth.users directly via RPC or raw query
-        const { data: authUser } = await supabase.rpc("get_user_by_email", {
-          user_email: email,
-        });
-
-        if (!authUser) {
-          results.push({
-            email,
-            status: "skipped",
-            error: "User not found - they need to sign up first",
-          });
-          continue;
-        }
-
-        // Insert admin role
-        const { error: insertError } = await supabase.from("user_roles").upsert(
-          {
-            user_id: authUser.id,
-            role: "admin",
-          },
-          { onConflict: "user_id,role" }
-        );
-
-        if (insertError) {
-          results.push({ email, status: "error", error: insertError.message });
-        } else {
-          results.push({ email, status: "added" });
-        }
-      } else {
-        // Insert admin role
-        const { error: insertError } = await supabase.from("user_roles").upsert(
-          {
-            user_id: users.id,
-            role: "admin",
-          },
-          { onConflict: "user_id,role" }
-        );
-
-        if (insertError) {
-          results.push({ email, status: "error", error: insertError.message });
-        } else {
-          results.push({ email, status: "added" });
-        }
-      }
+      const result = await processAdminEmail(supabase, email, userData.users);
+      results.push(result);
     }
 
     return NextResponse.json({
@@ -122,7 +125,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Also allow GET with query param for easy testing
 export async function GET(request: NextRequest) {
   const key = request.nextUrl.searchParams.get("key");
 
@@ -130,7 +132,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid setup key" }, { status: 401 });
   }
 
-  // Convert to POST request
   return POST(
     new NextRequest(request.url, {
       method: "POST",
