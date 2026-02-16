@@ -4,11 +4,11 @@
  * A transformational assessment designed to create
  * genuine self-insight and prequalify leads.
  *
- * 15 Questions across 4 phases:
- * - Phase A: External Success (Q1-3) - Prequalification
- * - Phase B: Hidden Reality (Q4-8) - The Rupture
- * - Phase C: Five Pillars Deep (Q9-13) - Specific Scores
- * - Phase D: The Opening (Q14-15) - Readiness & Priority
+ * 16 Questions across 4 phases:
+ * - Phase A: External Success (Q1-4) - Prequalification
+ * - Phase B: Hidden Reality (Q5-9) - The Rupture
+ * - Phase C: Five Pillars Deep (Q10-14) - Specific Scores
+ * - Phase D: The Opening (Q15-16) - Readiness & Priority
  */
 
 // ============================================
@@ -17,13 +17,7 @@
 
 export type QuestionType = "single_choice" | "multi_select" | "slider" | "free_text";
 
-export type RevenueTier =
-  | "under_250k"
-  | "250k_500k"
-  | "500k_1m"
-  | "1m_5m"
-  | "5m_10m"
-  | "10m_plus";
+export type RevenueTier = "under_250k" | "250k_500k" | "500k_1m" | "1m_5m" | "5m_10m" | "10m_plus";
 
 export type Achievement =
   | "built_business"
@@ -82,6 +76,8 @@ export type Readiness =
   | "ready_to_invest"
   | "desperate";
 
+export type PriorCoaching = "never" | "free_content" | "under_1k" | "1k_5k" | "5k_15k" | "15k_plus";
+
 export type PriorityPillar = "wealth" | "health" | "relationships" | "growth" | "purpose";
 
 export type Interpretation = "elite" | "gap" | "critical";
@@ -112,6 +108,7 @@ export interface AssessmentAnswers {
   // Section A
   revenue_tier?: RevenueTier;
   achievements?: Achievement[];
+  prior_coaching?: PriorCoaching;
   external_rating?: number;
 
   // Section B
@@ -178,6 +175,46 @@ export const ASSESSMENT_V2_QUESTIONS: AssessmentQuestion[] = [
     ],
   },
   {
+    id: "prior_coaching",
+    phase: "A",
+    type: "single_choice",
+    question: "How much have you invested in personal development, coaching, or self-work?",
+    subtext:
+      "Books, courses, coaches, retreats, therapy — the investments you've made in yourself. This reveals your pattern.",
+    options: [
+      {
+        value: "never",
+        label: "Haven't really invested yet",
+        description: "Still figuring out what works",
+      },
+      {
+        value: "free_content",
+        label: "Mostly free content",
+        description: "Books, podcasts, YouTube",
+      },
+      {
+        value: "under_1k",
+        label: "Under $1,000",
+        description: "A few courses or books",
+      },
+      {
+        value: "1k_5k",
+        label: "$1,000 - $5,000",
+        description: "Some programs or coaching",
+      },
+      {
+        value: "5k_15k",
+        label: "$5,000 - $15,000",
+        description: "Serious investment in growth",
+      },
+      {
+        value: "15k_plus",
+        label: "$15,000+",
+        description: "High-level coaching or programs",
+      },
+    ],
+  },
+  {
     id: "external_rating",
     phase: "A",
     type: "slider",
@@ -218,7 +255,7 @@ export const ASSESSMENT_V2_QUESTIONS: AssessmentQuestion[] = [
       },
       {
         value: "performing_success",
-        label: '"I\'m performing a version of success I don\'t even want"',
+        label: "\"I'm performing a version of success I don't even want\"",
       },
       { value: "other", label: "Something else..." },
     ],
@@ -330,8 +367,7 @@ export const ASSESSMENT_V2_QUESTIONS: AssessmentQuestion[] = [
     phase: "C",
     type: "slider",
     pillar: "health",
-    question:
-      "Beyond the metrics — when you wake up, does your body feel like a gift or a burden?",
+    question: "Beyond the metrics — when you wake up, does your body feel like a gift or a burden?",
     sliderConfig: {
       min: 1,
       max: 10,
@@ -542,7 +578,8 @@ export const BODY_TENSION_MEANINGS: Record<
   relaxed: {
     location: "relaxed",
     meaning: "present, integrated, or disconnected",
-    insight: "Either you've done significant work on yourself, or you've gotten very good at not feeling.",
+    insight:
+      "Either you've done significant work on yourself, or you've gotten very good at not feeling.",
   },
   disconnected: {
     location: "disconnected",
@@ -597,7 +634,8 @@ export const TWO_AM_MEANINGS: Record<
   other: {
     thought: "Something else",
     pattern: "Unique experience",
-    insight: "Your 2am thought is yours alone. But the pattern is the same: the defended self cracks open in the dark, and truth seeps through.",
+    insight:
+      "Your 2am thought is yours alone. But the pattern is the same: the defended self cracks open in the dark, and truth seeps through.",
   },
 };
 
@@ -682,7 +720,7 @@ export const READINESS_RESPONSES: Record<
   ready_to_invest: {
     label: "Ready to Invest",
     response:
-      "You're not shopping for a solution. You're ready to move. The 45-Day Awakening Challenge starts next month. $997. Limited to 15 men per cohort. The training will give you everything you need to know. But if you already know, reply to the email report — let's talk directly.",
+      "You're not shopping for a solution. You're ready to move. The 45-Day Awakening Challenge starts next month. $997. Join men who are done waiting and ready to transform. The training will give you everything you need to know. But if you already know, reply to the email report — let's talk directly.",
     cta: "Register for Training (and Challenge Info)",
     ctaVariant: "strong",
   },
@@ -823,9 +861,7 @@ export function getLowestPillar(
     { pillar: "purpose", score: answers.purpose_score || 10 },
   ];
 
-  return pillars.reduce((lowest, current) =>
-    current.score < lowest.score ? current : lowest
-  );
+  return pillars.reduce((lowest, current) => (current.score < lowest.score ? current : lowest));
 }
 
 export function calculateLeadScore(answers: AssessmentAnswers): number {

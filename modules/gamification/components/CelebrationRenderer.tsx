@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 
 import { usePopup } from "@contexts/UsePopup";
+import { useSession } from "@contexts/UseSession";
 import { useBadgeNotifications } from "@lib/hooks/useBadgeNotifications";
 import { Badge } from "@resources/types/gamification";
 
@@ -15,16 +16,20 @@ import BadgeUnlockPopup from "./BadgeUnlockPopup";
  * are shown regardless of which page the user is on.
  *
  * It integrates:
- * - useBadgeNotifications: Polls for newly earned badges
+ * - useBadgeNotifications: Polls for newly earned badges (only when authenticated)
  * - celebrationQueue: Queue system for showing celebrations in order
  * - BadgeUnlockPopup: Visual celebration with confetti
  */
 export default function CelebrationRenderer() {
   const { celebrationQueue } = usePopup();
+  const { session } = useSession();
+
+  // Only poll for badges when user is authenticated
+  const isAuthenticated = !!session?.user;
 
   // Set up badge notifications with callback to add to celebration queue
   const { currentCelebration, dismissCelebration } = useBadgeNotifications({
-    enabled: true,
+    enabled: isAuthenticated,
     pollInterval: 30000, // 30 seconds
     onNewBadge: (userBadge) => {
       // When a new badge is detected, add it to the celebration queue

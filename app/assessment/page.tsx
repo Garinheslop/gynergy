@@ -3,13 +3,13 @@ export const dynamic = "force-dynamic";
 
 import type { Metadata } from "next";
 
-import { AssessmentPage } from "@modules/landing";
+import { AssessmentPageV2 } from "@modules/landing";
 
 // Assessment page specific metadata
 export const metadata: Metadata = {
-  title: "Five Pillar Self-Assessment | Rate Your Life | GYNERGY",
+  title: "Five Pillar Assessment | The Truth You've Been Avoiding | GYNERGY",
   description:
-    "5 questions. 2 minutes. The number will surprise you. Score your life across wealth, health, relationships, growth, and purpose.",
+    "15 questions. 10 minutes. Discover your Five Pillar Score and which pillar is silently bleeding. Personalized insights for successful men.",
   keywords: [
     "life assessment",
     "self assessment",
@@ -52,5 +52,5 @@ export const metadata: Metadata = {
 };
 
 export default function AssessmentRoute() {
-  return <AssessmentPage />;
+  return <AssessmentPageV2 />;
 }

@@ -44,6 +44,8 @@ export async function middleware(request: NextRequest) {
     "/image", // Image routes
     "/pricing", // Legacy pricing route (redirects to /)
     "/payment/success", // Post-checkout success page
+    "/webinar", // Webinar registration landing page
+    "/assessment", // Five Pillar Self-Assessment
   ];
 
   if (publicRoutes.some((route) => pathname === route || pathname.startsWith(route + "/"))) {
