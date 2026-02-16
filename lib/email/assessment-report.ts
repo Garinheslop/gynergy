@@ -21,6 +21,39 @@ import type {
 import { sendEmail } from "./index";
 
 // ============================================
+// EMAIL TRACKING HELPERS
+// ============================================
+
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app";
+
+function generateEmailId(): string {
+  return `asr_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+}
+
+function createTrackedUrl(
+  originalUrl: string,
+  emailId: string,
+  recipientEmail: string,
+  linkName: string,
+  emailType: string = "assessment_report"
+): string {
+  const encodedUrl = Buffer.from(originalUrl).toString("base64");
+  const encodedEmail = Buffer.from(recipientEmail).toString("base64");
+
+  return `${BASE_URL}/api/email/track?type=click&id=${emailId}&email=${encodedEmail}&url=${encodedUrl}&name=${linkName}&et=${emailType}`;
+}
+
+function createTrackingPixel(
+  emailId: string,
+  recipientEmail: string,
+  emailType: string = "assessment_report"
+): string {
+  const encodedEmail = Buffer.from(recipientEmail).toString("base64");
+
+  return `<img src="${BASE_URL}/api/email/track?type=open&id=${emailId}&email=${encodedEmail}&et=${emailType}" width="1" height="1" style="display:none;width:1px;height:1px;" alt="" />`;
+}
+
+// ============================================
 // TYPES
 // ============================================
 
@@ -382,7 +415,10 @@ export async function sendAssessmentReportEmail(
     return { success: false, error: "No email provided" };
   }
 
-  const html = generateAssessmentReportHtml(data, firstName);
+  // Generate unique email ID for tracking
+  const emailId = generateEmailId();
+
+  const html = generateAssessmentReportHtml(data, firstName, email, emailId);
   const text = generateAssessmentReportText(data, firstName);
 
   const subject =
@@ -403,7 +439,12 @@ export async function sendAssessmentReportEmail(
 // HTML TEMPLATE
 // ============================================
 
-function generateAssessmentReportHtml(data: AssessmentReportData, firstName: string): string {
+function generateAssessmentReportHtml(
+  data: AssessmentReportData,
+  firstName: string,
+  recipientEmail: string,
+  emailId: string
+): string {
   const {
     totalScore,
     interpretation,
@@ -424,6 +465,14 @@ function generateAssessmentReportHtml(data: AssessmentReportData, firstName: str
     revenue_tier,
     v3_data,
   } = data;
+
+  // Create tracked webinar URL
+  const webinarUrl = createTrackedUrl(
+    "https://gynergy.app/webinar",
+    emailId,
+    recipientEmail,
+    "webinar_cta"
+  );
 
   // V3 Enhanced Sections
   const isV3 = Boolean(v3_data);
@@ -564,7 +613,7 @@ function generateAssessmentReportHtml(data: AssessmentReportData, firstName: str
         ${READINESS_RESPONSES[readiness].response}
       </p>
       <div style="text-align: center;">
-        <a href="https://gynergy.app/webinar" style="display: inline-block; background: linear-gradient(90deg, #b8943e, #d4a843); color: #0a0a0a; padding: 14px 32px; text-decoration: none; font-weight: 600; font-size: 16px; border-radius: 4px;">
+        <a href="${webinarUrl}" style="display: inline-block; background: linear-gradient(90deg, #b8943e, #d4a843); color: #0a0a0a; padding: 14px 32px; text-decoration: none; font-weight: 600; font-size: 16px; border-radius: 4px;">
           ${READINESS_RESPONSES[readiness].cta}
         </a>
       </div>
@@ -852,7 +901,7 @@ function generateAssessmentReportHtml(data: AssessmentReportData, firstName: str
         <strong style="color: #ffffff;">It doesn't have to stay that way.</strong>
       </p>
 
-      <a href="https://gynergy.app/webinar" style="display: inline-block; background: linear-gradient(90deg, #b8943e, #d4a843); color: #0a0a0a; padding: 16px 40px; text-decoration: none; font-weight: 600; font-size: 16px; border-radius: 4px;">
+      <a href="${webinarUrl}" style="display: inline-block; background: linear-gradient(90deg, #b8943e, #d4a843); color: #0a0a0a; padding: 16px 40px; text-decoration: none; font-weight: 600; font-size: 16px; border-radius: 4px;">
         Save Your Seat — March 3rd Training
       </a>
 
@@ -885,6 +934,9 @@ function generateAssessmentReportHtml(data: AssessmentReportData, firstName: str
         Questions? Reply directly to this email — I read every one.
       </p>
     </div>
+
+    <!-- Email Open Tracking Pixel -->
+    ${createTrackingPixel(emailId, recipientEmail)}
 
   </div>
 </body>
