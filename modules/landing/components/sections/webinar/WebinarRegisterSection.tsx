@@ -70,7 +70,7 @@ export default function WebinarRegisterSection({
                 "flex-1 sm:max-w-[180px]",
                 "font-oswald text-sm font-light",
                 "px-4 py-3",
-                "border-lp-border border bg-[#1a1918]",
+                "border-lp-border border bg-lp-input",
                 "text-lp-white placeholder:text-lp-gray",
                 "outline-none",
                 "focus:border-lp-gold focus:ring-lp-gold/30 transition-all focus:ring-1"
@@ -87,7 +87,7 @@ export default function WebinarRegisterSection({
                 "flex-1",
                 "font-oswald text-sm font-light",
                 "px-4 py-3",
-                "border-lp-border border bg-[#1a1918]",
+                "border-lp-border border bg-lp-input",
                 "text-lp-white placeholder:text-lp-gray",
                 "outline-none",
                 "focus:border-lp-gold focus:ring-lp-gold/30 transition-all focus:ring-1"

@@ -50,8 +50,8 @@ const VisionJournal = () => {
   }, [currentHistories]);
 
   return (
-    <section className="bg-bkg-light flex w-full flex-col gap-[30px] rounded-[20px] sm:p-[30px]">
-      <div className="flex flex-col items-center justify-between gap-[10px] sm:flex-row sm:items-start">
+    <section className="bg-bkg-light flex w-full flex-col gap-8 rounded-large sm:p-8">
+      <div className="flex flex-col items-center justify-between gap-2.5 sm:flex-row sm:items-start">
         <Heading variant={headingVariants.heading} sx={cn("!font-bold")}>
           {getHeaderData(currentHistories?.entryType!)}
         </Heading>
@@ -76,14 +76,14 @@ const VisionJournal = () => {
       <div className="flex flex-col gap-5">
         {fields.map((field, index) => {
           return (
-            <div key={index} className="flex flex-col gap-[10px]">
+            <div key={index} className="flex flex-col gap-2.5">
               <Heading variant={headingVariants.title} sx="!font-bold">
                 {visionInputData[field].heading}
               </Heading>
               {field === "symbols" ? (
                 <div
                   className={
-                    "relative flex max-h-[270px] w-full max-w-[250px] gap-[10px] overflow-hidden rounded"
+                    "relative flex max-h-[270px] w-full max-w-[250px] gap-2.5 overflow-hidden rounded"
                   }
                 >
                   <Image

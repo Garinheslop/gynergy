@@ -100,7 +100,7 @@ export function EmptyState({
             <ActionButton
               label={action.label}
               onClick={action.onClick}
-              sx="!min-h-[40px] !px-4 !py-2"
+              sx="!min-h-10 !px-4 !py-2"
             />
           )}
           {secondaryAction && (

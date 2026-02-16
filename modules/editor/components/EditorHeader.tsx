@@ -27,11 +27,11 @@ const EditorHeader: FC<EditorHeaderProps> = ({
 }) => {
   return (
     <section
-      className={cn("flex flex-col gap-[10px]", {
+      className={cn("flex flex-col gap-2.5", {
         "justify-between sm:flex-row sm:items-end": children,
       })}
     >
-      <div className="flex items-center gap-[10px] sm:flex-col sm:items-start">
+      <div className="flex items-center gap-2.5 sm:flex-col sm:items-start">
         {icon && <i className={cn(`gng-${icon.name} p-1 text-[32px]`, icon.class)} />}
         <Heading variant={headingVariant} sx={cn("!font-bold")}>
           {heading}

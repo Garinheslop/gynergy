@@ -79,7 +79,7 @@ const Accordion = ({
       aria-label="accordion"
       ref={accordionRef}
       className={cn(
-        "bg-bkg-light group flex h-full w-full flex-col rounded p-5 sm:rounded-[20px] md:p-[30px]",
+        "bg-bkg-light group flex h-full w-full flex-col rounded p-5 sm:rounded-large md:p-8",
         sx
       )}
       onClick={accordionHandler}
@@ -95,13 +95,13 @@ const Accordion = ({
             {title}
           </Heading>
         )}
-        <div className="flex h-full items-center gap-[20px]">
+        <div className="flex h-full items-center gap-5">
           {secondaryActionIconBtn && (
             <>
-              <div className="flex items-center gap-[10px]">
+              <div className="flex items-center gap-2.5">
                 <i
                   className={cn(
-                    `gng-${secondaryActionIconBtn?.icon} text-action-secondary cursor-pointer text-[20px] duration-150`,
+                    `gng-${secondaryActionIconBtn?.icon} text-action-secondary cursor-pointer text-xl duration-150`,
                     secondaryActionIconBtn?.sx,
                     { "opacity-0 group-hover:opacity-100": isStatic }
                   )}
@@ -120,10 +120,10 @@ const Accordion = ({
           )}
           {(open || isStatic) && (
             <>
-              <div className="flex gap-[10px]">
+              <div className="flex gap-2.5">
                 <i
                   className={cn(
-                    `gng-${primaryActionIconBtn?.icon} text-action-secondary cursor-pointer text-[20px] duration-150`,
+                    `gng-${primaryActionIconBtn?.icon} text-action-secondary cursor-pointer text-xl duration-150`,
                     primaryActionIconBtn?.sx,
                     { "opacity-0 group-hover:opacity-100": isStatic }
                   )}
@@ -151,11 +151,11 @@ const Accordion = ({
       </div>
       <div
         className={cn(
-          "flex max-h-0 flex-col gap-5 overflow-hidden px-1 transition-all duration-500 ease-out sm:p-0 md:gap-[30px]",
+          "flex max-h-0 flex-col gap-5 overflow-hidden px-1 transition-all duration-500 ease-out sm:p-0 md:gap-8",
           { "max-h-[350vh] ease-in": open || isStatic }
         )}
       >
-        <div className="border-border-light mt-5 w-full border-b md:mt-[30px]" />
+        <div className="border-border-light mt-5 w-full border-b md:mt-8" />
         {(isRenderContent || isStatic) && children}
       </div>
     </section>

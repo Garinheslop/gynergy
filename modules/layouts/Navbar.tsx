@@ -35,9 +35,9 @@ const Navbar: FC = () => {
         "border-border-light bg-bkg-light text-light z-sticky fixed h-[70px] w-full items-center justify-between border-b px-5"
       )}
     >
-      <section className="mx-auto flex w-full max-w-[1256px] items-center justify-between px-4 py-[10px]">
-        <Link href={`/${currentBook?.slug ?? "/"}`} className="flex items-center gap-[5px]">
-          <Image className="h-[40px] w-auto" src={icons.dateZeroLogo} alt="date-zero-logo" />
+      <section className="mx-auto flex w-full max-w-[1256px] items-center justify-between px-4 py-2.5">
+        <Link href={`/${currentBook?.slug ?? "/"}`} className="flex items-center gap-1">
+          <Image className="h-10 w-auto" src={icons.dateZeroLogo} alt="date-zero-logo" />
         </Link>
 
         {session?.user ? (
@@ -50,7 +50,7 @@ const Navbar: FC = () => {
                 router.push("/community");
               }}
               sx={
-                "bg-action-50 border border-border-light rounded-[10px] px-[10px] flex-row-reverse hidden sm:flex"
+                "bg-action-50 border border-border-light rounded px-2.5 flex-row-reverse hidden sm:flex"
               }
             />
             <ActionButton
@@ -61,7 +61,7 @@ const Navbar: FC = () => {
                 router.push(`/${currentBook?.slug}/${pagePaths.history}`);
               }}
               sx={
-                "bg-action-50 border border-border-light rounded-[10px] px-[10px] flex-row-reverse hidden sm:flex"
+                "bg-action-50 border border-border-light rounded px-2.5 flex-row-reverse hidden sm:flex"
               }
             />
             <DropdownMenu />
@@ -73,7 +73,7 @@ const Navbar: FC = () => {
                 label={"Sign In"}
                 paragraphVariant={paragraphVariants.meta}
                 onClick={() => {}}
-                sx={"bg-action-50 border border-border-light rounded-[10px] px-[10px] w-max"}
+                sx={"bg-action-50 border border-border-light rounded px-2.5 w-max"}
               />
             )}
           </>
@@ -131,7 +131,7 @@ const DropdownMenu: FC = () => {
           onErrorImage={images.placeholders.profileImage}
           alt={"Profile Image"}
         />
-        <div className="bg-dark-pure border-dark-pure group-hover:border-action-secondary absolute right-[1px] bottom-[1px] flex h-[20px] w-[20px] items-center justify-center rounded-full border duration-300">
+        <div className="bg-dark-pure border-dark-pure group-hover:border-action-secondary absolute right-[1px] bottom-[1px] flex h-5 w-5 items-center justify-center rounded-full border duration-300">
           <i className="gng-arrow-down-thin text-action-secondary text-[10px]" />
         </div>
       </button>
@@ -171,12 +171,12 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
   const userEnrollment = useSelector((state) => state.enrollments.current);
   const currentProfile = useSelector((state: RootState) => state.profile.current);
   return (
-    <ul className="bg-bkg-light border-border-light [&>li]:hover:[&>i]:text-action-secondary relative flex h-full w-full flex-col items-start gap-[20px] overflow-hidden rounded-t-2xl border px-[30px] py-[20px] pb-[env(safe-area-inset-bottom,20px)] sm:justify-between sm:gap-0 sm:rounded sm:pb-[20px] [&>li]:w-full [&>li]:hover:[&>i]:mr-[2px] [&>li>i]:duration-150">
+    <ul className="bg-bkg-light border-border-light [&>li]:hover:[&>i]:text-action-secondary relative flex h-full w-full flex-col items-start gap-5 overflow-hidden rounded-t-2xl border px-8 py-[20px] pb-[env(safe-area-inset-bottom,20px)] sm:justify-between sm:gap-0 sm:rounded sm:pb-[20px] [&>li]:w-full [&>li]:hover:[&>i]:mr-[2px] [&>li>i]:duration-150">
       {/* Mobile close indicator */}
       <li className="flex w-full justify-center pb-2 sm:hidden">
         <div className="h-1 w-12 rounded-full bg-gray-300" />
       </li>
-      <li className="flex items-center gap-[10px]">
+      <li className="flex items-center gap-2.5">
         <Image
           className="border-dark-pure h-[50px] w-[50px] shrink-0 rounded-full border-2 object-cover"
           onErrorImage={images.placeholders.profileImage}
@@ -190,7 +190,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
         />
       </li>
       <li className="flex items-center gap-[16px]">
-        <div className="flex items-center gap-[10px]">
+        <div className="flex items-center gap-2.5">
           <Image src={icons.point} className="h-[25px] w-auto" alt="Points" />
           <Paragraph
             variant={paragraphVariants.regular}
@@ -198,7 +198,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
             sx={"text-content-dark"}
           />
         </div>
-        <div className="flex items-center gap-[10px]">
+        <div className="flex items-center gap-2.5">
           <Image src={icons.streak} className="h-[25px] w-auto" alt="Streak" />
           <Paragraph
             variant={paragraphVariants.regular}
@@ -215,7 +215,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
       <li
         role="button"
         tabIndex={0}
-        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-[10px] rounded py-2 sm:hidden"
+        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-2.5 rounded py-2 sm:hidden"
         onClick={() => {
           router.push(`${currentBook?.slug}/${pagePaths.history}`);
           onItemClick();
@@ -224,7 +224,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
           e.key === "Enter" && router.push(`${currentBook?.slug}/${pagePaths.history}`)
         }
       >
-        <i className="gng-journal text-content-secondary text-[20px]" />
+        <i className="gng-journal text-content-secondary text-xl" />
         <Paragraph
           variant={paragraphVariants.regular}
           content={"Journaling History"}
@@ -234,7 +234,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
       <li
         role="button"
         tabIndex={0}
-        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-[10px] rounded py-2"
+        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-2.5 rounded py-2"
         onClick={() => {
           router.push(`/${currentBook?.slug}/${pagePaths.settings}`);
           onItemClick();
@@ -243,7 +243,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
           e.key === "Enter" && router.push(`/${currentBook?.slug}/${pagePaths.settings}`)
         }
       >
-        <i className="gng-settings text-content-secondary text-[20px]" />
+        <i className="gng-settings text-content-secondary text-xl" />
         <Paragraph
           variant={paragraphVariants.regular}
           content={"Settings"}
@@ -253,7 +253,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
       <li
         role="button"
         tabIndex={0}
-        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-[10px] rounded py-2"
+        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-2.5 rounded py-2"
         onClick={() => {
           window.open(
             "mailto:bitechxconnect+kojwp6mtw4hinjw7vdoe@boards.trello.com",
@@ -271,7 +271,7 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
           )
         }
       >
-        <i className="gng-alert text-content-secondary text-[20px]" />
+        <i className="gng-alert text-content-secondary text-xl" />
         <Paragraph
           variant={paragraphVariants.regular}
           content={"Report A Bug"}
@@ -281,14 +281,14 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
       <li
         role="button"
         tabIndex={0}
-        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-[10px] rounded py-2 sm:hidden"
+        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-2.5 rounded py-2 sm:hidden"
         onClick={() => {
           router.push("/community");
           onItemClick();
         }}
         onKeyDown={(e) => e.key === "Enter" && router.push("/community")}
       >
-        <i className="gng-people text-content-secondary text-[20px]" />
+        <i className="gng-people text-content-secondary text-xl" />
         <Paragraph
           variant={paragraphVariants.regular}
           content={"Community"}
@@ -298,14 +298,14 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
       <li
         role="button"
         tabIndex={0}
-        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-[10px] rounded py-2"
+        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-2.5 rounded py-2"
         onClick={() => {
           logout();
           onItemClick();
         }}
         onKeyDown={(e) => e.key === "Enter" && logout()}
       >
-        <i className="gng-sign-out text-content-secondary text-[20px]" />
+        <i className="gng-sign-out text-content-secondary text-xl" />
         <Paragraph
           variant={paragraphVariants.regular}
           content={"Sign Out"}

@@ -90,7 +90,7 @@ export default function AdminSidebar({
                     <>
                       <span className="text-sm font-medium">{item.label}</span>
                       {showBadge && (
-                        <span className="bg-danger ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-xs font-semibold text-white">
+                        <span className="bg-danger ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold text-white">
                           {pendingModeration > 99 ? "99+" : pendingModeration}
                         </span>
                       )}

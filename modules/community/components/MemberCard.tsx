@@ -2,9 +2,8 @@
 
 import { FC } from "react";
 
-import Image from "next/image";
-
 import { cn } from "@lib/utils/style";
+import { Avatar } from "@modules/common/components/ui";
 import { CohortMember } from "@resources/types/community";
 
 interface MemberCardProps {
@@ -34,15 +33,11 @@ const MemberCard: FC<MemberCardProps> = ({
         aria-label={`View profile of ${member.firstName} ${member.lastName}`}
       >
         {/* Avatar */}
-        <div className="bg-bkg-dark-800 relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full">
-          {member.profileImage ? (
-            <Image src={member.profileImage} alt={member.firstName} fill className="object-cover" />
-          ) : (
-            <div className="from-action-400 to-action-600 text-content-dark flex h-full w-full items-center justify-center bg-gradient-to-br text-sm font-semibold">
-              {member.firstName?.[0]}
-            </div>
-          )}
-        </div>
+        <Avatar
+          src={member.profileImage}
+          name={`${member.firstName} ${member.lastName}`}
+          size="md"
+        />
 
         {/* Info */}
         <div className="min-w-0 flex-1">
@@ -68,20 +63,12 @@ const MemberCard: FC<MemberCardProps> = ({
       {/* Header with Avatar */}
       <div className="mb-3 flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="bg-bkg-dark-800 relative h-14 w-14 overflow-hidden rounded-full">
-            {member.profileImage ? (
-              <Image
-                src={member.profileImage}
-                alt={member.firstName}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="from-action-400 to-action-600 text-content-dark flex h-full w-full items-center justify-center bg-gradient-to-br text-xl font-semibold">
-                {member.firstName?.[0]}
-              </div>
-            )}
-          </div>
+          <Avatar
+            src={member.profileImage}
+            name={`${member.firstName} ${member.lastName}`}
+            size="lg"
+            className="h-14 w-14"
+          />
           <div>
             <h3 className="text-content-light font-semibold">
               {member.firstName} {member.lastName}

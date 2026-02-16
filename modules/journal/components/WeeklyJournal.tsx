@@ -47,7 +47,7 @@ const WeeklyJournal = () => {
   }, [histories.current?.entryDate, userEnrollment]);
 
   return (
-    <section className="bg-bkg-light flex w-full flex-col gap-8 rounded-[20px] sm:p-8">
+    <section className="bg-bkg-light flex w-full flex-col gap-8 rounded-large sm:p-8">
       <div className="flex flex-col items-center justify-between gap-2.5 sm:flex-row sm:items-start">
         <Heading variant={headingVariants.titleLg} sx={cn("!font-bold")}>
           {getHeaderData(histories.current?.entryType!)}

@@ -56,7 +56,7 @@ export default function MountainProgress({
         milestones={milestones}
         progress={progress}
         isLoading={isLoading}
-        sx={"xmd:absolute left-[10px] top-[10px] lg:left-[30px] lg:top-[30px] z-[100]"}
+        sx={"xmd:absolute left-2.5 top-2.5 lg:left-8 lg:top-8 z-10"}
       />
       <div
         className={cn(

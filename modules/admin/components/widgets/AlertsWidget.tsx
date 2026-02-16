@@ -64,7 +64,7 @@ export default function AlertsWidget({ alerts, onDismiss, isLoading = false }: A
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-semibold text-white">Alerts</h3>
         {alerts.length > 0 && (
-          <span className="bg-danger flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-xs font-semibold text-white">
+          <span className="bg-danger flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-semibold text-white">
             {alerts.length}
           </span>
         )}

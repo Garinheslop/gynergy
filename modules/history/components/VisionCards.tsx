@@ -72,7 +72,7 @@ const VisionCard: React.FC<VisionCardProps> = ({ visions, cardType, onCardClick 
     >
       <Paragraph variant={paragraphVariants.title} content={heading} sx="!font-bold" />
       {visionExists?.isCompleted && (
-        <div className="flex items-center gap-[5px]">
+        <div className="flex items-center gap-1">
           <i className="gng-complete-circle text-purple p-[3px] text-[25px]" />
           <Paragraph variant={paragraphVariants.regular} content="Completed" sx="text-purple" />
         </div>

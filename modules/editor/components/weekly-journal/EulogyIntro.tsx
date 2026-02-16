@@ -5,7 +5,7 @@ import { headingVariants } from "@resources/variants";
 const EulogyIntro = () => {
   return (
     <>
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         <Heading variant={headingVariants.title} sx="!font-bold">
           Set Aside Time:
         </Heading>
@@ -16,7 +16,7 @@ const EulogyIntro = () => {
           sx="text-content-dark-secondary"
         />
       </div>
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         <Heading variant={headingVariants.title} sx="!font-bold">
           Reflect on Key Life Areas:
         </Heading>
@@ -27,7 +27,7 @@ const EulogyIntro = () => {
           sx="text-content-dark-secondary"
         />
       </div>
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         <Heading variant={headingVariants.title} sx="!font-bold">
           Contribution:
         </Heading>
@@ -38,7 +38,7 @@ const EulogyIntro = () => {
           sx="text-content-dark-secondary"
         />
       </div>
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         <Heading variant={headingVariants.title} sx="!font-bold">
           Personal Growth:
         </Heading>
@@ -49,7 +49,7 @@ const EulogyIntro = () => {
           sx="text-content-dark-secondary"
         />
       </div>
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         <Heading variant={headingVariants.title} sx="!font-bold">
           Write Your Eulogy:
         </Heading>
@@ -60,7 +60,7 @@ const EulogyIntro = () => {
           sx="text-content-dark-secondary"
         />
       </div>
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         <Heading variant={headingVariants.title} sx="!font-bold">
           Key Themes:
         </Heading>
@@ -71,7 +71,7 @@ const EulogyIntro = () => {
           sx="text-content-dark-secondary"
         />
       </div>
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         <Heading variant={headingVariants.title} sx="!font-bold">
           Closing Thoughts:
         </Heading>
@@ -82,7 +82,7 @@ const EulogyIntro = () => {
           sx="text-content-dark-secondary"
         />
       </div>
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         <Heading variant={headingVariants.title} sx="!font-bold">
           Reflect on the Exercise:
         </Heading>
@@ -93,7 +93,7 @@ const EulogyIntro = () => {
           sx="text-content-dark-secondary"
         />
       </div>
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         <Heading variant={headingVariants.title} sx="!font-bold">
           Optional Visualization:
         </Heading>

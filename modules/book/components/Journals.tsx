@@ -214,7 +214,7 @@ const Tasks = ({ heading, type, journalCardContents, onJournalWrite, isLoading }
   }, [userEnrollment]);
 
   return (
-    <section className="flex flex-col items-center gap-[30px]">
+    <section className="flex flex-col items-center gap-8">
       <Heading variant={headingVariants.sectionHeading} sx="text-center !font-bold">
         {heading}
       </Heading>
@@ -227,7 +227,7 @@ const Tasks = ({ heading, type, journalCardContents, onJournalWrite, isLoading }
       {(type === sectionTypes.weekly || !bookSession.isCompleted) && (
         <div
           className={cn("xmd:grid-cols-[386px_1fr] xmd:gap-5 grid w-full grid-cols-1 gap-y-5", {
-            "xmd:grid-cols-2 gap-[20px] lg:grid-cols-3": type === sectionTypes.daily,
+            "xmd:grid-cols-2 gap-5 lg:grid-cols-3": type === sectionTypes.daily,
           })}
         >
           {journalCardContents.map((content: any, index: number) => {

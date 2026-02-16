@@ -203,10 +203,13 @@ export const GRAND_PRIZE: GrandPrizeContent = {
 };
 
 export const GUARANTEE: GuaranteeContent = {
-  days: 14,
-  title: "14-Day Money Back Guarantee",
+  days: 45,
+  title: "The Garin-Tee",
   description:
-    "Complete the first two weeks. If you show up, do the work, and genuinely feel this isn't for you — we'll refund every cent. No questions asked. We only want men who are ready.",
+    "If the 45-Day Awakening Challenge doesn't fundamentally shift how you experience your days, your relationships, and your purpose — email me. I'll refund you in full AND you keep access to the community, the AI coach, and every resource.",
+  reason:
+    "Why? Because I've done this work. I know what happens when you show up for 45 days straight. The risk is mine, not yours.",
+  tagline: "That's the Garin-Tee.",
 };
 
 export const ABOUT: AboutContent = {

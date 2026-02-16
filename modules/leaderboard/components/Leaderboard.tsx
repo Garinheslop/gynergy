@@ -19,7 +19,7 @@ const Leaderboard = () => {
   const { scrollEndRef, leaderboardData } = useLeaderBoardData();
 
   return (
-    <section className="mx-auto flex w-full max-w-[1200px] flex-col items-center gap-[30px]">
+    <section className="mx-auto flex w-full max-w-[1200px] flex-col items-center gap-8">
       <i className="gng-community text-content py-[10] text-[28px]" />
       <Heading variant={headingVariants.sectionHeading} sx="text-center !font-bold max-w-[700px]">
         {"The Community Growth Leaderboard"}
@@ -50,7 +50,7 @@ const Leaderboard = () => {
                 variant={paragraphVariants.regular}
                 content={content}
                 sx={cn(
-                  "text-content-dark text-center py-3 w-full px-2 sm:px-6 rounded-[10px] cursor-pointer text-nowrap transition-all duration-200",
+                  "text-content-dark text-center py-3 w-full px-2 sm:px-6 rounded cursor-pointer text-nowrap transition-all duration-200",
                   {
                     "text-white bg-grey-900 shadow-md": type === leaderboard.filter,
                     "hover:bg-grey-100": type !== leaderboard.filter && !leaderboard.loading,
@@ -108,7 +108,7 @@ const Leaderboard = () => {
                 />
               ) : (
                 <>
-                  <div className="mt-[22px] hidden items-center rounded p-2 sm:flex sm:px-[15px] sm:py-2.5 [&>p]:text-black">
+                  <div className="mt-[22px] hidden items-center rounded p-2 sm:flex sm:px-4 sm:py-2.5 [&>p]:text-black">
                     <Paragraph
                       content={"Rank"}
                       variant={paragraphVariants.regular}

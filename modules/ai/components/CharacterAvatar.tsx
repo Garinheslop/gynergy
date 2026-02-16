@@ -46,7 +46,7 @@ const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
     },
     medium: {
       container: "w-12 h-12",
-      icon: "text-[20px]",
+      icon: "text-xl",
       ring: "ring-2",
     },
     large: {

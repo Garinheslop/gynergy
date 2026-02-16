@@ -353,7 +353,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
                   setImage(null);
                   onUpdate(null);
                 }}
-                className="!bg-dark-900/60 absolute top-2 right-2 z-10 flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-[10px]"
+                className="!bg-dark-900/60 absolute top-2 right-2 z-10 flex h-5 w-5 cursor-pointer items-center justify-center rounded"
               >
                 <i className="gng-trash text-danger text-body" />
               </button>
@@ -371,7 +371,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
           </div>
         ) : (
           <section
-            className="md:max-h-auto relative mx-auto h-full max-h-[550px] w-full shrink overflow-hidden rounded-[10px]"
+            className="md:max-h-auto relative mx-auto h-full max-h-[550px] w-full shrink overflow-hidden rounded"
             onDrop={handleDrop}
             onDragOver={preventDefaultHandler}
             onDragEnter={preventDefaultHandler}
@@ -386,7 +386,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
                 }
               }}
             >
-              <div className="border-border-light flex h-full flex-col justify-center gap-5 rounded-[10px] border-[4px] border-dashed p-5 lg:p-10">
+              <div className="border-border-light flex h-full flex-col justify-center gap-5 rounded border-[4px] border-dashed p-5 lg:p-10">
                 <div
                   className={cn(
                     "border-border-light mx-auto flex shrink-0 cursor-pointer items-center justify-center rounded-full md:size-[70px] md:border"

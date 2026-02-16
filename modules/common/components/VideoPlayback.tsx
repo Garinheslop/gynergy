@@ -29,7 +29,7 @@ const VideoPlayback = ({ url = "", sx }: { url: string; sx?: string }) => {
   return (
     <div
       className={cn(
-        "border-border-light relative aspect-video overflow-hidden rounded-[20px] border",
+        "border-border-light relative aspect-video overflow-hidden rounded-large border",
         sx
       )}
     >

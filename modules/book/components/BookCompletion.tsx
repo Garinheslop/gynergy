@@ -16,7 +16,7 @@ const BookCompletion = ({ latestSession }: { latestSession?: BookSessionData | n
 
   const currentBook = useSelector((state: RootState) => state.books.current);
   return (
-    <section className="bg-bkg-light mx-auto flex max-w-[1200px] flex-col items-center gap-[30px] rounded-[20px] p-[20px] pb-[20px] md:gap-[40px] md:p-[50px] md:pb-[30px]">
+    <section className="bg-bkg-light mx-auto flex max-w-[1200px] flex-col items-center gap-8 rounded-large p-5 pb-[20px] md:gap-10 md:p-[50px] md:pb-8">
       <Heading
         isHtml
         variant={headingVariants.heading}
@@ -29,7 +29,7 @@ const BookCompletion = ({ latestSession }: { latestSession?: BookSessionData | n
         isHtml
         content={currentBook?.farewell}
         variant={paragraphVariants.regular}
-        sx="flex flex-col gap-[5px] text-content-dark-secondary"
+        sx="flex flex-col gap-1 text-content-dark-secondary"
       />
 
       {latestSession && (

@@ -114,7 +114,7 @@ const VideoRoomCard: React.FC<VideoRoomCardProps> = ({
           <div
             className={cn("flex h-12 w-12 items-center justify-center rounded-xl", "bg-action/10")}
           >
-            <i className="gng-video text-action text-[24px]" />
+            <i className="gng-video text-action text-2xl" />
           </div>
           <div>
             <Paragraph

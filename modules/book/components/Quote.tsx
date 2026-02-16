@@ -25,10 +25,10 @@ const Quote = () => {
     }
   }, [enrollmentData]);
   return (
-    <div className="bg-action-50 flex w-full flex-col gap-[30px] rounded px-[30px] py-[15px] md:px-[40px]">
+    <div className="bg-action-50 flex w-full flex-col gap-8 rounded px-8 py-[15px] md:px-[40px]">
       {quotes.loading ? (
         <>
-          <div className="flex flex-col gap-[10px]">
+          <div className="flex flex-col gap-2.5">
             <TextSkeleton sx="w-full" />
             <TextSkeleton sx="w-full" />
             <TextSkeleton sx="w-[60%]" />

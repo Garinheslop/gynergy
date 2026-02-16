@@ -26,7 +26,7 @@ const BookOnboarding = () => {
 
   const book = useSelector((state: RootState) => state.books.current);
   return (
-    <section className="bg-bkg-light mx-auto flex max-w-[1200px] flex-col items-center gap-[30px] rounded-[20px] p-[20px] pb-[20px] md:gap-[40px] md:p-[50px] md:pb-[30px]">
+    <section className="bg-bkg-light mx-auto flex max-w-[1200px] flex-col items-center gap-8 rounded-large p-5 pb-[20px] md:gap-10 md:p-[50px] md:pb-8">
       {step > 1 && (
         <ActionButton
           label={"Back"}
@@ -40,7 +40,7 @@ const BookOnboarding = () => {
       {step === 2 && <AppDetails />}
       {step === 3 && <Inspiration />}
       {step === 4 && <PotentialSelf />}
-      <div className="border-border-light flex w-full grid-cols-3 flex-col gap-[20px] border-t pt-[20px] sm:grid md:pt-[30px]">
+      <div className="border-border-light flex w-full grid-cols-3 flex-col gap-5 border-t pt-[20px] sm:grid md:pt-8">
         <div className="flex items-center">
           {step > 1 && (
             <ActionButton
@@ -52,14 +52,14 @@ const BookOnboarding = () => {
             />
           )}
         </div>
-        <div className="mx-auto flex items-center gap-[10px]">
+        <div className="mx-auto flex items-center gap-2.5">
           {Array.from({ length: 4 }, (_, index) => (
             <span
               key={index}
               className={cn(
                 "bg-grey-300 h-[10px] w-[10px] cursor-pointer rounded-full duration-200",
                 {
-                  "bg-dark-pure w-[30px] rounded-[20px]": step === index + 1,
+                  "bg-dark-pure w-[30px] rounded-large": step === index + 1,
                 }
               )}
               onClick={() => setStep(index + 1)}
@@ -100,14 +100,14 @@ const BookDetails = () => {
         sx="font-bold"
       />
       <div className="border-border-light flex w-full border-t" />
-      <div className="grid gap-[30px] md:grid-cols-[1fr_400px] md:gap-[40px]">
+      <div className="grid gap-8 md:grid-cols-[1fr_400px] md:gap-10">
         <Paragraph
           isHtml
           content={book?.description}
           variant={paragraphVariants.regular}
-          sx="flex flex-col gap-[5px] text-content-dark-secondary [&>p>a]:!text-action-400 [&>p>a]:hover:!text-action-900"
+          sx="flex flex-col gap-1 text-content-dark-secondary [&>p>a]:!text-action-400 [&>p>a]:hover:!text-action-900"
         />
-        <Image className="h-auto w-full rounded-[20px]" path={book?.cover} />
+        <Image className="h-auto w-full rounded-large" path={book?.cover} />
       </div>
     </>
   );
@@ -156,13 +156,13 @@ const AppDetails = () => {
         isHtml
         content={appDescription}
         variant={paragraphVariants.regular}
-        sx="flex flex-col gap-[5px] [&>p>span]:!font-bold text-content-dark-secondary"
+        sx="flex flex-col gap-1 [&>p>span]:!font-bold text-content-dark-secondary"
       />
-      <div className="xmd:grid-cols-3 grid w-full grid-cols-1 gap-[10px] sm:grid-cols-2">
+      <div className="xmd:grid-cols-3 grid w-full grid-cols-1 gap-2.5 sm:grid-cols-2">
         {features.map((feature, index) => (
           <div
             key={index}
-            className="border-border-light flex flex-col gap-[10px] rounded border p-5"
+            className="border-border-light flex flex-col gap-2.5 rounded border p-5"
           >
             <div className="bg-grey-50 border-grey-100 mx-auto flex h-[80px] w-[80px] items-center justify-center rounded border">
               <i className={`gng-${feature.icon} text-[34px]`} />

@@ -273,7 +273,7 @@ const Button: React.FC<ButtonProps> = ({
       onMouseLeave={() => onHover && onHover(false)}
       disabled={disabled || isLoading}
     >
-      {icon && !isLoading && <i className={cn(`gng-${icon} duration-150`, "text-[20px]")} />}
+      {icon && !isLoading && <i className={cn(`gng-${icon} duration-150`, "text-xl")} />}
       {label && (
         <>
           {isSpinner && isLoading ? (
@@ -467,10 +467,10 @@ const SliderBtn: React.FC<SliderBtnProps> = ({
       <button
         id="slider"
         className={cn(
-          "relative flex h-[24px] w-[46px] flex-shrink-0 cursor-pointer items-center rounded-[73px] duration-150",
+          "relative flex h-6 w-[46px] flex-shrink-0 cursor-pointer items-center rounded-[73px] duration-150",
           "focus-visible:ring-action-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
           // Touch target expansion via padding
-          "before:absolute before:-inset-[10px] before:content-['']",
+          "before:absolute before:-inset-2.5 before:content-['']",
           !sliderState ? "bg-border-light-secondary" : "bg-action",
           {
             "bg-bkg-disabled/40 text-content-dark/60 cursor-default": disabled,
@@ -482,7 +482,7 @@ const SliderBtn: React.FC<SliderBtnProps> = ({
       >
         <span
           className={cn(
-            "mx-[2px] flex h-[20px] w-[20px] flex-shrink-0 items-center justify-center rounded-full transition-all duration-150",
+            "mx-[2px] flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full transition-all duration-150",
             !sliderState
               ? "bg-content/50 translate-x-0 transform bg-white"
               : "translate-x-[22px] transform bg-white",

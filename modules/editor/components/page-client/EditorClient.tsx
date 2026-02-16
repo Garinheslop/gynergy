@@ -122,7 +122,7 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
 
   if (!editorType) return null;
   return (
-    <section className="bg-bkg-light mx-auto flex w-full max-w-[1253px] flex-col justify-start gap-[20px] px-4 py-[100px] sm:bg-transparent md:py-[130px]">
+    <section className="bg-bkg-light mx-auto flex w-full max-w-[1253px] flex-col justify-start gap-5 px-4 py-[100px] sm:bg-transparent md:py-[130px]">
       {editorStates.creating && <Loader label={"Please Wait..."} type={loaderTypes.window} />}{" "}
       {editorStates.loading && (
         <Loader
@@ -149,7 +149,7 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
           journalTypes.gratitudeAction,
         ] as readonly string[]
       ).includes(editorType) && (
-        <div className="flex flex-col gap-[5px]">
+        <div className="flex flex-col gap-1">
           <Heading variant={headingVariants.heading} sx="!font-bold capitalize">
             Day{" "}
             {(dayjs().diff(dayjs(userEnrollment?.enrollmentDate).startOf("d"), "d") + 1)
@@ -163,7 +163,7 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
           />
         </div>
       )}
-      <div className="bg-bkg-light flex w-full flex-col gap-[30px] rounded-[20px] sm:p-[30px]">
+      <div className="bg-bkg-light flex w-full flex-col gap-8 rounded-large sm:p-8">
         {(
           [
             journalTypes.morningJournal,
@@ -214,14 +214,14 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
             </div>
           )}
           {(editorStates.action?.isEulogy || editorStates.action?.isJourneyTable) && (
-            <div className="mx-auto hidden items-center gap-[10px] sm:flex">
+            <div className="mx-auto hidden items-center gap-2.5 sm:flex">
               {Array.from({ length: 2 }, (_, index) => (
                 <span
                   key={index}
                   className={cn(
                     "bg-grey-300 h-[10px] w-[10px] cursor-pointer rounded-full duration-200",
                     {
-                      "bg-dark-pure w-[30px] rounded-[20px]":
+                      "bg-dark-pure w-[30px] rounded-large":
                         (index === 0 && intro) || (index === 1 && !intro),
                     }
                   )}

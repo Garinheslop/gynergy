@@ -5,6 +5,7 @@ import { FC, useState } from "react";
 import Image from "next/image";
 
 import { usePopup } from "@contexts/UsePopup";
+import { Avatar } from "@modules/common/components/ui";
 import { triggerHaptic } from "@lib/utils/haptic";
 import { cn } from "@lib/utils/style";
 import {
@@ -97,20 +98,11 @@ const PostCard: FC<PostCardProps> = ({ post, onReact }) => {
       <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center gap-3">
           {/* Avatar */}
-          <div className="bg-bkg-dark-800 relative h-12 w-12 overflow-hidden rounded-full">
-            {post.author?.profileImage ? (
-              <Image
-                src={post.author.profileImage}
-                alt={post.author.firstName || "User"}
-                fill
-                className="object-cover"
-              />
-            ) : (
-              <div className="from-action-400 to-action-600 text-content-dark flex h-full w-full items-center justify-center bg-gradient-to-br text-lg font-semibold">
-                {post.author?.firstName?.[0] || "?"}
-              </div>
-            )}
-          </div>
+          <Avatar
+            src={post.author?.profileImage}
+            name={`${post.author?.firstName || ""} ${post.author?.lastName || ""}`}
+            size="lg"
+          />
 
           {/* Name & Time */}
           <div>

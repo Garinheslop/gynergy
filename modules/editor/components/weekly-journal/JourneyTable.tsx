@@ -183,7 +183,7 @@ const JourneyTable = ({
               {/* Row header */}
               <div
                 className={cn(
-                  "border-border-light flex min-h-[57px] items-center border-r px-[15px]",
+                  "border-border-light flex min-h-[57px] items-center border-r px-4",
                   {
                     "bg-action-50": !tbl.isSecondary,
                     "bg-gray-100": tbl.isSecondary,
@@ -201,7 +201,7 @@ const JourneyTable = ({
                     key={colIdx}
                     className={cn("flex min-h-[57px] items-center justify-center", {
                       "border-border-light border-r": colIdx === 0,
-                      "justify-start px-[15px]": isStatic,
+                      "justify-start px-4": isStatic,
                     })}
                   >
                     {isStatic ? (

@@ -16,7 +16,7 @@ const Growth = forwardRef<HTMLDivElement>(({}, ref) => {
   const currentBook = useSelector((state) => state.books.current);
   const enrollments = useSelector((state) => state.enrollments);
   return (
-    <section ref={ref} className="flex flex-col items-center gap-[30px]">
+    <section ref={ref} className="flex flex-col items-center gap-8">
       <i className="gng-mountain-progress text-content py-[10] text-[28px]" />
       <Heading variant={headingVariants.sectionHeading} sx="text-center !font-bold">
         {"Climbing the Mountain of Growth"}
@@ -49,7 +49,7 @@ const Growth = forwardRef<HTMLDivElement>(({}, ref) => {
         onClick={() => {
           router.push(`/${currentBook?.slug}${pagePaths.history}`);
         }}
-        sx={"bg-action-50 border border-border-light rounded-[10px] px-[16px] w-max"}
+        sx={"bg-action-50 border border-border-light rounded px-[16px] w-max"}
       />
     </section>
   );

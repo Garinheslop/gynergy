@@ -28,7 +28,7 @@ export default function CTAButton({
   const variantStyles = {
     primary: cn(
       "bg-lp-gold-light text-lp-black",
-      "hover:bg-[#E0BE5A] hover:-translate-y-0.5",
+      "hover:bg-lp-gold-hover hover:-translate-y-0.5",
       "hover:shadow-[0_8px_40px_rgba(184,148,62,0.3)]"
     ),
     secondary: cn(

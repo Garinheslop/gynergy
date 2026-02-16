@@ -140,7 +140,7 @@ export default function NotificationsDropdown({ onClose }: NotificationsDropdown
         <div className="flex items-center gap-2">
           <h3 className="font-semibold text-white">Notifications</h3>
           {unreadCount > 0 && (
-            <span className="bg-danger flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-xs font-medium text-white">
+            <span className="bg-danger flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-medium text-white">
               {unreadCount}
             </span>
           )}

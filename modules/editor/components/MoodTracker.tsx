@@ -7,29 +7,54 @@ interface MoodTrackerProps {
   value?: number;
   onClick: (field: "moodScore", value: number) => void;
 }
+
+const MOOD_OPTIONS: { iconName: string; label: string; value: number }[] = [
+  { iconName: fontIcons.emoji.smileFull, label: "Very Happy", value: 1 },
+  { iconName: fontIcons.emoji.smile, label: "Happy", value: 2 },
+  { iconName: fontIcons.emoji.face, label: "Neutral", value: 3 },
+  { iconName: fontIcons.emoji.sad, label: "Sad", value: 4 },
+  { iconName: fontIcons.emoji.sadFull, label: "Very Sad", value: 5 },
+];
+
 const MoodTracker: React.FC<MoodTrackerProps> = ({ value, onClick }) => {
   return (
-    <div className="flex flex-col gap-5">
-      <Heading variant={headingVariants.title} sx="!font-bold">
-        Mood Tracker:
-      </Heading>
+    <fieldset className="flex flex-col gap-5">
+      <legend>
+        <Heading variant={headingVariants.title} sx="!font-bold">
+          Mood Tracker:
+        </Heading>
+      </legend>
       <div className="flex">
-        {Object.values(fontIcons.emoji).map((iconName, index) => (
-          <button
-            key={index}
-            className={cn(
-              "hover:[&>i]:text-action-secondary flex h-[60px] w-[50px] shrink-0 cursor-pointer items-center justify-center rounded-full duration-300",
-              {
-                "[&>i]:text-action-secondary bg-action-50 w-[60px]": value === index + 1,
-              }
-            )}
-            onClick={() => onClick("moodScore", index + 1)}
-          >
-            <i className={`gng-${iconName} text-grey-400 text-[30px] duration-150`} />
-          </button>
-        ))}
+        {MOOD_OPTIONS.map((option) => {
+          const isSelected = value === option.value;
+          return (
+            <label
+              key={option.iconName}
+              className={cn(
+                "hover:[&>i]:text-action-secondary focus-within:ring-action flex h-[60px] w-[50px] shrink-0 cursor-pointer items-center justify-center rounded-full duration-300 focus-within:ring-2",
+                {
+                  "[&>i]:text-action-secondary bg-action-50 w-[60px]": isSelected,
+                }
+              )}
+            >
+              <input
+                type="radio"
+                name="mood-score"
+                value={option.value}
+                checked={isSelected}
+                onChange={() => onClick("moodScore", option.value)}
+                className="sr-only"
+              />
+              <i
+                className={`gng-${option.iconName} text-grey-400 text-[30px] duration-150`}
+                aria-hidden="true"
+              />
+              <span className="sr-only">{option.label}</span>
+            </label>
+          );
+        })}
       </div>
-    </div>
+    </fieldset>
   );
 };
 

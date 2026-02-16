@@ -162,7 +162,7 @@ const ImageScanPopup = () => {
     <Modal open={imageScanPopupObj.show} onClose={imageScanPopupObj.close}>
       <section
         className={cn(
-          "bg-bkg-light mx-auto flex h-screen w-screen flex-col gap-[30px] overflow-auto rounded p-[30px] pb-[150px] sm:h-auto sm:max-h-[95vh] sm:max-w-[95vw] sm:pb-[30px] md:w-[730px]",
+          "bg-bkg-light mx-auto flex h-screen w-screen flex-col gap-8 overflow-auto rounded p-8 pb-[150px] sm:h-auto sm:max-h-[95vh] sm:max-w-[95vw] sm:pb-8 md:w-[730px]",
           { "bg-bkg-dark !w-max gap-0 p-0": openCamera && windowWidth! > 450 }
         )}
       >
@@ -182,7 +182,7 @@ const ImageScanPopup = () => {
               onClick={() => setOpenCamera(false)}
             />
             {images.length > 0 && (
-              <div className="grid h-max grid-cols-2 gap-[10px] pt-12">
+              <div className="grid h-max grid-cols-2 gap-2.5 pt-12">
                 {images.map((imgObj, index) => (
                   <ImageViewer
                     key={index}
@@ -199,7 +199,7 @@ const ImageScanPopup = () => {
           </div>
         ) : (
           <>
-            <div className="flex flex-col gap-[10px]">
+            <div className="flex flex-col gap-2.5">
               <div className="flex justify-between">
                 <Heading variant={headingVariants.cardHeading} sx="font-bold">
                   Add Pages to Scan
@@ -220,7 +220,7 @@ const ImageScanPopup = () => {
 
             <div
               className={cn(
-                "relative h-[270px] w-full shrink-0 overflow-hidden rounded-[10px] md:shrink",
+                "relative h-[270px] w-full shrink-0 overflow-hidden rounded md:shrink",
                 {
                   "h-max": openCamera,
                 }
@@ -230,7 +230,7 @@ const ImageScanPopup = () => {
               onDragEnter={preventDefaultHandler}
               onDragLeave={preventDefaultHandler}
             >
-              <div className={cn("grid h-full w-full grid-cols-4 gap-[10px] md:flex")}>
+              <div className={cn("grid h-full w-full grid-cols-4 gap-2.5 md:flex")}>
                 {images.map((imgObj, index) => (
                   <ImageViewer
                     key={index}
@@ -249,11 +249,11 @@ const ImageScanPopup = () => {
                         <div
                           key={index}
                           className={cn(
-                            "relative flex h-[100px] max-h-[270px] w-full max-w-[250px] gap-[10px] overflow-hidden rounded md:h-full md:max-w-[210px]"
+                            "relative flex h-[100px] max-h-[270px] w-full max-w-[250px] gap-2.5 overflow-hidden rounded md:h-full md:max-w-[210px]"
                           )}
                         >
                           <Image src={img.url} className="h-auto w-full object-cover" />
-                          <div className="bg-bkg-dark/70 absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center gap-[5px]">
+                          <div className="bg-bkg-dark/70 absolute top-0 left-0 flex h-full w-full flex-col items-center justify-center gap-1">
                             <Paragraph
                               content={`${img.progress}%`}
                               variant={paragraphVariants.meta}
@@ -280,7 +280,7 @@ const ImageScanPopup = () => {
                       >
                         <div
                           className={cn(
-                            "border-border-light flex w-[210px] flex-col justify-center gap-[20px] rounded-[10px] border-[4px] border-dashed p-[10px] md:h-full",
+                            "border-border-light flex w-[210px] flex-col justify-center gap-5 rounded border-[4px] border-dashed p-2.5 md:h-full",
                             {
                               "h-[100px] w-full md:h-full md:w-[210px]":
                                 images.length > 0 && windowWidth! < 768,
@@ -301,7 +301,7 @@ const ImageScanPopup = () => {
                           </div>
 
                           <div
-                            className={cn("flex flex-col gap-[5px]", {
+                            className={cn("flex flex-col gap-1", {
                               "hidden md:flex": images.length > 0 && windowWidth! < 768,
                             })}
                           >
@@ -332,7 +332,7 @@ const ImageScanPopup = () => {
 
         <div className="flex flex-col gap-5">
           {!openCamera && (
-            <div className="flex items-center gap-[10px]">
+            <div className="flex items-center gap-2.5">
               <i className="gng-Info text-content-dark-secondary text-[18px]" />
               <Paragraph
                 content={`For this instance, you can upload ${fileLimit > 1 ? `up to ${convertNumberToWords(fileLimit)} images` : `${convertNumberToWords(fileLimit)} image`} at once.`}
@@ -341,7 +341,7 @@ const ImageScanPopup = () => {
               />
             </div>
           )}
-          <div className="border-border-light flex justify-between gap-[10px] border-t pt-5">
+          <div className="border-border-light flex justify-between gap-2.5 border-t pt-5">
             {!openCamera && (
               <ActionButton
                 label={openCamera && windowWidth! > 450 ? "Close Camera" : "Take Photo"}
@@ -390,13 +390,13 @@ const ImageViewer = ({
   return (
     <div
       className={cn(
-        "relative flex h-full max-h-[270px] w-full max-w-[250px] gap-[10px] overflow-hidden rounded",
+        "relative flex h-full max-h-[270px] w-full max-w-[250px] gap-2.5 overflow-hidden rounded",
         sx
       )}
     >
       <button
         onClick={() => onDelete(id)}
-        className="!bg-dark-900/60 absolute top-2 right-2 z-10 flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-[10px]"
+        className="!bg-dark-900/60 absolute top-2 right-2 z-10 flex h-5 w-5 cursor-pointer items-center justify-center rounded"
       >
         <i className="gng-trash text-danger text-body" />
       </button>

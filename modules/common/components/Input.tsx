@@ -79,7 +79,7 @@ const Input: FC<InputProps> = ({
       {icon && <i className={`gng-${icon} text-body text-content-dark ml-4`} />}
       <section
         className={cn(
-          "border-border-light relative flex min-h-[47px] w-full items-center overflow-hidden rounded border [&>input]:px-[15px] [&>input]:py-[10px]",
+          "border-border-light relative flex min-h-[47px] w-full items-center overflow-hidden rounded border [&>input]:px-4 [&>input]:py-2.5",
           inputSx,
           { "border-danger": error },
           {
@@ -121,7 +121,7 @@ const Input: FC<InputProps> = ({
             type="button"
             aria-pressed={show}
             aria-label={show ? "Hide password" : "Show password"}
-            className="absolute right-[10px] flex h-[44px] w-[44px] cursor-pointer items-center justify-center bg-transparent"
+            className="absolute right-2.5 flex h-[44px] w-[44px] cursor-pointer items-center justify-center bg-transparent"
             onClick={() => setShow((prev) => !prev)}
           >
             <i className="gng-eye text-content-dark-secondary relative">

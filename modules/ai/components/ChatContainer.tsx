@@ -87,7 +87,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onClose, showHeader = tru
                 onClick={onClose}
                 className="text-content-dark-secondary hover:text-content-dark"
               >
-                <i className="gng-close text-[20px]" />
+                <i className="gng-close text-xl" />
               </button>
             )}
           </div>
@@ -156,7 +156,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onClose, showHeader = tru
                 onClick={onClose}
                 className="text-content-dark-secondary hover:text-content-dark hover:bg-bkg-light rounded-full p-2"
               >
-                <i className="gng-close text-[20px]" />
+                <i className="gng-close text-xl" />
               </button>
             )}
           </div>

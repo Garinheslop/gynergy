@@ -37,7 +37,7 @@ const rarityGlow: Record<BadgeRarity, string> = {
 const sizeClasses = {
   small: {
     container: "w-16 h-16 p-2",
-    icon: "text-[24px]",
+    icon: "text-2xl",
     text: paragraphVariants.meta,
   },
   medium: {
@@ -165,7 +165,7 @@ export const BadgeCardDetailed: React.FC<BadgeCardDetailedProps> = ({
           onClick={onClose}
           aria-label="Close"
         >
-          <i className="gng-close text-[20px]" />
+          <i className="gng-close text-xl" />
         </button>
       )}
 

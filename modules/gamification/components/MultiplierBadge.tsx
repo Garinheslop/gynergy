@@ -44,7 +44,7 @@ const MultiplierBadge: React.FC<MultiplierBadgeProps> = ({
       container: "px-4 py-2 gap-2",
       text: "text-lg font-bold",
       label: paragraphVariants.regular,
-      icon: "text-[20px]",
+      icon: "text-xl",
     },
   };
 
@@ -132,7 +132,7 @@ export const MultiplierProgress: React.FC<MultiplierProgressProps> = ({
     return (
       <div className={cn("flex flex-col items-center gap-2", sx)}>
         <div className="flex items-center gap-2">
-          <i className="gng-crown text-[24px] text-amber-400" />
+          <i className="gng-crown text-2xl text-amber-400" />
           <span className="font-bold text-amber-400">Max Multiplier!</span>
         </div>
         <Paragraph

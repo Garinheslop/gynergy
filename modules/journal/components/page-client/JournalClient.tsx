@@ -38,7 +38,7 @@ const JournalClient = ({ bookSlug }: { bookSlug: string }) => {
     }
   }, [histories?.current]);
   return (
-    <section className="bg-bkg-light mx-auto flex w-full max-w-[1220px] flex-col justify-start gap-[20px] px-4 py-[100px] sm:bg-transparent md:py-[130px]">
+    <section className="bg-bkg-light mx-auto flex w-full max-w-[1220px] flex-col justify-start gap-5 px-4 py-[100px] sm:bg-transparent md:py-[130px]">
       <ActionButton
         label="Back to Histories"
         buttonActionType={buttonActionTypes.text}
@@ -49,7 +49,7 @@ const JournalClient = ({ bookSlug }: { bookSlug: string }) => {
         sx="w-max [&>p]:!font-bold"
       />
       {histories.current?.isDailyJournal && (
-        <div className="flex flex-col gap-[5px]">
+        <div className="flex flex-col gap-1">
           <Heading variant={headingVariants.heading} sx="!font-bold capitalize">
             Day{" "}
             {histories?.current?.entryDate
@@ -73,7 +73,7 @@ const JournalClient = ({ bookSlug }: { bookSlug: string }) => {
         {histories.current?.isWeeklyJournal && <WeeklyJournal />}
         {(histories.current?.isOnboardingInspiration ||
           histories.current?.isOnboardingPotentialSelf) && (
-          <div className="bg-bkg-light mx-auto flex max-w-[1200px] flex-col items-center gap-[30px] rounded-[20px] p-[20px] pb-[20px] md:gap-[40px] md:p-[50px] md:pb-[30px]">
+          <div className="bg-bkg-light mx-auto flex max-w-[1200px] flex-col items-center gap-8 rounded-large p-5 pb-[20px] md:gap-10 md:p-[50px] md:pb-8">
             {histories.current?.isOnboardingInspiration && <Inspiration />}
             {histories.current?.isOnboardingPotentialSelf && <PotentialSelf />}
           </div>

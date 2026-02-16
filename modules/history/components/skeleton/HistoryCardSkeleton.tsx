@@ -7,14 +7,14 @@ function HistoryCardSkeleton({ isVision }: { isVision?: boolean }) {
   return (
     <div
       className={cn(
-        "bg-bkg-light flex h-[180px] flex-col justify-between gap-[10px] rounded p-5 shadow-2xs",
+        "bg-bkg-light flex h-[180px] flex-col justify-between gap-2.5 rounded p-5 shadow-2xs",
         { "justify-start": isVision }
       )}
     >
-      <TextSkeleton sx={cn("h-[20px] w-[50%]", { "w-full": isVision })} />
+      <TextSkeleton sx={cn("h-5 w-[50%]", { "w-full": isVision })} />
       {!isVision && <div className="border-border-light w-full border-t" />}
       {isVision ? (
-        <div className="mt-[30px] flex items-center gap-[10px]">
+        <div className="mt-8 flex items-center gap-2.5">
           <TextSkeleton sx="size-[25px]" />
           <TextSkeleton sx="w-[100px]" />
         </div>

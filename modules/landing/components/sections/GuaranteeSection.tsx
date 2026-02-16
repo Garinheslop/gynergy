@@ -31,14 +31,28 @@ export default function GuaranteeSection() {
         </div>
 
         {/* Title */}
-        <h3 className="font-bebas text-lp-green mb-4 text-2xl tracking-wide md:text-3xl">
+        <h3 className="font-bebas text-lp-green mb-6 text-2xl tracking-wide md:text-3xl">
           {GUARANTEE.title}
         </h3>
 
-        {/* Description */}
+        {/* Main Description */}
         <p className="font-oswald text-lp-gray text-sm leading-relaxed font-extralight md:text-base">
           {GUARANTEE.description}
         </p>
+
+        {/* Reason / Why */}
+        {GUARANTEE.reason && (
+          <p className="font-oswald text-lp-gray mt-4 text-sm leading-relaxed font-extralight italic md:text-base">
+            {GUARANTEE.reason}
+          </p>
+        )}
+
+        {/* Memorable Tagline */}
+        {GUARANTEE.tagline && (
+          <p className="font-bebas text-lp-green mt-6 text-xl tracking-wide md:text-2xl">
+            {GUARANTEE.tagline}
+          </p>
+        )}
       </div>
     </SectionWrapper>
   );

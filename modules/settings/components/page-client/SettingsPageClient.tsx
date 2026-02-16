@@ -131,7 +131,7 @@ const SettingsPageClient: React.FC = () => {
         My Settings
       </Heading>
 
-      <SectionCard sx={"mt-[30px] mb-[55px]"}>
+      <SectionCard sx={"mt-8 mb-[55px]"}>
         <>
           <div className="flex flex-col gap-5">
             <Heading variant={headingVariants.title} sx="!font-bold">

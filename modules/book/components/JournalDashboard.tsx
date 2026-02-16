@@ -71,7 +71,7 @@ const JournalDashboard = () => {
             isHtml
             content={currentBook?.messageDescription}
             variant={paragraphVariants.regular}
-            sx="flex flex-col gap-[10px]"
+            sx="flex flex-col gap-2.5"
           />
         </Card>
       )}

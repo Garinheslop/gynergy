@@ -16,15 +16,15 @@ const Highlights = () => {
   const userEnrollment = useSelector((state) => state.enrollments.current);
 
   return (
-    <div className="bg-bkg-light flex flex-col gap-[40px] rounded px-[30px] py-5 md:px-[40px]">
-      <div className="flex flex-col gap-[5px]">
+    <div className="bg-bkg-light flex flex-col gap-10 rounded px-8 py-5 md:px-[40px]">
+      <div className="flex flex-col gap-1">
         <div className="flex justify-between gap-5">
           <Paragraph
             content={`Day ${(dayjs().diff(dayjs(userEnrollment?.enrollmentDate).startOf("d"), "d") + 1).toString().padStart(2, "0")}`}
             variant={paragraphVariants.titleXlg}
             sx="!font-bold"
           />
-          <div className="flex items-center gap-[5px]">
+          <div className="flex items-center gap-1">
             {[
               journalTypes.morningJournal,
               journalTypes.eveningJournal,
@@ -50,7 +50,7 @@ const Highlights = () => {
           sx="text-content-dark-secondary"
         />
       </div>
-      <div className="flex gap-[5px]">
+      <div className="flex gap-1">
         <Image src={icons.point} className="h-[25px] w-auto" />
         {userEnrollment && (
           <Paragraph

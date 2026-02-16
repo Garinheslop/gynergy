@@ -81,7 +81,7 @@ const EveningJournalEditor: FC = () => {
           onClick={(field, value) => editor.update(field, value)}
         />
 
-        <div className="flex flex-col gap-[10px]">
+        <div className="flex flex-col gap-2.5">
           <TextAreaWithHeading
             heading={"Thought of the Day"}
             description={"What is one unique thought or insight you had today?"}
@@ -120,7 +120,7 @@ const EveningJournalEditor: FC = () => {
           value={editor.data ? editor.data.freeflow : ""}
           onUpdate={(value: any) => editor.update("freeflow", value)}
         />
-        <div className="flex flex-col gap-[10px]">
+        <div className="flex flex-col gap-2.5">
           <Heading variant={headingVariants.title} sx="!font-bold">
             Dream Magic
           </Heading>
@@ -176,7 +176,7 @@ const Entries = ({
     }
   }, [values]);
   return (
-    <div className={cn("flex flex-col gap-[10px]", sx)}>
+    <div className={cn("flex flex-col gap-2.5", sx)}>
       {heading && (
         <Paragraph
           content={heading}
@@ -184,9 +184,9 @@ const Entries = ({
           sx="!font-bold text-content-dark-secondary"
         />
       )}
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         {entries.map((entry, index) => (
-          <div key={index} className="flex items-center gap-[10px]">
+          <div key={index} className="flex items-center gap-2.5">
             <Paragraph
               content={entry.label}
               variant={paragraphVariants.regular}
@@ -194,7 +194,7 @@ const Entries = ({
             />
             <input
               type="text"
-              className="bg-bkg-transparent border-border-light text-content-dark placeholder-content-dark/40 text-regular ease focus:border-action box-border w-full rounded border px-[15px] py-[10px] outline-0 transition-all duration-300 focus:outline-none"
+              className="bg-bkg-transparent border-border-light text-content-dark placeholder-content-dark/40 text-regular ease focus:border-action box-border w-full rounded border px-4 py-2.5 outline-0 transition-all duration-300 focus:outline-none"
               value={entry.value}
               onChange={(e) => {
                 const newEntries = [...entries];
@@ -253,7 +253,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
   };
 
   return (
-    <section className="flex flex-col gap-[5px]">
+    <section className="flex flex-col gap-1">
       <Heading variant={headingVariants.title} sx="!font-bold">
         {"Free Flow"}
       </Heading>
@@ -262,10 +262,10 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
         variant={paragraphVariants.meta}
         sx="text-content-dark-secondary"
       />
-      <div className="flex w-full grid-cols-3 flex-col gap-[30px] sm:grid sm:h-[280px] sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex w-full grid-cols-3 flex-col gap-8 sm:grid sm:h-[280px] sm:flex-row sm:items-start sm:justify-between">
         {image ? (
           <div
-            className={cn("relative flex max-h-[270px] w-full gap-[10px] overflow-hidden rounded")}
+            className={cn("relative flex max-h-[270px] w-full gap-2.5 overflow-hidden rounded")}
           >
             {!loading && (
               <button
@@ -273,7 +273,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
                   setImage(null);
                   onUpdate(null);
                 }}
-                className="!bg-dark-900/60 absolute top-2 right-2 z-10 flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-[10px]"
+                className="!bg-dark-900/60 absolute top-2 right-2 z-10 flex h-5 w-5 cursor-pointer items-center justify-center rounded"
               >
                 <i className="gng-trash text-danger text-body" />
               </button>
@@ -282,7 +282,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
             {loading && (
               <div
                 className={cn(
-                  "bg-bkg-dark/50 border-border-light absolute top-0 left-0 flex h-[100px] w-full items-center justify-center gap-[10px] overflow-hidden rounded border md:h-full md:w-full"
+                  "bg-bkg-dark/50 border-border-light absolute top-0 left-0 flex h-[100px] w-full items-center justify-center gap-2.5 overflow-hidden rounded border md:h-full md:w-full"
                 )}
               >
                 <Spinner />
@@ -291,7 +291,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
           </div>
         ) : (
           <section
-            className="md:max-h-auto relative mx-auto h-full max-h-[550px] w-full shrink overflow-hidden rounded-[10px]"
+            className="md:max-h-auto relative mx-auto h-full max-h-[550px] w-full shrink overflow-hidden rounded"
             onDrop={handleDrop}
             onDragOver={preventDefaultHandler}
             onDragEnter={preventDefaultHandler}
@@ -306,7 +306,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
                 }
               }}
             >
-              <div className="border-border-light flex h-full flex-col justify-center gap-[20px] rounded-[10px] border-[4px] border-dashed p-5 lg:p-10">
+              <div className="border-border-light flex h-full flex-col justify-center gap-5 rounded border-[4px] border-dashed p-5 lg:p-10">
                 <div
                   className={cn(
                     "border-border-light mx-auto flex shrink-0 cursor-pointer items-center justify-center rounded-full md:size-[70px] md:border"
@@ -337,7 +337,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
               <Paragraph content={"or"} sx="text-content-dark-secondary" />
               <div className="border-border-light flex w-full border-t sm:h-full sm:w-[1px] sm:border-r" />
             </div>
-            <div className="flex h-full w-full flex-col gap-[5px]">
+            <div className="flex h-full w-full flex-col gap-1">
               <Paragraph content={"Explain your freeflow"} sx="text-content-dark" />
               <TextArea
                 value={value?.file ? "" : value}

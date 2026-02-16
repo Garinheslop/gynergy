@@ -105,7 +105,7 @@ const MeditationCard: React.FC<MeditationCardProps> = ({
         </div>
       )}
       {!isStatic && (
-        <div className="top-8 right-[30px] md:absolute">
+        <div className="top-8 right-8 md:absolute">
           {isCompleted ? (
             <div className="flex gap-2.5">
               <i className="gng-complete-circle text-action-secondary text-2xl" />

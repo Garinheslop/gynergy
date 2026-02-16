@@ -76,7 +76,7 @@ const DailyJournal = ({ day }: { day: number }) => {
   return (
     <>
       {(morningData || histories.loading) && (
-        <section className="bg-bkg-light flex flex-col gap-[20px] rounded-[20px] md:p-[30px]">
+        <section className="bg-bkg-light flex flex-col gap-5 rounded-large md:p-8">
           <Header type={journalTypes.morningJournal} />
 
           <div className="border-border-light w-full border-b" />
@@ -94,11 +94,11 @@ const DailyJournal = ({ day }: { day: number }) => {
                 score={morningData?.moodScore!}
                 contributions={morningData?.moodContribution!}
               />
-              <div className={cn("flex flex-col gap-[10px]")}>
+              <div className={cn("flex flex-col gap-2.5")}>
                 <Heading variant={headingVariants.cardHeading} sx="!font-bold">
                   Positive Affirmations
                 </Heading>
-                <div className="grid grid-cols-1 gap-[20px] lg:grid-cols-[1fr_1fr] lg:gap-[40px]">
+                <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1fr] lg:gap-10">
                   <Entries
                     entryType={journalEntryTypes.affirmation}
                     entries={
@@ -107,7 +107,7 @@ const DailyJournal = ({ day }: { day: number }) => {
                       )?.content
                     }
                   />
-                  <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                     <Entries
                       entryType={journalEntryTypes.gratitude}
                       heading="I Am Grateful For:"
@@ -137,7 +137,7 @@ const DailyJournal = ({ day }: { day: number }) => {
         </section>
       )}
       {(eveningData || histories.loading) && (
-        <section className="bg-bkg-light flex flex-col gap-[20px] rounded-[20px] md:p-[30px]">
+        <section className="bg-bkg-light flex flex-col gap-5 rounded-large md:p-8">
           <Header type={journalTypes.eveningJournal} />
 
           <div className="border-border-light w-full border-b" />
@@ -154,7 +154,7 @@ const DailyJournal = ({ day }: { day: number }) => {
               <TextInputs heading="What Went Well" description={eveningData?.success!} />
               <TextInputs heading="Changes for Tomorrow" description={eveningData?.changes!} />
 
-              <div className="flex flex-col gap-[10px]">
+              <div className="flex flex-col gap-2.5">
                 <Heading variant={headingVariants.title} sx="!font-bold">
                   Free Flow
                 </Heading>
@@ -168,11 +168,11 @@ const DailyJournal = ({ day }: { day: number }) => {
                   <Paragraph content={eveningData?.freeflow!} sx="text-content-dark-secondary" />
                 )}
               </div>
-              <div className={cn("flex flex-col gap-[10px]")}>
+              <div className={cn("flex flex-col gap-2.5")}>
                 <Heading variant={headingVariants.cardHeading} sx="!font-bold">
                   Dream Magic
                 </Heading>
-                <div className="grid grid-cols-1 gap-[20px] lg:grid-cols-[1fr_1fr] lg:gap-[40px]">
+                <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1fr] lg:gap-10">
                   <Entries
                     entryType={journalEntryTypes.dreammagic}
                     entries={
@@ -188,7 +188,7 @@ const DailyJournal = ({ day }: { day: number }) => {
         </section>
       )}
       {(actionData || histories.loading) && (
-        <section className="bg-bkg-light flex flex-col gap-[20px] rounded-[20px] md:p-[30px]">
+        <section className="bg-bkg-light flex flex-col gap-5 rounded-large md:p-8">
           <Header type={journalTypes.gratitudeAction} />
 
           <div className="border-border-light w-full border-b" />
@@ -196,7 +196,7 @@ const DailyJournal = ({ day }: { day: number }) => {
             <Loader type={loaderTypes.spinner} sx={"h-[500px]"} />
           ) : (
             <div className="flex flex-col gap-5">
-              <div className="flex flex-col gap-[10px]">
+              <div className="flex flex-col gap-2.5">
                 <Paragraph
                   content={`“ ${actionData?.action?.title?.charAt(0).toUpperCase() + actionData?.action?.title?.toLowerCase().slice(1)} ”`}
                   variant={paragraphVariants.titleLg}
@@ -258,7 +258,7 @@ const getHeaderData = (journalType: string) => {
 
 const Header = ({ type }: { type: string }) => {
   return (
-    <div className="flex items-center gap-[10px] sm:flex-col sm:items-start">
+    <div className="flex items-center gap-2.5 sm:flex-col sm:items-start">
       <i
         className={cn(`py-[4px] text-[32px]`, {
           "gng-morning text-primary": type === journalTypes.morningJournal,
@@ -283,7 +283,7 @@ const Question = ({
   isCompleted: boolean;
 }) => {
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-2.5">
       <Heading variant={headingVariants.title} sx="!font-bold">
         {heading}
       </Heading>
@@ -309,7 +309,7 @@ const TextInputs = ({
   subDescription?: string;
 }) => {
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-2.5">
       <Heading variant={headingVariants.title} sx="!font-bold">
         {heading}
       </Heading>
@@ -321,7 +321,7 @@ const TextInputs = ({
 
 const MoodScore = ({ score, contributions }: { score: number; contributions?: string }) => {
   return (
-    <div className="flex flex-col gap-[10px]">
+    <div className="flex flex-col gap-2.5">
       <Heading variant={headingVariants.title} sx="!font-bold">
         Mood Tracker:
       </Heading>
@@ -358,12 +358,12 @@ const Entries = ({
   sx?: string;
 }) => {
   return (
-    <div className={cn("flex flex-col gap-[10px]", sx)}>
+    <div className={cn("flex flex-col gap-2.5", sx)}>
       {heading && <Paragraph content={heading} sx="!font-bold text-content-dark-secondary" />}
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         {entries &&
           entries.map((entry, index) => (
-            <div key={index} className="flex items-start gap-[10px] lg:items-center">
+            <div key={index} className="flex items-start gap-2.5 lg:items-center">
               <Paragraph
                 content={entryType === journalEntryTypes.affirmation ? "I am" : `${index + 1}.`}
                 sx={cn("text-content-dark-secondary min-w-[15px] shrink-0", {

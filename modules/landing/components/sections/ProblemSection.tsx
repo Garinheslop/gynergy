@@ -69,7 +69,7 @@ export default function ProblemSection() {
                   <span
                     className={cn(
                       "font-bebas text-lp-white absolute top-1/2 right-2 -translate-y-1/2 text-base",
-                      isLow && "text-[#D4735E]"
+                      isLow && "text-lp-danger"
                     )}
                   >
                     {score}
@@ -83,12 +83,12 @@ export default function ProblemSection() {
           <div className="font-bebas text-lp-muted mb-4 text-lg tracking-wide">
             {multiplierExample.scores.map(({ score, isLow }, i) => (
               <span key={i}>
-                <span className={isLow ? "text-[#D4735E]" : "text-lp-gold-light"}>{score}</span>
+                <span className={isLow ? "text-lp-danger" : "text-lp-gold-light"}>{score}</span>
                 {i < multiplierExample.scores.length - 1 && " × "}
               </span>
             ))}
             {" = "}
-            <span className="text-[#D4735E]">fractured</span>
+            <span className="text-lp-danger">fractured</span>
           </div>
 
           {/* Insight */}

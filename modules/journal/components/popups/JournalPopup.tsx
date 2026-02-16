@@ -44,13 +44,13 @@ const JournalPopup = () => {
 
   return (
     <Modal open={journalPopupObj.show} onClose={journalPopupObj.close}>
-      <section className="items-between bg-bkg-light relative mx-auto flex h-screen w-screen flex-col justify-center overflow-auto rounded px-[30px] py-[60px] sm:h-[692px] sm:w-[620px] sm:p-[30px]">
+      <section className="items-between bg-bkg-light relative mx-auto flex h-screen w-screen flex-col justify-center overflow-auto rounded px-8 py-[60px] sm:h-[692px] sm:w-[620px] sm:p-8">
         <i
           className="gng-close absolute top-2 right-2 cursor-pointer p-6 text-[18px]"
           onClick={journalPopupObj.close}
         />
         <div className="flex h-full w-full flex-col gap-5">
-          <div className="flex flex-col gap-[10px]">
+          <div className="flex flex-col gap-2.5">
             <i
               className={cn(`gng-${popupContents?.icon} p-[4px] text-[32px]`, {
                 "text-primary": popupType === journalTypes.morningJournal,
@@ -63,7 +63,7 @@ const JournalPopup = () => {
             </Heading>
           </div>
           <div className="border-border-light flex w-full border-t" />
-          <div className="flex flex-col gap-[10px]">
+          <div className="flex flex-col gap-2.5">
             <Paragraph
               variant={paragraphVariants.titleXlg}
               content={popupData?.subHeading?.toLowerCase()}
@@ -75,7 +75,7 @@ const JournalPopup = () => {
 
         <div className="flex h-max flex-col gap-5">
           <div className="flex items-center justify-between">
-            <div className="flex gap-[5px]">
+            <div className="flex gap-1">
               <Image src={icons.streak} className="h-[25px] w-auto" />
               <Paragraph
                 isHtml
@@ -85,7 +85,7 @@ const JournalPopup = () => {
               />
             </div>
             {popupData?.isCompleted ? (
-              <div className="flex gap-[10px]">
+              <div className="flex gap-2.5">
                 <i className="gng-complete-circle text-action-secondary text-[25px]" />
                 <Paragraph content={"Completed"} variant={paragraphVariants.regular} />
               </div>
@@ -105,7 +105,7 @@ const JournalPopup = () => {
           </div>
 
           {!popupData?.isCompleted && (
-            <div className="border-border-light flex gap-[10px] border-t pt-[15px]">
+            <div className="border-border-light flex gap-2.5 border-t pt-[15px]">
               <Image src={icons.point} className="h-[25px] w-auto" />
               <Paragraph
                 isHtml

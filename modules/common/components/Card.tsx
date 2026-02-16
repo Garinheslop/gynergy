@@ -81,7 +81,7 @@ const Card = ({
     return (
       <section
         className={cn(
-          "bg-bkg-light flex h-full w-full flex-col gap-[30px] rounded p-5 duration-150 sm:rounded-[20px] md:p-[30px]",
+          "bg-bkg-light flex h-full w-full flex-col gap-8 rounded p-5 duration-150 sm:rounded-large md:p-8",
           {
             "cursor-pointer": onClick,
             "hover:translate-y-[-2px]": onClick,
@@ -113,14 +113,14 @@ const Card = ({
           </div>
           {(icon || primaryActionIconBtn?.action) && !isLoading && (
             <div
-              className={cn("flex h-full items-center gap-[5px]", {
+              className={cn("flex h-full items-center gap-1", {
                 "cursor-pointer": primaryActionIconBtn?.action,
               })}
               onClick={icon?.action}
             >
               <i
                 className={cn(
-                  `gng-${primaryActionIconBtn?.icon ?? icon?.class} text-content-dark text-[24px] duration-500`
+                  `gng-${primaryActionIconBtn?.icon ?? icon?.class} text-content-dark text-2xl duration-500`
                 )}
                 onClick={() => primaryActionIconBtn?.action && primaryActionIconBtn?.action()}
               />

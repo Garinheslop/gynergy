@@ -178,7 +178,7 @@ const BadgeUnlockPopup: React.FC<BadgeUnlockPopupProps> = ({
             onClick={onClose}
             aria-label="Close"
           >
-            <i className="gng-close text-[20px]" />
+            <i className="gng-close text-xl" />
           </button>
 
           {/* Badge unlocked text */}

@@ -78,7 +78,7 @@ const MorningJournalEditor: FC = () => {
             placeholder="Start writing from here or press “Scan & Fill” button to autofill"
           />
         </DreamEssence>
-        <div className="flex flex-col gap-[10px]">
+        <div className="flex flex-col gap-2.5">
           <MoodTracker
             value={editor.data?.moodScore}
             onClick={(field, value) => editor.update(field, value)}
@@ -90,17 +90,17 @@ const MorningJournalEditor: FC = () => {
             placeholder="Start writing from here or press “Scan & Fill” button to autofill"
           />
         </div>
-        <div className={cn("flex flex-col gap-[10px]")}>
+        <div className={cn("flex flex-col gap-2.5")}>
           <Heading variant={headingVariants.cardHeading} sx="!font-bold">
             Positive Affirmations
           </Heading>
-          <div className="grid grid-cols-1 gap-[20px] lg:grid-cols-[1fr_1fr] lg:gap-[40px]">
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1fr] lg:gap-10">
             <Entries
               entryType={journalEntryTypes.affirmation}
               values={editor.data?.affirmations}
               onEntryInput={(value) => editor.update("affirmations", value)}
             />
-            <div className="grid grid-cols-1 gap-[20px] sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <Entries
                 entryType={journalEntryTypes.gratitude}
                 values={editor.data?.gratitudes}
@@ -140,11 +140,11 @@ const DreamEssence = ({
 }) => {
   // const [value, setValue] = useState<boolean | null>(null);
   return (
-    <div className={cn("flex flex-col gap-[10px]")}>
+    <div className={cn("flex flex-col gap-2.5")}>
       <Heading variant={headingVariants.cardHeading} sx="!font-bold">
         Did You Dream?
       </Heading>
-      <div className="flex gap-[10px]">
+      <div className="flex gap-2.5">
         <button
           className={cn(
             "border-border-light flex h-[57px] w-[73px] cursor-pointer items-center justify-center rounded border",
@@ -170,7 +170,7 @@ const DreamEssence = ({
         </button>
       </div>
       <div
-        className={`flex flex-col gap-5 overflow-hidden px-1 transition-all duration-500 sm:p-0 md:gap-[30px] ${
+        className={`flex flex-col gap-5 overflow-hidden px-1 transition-all duration-500 sm:p-0 md:gap-8 ${
           value ? "max-h-[50vh] ease-in" : "max-h-0 ease-out"
         }`}
       >
@@ -220,7 +220,7 @@ const Entries = ({
     }
   }, [values]);
   return (
-    <div className={cn("flex flex-col gap-[10px]", sx)}>
+    <div className={cn("flex flex-col gap-2.5", sx)}>
       {heading && (
         <Paragraph
           content={heading}
@@ -228,9 +228,9 @@ const Entries = ({
           sx="!font-bold text-content-dark-secondary"
         />
       )}
-      <div className="flex flex-col gap-[10px]">
+      <div className="flex flex-col gap-2.5">
         {entries.map((entry, index) => (
-          <div key={index} className="flex items-center gap-[10px]">
+          <div key={index} className="flex items-center gap-2.5">
             <Paragraph
               content={entry.label}
               variant={paragraphVariants.regular}
@@ -238,7 +238,7 @@ const Entries = ({
             />
             <input
               type="text"
-              className="bg-bkg-transparent border-border-light text-content-dark placeholder-content-dark/40 text-regular ease focus:border-action box-border w-full rounded border px-[15px] py-[10px] outline-0 transition-all duration-300 focus:outline-none"
+              className="bg-bkg-transparent border-border-light text-content-dark placeholder-content-dark/40 text-regular ease focus:border-action box-border w-full rounded border px-4 py-2.5 outline-0 transition-all duration-300 focus:outline-none"
               value={entry.value}
               onChange={(e) => {
                 const newEntries = [...entries];

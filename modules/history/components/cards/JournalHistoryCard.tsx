@@ -107,7 +107,7 @@ const JournalHistoryCard = ({ data, onCardClick, isMeditation, isMeditationCompl
         <div className="flex items-center gap-1">
           <i
             className={cn(
-              `gng-${data?.weeklyChallengeCompleted || data?.weeklyReflectionCompleted ? "complete-circle" : "alert-circle"} text-action-secondary p-[3px] text-[24px]`,
+              `gng-${data?.weeklyChallengeCompleted || data?.weeklyReflectionCompleted ? "complete-circle" : "alert-circle"} text-action-secondary p-[3px] text-2xl`,
               {
                 "text-content-dark-secondary":
                   !data?.weeklyChallengeCompleted && !data?.weeklyReflectionCompleted,

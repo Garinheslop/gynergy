@@ -16,7 +16,7 @@ const PotentialSelf = () => {
         Meeting Your Highest Potential Self
       </Heading>
       <div className="border-border-light flex w-full border-t" />
-      <div className="flex flex-col gap-[30px] md:gap-[40px]">
+      <div className="flex flex-col gap-8 md:gap-10">
         <div className="flex flex-col gap-5">
           <Paragraph
             content={`Welcome to your journey of self-discovery and transformation. Begin by finding a quiet, comfortable place where you won't be disturbed. Sit or lie down, close your eyes, and take a few deep breaths to center yourself. Watch the video below:`}
@@ -26,13 +26,13 @@ const PotentialSelf = () => {
           <VideoPlayback url="https://www.youtube.com/embed/12zcgmmE_Aw?si=IfJHdPvviasJty0t" />
         </div>
 
-        <div className="flex flex-col gap-[10px]">
+        <div className="flex flex-col gap-2.5">
           <Paragraph
             content={"Alternatively, if you’re not into videos, you can follow along below:"}
             variant={paragraphVariants.regular}
             sx="flex flex-col gap-5 text-content-dark-secondary font-bold"
           />
-          <ol className="flex flex-col gap-[10px] [&>li]:flex [&>li]:items-start [&>li]:gap-[5px]">
+          <ol className="flex flex-col gap-2.5 [&>li]:flex [&>li]:items-start [&>li]:gap-1">
             <li>
               <Paragraph
                 content={"1."}

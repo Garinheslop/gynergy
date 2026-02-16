@@ -25,7 +25,7 @@ const TextAreaWithHeading: FC<TextAreaWithHeadingProps> = ({
   onChange,
 }) => {
   return (
-    <section className="flex flex-col gap-[5px]">
+    <section className="flex flex-col gap-1">
       {heading && (
         <Heading variant={headingVariants.title} sx="!font-bold">
           {heading}

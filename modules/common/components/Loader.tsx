@@ -62,14 +62,14 @@ const Loader = ({
       <Modal open={true} onClose={() => {}}>
         <section
           className={cn(
-            "bg-bkg-light flex h-screen w-screen flex-col items-center justify-center rounded p-[30px] sm:h-[300px] sm:w-[470px]",
+            "bg-bkg-light flex h-screen w-screen flex-col items-center justify-center rounded p-8 sm:h-[300px] sm:w-[470px]",
             sx
           )}
         >
           <div className="gradient-animation flex flex-col items-center justify-center overflow-hidden">
             <i id="clipWave" className={cn("gng-infinity text-[100px] text-transparent", sx)} />
           </div>
-          <div className="flex flex-col gap-[10px]">
+          <div className="flex flex-col gap-2.5">
             {heading && (
               <Paragraph
                 content={heading}

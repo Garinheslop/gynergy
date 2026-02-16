@@ -148,7 +148,7 @@ const Emblems: React.FC<CropImageProps> = ({ value, onUpdate }) => {
     setCroppedUrl(url);
   };
   return (
-    <section className="flex flex-col gap-[5px]">
+    <section className="flex flex-col gap-1">
       <Heading variant={headingVariants.title} sx="!font-bold">
         {"Symbols and Emblems"}
       </Heading>
@@ -162,7 +162,7 @@ const Emblems: React.FC<CropImageProps> = ({ value, onUpdate }) => {
       {croppedUrl || value ? (
         <div
           className={cn(
-            "relative flex max-h-[270px] w-full max-w-[250px] gap-[10px] overflow-hidden rounded"
+            "relative flex max-h-[270px] w-full max-w-[250px] gap-2.5 overflow-hidden rounded"
           )}
         >
           <button
@@ -170,7 +170,7 @@ const Emblems: React.FC<CropImageProps> = ({ value, onUpdate }) => {
               setCroppedUrl("");
               onUpdate(null);
             }}
-            className="!bg-dark-900/60 absolute top-2 right-2 z-10 flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-[10px]"
+            className="!bg-dark-900/60 absolute top-2 right-2 z-10 flex h-5 w-5 cursor-pointer items-center justify-center rounded"
           >
             <i className="gng-trash text-danger text-body" />
           </button>
@@ -182,7 +182,7 @@ const Emblems: React.FC<CropImageProps> = ({ value, onUpdate }) => {
         </div>
       ) : (
         <section
-          className="md:max-h-auto relative mx-auto h-full max-h-[550px] w-full shrink-0 overflow-hidden rounded-[10px] md:shrink lg:w-[500px]"
+          className="md:max-h-auto relative mx-auto h-full max-h-[550px] w-full shrink-0 overflow-hidden rounded md:shrink lg:w-[500px]"
           onDrop={handleDrop}
           onDragOver={preventDefaultHandler}
           onDragEnter={preventDefaultHandler}
@@ -197,8 +197,8 @@ const Emblems: React.FC<CropImageProps> = ({ value, onUpdate }) => {
               }
             }}
           >
-            <div className="border-border-light flex h-full flex-col justify-center gap-[20px] rounded-[10px] border-[4px] border-dashed p-5 lg:p-10">
-              <div className="border-border-light mx-auto flex size-[70px] cursor-pointer items-center justify-center rounded-[10px] border">
+            <div className="border-border-light flex h-full flex-col justify-center gap-5 rounded border-[4px] border-dashed p-5 lg:p-10">
+              <div className="border-border-light mx-auto flex size-[70px] cursor-pointer items-center justify-center rounded border">
                 <i className="gng-add-photo-filled text-content-dark-secondary text-center text-2xl" />
               </div>
               <div className="flex flex-col">

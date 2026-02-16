@@ -64,11 +64,11 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({
         )}
       >
         {isOpen ? (
-          <i className="gng-close text-content-dark text-[24px]" />
+          <i className="gng-close text-content-dark text-2xl" />
         ) : activeCharacter ? (
           <CharacterAvatar characterKey={activeCharacter} size="medium" />
         ) : (
-          <i className="gng-chat text-[24px] text-white" />
+          <i className="gng-chat text-2xl text-white" />
         )}
       </button>
 

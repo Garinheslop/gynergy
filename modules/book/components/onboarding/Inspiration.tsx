@@ -16,13 +16,13 @@ const Inspiration = () => {
         Inspiration and Gratitude
       </Heading>
       <div className="border-border-light flex w-full border-t" />
-      <div className="grid items-center gap-[30px] md:grid-cols-[540px_1fr] md:gap-[40px]">
-        <Image className="h-auto w-full rounded-[20px]" src={images.inspirationGratitude} />
+      <div className="grid items-center gap-8 md:grid-cols-[540px_1fr] md:gap-10">
+        <Image className="h-auto w-full rounded-large" src={images.inspirationGratitude} />
         <Paragraph
           isHtml
           content={description}
           variant={paragraphVariants.regular}
-          sx="flex flex-col gap-5 text-content-dark-secondary [&>p>span]:!font-bold [&>p]:flex [&>p]:flex-col [&>p]:gap-[10px]"
+          sx="flex flex-col gap-5 text-content-dark-secondary [&>p>span]:!font-bold [&>p]:flex [&>p]:flex-col [&>p]:gap-2.5"
         />
       </div>
     </>

@@ -59,7 +59,7 @@ const JournalCompletionPopup = () => {
 
   return (
     <Modal open={journalCompletionPopupObj.show} onClose={journalCompletionPopupObj.close}>
-      <section className="bg-bkg-light relative mx-auto flex min-h-[430px] w-[90vw] flex-col gap-[30px] overflow-auto rounded-[20px] p-[30px] md:w-[500px]">
+      <section className="bg-bkg-light relative mx-auto flex min-h-[430px] w-[90vw] flex-col gap-8 overflow-auto rounded-large p-8 md:w-[500px]">
         <ReactConfetti
           className="h-full w-full"
           run={showConfetti}
@@ -75,18 +75,18 @@ const JournalCompletionPopup = () => {
         />
         <div className="relative mx-auto w-max">
           <i
-            className={cn(`gng-${popupContents?.icon} p-[10px] text-[80px]`, {
+            className={cn(`gng-${popupContents?.icon} p-2.5 text-[80px]`, {
               "text-primary": popupType === journalTypes.morningJournal,
               "text-action-secondary": popupType === journalTypes.eveningJournal,
               "text-primary-500": popupType === journalTypes.gratitudeAction,
             })}
           />
-          <div className="bg-bkg-light absolute right-[0] -bottom-[10px] flex h-[45px] w-[45px] items-center justify-center rounded-full">
+          <div className="bg-bkg-light absolute right-[0] -bottom-2.5 flex h-[45px] w-[45px] items-center justify-center rounded-full">
             <i className={cn(`gng-complete-circle text-action-secondary text-[30px]`)} />
           </div>
         </div>
 
-        <div className="flex flex-col gap-[5px]">
+        <div className="flex flex-col gap-1">
           <Heading variant={headingVariants.cardHeading} sx="!font-bold text-center">
             {popupContents?.heading}
           </Heading>
@@ -100,7 +100,7 @@ const JournalCompletionPopup = () => {
           />
         )}
         <Image src={images.congratsAvatar} className="h-auto max-h-[225px] w-full" />
-        <div className="flex gap-[20px]">
+        <div className="flex gap-5">
           <ActionButton
             label="Close"
             onClick={journalCompletionPopupObj.close}

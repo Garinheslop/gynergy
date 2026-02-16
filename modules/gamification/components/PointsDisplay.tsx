@@ -90,7 +90,7 @@ const PointsDisplay: React.FC<PointsDisplayProps> = ({
       container: "gap-2",
       points: "text-3xl font-bold",
       label: paragraphVariants.meta,
-      icon: "text-[24px]",
+      icon: "text-2xl",
     },
     large: {
       container: "gap-3",
@@ -205,7 +205,7 @@ export const PointsEarned: React.FC<PointsEarnedProps> = ({
         sx
       )}
     >
-      <i className="gng-star text-action text-[20px]" />
+      <i className="gng-star text-action text-xl" />
       <span className="text-action font-bold">+{points}</span>
       {showMultiplier && multiplier > 1 && (
         <span className="text-action/70 text-sm">({multiplier}x)</span>

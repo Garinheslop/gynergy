@@ -2,8 +2,7 @@
 
 import { FC, useState, useEffect, useRef } from "react";
 
-import Image from "next/image";
-
+import { Avatar } from "@modules/common/components/ui";
 import { Comment } from "@resources/types/community";
 import { RootState } from "@store/configureStore";
 import { useSelector, useDispatch } from "@store/hooks";
@@ -96,20 +95,11 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
     <div className="border-border-dark mt-4 border-t pt-4">
       {/* Comment Input */}
       <div className="mb-4 flex gap-3">
-        <div className="bg-bkg-dark-800 relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-full">
-          {profile?.profileImage ? (
-            <Image
-              src={profile.profileImage}
-              alt={profile.firstName || "You"}
-              fill
-              className="object-cover"
-            />
-          ) : (
-            <div className="from-action-400 to-action-600 text-content-dark flex h-full w-full items-center justify-center bg-gradient-to-br text-xs font-semibold">
-              {profile?.firstName?.[0] || "Y"}
-            </div>
-          )}
-        </div>
+        <Avatar
+          src={profile?.profileImage}
+          name={profile?.firstName || "You"}
+          size="sm"
+        />
         <div className="flex-1">
           <textarea
             ref={inputRef}
@@ -224,20 +214,11 @@ const CommentItem: FC<CommentItemProps> = ({
     <div className="group">
       <div className="flex gap-3">
         {/* Avatar */}
-        <div className="bg-bkg-dark-800 relative h-8 w-8 flex-shrink-0 overflow-hidden rounded-full">
-          {comment.author?.profileImage ? (
-            <Image
-              src={comment.author.profileImage}
-              alt={comment.author.firstName || "User"}
-              fill
-              className="object-cover"
-            />
-          ) : (
-            <div className="from-action-400 to-action-600 text-content-dark flex h-full w-full items-center justify-center bg-gradient-to-br text-xs font-semibold">
-              {comment.author?.firstName?.[0] || "?"}
-            </div>
-          )}
-        </div>
+        <Avatar
+          src={comment.author?.profileImage}
+          name={`${comment.author?.firstName || ""} ${comment.author?.lastName || ""}`}
+          size="sm"
+        />
 
         {/* Content */}
         <div className="min-w-0 flex-1">
@@ -307,20 +288,11 @@ const CommentItem: FC<CommentItemProps> = ({
             <div className="border-border-dark mt-3 space-y-3 border-l-2 pl-4">
               {comment.replies.map((reply) => (
                 <div key={reply.id} className="flex gap-2">
-                  <div className="bg-bkg-dark-800 relative h-6 w-6 flex-shrink-0 overflow-hidden rounded-full">
-                    {reply.author?.profileImage ? (
-                      <Image
-                        src={reply.author.profileImage}
-                        alt={reply.author.firstName || "User"}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="from-action-400 to-action-600 text-content-dark flex h-full w-full items-center justify-center bg-gradient-to-br text-[10px] font-semibold">
-                        {reply.author?.firstName?.[0] || "?"}
-                      </div>
-                    )}
-                  </div>
+                  <Avatar
+                    src={reply.author?.profileImage}
+                    name={`${reply.author?.firstName || ""} ${reply.author?.lastName || ""}`}
+                    size="xs"
+                  />
                   <div className="min-w-0 flex-1">
                     <div className="bg-bkg-dark-800 rounded px-3 py-2">
                       <div className="flex items-center gap-2">
