@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 
 import { AssessmentPageV3 } from "@modules/landing";
+import { AssessmentErrorBoundary } from "@modules/landing/components/shared";
 
 // Assessment page specific metadata
 export const metadata: Metadata = {
@@ -52,5 +53,9 @@ export const metadata: Metadata = {
 };
 
 export default function AssessmentRoute() {
-  return <AssessmentPageV3 />;
+  return (
+    <AssessmentErrorBoundary>
+      <AssessmentPageV3 />
+    </AssessmentErrorBoundary>
+  );
 }

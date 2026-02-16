@@ -286,18 +286,43 @@ export default function AssessmentPageV3() {
         pattern_reveals_count: patternReveals.length,
       });
 
+      // Retry logic with exponential backoff
+      const MAX_RETRIES = 3;
+      const RETRY_DELAY_MS = 1000;
+
+      const submitWithRetry = async (attempt: number): Promise<Response> => {
+        try {
+          const response = await fetch("/api/assessment/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...answers,
+              email,
+              first_name: firstName,
+              completed_at: new Date().toISOString(),
+              source: "v3_assessment",
+            }),
+          });
+
+          if (!response.ok && attempt < MAX_RETRIES) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          return response;
+        } catch (error) {
+          if (attempt < MAX_RETRIES) {
+            // Wait with exponential backoff before retrying
+            await new Promise((resolve) =>
+              setTimeout(resolve, RETRY_DELAY_MS * Math.pow(2, attempt - 1))
+            );
+            return submitWithRetry(attempt + 1);
+          }
+          throw error;
+        }
+      };
+
       try {
-        const response = await fetch("/api/assessment/submit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...answers,
-            email,
-            first_name: firstName,
-            completed_at: new Date().toISOString(),
-            source: "v3_assessment",
-          }),
-        });
+        const response = await submitWithRetry(1);
 
         if (!response.ok) {
           throw new Error("Failed to submit assessment");
@@ -333,12 +358,13 @@ export default function AssessmentPageV3() {
 
         setState("results");
       } catch {
-        // Track failure
+        // Track failure after all retries exhausted
         track("assessment_email_failed", {
           version: "v3",
-          error: "submission_failed",
+          error: "submission_failed_after_retries",
+          retries: MAX_RETRIES,
         });
-        setEmailError("Something went wrong. Please try again.");
+        setEmailError("Connection issue. Please check your internet and try again.");
       } finally {
         setEmailSubmitting(false);
       }
@@ -376,6 +402,53 @@ export default function AssessmentPageV3() {
     }
     return null;
   }, [state, totalQuestions]);
+
+  // CTA click tracking
+  const handleCtaClick = useCallback(() => {
+    track("assessment_cta_clicked", {
+      version: "v3",
+      total_score: totalScore,
+      interpretation,
+      readiness: answers.readiness || null,
+      priority_pillar: answers.priority_pillar || null,
+      lowest_pillar: lowestPillar?.pillar || null,
+      destination: "/webinar",
+    });
+  }, [totalScore, interpretation, answers.readiness, answers.priority_pillar, lowestPillar]);
+
+  // Abandonment tracking
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Only track if user is mid-assessment (not on intro or results)
+      if (state === "questions" || state === "email_capture") {
+        const progressPercent = Math.round((currentQuestionIndex / totalQuestions) * 100);
+        const timeSpent = Date.now() - assessmentStartTime.current;
+
+        // Use sendBeacon for reliable delivery on page unload
+        if (navigator.sendBeacon) {
+          const abandonmentData = {
+            event: "assessment_abandoned",
+            properties: {
+              version: "v3",
+              abandoned_at_state: state,
+              abandoned_at_question: currentQuestionIndex + 1,
+              progress_percent: progressPercent,
+              time_spent_ms: timeSpent,
+              time_spent_minutes: Math.round(timeSpent / 60000),
+              answers_count: Object.keys(answers).length,
+              last_section: lastSection.current,
+            },
+            timestamp: Date.now(),
+          };
+
+          navigator.sendBeacon("/api/analytics/beacon", JSON.stringify(abandonmentData));
+        }
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [state, currentQuestionIndex, totalQuestions, answers]);
 
   return (
     <div
@@ -477,6 +550,7 @@ export default function AssessmentPageV3() {
           interpretation={interpretation}
           lowestPillar={lowestPillar}
           patternReveals={patternReveals}
+          onCtaClick={handleCtaClick}
         />
       )}
     </div>
@@ -898,6 +972,7 @@ interface ResultsSectionProps {
   interpretation: "elite" | "gap" | "critical";
   lowestPillar: { pillar: PriorityPillar; score: number } | null;
   patternReveals: Array<{ pattern: string; insight: string; recommendation: string }>;
+  onCtaClick: () => void;
 }
 
 function ResultsSection({
@@ -906,6 +981,7 @@ function ResultsSection({
   interpretation: _interpretation,
   lowestPillar,
   patternReveals,
+  onCtaClick,
 }: ResultsSectionProps) {
   const readinessResponse = answers.readiness ? V3_READINESS_RESPONSES[answers.readiness] : null;
   const priorityInsight = answers.priority_pillar
@@ -1054,6 +1130,7 @@ function ResultsSection({
           </p>
           <a
             href="/webinar"
+            onClick={onCtaClick}
             className={cn(
               "flex w-full items-center justify-center gap-2",
               "bg-lp-gold-light text-lp-black",
