@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 
+import { track } from "@lib/utils/analytics";
 import { cn } from "@lib/utils/style";
 
 import { CTAButton, PillarProgressBar } from "./shared";
@@ -63,15 +64,28 @@ export default function AssessmentPageV3() {
   const [emailError, setEmailError] = useState<string | null>(null);
   const [hasExistingResult, setHasExistingResult] = useState(false);
 
-  // Load saved progress on mount
+  // Analytics tracking
+  const assessmentStartTime = useRef<number>(0);
+  const questionStartTime = useRef<number>(Date.now());
+  const lastSection = useRef<number>(1);
+
+  // Load saved progress on mount and track page view
   useEffect(() => {
+    // Track page view
+    track("assessment_viewed", {
+      version: "v3",
+      referrer: typeof document !== "undefined" ? document.referrer : null,
+    });
+
     // Check for completed assessment
     const storedResult = localStorage.getItem(STORAGE_KEY);
+    let hasResult = false;
     if (storedResult) {
       try {
         const result = JSON.parse(storedResult);
         if (result.completedAt) {
           setHasExistingResult(true);
+          hasResult = true;
         }
       } catch {
         // Invalid stored data
@@ -80,16 +94,26 @@ export default function AssessmentPageV3() {
 
     // Check for in-progress assessment
     const storedProgress = localStorage.getItem(STORAGE_PROGRESS_KEY);
+    let hasProgress = false;
     if (storedProgress) {
       try {
         const progress = JSON.parse(storedProgress);
         if (progress.answers && progress.currentIndex !== undefined) {
           setAnswers(progress.answers);
           setCurrentQuestionIndex(progress.currentIndex);
+          hasProgress = true;
         }
       } catch {
         // Invalid stored data
       }
+    }
+
+    // Track returning user state
+    if (hasResult || hasProgress) {
+      track("assessment_returning_user", {
+        has_completed: hasResult,
+        has_progress: hasProgress,
+      });
     }
   }, []);
 
@@ -161,10 +185,42 @@ export default function AssessmentPageV3() {
   );
 
   const handleNext = useCallback(() => {
+    const currentQ = ASSESSMENT_V3_QUESTIONS[currentQuestionIndex];
+    const timeOnQuestion = Date.now() - questionStartTime.current;
+
+    // Track question answered
+    track("assessment_question_answered", {
+      question_id: currentQ?.id,
+      question_index: currentQuestionIndex + 1,
+      question_total: totalQuestions,
+      section: currentQ?.section,
+      pillar: currentQ?.pillar || null,
+      time_on_question_ms: timeOnQuestion,
+      progress_percent: Math.round(((currentQuestionIndex + 1) / totalQuestions) * 100),
+    });
+
+    // Track section completion
+    if (currentQ && currentQ.section !== lastSection.current) {
+      track("assessment_section_completed", {
+        section: lastSection.current,
+        questions_answered: currentQuestionIndex,
+      });
+      lastSection.current = currentQ.section;
+    }
+
+    // Reset question timer
+    questionStartTime.current = Date.now();
+
     if (currentQuestionIndex < totalQuestions - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
     } else {
-      // Go to email capture
+      // Track all questions completed
+      const totalTime = Date.now() - assessmentStartTime.current;
+      track("assessment_questions_completed", {
+        total_questions: totalQuestions,
+        total_time_ms: totalTime,
+        total_time_minutes: Math.round(totalTime / 60000),
+      });
       setState("email_capture");
     }
   }, [currentQuestionIndex, totalQuestions]);
@@ -176,15 +232,39 @@ export default function AssessmentPageV3() {
   }, [currentQuestionIndex]);
 
   const handleStart = useCallback(() => {
+    // Track assessment start
+    assessmentStartTime.current = Date.now();
+    questionStartTime.current = Date.now();
+    lastSection.current = 1;
+
+    track("assessment_started", {
+      version: "v3",
+      total_questions: totalQuestions,
+      has_existing_result: hasExistingResult,
+      source: "fresh_start",
+    });
+
     setState("questions");
     setCurrentQuestionIndex(0);
     setAnswers({});
     localStorage.removeItem(STORAGE_PROGRESS_KEY);
-  }, []);
+  }, [totalQuestions, hasExistingResult]);
 
   const handleResumeProgress = useCallback(() => {
+    // Track assessment resumed
+    assessmentStartTime.current = Date.now();
+    questionStartTime.current = Date.now();
+    lastSection.current = ASSESSMENT_V3_QUESTIONS[currentQuestionIndex]?.section || 1;
+
+    track("assessment_resumed", {
+      version: "v3",
+      resumed_at_question: currentQuestionIndex + 1,
+      total_questions: totalQuestions,
+      progress_percent: Math.round((currentQuestionIndex / totalQuestions) * 100),
+    });
+
     setState("questions");
-  }, []);
+  }, [currentQuestionIndex, totalQuestions]);
 
   const handleEmailSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -195,6 +275,16 @@ export default function AssessmentPageV3() {
       const formData = new FormData(e.currentTarget);
       const email = formData.get("email") as string;
       const firstName = formData.get("first_name") as string;
+
+      // Track email capture attempt
+      track("assessment_email_submitted", {
+        version: "v3",
+        total_score: totalScore,
+        interpretation,
+        lowest_pillar: lowestPillar?.pillar || null,
+        lowest_pillar_score: lowestPillar?.score || null,
+        pattern_reveals_count: patternReveals.length,
+      });
 
       try {
         const response = await fetch("/api/assessment/submit", {
@@ -213,6 +303,23 @@ export default function AssessmentPageV3() {
           throw new Error("Failed to submit assessment");
         }
 
+        // Calculate total time
+        const totalTime = Date.now() - assessmentStartTime.current;
+
+        // Track successful completion
+        track("assessment_completed", {
+          version: "v3",
+          total_score: totalScore,
+          interpretation,
+          lowest_pillar: lowestPillar?.pillar || null,
+          lowest_pillar_score: lowestPillar?.score || null,
+          pattern_reveals_count: patternReveals.length,
+          total_time_ms: totalTime,
+          total_time_minutes: Math.round(totalTime / 60000),
+          priority_pillar: answers.priority_pillar || null,
+          readiness: answers.readiness || null,
+        });
+
         // Clear progress, save result
         localStorage.removeItem(STORAGE_PROGRESS_KEY);
         localStorage.setItem(
@@ -226,12 +333,17 @@ export default function AssessmentPageV3() {
 
         setState("results");
       } catch {
+        // Track failure
+        track("assessment_email_failed", {
+          version: "v3",
+          error: "submission_failed",
+        });
         setEmailError("Something went wrong. Please try again.");
       } finally {
         setEmailSubmitting(false);
       }
     },
-    [answers, totalScore]
+    [answers, totalScore, interpretation, lowestPillar, patternReveals]
   );
 
   const canProceed = useMemo(() => {

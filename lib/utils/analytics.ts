@@ -568,6 +568,19 @@ export const EventNames = {
   STREAK_UPDATED: "streak_updated",
   CHALLENGE_STARTED: "challenge_started",
   CHALLENGE_COMPLETED: "challenge_completed",
+
+  // Assessment Funnel
+  ASSESSMENT_VIEWED: "assessment_viewed",
+  ASSESSMENT_STARTED: "assessment_started",
+  ASSESSMENT_RESUMED: "assessment_resumed",
+  ASSESSMENT_QUESTION_ANSWERED: "assessment_question_answered",
+  ASSESSMENT_SECTION_COMPLETED: "assessment_section_completed",
+  ASSESSMENT_QUESTIONS_COMPLETED: "assessment_questions_completed",
+  ASSESSMENT_EMAIL_SUBMITTED: "assessment_email_submitted",
+  ASSESSMENT_EMAIL_FAILED: "assessment_email_failed",
+  ASSESSMENT_COMPLETED: "assessment_completed",
+  ASSESSMENT_ABANDONED: "assessment_abandoned",
+  ASSESSMENT_CTA_CLICKED: "assessment_cta_clicked",
 } as const;
 
 /**

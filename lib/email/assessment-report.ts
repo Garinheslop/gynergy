@@ -309,6 +309,66 @@ const INTERPRETATION_DISPLAY: Record<Interpretation, { headline: string; message
 };
 
 // ============================================
+// V3 ENHANCED DISPLAY MAPPINGS
+// ============================================
+
+const V3_VISION_DISPLAY: Record<string, { vision: string; reflection: string }> = {
+  freedom: {
+    vision: "True Freedom",
+    reflection:
+      "You didn't build success to stay trapped. The golden handcuffs are real — and recognizing them is the first step to unlocking them.",
+  },
+  presence: {
+    vision: "Being Present",
+    reflection:
+      "You've sacrificed presence for provision. The irony: you built everything for your family while becoming a stranger to them.",
+  },
+  health: {
+    vision: "Reclaiming Your Body",
+    reflection:
+      "Your body has been the casualty of your ambition. You know the cost is compounding. The body you have at 50 is built by the decisions you make now.",
+  },
+  meaning: {
+    vision: "Finding Meaning",
+    reflection:
+      "The success was supposed to mean something. It doesn't. Not yet. But that emptiness is a signal — it's pointing you somewhere.",
+  },
+  legacy: {
+    vision: "Building a Legacy",
+    reflection:
+      "What will they say about you? Not the LinkedIn version. The real one. Legacy is built in daily presence, not in achievements.",
+  },
+};
+
+const V3_MOTIVATION_DISPLAY: Record<string, { motivation: string; truth: string }> = {
+  fear_missing: {
+    motivation: "Fear of missing out on life",
+    truth:
+      "You're already missing it. That's not judgment — it's the truth you told us. The question is: how many more years will you let slip by?",
+  },
+  health_wake_up: {
+    motivation: "A health scare or warning sign",
+    truth:
+      "Your body sent you a message. Most men ignore it until it's too late. You're listening. That matters.",
+  },
+  relationship_crisis: {
+    motivation: "A relationship reaching a breaking point",
+    truth:
+      "Someone who matters is about to give up on you. Or already has. The work you do now determines what happens next.",
+  },
+  emptiness: {
+    motivation: "Success feeling hollow",
+    truth:
+      "You won the game and found out the trophy was empty. This is the most common starting point for transformation — because you can't outrun it anymore.",
+  },
+  something_more: {
+    motivation: "Knowing there must be something more",
+    truth:
+      "There is. The man you're becoming is waiting on the other side of this work. You've always known it.",
+  },
+};
+
+// ============================================
 // EMAIL GENERATION
 // ============================================
 
@@ -362,7 +422,14 @@ function generateAssessmentReportHtml(data: AssessmentReportData, firstName: str
     priority_pillar,
     lowestPillar,
     revenue_tier,
+    v3_data,
   } = data;
+
+  // V3 Enhanced Sections
+  const isV3 = Boolean(v3_data);
+  const patternReveals = v3_data?.patternReveals || [];
+  const visionGoal = v3_data?.vision_goal;
+  const drivingMotivation = v3_data?.driving_motivation;
 
   // Build sections
   const contrastSection =
@@ -505,6 +572,76 @@ function generateAssessmentReportHtml(data: AssessmentReportData, firstName: str
   `
     : "";
 
+  // V3: Vision & Motivation Section
+  const visionSection =
+    visionGoal && V3_VISION_DISPLAY[visionGoal]
+      ? `
+    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%); border: 1px solid #b8943e44; padding: 24px; margin: 24px 0; border-radius: 4px;">
+      <p style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 12px 0;">
+        What You're Really After
+      </p>
+      <p style="color: #b8943e; font-size: 22px; font-weight: bold; margin: 0 0 12px 0;">
+        ${V3_VISION_DISPLAY[visionGoal].vision}
+      </p>
+      <p style="color: #a0a0a0; font-size: 15px; line-height: 1.7; margin: 0;">
+        ${V3_VISION_DISPLAY[visionGoal].reflection}
+      </p>
+    </div>
+  `
+      : "";
+
+  const motivationSection =
+    drivingMotivation && V3_MOTIVATION_DISPLAY[drivingMotivation]
+      ? `
+    <div style="background: #1a1a1a; padding: 24px; margin: 24px 0; border-radius: 4px;">
+      <p style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 12px 0;">
+        What Brought You Here
+      </p>
+      <p style="color: #ffffff; font-size: 16px; margin: 0 0 12px 0;">
+        ${V3_MOTIVATION_DISPLAY[drivingMotivation].motivation}
+      </p>
+      <p style="color: #a0a0a0; font-size: 15px; line-height: 1.7; margin: 0;">
+        ${V3_MOTIVATION_DISPLAY[drivingMotivation].truth}
+      </p>
+    </div>
+  `
+      : "";
+
+  // V3: Pattern Reveals Section (the "how did they know?" moments)
+  const patternRevealsSection =
+    patternReveals.length > 0
+      ? `
+    <div style="margin: 40px 0;">
+      <h2 style="color: #b8943e; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 1px solid #333; padding-bottom: 10px; margin: 0 0 20px 0;">
+        ✦ What We See In Your Answers
+      </h2>
+      <p style="color: #a0a0a0; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0; font-style: italic;">
+        Your answers revealed patterns. Here's what they mean.
+      </p>
+      ${patternReveals
+        .map(
+          (reveal) => `
+        <div style="background: linear-gradient(135deg, #1a1a0a 0%, #0f0f0a 100%); border-left: 3px solid #b8943e; padding: 20px; margin: 16px 0; border-radius: 0 4px 4px 0;">
+          <p style="color: #b8943e; font-size: 16px; font-weight: bold; margin: 0 0 8px 0;">
+            ${reveal.pattern}
+          </p>
+          <p style="color: #ffffff; font-size: 15px; line-height: 1.7; margin: 0 0 12px 0;">
+            ${reveal.insight}
+          </p>
+          <p style="color: #a0a0a0; font-size: 14px; line-height: 1.6; margin: 0; padding-top: 8px; border-top: 1px solid #333;">
+            <span style="color: #b8943e;">→</span> ${reveal.recommendation}
+          </p>
+        </div>
+      `
+        )
+        .join("")}
+    </div>
+  `
+      : "";
+
+  // Check if V3 to customize closing
+  const isV3Assessment = isV3 && patternReveals.length > 0;
+
   return `
 <!DOCTYPE html>
 <html>
@@ -572,12 +709,19 @@ function generateAssessmentReportHtml(data: AssessmentReportData, firstName: str
       ${contrastSection}
     </div>
 
+    <!-- V3: Vision & Motivation -->
+    ${visionSection}
+    ${motivationSection}
+
     <!-- Insights -->
     ${twoAmSection}
     ${presenceSection}
     ${sacrificesSection}
     ${bodySection}
     ${maskSection}
+
+    <!-- V3: Pattern Reveals -->
+    ${patternRevealsSection}
 
     <!-- Pillar Breakdown -->
     <div style="margin: 40px 0;">
@@ -680,13 +824,28 @@ function generateAssessmentReportHtml(data: AssessmentReportData, firstName: str
         ${firstName},
       </p>
 
+      ${
+        isV3Assessment
+          ? `
+      <p style="color: #a0a0a0; font-size: 15px; line-height: 1.8; margin: 0 0 20px 0;">
+        You answered 23 questions. But you revealed much more than that.
+      </p>
+      <p style="color: #a0a0a0; font-size: 15px; line-height: 1.8; margin: 0 0 20px 0;">
+        The patterns above aren't guesses — they're reflections of what you told us, connected in ways you might not have seen.
+      </p>
+      <p style="color: #a0a0a0; font-size: 15px; line-height: 1.8; margin: 0 0 20px 0;">
+        Your score — <span style="color: #b8943e;">${totalScore}/50</span> — is the starting point. The patterns are the roadmap.
+      </p>
+      `
+          : `
       <p style="color: #a0a0a0; font-size: 15px; line-height: 1.8; margin: 0 0 20px 0;">
         Most assessments tell you what you already know. I designed this one to show you what you've been avoiding.
       </p>
-
       <p style="color: #a0a0a0; font-size: 15px; line-height: 1.8; margin: 0 0 20px 0;">
         Your score — <span style="color: #b8943e;">${totalScore}/50</span> — isn't a judgment. It's a starting point.
       </p>
+      `
+      }
 
       <p style="color: #a0a0a0; font-size: 15px; line-height: 1.8; margin: 0 0 30px 0;">
         You built an empire that looks like freedom but feels like a prison.<br>
@@ -753,7 +912,12 @@ function generateAssessmentReportText(data: AssessmentReportData, firstName: str
     readiness,
     priority_pillar,
     lowestPillar,
+    v3_data,
   } = data;
+
+  const patternReveals = v3_data?.patternReveals || [];
+  const visionGoal = v3_data?.vision_goal;
+  const drivingMotivation = v3_data?.driving_motivation;
 
   let text = `
 GYNERGY
@@ -774,6 +938,26 @@ ${firstName},
 
 You took the Five Pillar Assessment. Here's what you told us — and what it means.
 `;
+
+  // V3: Vision Section
+  if (visionGoal && V3_VISION_DISPLAY[visionGoal]) {
+    text += `
+WHAT YOU'RE REALLY AFTER:
+${V3_VISION_DISPLAY[visionGoal].vision}
+
+${V3_VISION_DISPLAY[visionGoal].reflection}
+`;
+  }
+
+  // V3: Motivation Section
+  if (drivingMotivation && V3_MOTIVATION_DISPLAY[drivingMotivation]) {
+    text += `
+WHAT BROUGHT YOU HERE:
+${V3_MOTIVATION_DISPLAY[drivingMotivation].motivation}
+
+${V3_MOTIVATION_DISPLAY[drivingMotivation].truth}
+`;
+  }
 
   if (two_am_thought && two_am_thought !== "other") {
     text += `
@@ -807,6 +991,26 @@ Tension in your ${BODY_TENSION_DISPLAY[body_tension].location}: ${BODY_TENSION_D
 
 ${BODY_TENSION_DISPLAY[body_tension].insight}
 `;
+  }
+
+  // V3: Pattern Reveals Section
+  if (patternReveals.length > 0) {
+    text += `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✦ WHAT WE SEE IN YOUR ANSWERS
+
+Your answers revealed patterns. Here's what they mean.
+
+`;
+    patternReveals.forEach((reveal) => {
+      text += `▸ ${reveal.pattern}
+${reveal.insight}
+
+→ ${reveal.recommendation}
+
+`;
+    });
   }
 
   text += `
