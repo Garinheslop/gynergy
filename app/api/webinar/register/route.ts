@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { sendWebinarConfirmationEmail } from "@lib/email/webinar";
 import { createClient } from "@lib/supabase-server";
 
 export async function POST(request: Request) {
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
 
     // Validate webinar date
     const eventDate = webinarDate ? new Date(webinarDate) : new Date("2026-03-03");
-    if (isNaN(eventDate.getTime())) {
+    if (Number.isNaN(eventDate.getTime())) {
       return NextResponse.json(
         { error: "Invalid date", message: "Invalid webinar date" },
         { status: 400 }
@@ -74,15 +75,24 @@ export async function POST(request: Request) {
       );
     }
 
-    // TODO: Send confirmation email with:
-    // - Webinar date/time confirmation
-    // - Link to calendar invite
-    // - Reminder to complete Five Pillar Assessment
-    // This can be done via Resend, SendGrid, or similar service
+    // Send confirmation email with calendar invite
+    try {
+      await sendWebinarConfirmationEmail({
+        to: normalizedEmail,
+        firstName: normalizedFirstName || undefined,
+        webinarTitle: "The 5 Pillars of Integrated Power",
+        webinarDate: eventDate,
+        durationMinutes: 90,
+      });
+    } catch (emailError) {
+      // Log but don't fail registration if email fails
+      // eslint-disable-next-line no-console
+      console.error("Failed to send webinar confirmation email:", emailError);
+    }
 
     return NextResponse.json({
       success: true,
-      message: "Registration complete! Redirecting to assessment...",
+      message: "Registration complete! Check your email for confirmation.",
     });
   } catch (error) {
     console.error("Webinar registration error:", error);

@@ -36,8 +36,6 @@ interface AssessmentAnalytics {
   distribution: {
     scores: Array<{ name: string; value: number }>;
     lowestPillars: Array<{ name: string; value: number }>;
-    twoAmThoughts: Array<{ name: string; value: number }>;
-    readinessLevels: Array<{ name: string; value: number }>;
   };
   emailPerformance: {
     sent: number;
@@ -80,8 +78,6 @@ const defaultAnalytics: AssessmentAnalytics = {
   distribution: {
     scores: [],
     lowestPillars: [],
-    twoAmThoughts: [],
-    readinessLevels: [],
   },
   emailPerformance: {
     sent: 0,
@@ -130,11 +126,31 @@ export default function AssessmentAnalyticsPage() {
     { name: "CTA Clicked", value: analytics.funnel.ctaClicked, fill: "#22c55e" },
   ];
 
+  // Score distribution with proper keys for BarChart
+  const scoreData =
+    analytics.distribution.scores.length > 0
+      ? analytics.distribution.scores
+      : [
+          { name: "0-15", value: 0 },
+          { name: "16-25", value: 0 },
+          { name: "26-35", value: 0 },
+          { name: "36-45", value: 0 },
+          { name: "46-50", value: 0 },
+        ];
+
+  const pillarData =
+    analytics.distribution.lowestPillars.length > 0
+      ? analytics.distribution.lowestPillars
+      : [
+          { name: "Wealth", value: 0 },
+          { name: "Health", value: 0 },
+          { name: "Relationships", value: 0 },
+          { name: "Growth", value: 0 },
+          { name: "Purpose", value: 0 },
+        ];
+
   return (
-    <AdminLayout
-      title="Assessment Funnel"
-      description="Five Pillar Assessment conversion analytics"
-    >
+    <AdminLayout title="Assessment Funnel" subtitle="Five Pillar Assessment conversion analytics">
       {/* Date Range Selector */}
       <div className="mb-6 flex justify-end">
         <div className="flex rounded-lg border border-gray-700 bg-gray-800 p-1">
@@ -154,85 +170,80 @@ export default function AssessmentAnalyticsPage() {
       </div>
 
       {/* Key Metrics */}
-      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
+      <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
         <StatCard
           title="Start Rate"
           value={`${analytics.rates.startRate.toFixed(1)}%`}
-          subtitle="Viewed → Started"
-          trend={analytics.rates.startRate > 50 ? "up" : "down"}
-          loading={isLoading}
+          change={{
+            value: analytics.rates.startRate,
+            period: "30d",
+            isPositive: analytics.rates.startRate > 50,
+          }}
         />
         <StatCard
           title="Completion Rate"
           value={`${analytics.rates.completionRate.toFixed(1)}%`}
-          subtitle="Started → Completed"
-          trend={analytics.rates.completionRate > 70 ? "up" : "down"}
-          loading={isLoading}
+          change={{
+            value: analytics.rates.completionRate,
+            period: "30d",
+            isPositive: analytics.rates.completionRate > 70,
+          }}
         />
         <StatCard
           title="Email Capture"
           value={`${analytics.rates.emailCaptureRate.toFixed(1)}%`}
-          subtitle="Questions → Email"
-          trend={analytics.rates.emailCaptureRate > 80 ? "up" : "down"}
-          loading={isLoading}
+          change={{
+            value: analytics.rates.emailCaptureRate,
+            period: "30d",
+            isPositive: analytics.rates.emailCaptureRate > 80,
+          }}
         />
         <StatCard
           title="CTA Click Rate"
           value={`${analytics.rates.ctaRate.toFixed(1)}%`}
-          subtitle="Completed → Webinar"
-          trend={analytics.rates.ctaRate > 30 ? "up" : "down"}
-          loading={isLoading}
+          change={{
+            value: analytics.rates.ctaRate,
+            period: "30d",
+            isPositive: analytics.rates.ctaRate > 30,
+          }}
         />
-        <StatCard
-          title="Avg Score"
-          value={analytics.averages.scoreAverage.toFixed(1)}
-          subtitle="Out of 50"
-          loading={isLoading}
-        />
+        <StatCard title="Avg Score" value={analytics.averages.scoreAverage.toFixed(1)} />
         <StatCard
           title="Avg Time"
           value={`${analytics.averages.completionTimeMinutes.toFixed(1)}m`}
-          subtitle="To complete"
-          loading={isLoading}
         />
       </div>
 
+      {/* Loading State */}
+      {isLoading && (
+        <div className="mb-8 flex items-center justify-center py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
+        </div>
+      )}
+
       {/* Funnel Chart */}
-      <div className="mb-8">
-        <ChartContainer title="Assessment Funnel" height={400}>
-          <FunnelChartWidget data={funnelData} height={350} showPercentages loading={isLoading} />
-        </ChartContainer>
-      </div>
+      {!isLoading && (
+        <>
+          <div className="mb-8">
+            <ChartContainer title="Assessment Funnel" height={400}>
+              <FunnelChartWidget data={funnelData} showPercentage />
+            </ChartContainer>
+          </div>
 
-      {/* Two Column Layout */}
-      <div className="mb-8 grid gap-8 lg:grid-cols-2">
-        {/* Score Distribution */}
-        <ChartContainer title="Score Distribution" height={300}>
-          <BarChartWidget
-            data={[
-              { name: "0-15", value: 0 },
-              { name: "16-25", value: 0 },
-              { name: "26-35", value: 0 },
-              { name: "36-45", value: 0 },
-              { name: "46-50", value: 0 },
-              ...analytics.distribution.scores,
-            ].slice(-5)}
-            height={250}
-            fill="#b8943e"
-            loading={isLoading}
-          />
-        </ChartContainer>
+          {/* Two Column Layout */}
+          <div className="mb-8 grid gap-8 lg:grid-cols-2">
+            {/* Score Distribution */}
+            <ChartContainer title="Score Distribution" height={300}>
+              <BarChartWidget data={scoreData} xKey="name" yKey="value" color="#b8943e" />
+            </ChartContainer>
 
-        {/* Lowest Pillars */}
-        <ChartContainer title="Lowest Pillar Distribution" height={300}>
-          <BarChartWidget
-            data={analytics.distribution.lowestPillars}
-            height={250}
-            fill="#dc3545"
-            loading={isLoading}
-          />
-        </ChartContainer>
-      </div>
+            {/* Lowest Pillars */}
+            <ChartContainer title="Lowest Pillar Distribution" height={300}>
+              <BarChartWidget data={pillarData} xKey="name" yKey="value" color="#dc3545" />
+            </ChartContainer>
+          </div>
+        </>
+      )}
 
       {/* Email Performance */}
       <div className="mb-8">

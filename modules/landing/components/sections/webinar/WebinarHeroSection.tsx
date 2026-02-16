@@ -23,11 +23,15 @@ function QuoteIcon({ className }: { className?: string }) {
 interface WebinarHeroSectionProps {
   onRegister: (email: string, firstName?: string) => Promise<void>;
   isLoading?: boolean;
+  seatsRemaining?: number;
+  isAlmostFull?: boolean;
 }
 
 export default function WebinarHeroSection({
   onRegister,
   isLoading = false,
+  seatsRemaining = WEBINAR_HERO_CONTENT.seatsRemaining,
+  isAlmostFull = false,
 }: WebinarHeroSectionProps) {
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -164,12 +168,29 @@ export default function WebinarHeroSection({
         {/* Urgency Bar */}
         <div className="mb-8 flex flex-wrap items-center justify-center gap-4 md:gap-8">
           <CountdownTimer targetDate={WEBINAR_HERO_CONTENT.eventDate} compact />
-          <div className="border-lp-gold-dim bg-lp-gold-glow flex flex-col items-center border px-4 py-2">
-            <span className="font-bebas text-lp-gold-light text-xl leading-none">
-              {WEBINAR_HERO_CONTENT.seatsRemaining}
+          <div
+            className={cn(
+              "flex flex-col items-center border px-4 py-2",
+              isAlmostFull
+                ? "animate-pulse border-red-500/50 bg-red-500/10"
+                : "border-lp-gold-dim bg-lp-gold-glow"
+            )}
+          >
+            <span
+              className={cn(
+                "font-bebas text-xl leading-none",
+                isAlmostFull ? "text-red-400" : "text-lp-gold-light"
+              )}
+            >
+              {seatsRemaining}
             </span>
-            <span className="font-oswald text-lp-muted mt-0.5 text-[10px] font-extralight tracking-widest uppercase">
-              Seats Left
+            <span
+              className={cn(
+                "font-oswald mt-0.5 text-[10px] font-extralight tracking-widest uppercase",
+                isAlmostFull ? "text-red-300" : "text-lp-muted"
+              )}
+            >
+              {isAlmostFull ? "Almost Full!" : "Seats Left"}
             </span>
           </div>
         </div>
@@ -190,7 +211,7 @@ export default function WebinarHeroSection({
                 "flex-1 sm:max-w-[160px]",
                 "font-oswald text-sm font-light",
                 "px-4 py-3",
-                "border-lp-border border bg-lp-input",
+                "border-lp-border bg-lp-input border",
                 "text-lp-white placeholder:text-lp-gray",
                 "outline-none",
                 "focus:border-lp-gold focus:ring-lp-gold/30 transition-all focus:ring-1"
@@ -207,7 +228,7 @@ export default function WebinarHeroSection({
                 "flex-1",
                 "font-oswald text-sm font-light",
                 "px-4 py-3",
-                "border-lp-border border bg-lp-input",
+                "border-lp-border bg-lp-input border",
                 "text-lp-white placeholder:text-lp-gray",
                 "outline-none",
                 "focus:border-lp-gold focus:ring-lp-gold/30 transition-all focus:ring-1"

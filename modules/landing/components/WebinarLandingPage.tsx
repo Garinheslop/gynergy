@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 
 import dynamic from "next/dynamic";
 
@@ -13,6 +13,12 @@ import { LandingNav, ExitIntentPopup } from "./shared";
 import { WEBINAR_HERO_CONTENT } from "../data/webinar-content";
 import { useExitIntent } from "../hooks/useExitIntent";
 import { WebinarHeroSection } from "./sections/webinar";
+
+interface SeatsData {
+  seatsRemaining: number;
+  isAlmostFull: boolean;
+  isFull: boolean;
+}
 
 // Dynamic imports for below-fold sections
 const WebinarLearnSection = dynamic(() => import("./sections/webinar/WebinarLearnSection"), {
@@ -37,7 +43,38 @@ const WebinarFinalCTASection = dynamic(() => import("./sections/webinar/WebinarF
 
 function WebinarLandingPageContent() {
   const [registrationLoading, setRegistrationLoading] = useState(false);
+  const [seatsData, setSeatsData] = useState<SeatsData>({
+    seatsRemaining: WEBINAR_HERO_CONTENT.seatsRemaining,
+    isAlmostFull: false,
+    isFull: false,
+  });
   const { showPopup, closePopup } = useExitIntent({ threshold: 0, delay: 100 });
+
+  // Fetch dynamic seat count on mount
+  useEffect(() => {
+    const fetchSeats = async () => {
+      try {
+        const response = await fetch("/api/webinar/seats");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setSeatsData({
+              seatsRemaining: data.data.seatsRemaining,
+              isAlmostFull: data.data.isAlmostFull,
+              isFull: data.data.isFull,
+            });
+          }
+        }
+      } catch {
+        // Silently fail - use default values
+      }
+    };
+
+    fetchSeats();
+    // Refresh every 30 seconds for real-time urgency
+    const interval = setInterval(fetchSeats, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleRegister = useCallback(async (email: string, firstName?: string) => {
     setRegistrationLoading(true);
@@ -99,13 +136,18 @@ function WebinarLandingPageContent() {
 
       {/* Navigation */}
       <LandingNav
-        seatsRemaining={WEBINAR_HERO_CONTENT.seatsRemaining}
+        seatsRemaining={seatsData.seatsRemaining}
         onEnrollClick={handleScrollToRegister}
         isLoading={registrationLoading}
       />
 
       {/* Hero Section - Critical */}
-      <WebinarHeroSection onRegister={handleRegister} isLoading={registrationLoading} />
+      <WebinarHeroSection
+        onRegister={handleRegister}
+        isLoading={registrationLoading}
+        seatsRemaining={seatsData.seatsRemaining}
+        isAlmostFull={seatsData.isAlmostFull}
+      />
 
       {/* What You'll Learn */}
       <SectionErrorBoundary sectionName="What You'll Learn">
