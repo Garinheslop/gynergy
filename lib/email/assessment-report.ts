@@ -29,6 +29,27 @@ export interface AssessmentReportData extends AssessmentAnswers {
   interpretation: Interpretation;
   lowestPillar: { pillar: PriorityPillar; score: number } | null;
   leadScore: number;
+  // V3 extra data for enhanced personalization
+  v3_data?: {
+    vision_goal?: string;
+    driving_motivation?: string;
+    success_definition?: string;
+    wealth_relationship?: string;
+    work_life_balance?: string;
+    energy_pattern?: string;
+    body_connection?: string;
+    presence_with_family?: string;
+    vulnerability_level?: string;
+    challenge_level?: string;
+    learning_mode?: string;
+    legacy_clarity?: string;
+    impact_feeling?: string;
+    patternReveals?: Array<{
+      pattern: string;
+      insight: string;
+      recommendation: string;
+    }>;
+  };
 }
 
 // ============================================
