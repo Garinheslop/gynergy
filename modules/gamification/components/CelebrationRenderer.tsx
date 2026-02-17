@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-
 import { usePopup } from "@contexts/UsePopup";
 import { useSession } from "@contexts/UseSession";
 import { useBadgeNotifications } from "@lib/hooks/useBadgeNotifications";
@@ -28,7 +26,9 @@ export default function CelebrationRenderer() {
   const isAuthenticated = !!session?.user;
 
   // Set up badge notifications with callback to add to celebration queue
-  const { currentCelebration, dismissCelebration } = useBadgeNotifications({
+  // The onNewBadge callback is the single path for adding badges to the queue.
+  // Previously a duplicate useEffect on currentCelebration caused double entries.
+  useBadgeNotifications({
     enabled: isAuthenticated,
     pollInterval: 30000, // 30 seconds
     onNewBadge: (userBadge) => {
@@ -46,18 +46,6 @@ export default function CelebrationRenderer() {
       }
     },
   });
-
-  // Also handle celebrations from useBadgeNotifications hook directly
-  useEffect(() => {
-    if (currentCelebration?.type === "badge" && currentCelebration.data?.badge) {
-      celebrationQueue.add({
-        type: "badge",
-        priority: getBadgePriority(currentCelebration.data.badge),
-        data: currentCelebration.data,
-        onDismiss: dismissCelebration,
-      });
-    }
-  }, [currentCelebration, celebrationQueue, dismissCelebration]);
 
   // Get the current celebration to render
   const current = celebrationQueue.current;

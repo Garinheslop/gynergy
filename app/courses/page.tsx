@@ -28,13 +28,13 @@ export default function CoursesPage() {
       setError(null);
 
       const response = await fetch("/api/content/list-courses");
-      const data = await response.json();
+      const json = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to load courses");
+        throw new Error(json.error || "Failed to load courses");
       }
 
-      setCourses(data.items || []);
+      setCourses(json.data?.items || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load courses");
     } finally {

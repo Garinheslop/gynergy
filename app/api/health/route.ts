@@ -33,7 +33,7 @@ export async function GET(): Promise<NextResponse<HealthCheck>> {
   // Check database connectivity
   try {
     const supabase = createServiceClient();
-    const { error } = await supabase.from("user_profiles").select("id").limit(1);
+    const { error } = await supabase.from("users").select("id").limit(1);
     checks.database = !error;
   } catch {
     checks.database = false;

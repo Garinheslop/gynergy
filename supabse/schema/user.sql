@@ -37,7 +37,9 @@ ALTER TABLE user_roles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can CRUD own profile" ON users
     FOR ALL USING (auth.uid() = id);
 
-
+-- User roles policies
+CREATE POLICY "Users can read own roles" ON user_roles
+    FOR SELECT USING (auth.uid() = user_id);
 
 -- Create indexes
 CREATE INDEX idx_user_roles ON user_roles(user_id, role);

@@ -70,12 +70,13 @@ export default function LibraryPage() {
         params.set("offset", reset ? "0" : ((page - 1) * 20).toString());
 
         const response = await fetch(`/api/content/list-content?${params}`);
-        const data: ContentListResponse = await response.json();
+        const json = await response.json();
 
         if (!response.ok) {
-          throw new Error("Failed to load content");
+          throw new Error(json.error || "Failed to load content");
         }
 
+        const data: ContentListResponse = json.data;
         setContent(reset ? data.items : [...content, ...data.items]);
         setTotal(data.total);
         setHasMore(data.hasMore);

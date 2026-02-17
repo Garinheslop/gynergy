@@ -60,27 +60,36 @@ export function useBadgeNotifications(options: UseBadgeNotificationsOptions = {}
     };
   });
 
-  const pollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pollTimeoutRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isMountedRef = useRef(true);
+  const onNewBadgeRef = useRef(onNewBadge);
+  const onCelebrationRef = useRef(onCelebration);
+  const persistKeyRef = useRef(persistKey);
 
-  // Persist state to localStorage
-  const persistState = useCallback(
-    (newState: Partial<BadgeNotificationState>) => {
-      if (typeof window !== "undefined") {
-        try {
-          const toStore = {
-            newBadges: newState.newBadges ?? state.newBadges,
-            pendingCelebrations: newState.pendingCelebrations ?? state.pendingCelebrations,
-            lastChecked: newState.lastChecked ?? state.lastChecked,
-          };
-          localStorage.setItem(`${STORAGE_KEY_PREFIX}${persistKey}`, JSON.stringify(toStore));
-        } catch {
-          // Ignore storage errors
-        }
+  // Keep refs in sync with latest callback values
+  useEffect(() => {
+    onNewBadgeRef.current = onNewBadge;
+    onCelebrationRef.current = onCelebration;
+    persistKeyRef.current = persistKey;
+  }, [onNewBadge, onCelebration, persistKey]);
+
+  // Persist state to localStorage (stable — no state/callback dependencies)
+  const persistState = useCallback((newState: Partial<BadgeNotificationState>) => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(
+          `${STORAGE_KEY_PREFIX}${persistKeyRef.current}`,
+          JSON.stringify({
+            newBadges: newState.newBadges ?? [],
+            pendingCelebrations: newState.pendingCelebrations ?? [],
+            lastChecked: newState.lastChecked ?? null,
+          })
+        );
+      } catch {
+        // Ignore storage errors
       }
-    },
-    [persistKey, state]
-  );
+    }
+  }, []);
 
   // Check for new badges
   const checkForNewBadges = useCallback(async () => {
@@ -122,9 +131,9 @@ export function useBadgeNotifications(options: UseBadgeNotificationsOptions = {}
           return updatedState;
         });
 
-        // Notify for each new badge
+        // Notify for each new badge via ref (avoids dependency instability)
         newBadges.forEach((badge) => {
-          onNewBadge?.(badge);
+          onNewBadgeRef.current?.(badge);
         });
       } else {
         setState((prev) => {
@@ -141,7 +150,7 @@ export function useBadgeNotifications(options: UseBadgeNotificationsOptions = {}
       console.error("Error checking for new badges:", error);
       setState((prev) => ({ ...prev, isPolling: false }));
     }
-  }, [onNewBadge, persistState]);
+  }, [persistState]);
 
   // Show next celebration
   const showNextCelebration = useCallback(() => {
@@ -151,7 +160,7 @@ export function useBadgeNotifications(options: UseBadgeNotificationsOptions = {}
       }
 
       const [next, ...remaining] = prev.pendingCelebrations;
-      onCelebration?.(next);
+      onCelebrationRef.current?.(next);
 
       return {
         ...prev,
@@ -159,7 +168,7 @@ export function useBadgeNotifications(options: UseBadgeNotificationsOptions = {}
         pendingCelebrations: remaining,
       };
     });
-  }, [onCelebration]);
+  }, []);
 
   // Dismiss current celebration
   const dismissCelebration = useCallback(() => {
@@ -204,7 +213,7 @@ export function useBadgeNotifications(options: UseBadgeNotificationsOptions = {}
     });
   }, [persistState]);
 
-  // Set up polling
+  // Set up polling (single setInterval, no recursive chains)
   useEffect(() => {
     isMountedRef.current = true;
 
@@ -217,20 +226,16 @@ export function useBadgeNotifications(options: UseBadgeNotificationsOptions = {}
     // Initial check
     checkForNewBadges();
 
-    // Set up interval
-    const poll = () => {
-      pollTimeoutRef.current = setTimeout(() => {
-        checkForNewBadges();
-        poll();
-      }, pollInterval);
-    };
-
-    poll();
+    // Single interval — checkForNewBadges is stable so this effect
+    // only fires on mount/unmount, preventing parallel polling chains
+    pollTimeoutRef.current = setInterval(() => {
+      checkForNewBadges();
+    }, pollInterval);
 
     return () => {
       isMountedRef.current = false;
       if (pollTimeoutRef.current) {
-        clearTimeout(pollTimeoutRef.current);
+        clearInterval(pollTimeoutRef.current);
       }
     };
   }, [enabled, pollInterval, checkForNewBadges]);
