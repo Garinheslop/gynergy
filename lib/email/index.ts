@@ -23,8 +23,8 @@ function getResend(): Resend {
 
 // Email configuration
 export const EMAIL_CONFIG = {
-  from: process.env.EMAIL_FROM || "Gynergy <hello@gynergy.com>",
-  replyTo: process.env.EMAIL_REPLY_TO || "support@gynergy.com",
+  from: process.env.EMAIL_FROM || "Gynergy <hello@gynergy.app>",
+  replyTo: process.env.EMAIL_REPLY_TO || "support@gynergy.app",
 } as const;
 
 // Email types
@@ -230,7 +230,7 @@ function emailWrapper(content: string): string {
     </div>
     <div class="footer">
       <p>The Gynergy Effect | Transforming Lives Through Gratitude</p>
-      <p>Questions? Reply to this email or contact support@gynergy.com</p>
+      <p>Questions? Reply to this email or contact support@gynergy.app</p>
     </div>
   </div>
 </body>
@@ -247,7 +247,7 @@ function generateWelcomeEmailHtml(firstName: string): string {
     <p>2. Explore the 45-Day Awakening Challenge</p>
     <p>3. Connect with fellow journeyers in our community</p>
     <div style="text-align: center;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://app.gynergy.com"}/dashboard" class="button">Start Your Journey</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/dashboard" class="button">Start Your Journey</a>
     </div>
     <div class="divider"></div>
     <p>We're honored to be part of your transformation. Let's make every day count.</p>
@@ -266,7 +266,7 @@ What's next?
 2. Explore the 45-Day Awakening Challenge
 3. Connect with fellow journeyers in our community
 
-Start your journey: ${process.env.NEXT_PUBLIC_APP_URL || "https://app.gynergy.com"}/dashboard
+Start your journey: ${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/dashboard
 
 We're honored to be part of your transformation. Let's make every day count.
 
@@ -302,7 +302,7 @@ function generatePurchaseConfirmationHtml(
     ${friendCodesSection}
     <div class="divider"></div>
     <div style="text-align: center;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://app.gynergy.com"}/date-zero-gratitude" class="button">Begin the Challenge</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/date-zero-gratitude" class="button">Begin the Challenge</a>
     </div>
     <p>Your 45-day transformation awaits. Let's make it legendary.</p>
   `);
@@ -332,7 +332,7 @@ Order Details:
 - Amount: ${amount}
 - Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
 ${friendCodesSection}
-Begin the Challenge: ${process.env.NEXT_PUBLIC_APP_URL || "https://app.gynergy.com"}/date-zero-gratitude
+Begin the Challenge: ${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/date-zero-gratitude
 
 Your 45-day transformation awaits. Let's make it legendary.
 
@@ -356,7 +356,7 @@ function generateStreakReminderHtml(
     <p>You're on <span class="highlight">Day ${dayNumber}</span> of your 45-day journey. Don't let today be the day you break your momentum!</p>
     <p>Just 5 minutes of journaling can keep your streak alive and your transformation on track.</p>
     <div style="text-align: center;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://app.gynergy.com"}/date-zero-gratitude/journal" class="button">Complete Today's Journal</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/date-zero-gratitude/journal" class="button">Complete Today's Journal</a>
     </div>
     <div class="divider"></div>
     <p style="font-size: 14px; color: #888;">Remember: Consistency beats perfection. Even a short entry counts.</p>
@@ -378,7 +378,7 @@ Don't let today be the day you break your momentum!
 
 Just 5 minutes of journaling can keep your streak alive and your transformation on track.
 
-Complete Today's Journal: ${process.env.NEXT_PUBLIC_APP_URL || "https://app.gynergy.com"}/date-zero-gratitude/journal
+Complete Today's Journal: ${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/date-zero-gratitude/journal
 
 Remember: Consistency beats perfection. Even a short entry counts.
 
@@ -395,7 +395,7 @@ function generateFriendCodeHtml(firstName: string, friendCodes: string[]): strin
     <div class="divider"></div>
     <p><strong>How to share:</strong></p>
     <p>1. Send a code to a friend via text or email</p>
-    <p>2. They visit <span class="highlight">gynergy.com/redeem</span></p>
+    <p>2. They visit <span class="highlight">gynergy.app/redeem</span></p>
     <p>3. They enter the code and get instant access</p>
     <div class="divider"></div>
     <p style="font-size: 14px;">Tip: Choose people who are ready for transformation. These codes are precious — use them wisely!</p>
@@ -414,7 +414,7 @@ ${friendCodes.map((code) => `  ${code}`).join("\n")}
 
 How to share:
 1. Send a code to a friend via text or email
-2. They visit gynergy.com/redeem
+2. They visit gynergy.app/redeem
 3. They enter the code and get instant access
 
 Tip: Choose people who are ready for transformation!
@@ -439,7 +439,7 @@ function generateFriendCodeRedeemedHtml(
     <p>Your gift of transformation is already making a difference. ${redeemerFirstName} is now part of our community and ready to begin their 45-day journey.</p>
     <p>Consider reaching out to support them along the way — accountability partners see <span class="highlight">3x better results!</span></p>
     <div style="text-align: center;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://app.gynergy.com"}/community" class="button">Visit Community</a>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/community" class="button">Visit Community</a>
     </div>
     <div class="divider"></div>
     <p style="font-size: 14px; color: #888;">Thank you for spreading the gift of gratitude.</p>
@@ -460,7 +460,7 @@ Your gift of transformation is already making a difference. ${redeemerFirstName}
 
 Consider reaching out to support them along the way — accountability partners see 3x better results!
 
-Visit the Community: ${process.env.NEXT_PUBLIC_APP_URL || "https://app.gynergy.com"}/community
+Visit the Community: ${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/community
 
 Thank you for spreading the gift of gratitude.
 

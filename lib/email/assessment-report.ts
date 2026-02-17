@@ -431,7 +431,7 @@ export async function sendAssessmentReportEmail(
     subject,
     html,
     text,
-    replyTo: "garin@gynergy.com",
+    replyTo: "garin@gynergy.app",
   });
 }
 
