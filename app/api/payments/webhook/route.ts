@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 import { sendPurchaseConfirmationEmail } from "@lib/email";
+import { enrollInDrip, cancelDrip } from "@lib/services/dripService";
 import { verifyWebhookSignature, formatPrice, STRIPE_PRODUCTS } from "@lib/stripe";
 import { createServiceClient } from "@lib/supabase-server";
 
@@ -172,6 +173,16 @@ async function handleCheckoutCompleted(
       }).catch((err) => {
         console.error("Failed to send purchase confirmation email:", err);
       });
+
+      // Enroll in post-purchase drip + cancel webinar nurture (non-blocking)
+      enrollInDrip("purchase_completed", session.customer_email, {
+        firstName,
+        productName: STRIPE_PRODUCTS.CHALLENGE.name,
+      }).catch((err) => console.error("Purchase drip enrollment error:", err));
+
+      cancelDrip("webinar_registered", session.customer_email).catch((err) =>
+        console.error("Webinar drip cancel error:", err)
+      );
     }
   } else if (productType === "journal_subscription") {
     // Subscription is handled by invoice.paid event

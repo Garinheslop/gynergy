@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { sendAssessmentReportEmail } from "@lib/email/assessment-report";
+import { enrollInDrip } from "@lib/services/dripService";
 import { createClient } from "@lib/supabase-server";
 import {
   calculateTotalScore,
@@ -185,6 +186,13 @@ export async function POST(request: Request) {
         console.error("Failed to send V3 assessment email:", emailResult.error);
       }
 
+      // Enroll in post-assessment drip campaign (non-blocking)
+      enrollInDrip("assessment_completed", normalizedEmail, {
+        firstName: first_name,
+        score: totalScore,
+        lowest_pillar: lowestPillar,
+      }).catch((err) => console.error("Drip enrollment error:", err));
+
       return NextResponse.json({
         success: true,
         message: "V3 Assessment saved successfully",
@@ -273,6 +281,13 @@ export async function POST(request: Request) {
     if (!emailResult.success) {
       console.error("Failed to send assessment email:", emailResult.error);
     }
+
+    // Enroll in post-assessment drip campaign (non-blocking)
+    enrollInDrip("assessment_completed", normalizedEmail, {
+      firstName: first_name,
+      score: totalScore,
+      lowest_pillar: lowestPillar,
+    }).catch((err) => console.error("Drip enrollment error:", err));
 
     return NextResponse.json({
       success: true,

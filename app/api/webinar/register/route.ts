@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { sendWebinarConfirmationEmail } from "@lib/email/webinar";
+import { enrollInDrip } from "@lib/services/dripService";
 import { createClient } from "@lib/supabase-server";
 
 export async function POST(request: Request) {
@@ -89,6 +90,12 @@ export async function POST(request: Request) {
       // eslint-disable-next-line no-console
       console.error("Failed to send webinar confirmation email:", emailError);
     }
+
+    // Enroll in post-webinar drip campaign (non-blocking)
+    enrollInDrip("webinar_registered", normalizedEmail, {
+      firstName: normalizedFirstName,
+      webinar_title: "The 5 Pillars of Integrated Power",
+    }).catch((err) => console.error("Drip enrollment error:", err));
 
     return NextResponse.json({
       success: true,

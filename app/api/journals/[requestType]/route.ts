@@ -10,6 +10,7 @@ import { pick } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
+import { processGamification, journalToActivityType } from "@lib/services/gamificationHook";
 import { createClient, createServiceClient } from "@lib/supabase-server";
 import { serverErrorTypes } from "@resources/types/error";
 import {
@@ -583,6 +584,20 @@ const createJournal: CreateJournalHandler = async ({
 
     if (journalError || !journalData) return { error: serverErrorTypes.serverError };
 
+    // Process gamification (non-blocking — errors won't fail the request)
+    const gamActivityType = journalToActivityType(requestType!);
+    let gamification = { points: 0, celebrations: [] as any[] };
+    if (gamActivityType && userId && sessionId) {
+      gamification = await processGamification({
+        supabase: supabaseAdmin,
+        userId,
+        sessionId,
+        activityType: gamActivityType,
+        sourceId: journalId,
+        sourceType: "journal",
+      });
+    }
+
     if (requestType === journalRequestTypes.createMorningJournal) {
       const journalEntries = Object.entries({
         [journalEntryTypes.affirmation]: parsedJournal.affirmations,
@@ -600,14 +615,17 @@ const createJournal: CreateJournalHandler = async ({
 
       if (journalEntryError) return { error: serverErrorTypes.serverError };
 
-      return camelcaseKeys({
-        ...journalData,
-        ...{
-          affirmations: parsedJournal.affirmations,
-          excitements: parsedJournal.excitements,
-          gratitudes: parsedJournal.gratitudes,
-        },
-      });
+      return {
+        ...camelcaseKeys({
+          ...journalData,
+          ...{
+            affirmations: parsedJournal.affirmations,
+            excitements: parsedJournal.excitements,
+            gratitudes: parsedJournal.gratitudes,
+          },
+        }),
+        gamification,
+      };
     } else if (requestType === journalRequestTypes.createEveningJournal) {
       const journalEntries = Object.entries({
         [journalEntryTypes.dreammagic]: parsedJournal.dreammagic,
@@ -623,14 +641,17 @@ const createJournal: CreateJournalHandler = async ({
 
       if (journalEntryError) return { error: serverErrorTypes.serverError };
 
-      return camelcaseKeys({
-        ...journalData,
-        ...{
-          dreammagic: parsedJournal.dreammagic,
-        },
-      });
+      return {
+        ...camelcaseKeys({
+          ...journalData,
+          ...{
+            dreammagic: parsedJournal.dreammagic,
+          },
+        }),
+        gamification,
+      };
     }
-    return camelcaseKeys(journalData);
+    return { ...camelcaseKeys(journalData), gamification };
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return {

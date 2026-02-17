@@ -25,6 +25,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:deploy-webinar": "npx tsx lib/db/deploy-webinar-schema.ts",
+    "db:deploy-email-drips": "npx tsx lib/db/deploy-email-drips-schema.ts",
+    "db:deploy-automation": "npx tsx lib/db/deploy-automation-schema.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },

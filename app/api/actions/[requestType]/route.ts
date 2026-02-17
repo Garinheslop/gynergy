@@ -10,6 +10,7 @@ import { pick } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
+import { processGamification, actionToActivityType } from "@lib/services/gamificationHook";
 import { createClient, createServiceClient } from "@lib/supabase-server";
 import { actionRequestTypes, ActionLogData, actionLogTypes } from "@resources/types/action";
 import { serverErrorTypes } from "@resources/types/error";
@@ -452,7 +453,21 @@ const createUserActionLog = async ({
 
     if (actionLogError || !actionLogData) return { error: serverErrorTypes.serverError };
 
-    return camelcaseKeys(actionLogData);
+    // Process gamification (non-blocking — errors won't fail the request)
+    const gamActivityType = actionToActivityType(requestType!);
+    let gamification = { points: 0, celebrations: [] as any[] };
+    if (gamActivityType && userId && sessionId) {
+      gamification = await processGamification({
+        supabase: supabaseAdmin,
+        userId,
+        sessionId,
+        activityType: gamActivityType,
+        sourceId: actionLogData.id,
+        sourceType: "action_log",
+      });
+    }
+
+    return { ...camelcaseKeys(actionLogData), gamification };
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return {
