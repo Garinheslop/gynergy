@@ -345,3 +345,47 @@ CREATE TRIGGER update_journal_access_trigger
     AFTER INSERT OR UPDATE ON subscriptions
     FOR EACH ROW
     EXECUTE FUNCTION update_journal_access();
+
+-- ============================================================================
+-- Webhook Events Table (Deduplication + Dead Letter Queue)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS "webhook_events" (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    stripe_event_id TEXT UNIQUE NOT NULL,
+    event_type TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'processing',     -- processing, processed, failed
+    payload JSONB,
+    error_message TEXT,
+    attempts INTEGER DEFAULT 1,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    processed_at TIMESTAMPTZ,
+    last_failed_at TIMESTAMPTZ
+);
+
+-- Index for deduplication lookups
+CREATE INDEX IF NOT EXISTS idx_webhook_events_stripe_id ON webhook_events(stripe_event_id);
+-- Index for finding failed events (dead letter queue)
+CREATE INDEX IF NOT EXISTS idx_webhook_events_failed ON webhook_events(status) WHERE status = 'failed';
+
+-- RLS: Only service role can access webhook events
+ALTER TABLE webhook_events ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Service role manages webhook events"
+    ON webhook_events FOR ALL
+    USING (auth.role() = 'service_role')
+    WITH CHECK (auth.role() = 'service_role');
+
+-- Auto-cleanup: Remove processed events older than 30 days
+-- (Run via cron or manual cleanup)
+CREATE OR REPLACE FUNCTION cleanup_old_webhook_events()
+RETURNS INTEGER AS $$
+DECLARE
+    deleted_count INTEGER;
+BEGIN
+    DELETE FROM webhook_events
+    WHERE status = 'processed'
+    AND processed_at < NOW() - INTERVAL '30 days';
+    GET DIAGNOSTICS deleted_count = ROW_COUNT;
+    RETURN deleted_count;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;

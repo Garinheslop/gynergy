@@ -58,6 +58,34 @@ export async function POST(request: NextRequest) {
 
   const supabase = createServiceClient();
 
+  // --- Event deduplication ---
+  // Check if we've already processed this event
+  const { data: existingEvent } = await supabase
+    .from("webhook_events")
+    .select("id, status, attempts")
+    .eq("stripe_event_id", event.id)
+    .single();
+
+  if (existingEvent?.status === "processed") {
+    return NextResponse.json({ received: true, deduplicated: true });
+  }
+
+  const previousAttempts = existingEvent?.attempts ?? 0;
+
+  // Record event (upsert to handle race conditions)
+  await supabase.from("webhook_events").upsert(
+    {
+      stripe_event_id: event.id,
+      event_type: event.type,
+      status: "processing",
+      payload: JSON.parse(body),
+      attempts: previousAttempts + 1,
+      created_at: new Date().toISOString(),
+    },
+    { onConflict: "stripe_event_id" }
+  );
+
+  // --- Process event (always return 200 to Stripe) ---
   try {
     switch (event.type) {
       case "checkout.session.completed": {
@@ -94,10 +122,29 @@ export async function POST(request: NextRequest) {
       // Unhandled event type - no action needed
     }
 
+    // Mark as processed
+    await supabase
+      .from("webhook_events")
+      .update({ status: "processed", processed_at: new Date().toISOString() })
+      .eq("stripe_event_id", event.id);
+
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error("Webhook handler error:", error);
-    return NextResponse.json({ error: "Webhook handler failed" }, { status: 500 });
+
+    // Store in dead letter queue (mark as failed, keep payload for retry)
+    await supabase
+      .from("webhook_events")
+      .update({
+        status: "failed",
+        error_message: error instanceof Error ? error.message : "Unknown error",
+        last_failed_at: new Date().toISOString(),
+      })
+      .eq("stripe_event_id", event.id);
+
+    // Always return 200 to prevent Stripe from retrying endlessly
+    // Failed events are stored for manual/automated retry via admin
+    return NextResponse.json({ received: true, error: "Handler failed, queued for retry" });
   }
 }
 
