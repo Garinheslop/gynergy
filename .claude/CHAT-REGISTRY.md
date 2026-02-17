@@ -7,9 +7,9 @@
 
 ## Active Chats
 
-| Chat ID | Developer | Branch | Focus | Status | Files Owned | Last Sync |
-| ------- | --------- | ------ | ----- | ------ | ----------- | --------- |
-| (none)  | -         | -      | -     | -      | -           | -         |
+| Chat ID               | Developer | Branch | Focus             | Status | Files Owned | Last Sync  |
+| --------------------- | --------- | ------ | ----------------- | ------ | ----------- | ---------- |
+| chat-G-community-0217 | Garin     | main   | Community section | Active | TBD         | 2026-02-17 |
 
 ---
 
