@@ -7,8 +7,32 @@ import { createClient } from "@lib/supabase-server";
  *
  * Fetches assessment funnel metrics, email performance,
  * and recent completions for the admin dashboard.
+ *
+ * Requires admin authentication.
  */
 export async function GET(request: NextRequest) {
+  const supabase = createClient();
+
+  // Verify admin access
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
+  const { data: adminRole } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", user.id)
+    .eq("role", "admin")
+    .single();
+
+  if (!adminRole) {
+    return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+  }
+
   const searchParams = request.nextUrl.searchParams;
   const range = searchParams.get("range") || "30d";
 
@@ -18,8 +42,6 @@ export async function GET(request: NextRequest) {
   const startDate = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000);
 
   try {
-    const supabase = await createClient();
-
     // Fetch assessment results
     const { data: assessments, error: assessmentError } = await supabase
       .from("assessment_results")
