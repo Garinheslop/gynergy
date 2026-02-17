@@ -17,6 +17,8 @@ import { useDispatch, useSelector } from "@store/hooks";
 import { resetUserBookSessionData } from "@store/modules/enrollment";
 import { updateUserProfileData } from "@store/modules/profile";
 
+import SubscriptionManagement from "@modules/payment/components/SubscriptionManagement";
+
 import ProfileImage from "../ProfileImage";
 
 type InputState = {
@@ -165,6 +167,10 @@ const SettingsPageClient: React.FC = () => {
             disabled={!isChanged || updating || profile.updating}
           />
         </>
+      </SectionCard>
+
+      <SectionCard sx={"mb-[55px]"}>
+        <SubscriptionManagement />
       </SectionCard>
 
       <SectionCard sx={"gap-8"}>
