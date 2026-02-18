@@ -49,9 +49,67 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams;
+    const postId = searchParams.get("postId");
     const cursor = searchParams.get("cursor");
     const limit = Math.min(parseInt(searchParams.get("limit") || "20"), 50);
     const postType = searchParams.get("type");
+
+    // Single post fetch by ID
+    if (postId) {
+      const { data: singlePost, error: singleError } = await supabase
+        .from("community_posts")
+        .select(
+          `
+          *,
+          author:users!community_posts_user_id_fkey(
+            id,
+            first_name,
+            last_name,
+            profile_image
+          ),
+          user_reaction:post_reactions!left(
+            reaction_type
+          )
+        `
+        )
+        .eq("id", postId)
+        .eq("is_approved", true)
+        .single();
+
+      if (singleError || !singlePost) {
+        return NextResponse.json({ error: "Post not found" }, { status: 404 });
+      }
+
+      const typedPost = singlePost as CommunityPost;
+      return NextResponse.json({
+        post: {
+          id: typedPost.id,
+          userId: typedPost.user_id,
+          cohortId: typedPost.cohort_id,
+          postType: typedPost.post_type,
+          title: typedPost.title,
+          content: typedPost.content,
+          mediaUrls: typedPost.media_urls || [],
+          reactionCount: typedPost.reaction_count,
+          commentCount: typedPost.comment_count,
+          shareCount: typedPost.share_count,
+          visibility: typedPost.visibility,
+          isFeatured: typedPost.is_featured,
+          isPinned: typedPost.is_pinned,
+          createdAt: typedPost.created_at,
+          updatedAt: typedPost.updated_at,
+          author: typedPost.author
+            ? {
+                id: typedPost.author.id,
+                firstName: typedPost.author.first_name,
+                lastName: typedPost.author.last_name,
+                profileImage: typedPost.author.profile_image,
+              }
+            : null,
+          userReaction: typedPost.user_reaction?.[0]?.reaction_type || null,
+        },
+      });
+    }
 
     // Get user's active cohort
     const { data: membership } = await supabase
@@ -248,6 +306,118 @@ export async function POST(request: NextRequest) {
         userReaction: null,
       },
     });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+// PATCH: Edit own post
+export async function PATCH(request: NextRequest) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
+  try {
+    const body = await request.json();
+    const { postId, title, content } = body;
+
+    if (!postId) {
+      return NextResponse.json({ error: "Post ID is required" }, { status: 400 });
+    }
+
+    if (!content || content.trim().length === 0) {
+      return NextResponse.json({ error: "Content is required" }, { status: 400 });
+    }
+
+    // Verify ownership
+    const { data: existing, error: fetchError } = await supabase
+      .from("community_posts")
+      .select("user_id")
+      .eq("id", postId)
+      .single();
+
+    if (fetchError || !existing) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
+
+    if (existing.user_id !== user.id) {
+      return NextResponse.json({ error: "You can only edit your own posts" }, { status: 403 });
+    }
+
+    const { data: updated, error: updateError } = await supabase
+      .from("community_posts")
+      .update({
+        title: title?.trim() || null,
+        content: content.trim(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", postId)
+      .eq("user_id", user.id)
+      .select()
+      .single();
+
+    if (updateError || !updated) {
+      return NextResponse.json({ error: "Failed to update post" }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, post: updated });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Unknown error occurred";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+// DELETE: Delete own post
+export async function DELETE(request: NextRequest) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const postId = searchParams.get("postId");
+
+    if (!postId) {
+      return NextResponse.json({ error: "Post ID is required" }, { status: 400 });
+    }
+
+    // Verify ownership
+    const { data: existing, error: fetchError } = await supabase
+      .from("community_posts")
+      .select("user_id")
+      .eq("id", postId)
+      .single();
+
+    if (fetchError || !existing) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
+
+    if (existing.user_id !== user.id) {
+      return NextResponse.json({ error: "You can only delete your own posts" }, { status: 403 });
+    }
+
+    const { error: deleteError } = await supabase
+      .from("community_posts")
+      .delete()
+      .eq("id", postId)
+      .eq("user_id", user.id);
+
+    if (deleteError) {
+      return NextResponse.json({ error: "Failed to delete post" }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error occurred";
     return NextResponse.json({ error: message }, { status: 500 });

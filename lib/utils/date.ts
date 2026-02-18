@@ -615,6 +615,30 @@ export function toDate(input: Date | string | number): Date {
 }
 
 /**
+ * Format a date as a compact time-ago string for feeds/comments.
+ * Use compact=true for short labels without "ago" (e.g. "3m", "5h").
+ * Default returns "3m ago", "5h ago", etc.
+ */
+export function formatTimeAgo(
+  date: Date | string | number,
+  options: { compact?: boolean } = {}
+): string {
+  const d = toDate(date);
+  const now = new Date();
+  const diff = now.getTime() - d.getTime();
+  const minutes = Math.floor(diff / (1000 * 60));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const suffix = options.compact ? "" : " ago";
+
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes}m${suffix}`;
+  if (hours < 24) return `${hours}h${suffix}`;
+  if (days < 7) return `${days}d${suffix}`;
+  return d.toLocaleDateString();
+}
+
+/**
  * Helper to pad single digits with zero
  */
 function padZero(num: number): string {

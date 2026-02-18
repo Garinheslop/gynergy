@@ -2,7 +2,9 @@
 
 import { FC, useState, useEffect, useRef } from "react";
 
+import { formatTimeAgo } from "@lib/utils/date";
 import { Avatar } from "@modules/common/components/ui";
+import { useConfirm } from "@modules/common/components/ui/ConfirmDialog";
 import { Comment } from "@resources/types/community";
 import { RootState } from "@store/configureStore";
 import { useSelector, useDispatch } from "@store/hooks";
@@ -16,10 +18,11 @@ interface CommentSectionProps {
 
 const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle: _onToggle }) => {
   const dispatch = useDispatch();
+  const { confirm, Dialog } = useConfirm();
   const [newComment, setNewComment] = useState("");
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittingId, setSubmittingId] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const replyInputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -32,7 +35,7 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
   // Fetch comments when expanded
   useEffect(() => {
     if (isExpanded && comments.length === 0 && !isLoading) {
-      dispatch(fetchComments(postId) as any);
+      dispatch(fetchComments(postId));
     }
   }, [isExpanded, postId, comments.length, isLoading, dispatch]);
 
@@ -44,11 +47,11 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
   }, [replyingTo]);
 
   const handleSubmitComment = async () => {
-    if (!newComment.trim() || isSubmitting) return;
+    if (!newComment.trim() || submittingId) return;
 
-    setIsSubmitting(true);
-    const result = await dispatch(createComment(postId, newComment.trim()) as any);
-    setIsSubmitting(false);
+    setSubmittingId("new");
+    const result = await dispatch(createComment(postId, newComment.trim()));
+    setSubmittingId(null);
 
     if (result.success) {
       setNewComment("");
@@ -56,11 +59,11 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
   };
 
   const handleSubmitReply = async (parentId: string) => {
-    if (!replyContent.trim() || isSubmitting) return;
+    if (!replyContent.trim() || submittingId) return;
 
-    setIsSubmitting(true);
-    const result = await dispatch(createComment(postId, replyContent.trim(), parentId) as any);
-    setIsSubmitting(false);
+    setSubmittingId(parentId);
+    const result = await dispatch(createComment(postId, replyContent.trim(), parentId));
+    setSubmittingId(null);
 
     if (result.success) {
       setReplyContent("");
@@ -69,23 +72,18 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    await dispatch(deleteComment(postId, commentId) as any);
+    const confirmed = await confirm({
+      title: "Delete Comment",
+      message: "Are you sure you want to delete this comment? This action cannot be undone.",
+      confirmLabel: "Delete",
+      cancelLabel: "Cancel",
+      variant: "danger",
+    });
+    if (!confirmed) return;
+    await dispatch(deleteComment(postId, commentId));
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / (1000 * 60));
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-    if (minutes < 1) return "Just now";
-    if (minutes < 60) return `${minutes}m`;
-    if (hours < 24) return `${hours}h`;
-    if (days < 7) return `${days}d`;
-    return date.toLocaleDateString();
-  };
+  const formatDate = (dateString: string) => formatTimeAgo(dateString, { compact: true });
 
   if (!isExpanded) {
     return null;
@@ -93,13 +91,10 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
 
   return (
     <div className="border-border-dark mt-4 border-t pt-4">
+      <Dialog />
       {/* Comment Input */}
       <div className="mb-4 flex gap-3">
-        <Avatar
-          src={profile?.profileImage}
-          name={profile?.firstName || "You"}
-          size="sm"
-        />
+        <Avatar src={profile?.profileImage} name={profile?.firstName || "You"} size="sm" />
         <div className="flex-1">
           <textarea
             ref={inputRef}
@@ -120,10 +115,10 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
             <div className="mt-2 flex justify-end">
               <button
                 onClick={handleSubmitComment}
-                disabled={isSubmitting}
+                disabled={submittingId === "new"}
                 className="bg-action text-content-dark hover:bg-action-100 focus-visible:ring-action min-h-[32px] rounded px-3 py-1 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
               >
-                {isSubmitting ? "Posting..." : "Post"}
+                {submittingId === "new" ? "Posting..." : "Post"}
               </button>
             </div>
           )}
@@ -169,7 +164,7 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
             replyContent={replyContent}
             setReplyContent={setReplyContent}
             onSubmitReply={handleSubmitReply}
-            isSubmitting={isSubmitting}
+            submittingId={submittingId}
             replyInputRef={replyInputRef}
           />
         ))}
@@ -189,7 +184,7 @@ interface CommentItemProps {
   replyContent: string;
   setReplyContent: (content: string) => void;
   onSubmitReply: (parentId: string) => void;
-  isSubmitting: boolean;
+  submittingId: string | null;
   replyInputRef: React.RefObject<HTMLTextAreaElement>;
 }
 
@@ -204,7 +199,7 @@ const CommentItem: FC<CommentItemProps> = ({
   replyContent,
   setReplyContent,
   onSubmitReply,
-  isSubmitting,
+  submittingId,
   replyInputRef,
 }) => {
   const isOwner = currentUserId === comment.userId;
@@ -275,10 +270,10 @@ const CommentItem: FC<CommentItemProps> = ({
               />
               <button
                 onClick={() => onSubmitReply(comment.id)}
-                disabled={isSubmitting || !replyContent.trim()}
+                disabled={submittingId === comment.id || !replyContent.trim()}
                 className="bg-action text-content-dark hover:bg-action-100 focus-visible:ring-action min-h-[32px] rounded px-3 py-1 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
               >
-                Reply
+                {submittingId === comment.id ? "Posting..." : "Reply"}
               </button>
             </div>
           )}

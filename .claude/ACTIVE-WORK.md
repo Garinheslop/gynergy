@@ -8,10 +8,10 @@
 
 ## Current Status Overview
 
-| Developer | Status   | Branch | Focus             | Since      |
-| --------- | -------- | ------ | ----------------- | ---------- |
-| **Garin** | Active   | main   | Community section | 2026-02-17 |
-| **Bill**  | Inactive | main   | -                 | 2026-02-14 |
+| Developer | Status   | Branch | Focus                          | Since      |
+| --------- | -------- | ------ | ------------------------------ | ---------- |
+| **Garin** | Active   | main   | Funnel scripts & landing pages | 2026-02-17 |
+| **Bill**  | Inactive | main   | -                              | 2026-02-14 |
 
 ### Status Legend
 

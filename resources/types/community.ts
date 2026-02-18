@@ -227,15 +227,57 @@ export interface FeedResponse {
   nextCursor: string | null;
 }
 
-// Reaction emoji mapping
-export const REACTION_EMOJIS: Record<ReactionType, string> = {
-  cheer: "🙌",
-  fire: "🔥",
-  heart: "❤️",
-  celebrate: "🎉",
-  inspire: "✨",
-  support: "💪",
+// Reaction icon configuration (SVG paths + colors, no emoji)
+export interface ReactionIconConfig {
+  label: string;
+  color: string;
+  svgPath: string;
+  viewBox?: string;
+}
+
+export const REACTION_ICONS: Record<ReactionType, ReactionIconConfig> = {
+  cheer: {
+    label: "Cheer",
+    color: "#F59E0B",
+    svgPath:
+      "M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11",
+  },
+  fire: {
+    label: "Fire",
+    color: "#EF4444",
+    svgPath:
+      "M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z",
+  },
+  heart: {
+    label: "Love",
+    color: "#EC4899",
+    svgPath:
+      "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z",
+  },
+  celebrate: {
+    label: "Celebrate",
+    color: "#8B5CF6",
+    svgPath:
+      "M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z",
+  },
+  inspire: {
+    label: "Inspire",
+    color: "#06B6D4",
+    svgPath:
+      "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
+  },
+  support: {
+    label: "Support",
+    color: "#10B981",
+    svgPath:
+      "M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5",
+  },
 };
+
+// Legacy alias for backward compatibility — maps to label text
+export const REACTION_EMOJIS: Record<ReactionType, string> = Object.fromEntries(
+  Object.entries(REACTION_ICONS).map(([key, config]) => [key, config.label])
+) as Record<ReactionType, string>;
 
 // Social platform icons/colors
 export const SOCIAL_PLATFORMS: Record<
@@ -274,12 +316,12 @@ export const SOCIAL_PLATFORMS: Record<
   },
 };
 
-// Post type labels
-export const POST_TYPE_LABELS: Record<PostType, { label: string; emoji: string }> = {
-  win: { label: "Win", emoji: "🏆" },
-  reflection: { label: "Reflection", emoji: "💭" },
-  milestone: { label: "Milestone", emoji: "🎯" },
-  encouragement: { label: "Encouragement", emoji: "💪" },
-  question: { label: "Question", emoji: "❓" },
-  celebration: { label: "Celebration", emoji: "🎉" },
+// Post type labels with color indicators (no emoji)
+export const POST_TYPE_LABELS: Record<PostType, { label: string; color: string }> = {
+  win: { label: "Win", color: "#F59E0B" },
+  reflection: { label: "Reflection", color: "#8B5CF6" },
+  milestone: { label: "Milestone", color: "#06B6D4" },
+  encouragement: { label: "Encouragement", color: "#10B981" },
+  question: { label: "Question", color: "#6366F1" },
+  celebration: { label: "Celebration", color: "#EC4899" },
 };

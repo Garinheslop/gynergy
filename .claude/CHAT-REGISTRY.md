@@ -7,9 +7,11 @@
 
 ## Active Chats
 
-| Chat ID               | Developer | Branch | Focus             | Status | Files Owned | Last Sync  |
-| --------------------- | --------- | ------ | ----------------- | ------ | ----------- | ---------- |
-| chat-G-community-0217 | Garin     | main   | Community section | Active | TBD         | 2026-02-17 |
+| Chat ID               | Developer | Branch | Focus                          | Status | Files Owned                        | Last Sync  |
+| --------------------- | --------- | ------ | ------------------------------ | ------ | ---------------------------------- | ---------- |
+| chat-G-community-0217 | Garin     | main   | Community section              | Stale  | app/community/, modules/community/ | 2026-02-17 |
+| chat-G-phase1-0217    | Garin     | main   | 10/10 Plan Phase 1             | Stale  | app/api/payments/, modules/book/   | 2026-02-17 |
+| chat-G-funnels-0217   | Garin     | main   | Funnel scripts & landing pages | Active | (planning phase)                   | 2026-02-17 |
 
 ---
 

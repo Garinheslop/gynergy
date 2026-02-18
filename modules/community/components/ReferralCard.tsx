@@ -163,7 +163,7 @@ const ReferralCard: FC<ReferralCardProps> = ({
                         );
                       }}
                       aria-label="Share on Facebook"
-                      className="focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded bg-facebook px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
+                      className="focus-visible:ring-action bg-facebook flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
                     >
                       <svg
                         className="h-4 w-4"
@@ -185,7 +185,7 @@ const ReferralCard: FC<ReferralCardProps> = ({
                         );
                       }}
                       aria-label="Share on WhatsApp"
-                      className="focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded bg-whatsapp px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
+                      className="focus-visible:ring-action bg-whatsapp flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
                     >
                       <svg
                         className="h-4 w-4"
@@ -204,7 +204,7 @@ const ReferralCard: FC<ReferralCardProps> = ({
 
             {/* Incentive Info */}
             <div className="bg-primary/10 rounded p-4">
-              <h4 className="text-primary mb-2 font-semibold">🎁 Referral Rewards</h4>
+              <h4 className="text-primary mb-2 font-semibold">Referral Rewards</h4>
               <ul className="text-primary/80 space-y-2 text-sm">
                 <li className="flex items-start gap-2">
                   <span className="text-primary font-bold">+100</span>
@@ -215,7 +215,20 @@ const ReferralCard: FC<ReferralCardProps> = ({
                   <span>bonus for completing your Accountability Trio</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-primary font-bold">🏆</span>
+                  <svg
+                    className="text-primary h-4 w-4 flex-shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                    />
+                  </svg>
                   <span>Unlock exclusive badges as you refer more friends</span>
                 </li>
               </ul>
@@ -227,7 +240,22 @@ const ReferralCard: FC<ReferralCardProps> = ({
           <div>
             {referrals.length === 0 ? (
               <div className="py-8 text-center">
-                <p className="text-5xl">👥</p>
+                <div className="bg-action/20 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
+                  <svg
+                    className="text-action h-7 w-7"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                </div>
                 <p className="text-grey-300 mt-2 font-medium">No referrals yet</p>
                 <p className="text-grey-500 text-sm">Share your link to start earning rewards!</p>
               </div>
@@ -288,7 +316,37 @@ const ReferralCard: FC<ReferralCardProps> = ({
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xl">{milestone.isAchieved ? "✅" : "🎯"}</span>
+                      {milestone.isAchieved ? (
+                        <svg
+                          className="text-success h-5 w-5 flex-shrink-0"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          className="text-grey-500 h-5 w-5 flex-shrink-0"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                          />
+                        </svg>
+                      )}
                       <h4 className="text-content-light font-semibold">{milestone.name}</h4>
                     </div>
                     <p className="text-grey-400 mt-1 text-sm">{milestone.description}</p>

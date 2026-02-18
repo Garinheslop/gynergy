@@ -1,7 +1,6 @@
 // Community Redux Module
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { AppDispatch, RootState } from "@store/configureStore";
 import {
   CommunityPost,
   CohortMember,
@@ -11,6 +10,8 @@ import {
   ReactionType,
   Comment,
 } from "@resources/types/community";
+import { CommunityEvent, EventAttendee } from "@resources/types/communityEvent";
+import { AppThunk } from "@store/configureStore";
 
 interface CommunityState {
   // Feed
@@ -28,6 +29,7 @@ interface CommunityState {
   // Members
   members: CohortMember[];
   membersLoading: boolean;
+  membersError: string | null;
   cohort: { id: string; name: string; slug: string } | null;
 
   // Referrals
@@ -35,11 +37,21 @@ interface CommunityState {
   referrals: Referral[];
   milestones: ReferralMilestone[];
   referralsLoading: boolean;
+  referralsError: string | null;
   referralStats: {
     totalReferrals: number;
     convertedReferrals: number;
     totalPointsEarned: number;
   };
+
+  // Events
+  events: {
+    upcoming: CommunityEvent[];
+    past: CommunityEvent[];
+    attendees: Record<string, EventAttendee[]>;
+  };
+  eventsLoading: boolean;
+  eventsError: string | null;
 
   // UI State
   createPostOpen: boolean;
@@ -59,17 +71,27 @@ const initialState: CommunityState = {
 
   members: [],
   membersLoading: false,
+  membersError: null,
   cohort: null,
 
   referralCode: null,
   referrals: [],
   milestones: [],
   referralsLoading: false,
+  referralsError: null,
   referralStats: {
     totalReferrals: 0,
     convertedReferrals: 0,
     totalPointsEarned: 0,
   },
+
+  events: {
+    upcoming: [],
+    past: [],
+    attendees: {},
+  },
+  eventsLoading: false,
+  eventsError: null,
 
   createPostOpen: false,
   selectedPostId: null,
@@ -105,6 +127,20 @@ const communitySlice = createSlice({
     },
     addPost: (state, action: PayloadAction<CommunityPost>) => {
       state.posts = [action.payload, ...state.posts];
+    },
+    updatePost: (
+      state,
+      action: PayloadAction<{ postId: string; title: string | null; content: string }>
+    ) => {
+      const post = state.posts.find((p) => p.id === action.payload.postId);
+      if (post) {
+        post.title = action.payload.title;
+        post.content = action.payload.content;
+        post.updatedAt = new Date().toISOString();
+      }
+    },
+    removePost: (state, action: PayloadAction<string>) => {
+      state.posts = state.posts.filter((p) => p.id !== action.payload);
     },
     updatePostReaction: (
       state,
@@ -173,6 +209,9 @@ const communitySlice = createSlice({
     setMembersLoading: (state, action: PayloadAction<boolean>) => {
       state.membersLoading = action.payload;
     },
+    setMembersError: (state, action: PayloadAction<string | null>) => {
+      state.membersError = action.payload;
+    },
     setMembers: (
       state,
       action: PayloadAction<{
@@ -187,6 +226,9 @@ const communitySlice = createSlice({
     // Referrals actions
     setReferralsLoading: (state, action: PayloadAction<boolean>) => {
       state.referralsLoading = action.payload;
+    },
+    setReferralsError: (state, action: PayloadAction<string | null>) => {
+      state.referralsError = action.payload;
     },
     setReferralData: (
       state,
@@ -207,6 +249,24 @@ const communitySlice = createSlice({
       state.referralStats = action.payload.stats;
     },
 
+    // Events actions
+    setEventsLoading: (state, action: PayloadAction<boolean>) => {
+      state.eventsLoading = action.payload;
+    },
+    setEventsError: (state, action: PayloadAction<string | null>) => {
+      state.eventsError = action.payload;
+    },
+    setEvents: (
+      state,
+      action: PayloadAction<{
+        upcoming: CommunityEvent[];
+        past: CommunityEvent[];
+        attendees: Record<string, EventAttendee[]>;
+      }>
+    ) => {
+      state.events = action.payload;
+    },
+
     // UI actions
     setCreatePostOpen: (state, action: PayloadAction<boolean>) => {
       state.createPostOpen = action.payload;
@@ -225,6 +285,8 @@ export const {
   setFeedError,
   setPosts,
   addPost,
+  updatePost,
+  removePost,
   updatePostReaction,
   updatePostCommentCount,
   setCommentsLoading,
@@ -233,9 +295,14 @@ export const {
   removeComment,
   toggleExpandComments,
   setMembersLoading,
+  setMembersError,
   setMembers,
   setReferralsLoading,
+  setReferralsError,
   setReferralData,
+  setEventsLoading,
+  setEventsError,
+  setEvents,
   setCreatePostOpen,
   setSelectedPostId,
   resetCommunity,
@@ -245,8 +312,8 @@ export default communitySlice.reducer;
 
 // Thunk actions
 export const fetchFeed =
-  (options?: { append?: boolean; postType?: string }) =>
-  async (dispatch: AppDispatch, getState: () => RootState) => {
+  (options?: { append?: boolean; postType?: string }): AppThunk =>
+  async (dispatch, getState) => {
     const state = getState().community;
 
     if (state.feedLoading) return;
@@ -293,8 +360,8 @@ export const createPost =
     content: string;
     mediaUrls?: string[];
     visibility?: string;
-  }) =>
-  async (dispatch: AppDispatch) => {
+  }): AppThunk<Promise<{ success: boolean; error?: string }>> =>
+  async (dispatch) => {
     try {
       const response = await fetch("/api/community/feed", {
         method: "POST",
@@ -319,8 +386,8 @@ export const createPost =
   };
 
 export const toggleReaction =
-  (postId: string, reactionType: ReactionType) =>
-  async (dispatch: AppDispatch, getState: () => RootState) => {
+  (postId: string, reactionType: ReactionType): AppThunk =>
+  async (dispatch, getState) => {
     const state = getState().community;
     const post = state.posts.find((p: CommunityPost) => p.id === postId);
 
@@ -369,8 +436,9 @@ export const toggleReaction =
     }
   };
 
-export const fetchMembers = () => async (dispatch: AppDispatch) => {
+export const fetchMembers = (): AppThunk => async (dispatch) => {
   dispatch(setMembersLoading(true));
+  dispatch(setMembersError(null));
 
   try {
     const response = await fetch("/api/community/members");
@@ -386,15 +454,17 @@ export const fetchMembers = () => async (dispatch: AppDispatch) => {
         cohort: data.cohort,
       })
     );
-  } catch {
-    // Error is logged server-side
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to load members";
+    dispatch(setMembersError(message));
   } finally {
     dispatch(setMembersLoading(false));
   }
 };
 
-export const fetchReferrals = () => async (dispatch: AppDispatch) => {
+export const fetchReferrals = (): AppThunk => async (dispatch) => {
   dispatch(setReferralsLoading(true));
+  dispatch(setReferralsError(null));
 
   try {
     const response = await fetch("/api/community/referrals");
@@ -412,8 +482,9 @@ export const fetchReferrals = () => async (dispatch: AppDispatch) => {
         stats: data.stats,
       })
     );
-  } catch {
-    // Error is logged server-side
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Failed to load referrals";
+    dispatch(setReferralsError(message));
   } finally {
     dispatch(setReferralsLoading(false));
   }
@@ -421,7 +492,8 @@ export const fetchReferrals = () => async (dispatch: AppDispatch) => {
 
 // Comment thunks
 export const fetchComments =
-  (postId: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
+  (postId: string): AppThunk =>
+  async (dispatch, getState) => {
     const state = getState().community;
     if (state.commentsLoading[postId]) return;
 
@@ -444,7 +516,12 @@ export const fetchComments =
   };
 
 export const createComment =
-  (postId: string, content: string, parentId?: string) => async (dispatch: AppDispatch) => {
+  (
+    postId: string,
+    content: string,
+    parentId?: string
+  ): AppThunk<Promise<{ success: boolean; comment?: Comment; error?: string }>> =>
+  async (dispatch) => {
     try {
       const response = await fetch("/api/community/comments", {
         method: "POST",
@@ -469,7 +546,8 @@ export const createComment =
   };
 
 export const deleteComment =
-  (postId: string, commentId: string) => async (dispatch: AppDispatch) => {
+  (postId: string, commentId: string): AppThunk<Promise<{ success: boolean; error?: string }>> =>
+  async (dispatch) => {
     try {
       const response = await fetch(`/api/community/comments?commentId=${commentId}`, {
         method: "DELETE",
@@ -490,35 +568,94 @@ export const deleteComment =
     }
   };
 
-export const incrementShareCount = (postId: string) => async () => {
-  try {
-    await fetch("/api/community/share", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ postId }),
-    });
-  } catch {
-    // Silent fail for share count
-  }
-};
-
-export const sendEncouragement = (memberId: string) => async () => {
-  try {
-    const response = await fetch("/api/community/encourage", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ memberId }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to send encouragement");
+export const incrementShareCount =
+  (postId: string): AppThunk =>
+  async () => {
+    try {
+      await fetch("/api/community/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ postId }),
+      });
+    } catch {
+      // Silent fail for share count
     }
+  };
 
-    return { success: true };
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to send encouragement";
-    return { success: false, error: message };
-  }
-};
+export const editPost =
+  (
+    postId: string,
+    data: { title?: string; content: string }
+  ): AppThunk<Promise<{ success: boolean; error?: string }>> =>
+  async (dispatch) => {
+    try {
+      const response = await fetch("/api/community/feed", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ postId, ...data }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to update post");
+      }
+
+      dispatch(
+        updatePost({
+          postId,
+          title: data.title?.trim() || null,
+          content: data.content.trim(),
+        })
+      );
+
+      return { success: true };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to update post";
+      return { success: false, error: message };
+    }
+  };
+
+export const deletePost =
+  (postId: string): AppThunk<Promise<{ success: boolean; error?: string }>> =>
+  async (dispatch) => {
+    try {
+      const response = await fetch(`/api/community/feed?postId=${postId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to delete post");
+      }
+
+      dispatch(removePost(postId));
+      return { success: true };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to delete post";
+      return { success: false, error: message };
+    }
+  };
+
+export const sendEncouragement =
+  (memberId: string): AppThunk<Promise<{ success: boolean; error?: string }>> =>
+  async () => {
+    try {
+      const response = await fetch("/api/community/encourage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ memberId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send encouragement");
+      }
+
+      return { success: true };
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Failed to send encouragement";
+      return { success: false, error: message };
+    }
+  };

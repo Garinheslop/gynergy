@@ -234,6 +234,23 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
       <li
         role="button"
         tabIndex={0}
+        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-2.5 rounded py-2 sm:hidden"
+        onClick={() => {
+          router.push("/community");
+          onItemClick();
+        }}
+        onKeyDown={(e) => e.key === "Enter" && router.push("/community")}
+      >
+        <i className="gng-people text-content-secondary text-xl" />
+        <Paragraph
+          variant={paragraphVariants.regular}
+          content={"Community"}
+          sx={"text-content-dark"}
+        />
+      </li>
+      <li
+        role="button"
+        tabIndex={0}
         className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-2.5 rounded py-2"
         onClick={() => {
           router.push(`/${currentBook?.slug}/${pagePaths.settings}`);
@@ -275,23 +292,6 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
         <Paragraph
           variant={paragraphVariants.regular}
           content={"Report A Bug"}
-          sx={"text-content-dark"}
-        />
-      </li>
-      <li
-        role="button"
-        tabIndex={0}
-        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-2.5 rounded py-2 sm:hidden"
-        onClick={() => {
-          router.push("/community");
-          onItemClick();
-        }}
-        onKeyDown={(e) => e.key === "Enter" && router.push("/community")}
-      >
-        <i className="gng-people text-content-secondary text-xl" />
-        <Paragraph
-          variant={paragraphVariants.regular}
-          content={"Community"}
           sx={"text-content-dark"}
         />
       </li>

@@ -1,42 +1,88 @@
-import { LoadingState, ListSkeleton } from "@modules/common/components/ui/LoadingState";
-
 export default function CommunityLoading() {
   return (
-    <div className="bg-bkg-light-secondary min-h-screen p-4 sm:p-6">
-      <div className="mx-auto max-w-4xl">
-        {/* Header skeleton */}
-        <div className="mb-8 flex items-center justify-between">
-          <div className="bg-bkg-light h-8 w-40 animate-pulse rounded" />
-          <div className="bg-bkg-light h-10 w-32 animate-pulse rounded-full" />
-        </div>
+    <div className="bg-bkg-dark min-h-screen">
+      {/* Hero skeleton */}
+      <div className="from-action-700 via-action-600 to-action-400 bg-gradient-to-br">
+        <div className="mx-auto max-w-6xl px-4 py-12">
+          <div className="text-center">
+            <div className="mx-auto mb-2 h-10 w-64 animate-pulse rounded bg-white/10" />
+            <div className="mx-auto mb-8 h-5 w-96 max-w-full animate-pulse rounded bg-white/10" />
 
-        {/* Stats cards skeleton */}
-        <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="bg-bkg-light rounded-large animate-pulse p-4">
-              <div className="bg-bkg-light-secondary mb-2 h-4 w-1/2 rounded" />
-              <div className="bg-bkg-light-secondary h-8 w-3/4 rounded" />
-            </div>
-          ))}
-        </div>
-
-        {/* Leaderboard section */}
-        <div className="bg-bkg-light rounded-large p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="bg-bkg-light-secondary h-6 w-32 animate-pulse rounded" />
-            <div className="flex gap-2">
-              <div className="bg-bkg-light-secondary h-8 w-20 animate-pulse rounded-full" />
-              <div className="bg-bkg-light-secondary h-8 w-20 animate-pulse rounded-full" />
+            {/* Stats skeleton */}
+            <div className="mx-auto grid max-w-2xl grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="animate-pulse rounded bg-white/10 p-4 backdrop-blur">
+                  <div className="mx-auto mb-2 h-8 w-12 rounded bg-white/10" />
+                  <div className="mx-auto h-4 w-24 rounded bg-white/10" />
+                </div>
+              ))}
             </div>
           </div>
-
-          {/* Member list skeleton */}
-          <ListSkeleton rows={5} />
         </div>
 
-        {/* Loading indicator */}
-        <div className="mt-8 flex justify-center">
-          <LoadingState message="Loading community..." size="sm" variant="dots" inline />
+        {/* Tab bar skeleton */}
+        <div className="bg-white/10 backdrop-blur">
+          <div className="mx-auto max-w-6xl px-4">
+            <div className="flex">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="flex-1 px-6 py-4">
+                  <div className="mx-auto h-4 w-24 animate-pulse rounded bg-white/10" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content skeleton */}
+      <div className="mx-auto max-w-6xl px-4 py-8">
+        <div className="grid gap-8 lg:grid-cols-3">
+          {/* Feed skeleton */}
+          <div className="space-y-6 lg:col-span-2">
+            {/* Create post CTA skeleton */}
+            <div className="border-border-dark bg-bkg-dark-secondary animate-pulse rounded border p-4">
+              <div className="flex items-center gap-4">
+                <div className="bg-bkg-dark-800 h-12 w-12 rounded-full" />
+                <div className="bg-bkg-dark h-11 flex-1 rounded-full" />
+              </div>
+            </div>
+
+            {/* Post skeletons */}
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="border-border-dark bg-bkg-dark-secondary animate-pulse rounded border p-6"
+              >
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="bg-bkg-dark-800 h-12 w-12 rounded-full" />
+                  <div className="space-y-2">
+                    <div className="bg-bkg-dark-800 h-4 w-32 rounded" />
+                    <div className="bg-bkg-dark-800 h-3 w-24 rounded" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="bg-bkg-dark-800 h-4 w-full rounded" />
+                  <div className="bg-bkg-dark-800 h-4 w-3/4 rounded" />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Sidebar skeleton */}
+          <div className="space-y-6">
+            <div className="border-border-dark bg-bkg-dark-secondary animate-pulse rounded border p-4">
+              <div className="bg-bkg-dark-800 mb-3 h-5 w-24 rounded" />
+              <div className="bg-bkg-dark-800 h-16 rounded" />
+            </div>
+            <div className="border-border-dark bg-bkg-dark-secondary animate-pulse rounded border p-4">
+              <div className="bg-bkg-dark-800 mb-3 h-5 w-28 rounded" />
+              <div className="space-y-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="bg-bkg-dark-800 h-12 rounded" />
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

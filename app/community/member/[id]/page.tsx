@@ -10,7 +10,7 @@ import { usePopup } from "@contexts/UsePopup";
 import { useSession } from "@contexts/UseSession";
 import { triggerHaptic } from "@lib/utils/haptic";
 import BadgeShowcase from "@modules/gamification/components/BadgeShowcase";
-import { MemberProfile, CommunityPost } from "@resources/types/community";
+import { MemberProfile, CommunityPost, POST_TYPE_LABELS } from "@resources/types/community";
 
 const MemberProfilePage: FC = () => {
   const params = useParams();
@@ -81,7 +81,7 @@ const MemberProfilePage: FC = () => {
       }
 
       messagePopupObj.open({
-        popupData: `Encouragement sent to ${member.firstName}! 💪`,
+        popupData: `Encouragement sent to ${member.firstName}!`,
         popupType: "success",
       });
       triggerHaptic("success");
@@ -213,7 +213,7 @@ const MemberProfilePage: FC = () => {
                 disabled={isEncouraging}
                 className="from-primary to-primary-500 text-content-dark focus-visible:ring-action mt-4 min-h-[44px] rounded bg-gradient-to-r px-6 py-2 font-medium transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:opacity-50"
               >
-                {isEncouraging ? "Sending..." : "💪 Send Encouragement"}
+                {isEncouraging ? "Sending..." : "Send Encouragement"}
               </button>
             )}
           </div>
@@ -223,8 +223,21 @@ const MemberProfilePage: FC = () => {
         <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {member.showStreak !== false && (
             <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4 text-center">
-              <div className="flex items-center justify-center gap-1">
-                <span className="text-xl">🔥</span>
+              <div className="flex items-center justify-center gap-1.5">
+                <svg
+                  className="text-primary h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"
+                  />
+                </svg>
                 <span className="text-primary text-2xl font-bold">{member.streak}</span>
               </div>
               <p className="text-grey-500 mt-1 text-xs">Day Streak</p>
@@ -232,8 +245,21 @@ const MemberProfilePage: FC = () => {
           )}
           {member.showPoints !== false && (
             <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4 text-center">
-              <div className="flex items-center justify-center gap-1">
-                <span className="text-xl">⭐</span>
+              <div className="flex items-center justify-center gap-1.5">
+                <svg
+                  className="text-action h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                  />
+                </svg>
                 <span className="text-action text-2xl font-bold">{member.points}</span>
               </div>
               <p className="text-grey-500 mt-1 text-xs">Points</p>
@@ -241,8 +267,21 @@ const MemberProfilePage: FC = () => {
           )}
           {member.showBadges !== false && (
             <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4 text-center">
-              <div className="flex items-center justify-center gap-1">
-                <span className="text-xl">🏅</span>
+              <div className="flex items-center justify-center gap-1.5">
+                <svg
+                  className="text-purple h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                  />
+                </svg>
                 <span className="text-purple text-2xl font-bold">{member.badgesCount}</span>
               </div>
               <p className="text-grey-500 mt-1 text-xs">Badges</p>
@@ -250,7 +289,20 @@ const MemberProfilePage: FC = () => {
           )}
           <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4 text-center">
             <div className="flex items-center justify-center gap-1">
-              <span className="text-xl">📝</span>
+              <svg
+                className="text-content-light h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
+              </svg>
               <span className="text-content-light text-2xl font-bold">{member.postsCount}</span>
             </div>
             <p className="text-grey-500 mt-1 text-xs">Posts</p>
@@ -276,7 +328,14 @@ const MemberProfilePage: FC = () => {
                   className="border-border-dark bg-bkg-dark-secondary rounded border p-4"
                 >
                   <div className="text-grey-500 mb-2 flex items-center gap-2 text-sm">
-                    <span>{post.postType === "win" ? "🏆" : "💭"}</span>
+                    <span
+                      className="inline-block h-2 w-2 rounded-full"
+                      style={{
+                        backgroundColor: POST_TYPE_LABELS[post.postType]?.color || "#6B7280",
+                      }}
+                    />
+                    <span>{POST_TYPE_LABELS[post.postType]?.label || post.postType}</span>
+                    <span>·</span>
                     <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                   </div>
                   {post.title && (

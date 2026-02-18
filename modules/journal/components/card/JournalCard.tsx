@@ -60,7 +60,7 @@ const JournalCard: React.FC<JournalCardProps> = ({
   return (
     <div
       className={cn(
-        "items-between bg-bkg-light flex flex-col justify-center gap-8 rounded-large p-5 md:p-8",
+        "items-between bg-bkg-light rounded-large flex flex-col justify-center gap-8 p-5 md:p-8",
         { "bg-grey-50": isCompleted || isDisabled }
       )}
     >
@@ -202,14 +202,42 @@ const JournalCard: React.FC<JournalCardProps> = ({
         ) : (
           <>
             {!isDisabled && (
-              <ActionButton
-                label="Write Now"
-                buttonActionType={buttonActionTypes.text}
-                onClick={() => onWrite && onWrite(journalType)}
-                disabled={isLoading || !onWrite || isDisabled || isTimeRestricted}
-                icon="long-arrow-right-circle"
-                sx="[&>p]:!font-bold flex-row-reverse w-max"
-              />
+              <div className="flex items-center gap-3">
+                {journalType !== journalTypes.weeklyChallenge && (
+                  <ActionButton
+                    label="Scan"
+                    buttonActionType={buttonActionTypes.text}
+                    onClick={() => {
+                      journalPopupObj.open({
+                        popupData: {
+                          heading,
+                          subHeading,
+                          description,
+                          subDescription,
+                          icon,
+                          points,
+                          streak,
+                          isCompleted,
+                          startAtCapture: true,
+                        },
+                        popupAction: () => onWrite?.(journalType),
+                        popupType: journalType,
+                      });
+                    }}
+                    disabled={isLoading || isDisabled || isTimeRestricted}
+                    icon="camera-filled"
+                    sx="[&>p]:!font-bold flex-row-reverse w-max"
+                  />
+                )}
+                <ActionButton
+                  label="Write Now"
+                  buttonActionType={buttonActionTypes.text}
+                  onClick={() => onWrite?.(journalType)}
+                  disabled={isLoading || !onWrite || isDisabled || isTimeRestricted}
+                  icon="long-arrow-right-circle"
+                  sx="[&>p]:!font-bold flex-row-reverse w-max"
+                />
+              </div>
             )}
           </>
         )}

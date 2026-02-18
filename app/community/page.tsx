@@ -1,18 +1,27 @@
 "use client";
 
-import { FC, useEffect, useState, useRef, KeyboardEvent } from "react";
+import { FC, useEffect, useState, useRef, useCallback, KeyboardEvent } from "react";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { usePopup } from "@contexts/UsePopup";
 import { useSession } from "@contexts/UseSession";
+import { useCommunityCallState } from "@lib/hooks/useCommunityCallState";
 import { triggerHaptic } from "@lib/utils/haptic";
 import { cn } from "@lib/utils/style";
+import CommunityCallCard from "@modules/community/components/CommunityCallCard";
 import CreatePostModal from "@modules/community/components/CreatePostModal";
+import EventsList from "@modules/community/components/EventsList";
+import LiveCallBar from "@modules/community/components/LiveCallBar";
 import MemberCard from "@modules/community/components/MemberCard";
 import PostCard from "@modules/community/components/PostCard";
 import ReferralCard from "@modules/community/components/ReferralCard";
-import { ReactionType, PostType, PostVisibility } from "@resources/types/community";
+import {
+  ReactionType,
+  PostType,
+  PostVisibility,
+  POST_TYPE_LABELS,
+} from "@resources/types/community";
 import { RootState } from "@store/configureStore";
 import { useSelector, useDispatch } from "@store/hooks";
 import {
@@ -25,8 +34,8 @@ import {
   sendEncouragement,
 } from "@store/modules/community";
 
-type TabType = "feed" | "members" | "referrals";
-const TABS: TabType[] = ["feed", "members", "referrals"];
+type TabType = "feed" | "members" | "events" | "referrals";
+const TABS: TabType[] = ["feed", "members", "events", "referrals"];
 
 const CommunityPage: FC = () => {
   const router = useRouter();
@@ -34,8 +43,18 @@ const CommunityPage: FC = () => {
   const { session, authenticating } = useSession();
   const { messagePopupObj } = usePopup();
 
-  const [activeTab, setActiveTab] = useState<TabType>("feed");
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const activeTab: TabType =
+    tabParam && TABS.includes(tabParam as TabType) ? (tabParam as TabType) : "feed";
+
   const [postTypeFilter, setPostTypeFilter] = useState<string | null>(null);
+  const [membersDisplayCount, setMembersDisplayCount] = useState(12);
+  const [heroStats, setHeroStats] = useState<{
+    totalPosts: number;
+    totalMembers: number;
+    totalReferrals: number;
+  } | null>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Handle tab keyboard navigation (WAI-ARIA pattern)
@@ -60,7 +79,7 @@ const CommunityPage: FC = () => {
     }
 
     e.preventDefault();
-    setActiveTab(TABS[newIndex]);
+    handleTabChange(TABS[newIndex]);
     tabRefs.current[newIndex]?.focus();
   };
 
@@ -68,7 +87,7 @@ const CommunityPage: FC = () => {
   const handleSendEncouragement = async (memberId: string) => {
     const result = await dispatch(sendEncouragement(memberId));
     if (result.success) {
-      messagePopupObj.open({ popupData: "Encouragement sent! 💪", popupType: "success" });
+      messagePopupObj.open({ popupData: "Encouragement sent!", popupType: "success" });
       triggerHaptic("success");
     } else {
       messagePopupObj.open({
@@ -92,14 +111,29 @@ const CommunityPage: FC = () => {
     hasMore,
     members,
     membersLoading,
+    membersError,
     cohort,
     referralCode,
     referrals,
     milestones,
     referralsLoading,
+    referralsError,
     referralStats,
     createPostOpen,
   } = useSelector((state: RootState) => state.community);
+
+  // Community calls state
+  const {
+    primaryState: callState,
+    upcoming: upcomingEvents,
+    past: pastEvents,
+    attendees: eventAttendees,
+    loading: eventsLoading,
+    rsvp: handleRsvp,
+  } = useCommunityCallState();
+
+  const isCallLive = callState.state === "live_now" || callState.state === "ending_soon";
+  const isCallStartingSoon = callState.state === "starting_soon";
 
   // Redirect if not logged in
   useEffect(() => {
@@ -108,18 +142,57 @@ const CommunityPage: FC = () => {
     }
   }, [session, authenticating, router]);
 
-  // Fetch data on mount
+  // Fetch real aggregate stats for hero section
   useEffect(() => {
-    if (session?.user) {
-      dispatch(fetchFeed());
-      dispatch(fetchMembers());
-      dispatch(fetchReferrals());
-    }
-  }, [dispatch, session?.user]);
+    if (!session?.user) return;
+    fetch("/api/community/stats")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data) setHeroStats(data);
+      })
+      .catch(() => {});
+  }, [session?.user]);
 
-  // Handle tab change
+  // Track which tabs have had their data fetched
+  const fetchedTabsRef = useRef<Set<TabType>>(new Set());
+
+  // Lazy-load data per tab — only fetch when tab is first activated
+  const ensureTabData = useCallback(
+    (tab: TabType) => {
+      if (!session?.user || fetchedTabsRef.current.has(tab)) return;
+      fetchedTabsRef.current.add(tab);
+
+      switch (tab) {
+        case "feed":
+          dispatch(fetchFeed());
+          break;
+        case "members":
+          dispatch(fetchMembers());
+          break;
+        case "referrals":
+          dispatch(fetchReferrals());
+          break;
+        // Events are fetched by useCommunityCallState hook automatically
+      }
+    },
+    [dispatch, session?.user]
+  );
+
+  // Fetch data for the active tab
+  useEffect(() => {
+    ensureTabData(activeTab);
+  }, [activeTab, ensureTabData]);
+
+  // Handle tab change — sync with URL for deep linking + back button
   const handleTabChange = (tab: TabType) => {
-    setActiveTab(tab);
+    const params = new URLSearchParams(searchParams.toString());
+    if (tab === "feed") {
+      params.delete("tab");
+    } else {
+      params.set("tab", tab);
+    }
+    const query = params.toString();
+    router.push(`/community${query ? `?${query}` : ""}`, { scroll: false });
   };
 
   // Handle post creation
@@ -128,6 +201,7 @@ const CommunityPage: FC = () => {
     title?: string;
     content: string;
     visibility: PostVisibility;
+    mediaUrls?: string[];
   }) => {
     const result = await dispatch(createPost(data));
     return result as { success: boolean; error?: string };
@@ -162,29 +236,101 @@ const CommunityPage: FC = () => {
   return (
     <div className="bg-bkg-dark min-h-screen">
       {/* Hero Header */}
-      <div className="from-action-700 via-action-600 to-action-400 bg-gradient-to-br">
+      <div
+        className={cn(
+          "bg-gradient-to-br transition-colors duration-500",
+          isCallLive
+            ? "from-action-800 via-action-700 to-danger/30"
+            : "from-action-700 via-action-600 to-action-400"
+        )}
+      >
         <div className="mx-auto max-w-6xl px-4 py-12">
           <div className="text-center text-white">
-            <h1 className="mb-2 text-4xl font-bold">Gynergy Community</h1>
-            <p className="text-action-100 mb-8 text-lg">
-              Connect, share wins, and grow together on your 45-Day Awakening Journey
-            </p>
-
-            {/* Quick Stats */}
-            <div className="mx-auto grid max-w-2xl grid-cols-3 gap-4">
-              <div className="rounded bg-white/10 p-4 backdrop-blur">
-                <p className="text-3xl font-bold">{members.length}</p>
-                <p className="text-action-100 text-sm">Community Members</p>
-              </div>
-              <div className="rounded bg-white/10 p-4 backdrop-blur">
-                <p className="text-3xl font-bold">{posts.length}</p>
-                <p className="text-action-100 text-sm">Wins Shared</p>
-              </div>
-              <div className="rounded bg-white/10 p-4 backdrop-blur">
-                <p className="text-3xl font-bold">{referralStats.totalReferrals}</p>
-                <p className="text-action-100 text-sm">Friends Invited</p>
-              </div>
-            </div>
+            {isCallLive && callState.event ? (
+              <>
+                <div className="mb-3 flex items-center justify-center gap-2">
+                  <span className="relative flex h-3 w-3">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                    <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500" />
+                  </span>
+                  <span className="text-sm font-bold tracking-wider text-red-300 uppercase">
+                    Live Now
+                  </span>
+                </div>
+                <h1 className="mb-2 text-4xl font-bold">{callState.event.title}</h1>
+                <p className="text-action-100 mb-8 text-lg">Hosted by {callState.event.hostName}</p>
+                <div className="mx-auto grid max-w-2xl grid-cols-3 gap-4">
+                  <div className="rounded bg-white/10 p-4 backdrop-blur">
+                    <p className="text-3xl font-bold">{callState.event.participantCount}</p>
+                    <p className="text-action-100 text-sm">Joined</p>
+                  </div>
+                  <div className="rounded bg-white/10 p-4 backdrop-blur">
+                    <p className="text-3xl font-bold">{callState.minutesRemaining ?? 0}</p>
+                    <p className="text-action-100 text-sm">Min Remaining</p>
+                  </div>
+                  <button
+                    onClick={() => router.push(`/community/call/${callState.event!.roomId}`)}
+                    className="from-primary to-primary-500 focus-visible:ring-action min-h-[56px] rounded bg-gradient-to-r p-4 font-bold text-white transition-all hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none active:scale-95"
+                  >
+                    Join Now
+                  </button>
+                </div>
+              </>
+            ) : isCallStartingSoon && callState.event ? (
+              <>
+                <h1 className="mb-2 text-4xl font-bold">Gynergy Community</h1>
+                <p className="text-action-100 mb-2 text-lg">
+                  Connect, share wins, and grow together on your 45-Day Awakening Journey
+                </p>
+                <p className="mb-8 text-sm font-semibold text-yellow-200">
+                  {callState.event.title} starts in {Math.max(0, callState.minutesUntilStart ?? 0)}{" "}
+                  minutes
+                </p>
+                <div className="mx-auto grid max-w-2xl grid-cols-3 gap-4">
+                  <div className="rounded bg-white/10 p-4 backdrop-blur">
+                    <p className="text-3xl font-bold">
+                      {heroStats?.totalMembers ?? members.length}
+                    </p>
+                    <p className="text-action-100 text-sm">Community Members</p>
+                  </div>
+                  <div className="rounded bg-white/10 p-4 backdrop-blur">
+                    <p className="text-3xl font-bold">{callState.event.rsvpCount}</p>
+                    <p className="text-action-100 text-sm">RSVPs</p>
+                  </div>
+                  <button
+                    onClick={() => router.push(`/community/call/${callState.event!.roomId}`)}
+                    className="bg-action focus-visible:ring-action text-content-dark min-h-[56px] rounded p-4 font-bold transition-all hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none active:scale-95"
+                  >
+                    Join Early
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 className="mb-2 text-4xl font-bold">Gynergy Community</h1>
+                <p className="text-action-100 mb-8 text-lg">
+                  Connect, share wins, and grow together on your 45-Day Awakening Journey
+                </p>
+                <div className="mx-auto grid max-w-2xl grid-cols-3 gap-4">
+                  <div className="rounded bg-white/10 p-4 backdrop-blur">
+                    <p className="text-3xl font-bold">
+                      {heroStats?.totalMembers ?? members.length}
+                    </p>
+                    <p className="text-action-100 text-sm">Community Members</p>
+                  </div>
+                  <div className="rounded bg-white/10 p-4 backdrop-blur">
+                    <p className="text-3xl font-bold">{heroStats?.totalPosts ?? posts.length}</p>
+                    <p className="text-action-100 text-sm">Wins Shared</p>
+                  </div>
+                  <div className="rounded bg-white/10 p-4 backdrop-blur">
+                    <p className="text-3xl font-bold">
+                      {heroStats?.totalReferrals ?? referralStats.totalReferrals}
+                    </p>
+                    <p className="text-action-100 text-sm">Friends Invited</p>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
 
@@ -212,6 +358,17 @@ const CommunityPage: FC = () => {
                 >
                   {tab === "feed" && "Activity Feed"}
                   {tab === "members" && `Members (${members.length})`}
+                  {tab === "events" && (
+                    <span className="flex items-center gap-2">
+                      Events
+                      {isCallLive && (
+                        <span className="relative flex h-2 w-2">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
+                          <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
+                        </span>
+                      )}
+                    </span>
+                  )}
                   {tab === "referrals" && "Invite Friends"}
                   {activeTab === tab && (
                     <div className="absolute right-0 bottom-0 left-0 h-1 bg-white" />
@@ -275,24 +432,22 @@ const CommunityPage: FC = () => {
                 >
                   All Posts
                 </button>
-                {[
-                  { type: "win", label: "Wins", emoji: "🏆" },
-                  { type: "reflection", label: "Reflections", emoji: "💭" },
-                  { type: "milestone", label: "Milestones", emoji: "🎯" },
-                  { type: "celebration", label: "Celebrations", emoji: "🎉" },
-                ].map(({ type, label, emoji }) => (
+                {Object.entries(POST_TYPE_LABELS).map(([type, { label, color }]) => (
                   <button
                     key={type}
                     onClick={() => handleFilterChange(type)}
                     aria-pressed={postTypeFilter === type}
                     className={cn(
-                      "focus-visible:ring-action flex min-h-[44px] items-center gap-1 rounded-full px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
+                      "focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
                       postTypeFilter === type
                         ? "bg-action text-content-dark"
                         : "bg-bkg-dark-secondary text-grey-400 hover:bg-bkg-dark-800"
                     )}
                   >
-                    <span>{emoji}</span>
+                    <span
+                      className="inline-block h-2 w-2 rounded-full"
+                      style={{ backgroundColor: color }}
+                    />
                     <span>{label}</span>
                   </button>
                 ))}
@@ -332,7 +487,22 @@ const CommunityPage: FC = () => {
                 </div>
               ) : posts.length === 0 ? (
                 <div className="border-border-dark bg-bkg-dark-secondary rounded border py-12 text-center">
-                  <p className="text-5xl">🌟</p>
+                  <div className="bg-action/20 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
+                    <svg
+                      className="text-action h-7 w-7"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                  </div>
                   <h3 className="text-content-light mt-4 text-lg font-semibold">No posts yet</h3>
                   <p className="text-grey-500 mt-1">
                     Be the first to share a win with the community!
@@ -348,7 +518,12 @@ const CommunityPage: FC = () => {
                 <>
                   <div className="space-y-4">
                     {posts.map((post) => (
-                      <PostCard key={post.id} post={post} onReact={handleReaction} />
+                      <PostCard
+                        key={post.id}
+                        post={post}
+                        currentUserId={session?.user?.id}
+                        onReact={handleReaction}
+                      />
                     ))}
                   </div>
 
@@ -369,6 +544,15 @@ const CommunityPage: FC = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
+              {/* Next/Live Community Call */}
+              {callState.event && callState.state !== "no_events" && (
+                <CommunityCallCard
+                  event={callState.event}
+                  state={callState.state}
+                  onRsvp={handleRsvp}
+                />
+              )}
+
               {/* Cohort Info */}
               {cohort && (
                 <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4">
@@ -398,7 +582,7 @@ const CommunityPage: FC = () => {
                     ))}
                 </div>
                 <button
-                  onClick={() => setActiveTab("members")}
+                  onClick={() => handleTabChange("members")}
                   className="text-action hover:text-action-100 focus-visible:ring-action mt-3 min-h-[44px] w-full text-center text-sm font-medium focus-visible:ring-2 focus-visible:outline-none"
                 >
                   View All Members
@@ -412,7 +596,7 @@ const CommunityPage: FC = () => {
                   Get 100 points for each friend who joins your journey!
                 </p>
                 <button
-                  onClick={() => setActiveTab("referrals")}
+                  onClick={() => handleTabChange("referrals")}
                   className="from-primary to-primary-500 text-content-dark focus-visible:ring-action min-h-[44px] w-full rounded bg-gradient-to-r py-2 font-medium transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
                 >
                   Share Your Link
@@ -446,9 +630,53 @@ const CommunityPage: FC = () => {
                   </div>
                 ))}
               </div>
+            ) : membersError ? (
+              <div className="border-border-dark bg-bkg-dark-secondary rounded border py-12 text-center">
+                <div className="bg-danger/20 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
+                  <svg
+                    className="text-danger h-7 w-7"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-content-light mt-4 text-lg font-semibold">
+                  Failed to load members
+                </h3>
+                <p className="text-grey-500 mt-1">{membersError}</p>
+                <button
+                  onClick={() => dispatch(fetchMembers())}
+                  className="bg-action text-content-dark hover:bg-action-100 mt-4 min-h-[44px] rounded px-6 py-2 font-medium transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
             ) : members.length === 0 ? (
               <div className="border-border-dark bg-bkg-dark-secondary rounded border py-12 text-center">
-                <p className="text-5xl">👥</p>
+                <div className="bg-action/20 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
+                  <svg
+                    className="text-action h-7 w-7"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                </div>
                 <h3 className="text-content-light mt-4 text-lg font-semibold">No members yet</h3>
                 <p className="text-grey-500 mt-1">Invite friends to join your cohort!</p>
               </div>
@@ -479,6 +707,7 @@ const CommunityPage: FC = () => {
                   {members
                     .slice()
                     .sort((a, b) => b.points - a.points)
+                    .slice(0, membersDisplayCount)
                     .map((member) => (
                       <MemberCard
                         key={member.id}
@@ -488,8 +717,33 @@ const CommunityPage: FC = () => {
                       />
                     ))}
                 </div>
+
+                {/* Show More */}
+                {members.length > membersDisplayCount && (
+                  <div className="mt-6 text-center">
+                    <button
+                      onClick={() => setMembersDisplayCount((prev) => prev + 12)}
+                      className="bg-bkg-dark-secondary text-grey-400 hover:bg-bkg-dark-800 hover:text-content-light border-border-dark min-h-[44px] rounded-full border px-8 py-2 font-medium transition-colors"
+                    >
+                      Show More ({members.length - membersDisplayCount} remaining)
+                    </button>
+                  </div>
+                )}
               </>
             )}
+          </div>
+        )}
+
+        {/* Events Tab */}
+        {activeTab === "events" && (
+          <div role="tabpanel" id="tabpanel-events" aria-labelledby="tab-events">
+            <EventsList
+              upcoming={upcomingEvents}
+              past={pastEvents}
+              attendees={eventAttendees}
+              loading={eventsLoading}
+              onRsvp={handleRsvp}
+            />
           </div>
         )}
 
@@ -501,13 +755,44 @@ const CommunityPage: FC = () => {
             id="tabpanel-referrals"
             aria-labelledby="tab-referrals"
           >
-            <ReferralCard
-              referralCode={referralCode}
-              referrals={referrals}
-              milestones={milestones}
-              stats={referralStats}
-              isLoading={referralsLoading}
-            />
+            {referralsError ? (
+              <div className="border-border-dark bg-bkg-dark-secondary rounded border py-12 text-center">
+                <div className="bg-danger/20 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
+                  <svg
+                    className="text-danger h-7 w-7"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-content-light mt-4 text-lg font-semibold">
+                  Failed to load referrals
+                </h3>
+                <p className="text-grey-500 mt-1">{referralsError}</p>
+                <button
+                  onClick={() => dispatch(fetchReferrals())}
+                  className="bg-action text-content-dark hover:bg-action-100 mt-4 min-h-[44px] rounded px-6 py-2 font-medium transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            ) : (
+              <ReferralCard
+                referralCode={referralCode}
+                referrals={referrals}
+                milestones={milestones}
+                stats={referralStats}
+                isLoading={referralsLoading}
+              />
+            )}
 
             {/* How It Works */}
             <div className="border-border-dark bg-bkg-dark-secondary mt-8 rounded border p-6">
@@ -546,7 +831,22 @@ const CommunityPage: FC = () => {
             {/* Accountability Trio */}
             <div className="border-action/30 from-action-900/50 to-action-800/50 mt-6 rounded border-2 border-dashed bg-gradient-to-r p-6">
               <div className="flex items-start gap-4">
-                <div className="text-4xl">👥</div>
+                <div className="bg-action/20 flex h-12 w-12 items-center justify-center rounded-full">
+                  <svg
+                    className="text-action h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                    />
+                  </svg>
+                </div>
                 <div>
                   <h3 className="text-action font-bold">Build Your Accountability Trio</h3>
                   <p className="text-action-200 mt-1 text-sm">
@@ -563,7 +863,24 @@ const CommunityPage: FC = () => {
                           : "bg-bkg-dark-800 text-grey-500"
                       )}
                     >
-                      {referralStats.convertedReferrals >= 1 ? "✓" : "1"}
+                      {referralStats.convertedReferrals >= 1 ? (
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={3}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      ) : (
+                        "1"
+                      )}
                     </div>
                     <div className="bg-bkg-dark-800 h-1 w-8" />
                     <div
@@ -574,7 +891,24 @@ const CommunityPage: FC = () => {
                           : "bg-bkg-dark-800 text-grey-500"
                       )}
                     >
-                      {referralStats.convertedReferrals >= 2 ? "✓" : "2"}
+                      {referralStats.convertedReferrals >= 2 ? (
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          aria-hidden="true"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={3}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      ) : (
+                        "2"
+                      )}
                     </div>
                     <div className="bg-bkg-dark-800 h-1 w-8" />
                     <div className="bg-action text-content-dark flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold">
@@ -587,6 +921,11 @@ const CommunityPage: FC = () => {
           </div>
         )}
       </div>
+
+      {/* Mobile Live Call Bar */}
+      {callState.event && (isCallLive || isCallStartingSoon) && (
+        <LiveCallBar event={callState.event} state={callState.state} />
+      )}
 
       {/* Create Post Modal */}
       <CreatePostModal
