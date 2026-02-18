@@ -245,6 +245,42 @@ DO NOT just add them. Instead:
 
 ---
 
+## SESSION TYPES
+
+Not all sessions are equal. Declare the session type at `/start` — it determines branch rules, commit cadence, and risk profile.
+
+| Type         | Branch Required?  | Commit Cadence | Risk Profile | Example                                     |
+| ------------ | ----------------- | -------------- | ------------ | ------------------------------------------- |
+| **Code**     | YES (feature/)    | Every 30 min   | High         | Building features, fixing bugs, refactoring |
+| **Content**  | NO (main is fine) | End of session | Low          | Scripts, copy, knowledge files, docs        |
+| **Strategy** | NO (main is fine) | End of session | Low          | Planning, audits, research, funnel mapping  |
+| **Hotfix**   | YES (hotfix/)     | After each fix | Critical     | Production bug, payment issue, auth break   |
+
+### Rules by Session Type
+
+**Code Sessions:**
+
+- Create `feature/[developer]-[topic]` branch
+- Commit every 30 minutes minimum
+- PR required before merging to main
+- Full quality gates apply
+
+**Content/Strategy Sessions:**
+
+- Work directly on `main` (no branch needed)
+- Commit all work before session end
+- No PR required — content doesn't break builds
+- Files created should be in `scripts/`, `docs/`, or `.claude/`
+
+**Hotfix Sessions:**
+
+- Create `hotfix/[topic]` branch
+- Commit after each individual fix
+- Fast-track PR — merge immediately after verification
+- P0/P1 escalation rules apply
+
+---
+
 ## DEVELOPER WORKFLOW
 
 ### Session Commands
@@ -380,6 +416,72 @@ If committed to feature branch, they become orphaned after PR merge and collabor
 | Build Failures           | 0      |
 | Runtime Errors           | 0      |
 | Security Vulnerabilities | 0      |
+
+---
+
+## KNOWLEDGE BASE MAINTENANCE
+
+### Claude.ai Workspace Files (`scripts/claude-workspace/`)
+
+13 knowledge files exist for the Claude.ai Gynergy workspace. These drift as the codebase evolves.
+
+**When to update:**
+
+- After adding a new database table → update `03-DATABASE-SCHEMA.md`
+- After adding a new API endpoint → update `08-API-REFERENCE.md`
+- After adding a new feature → update `07-FEATURES.md`
+- After changing auth/middleware → update `02-ARCHITECTURE.md`
+- After changing payment flows → update `04-BUSINESS-MODEL.md`
+- After adding/changing integrations → update `11-INTEGRATIONS.md`
+- After adding utilities or hooks → update `13-UTILITIES-HOOKS-TESTING.md`
+
+**How to update:**
+
+1. Do NOT rewrite the entire file — edit only the affected section
+2. Keep the same format and structure
+3. Verify changes from source code (no assumptions)
+
+**Staleness check (monthly):**
+Run a diff of what the knowledge files say vs what the codebase contains. Flag any drift.
+
+---
+
+## REDUX PERSIST MIGRATION RULES
+
+**Location:** `store/configureStore.ts`
+
+The Redux store uses versioned migrations. Breaking this silently corrupts user state.
+
+### When Adding a New Redux Slice:
+
+1. Add the slice to `store/reducer.ts`
+2. Add the slice name to `persistConfig.blacklist` in `configureStore.ts` (if it should NOT persist) or create its own persist config (if it should)
+3. **INCREMENT `persistConfig.version`** (currently `1`)
+4. **ADD a new migration function** in the `migrations` object that initializes the new slice's default state
+5. Test: clear localStorage, verify app loads. Then test WITH old localStorage, verify migration runs.
+
+### What Happens If You Skip Steps 3-4:
+
+- Existing users' persisted state won't include the new slice
+- `autoMergeLevel2` may partially merge, causing undefined field errors
+- No migration runs, so default state is never set
+- **Result:** Silent runtime errors for every returning user
+
+---
+
+## CHAT REGISTRY HYGIENE
+
+### Stale Chat Rules
+
+- Any chat marked Active with last sync >24 hours ago → auto-mark as Stale
+- Stale chats older than 7 days → move to "Recently Closed" with status "Abandoned"
+- At `/start`, clean up any Stale entries >7 days old
+
+### Registry Cleanup (at every `/start`):
+
+1. Check all Active entries — mark as Stale if last sync >24h
+2. Check all Stale entries — move to Closed if >7 days old
+3. Remove Closed entries older than 30 days
 
 ---
 

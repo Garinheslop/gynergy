@@ -7,19 +7,18 @@
 
 ## Active Chats
 
-| Chat ID               | Developer | Branch | Focus                          | Status | Files Owned                        | Last Sync  |
-| --------------------- | --------- | ------ | ------------------------------ | ------ | ---------------------------------- | ---------- |
-| chat-G-community-0217 | Garin     | main   | Community section              | Stale  | app/community/, modules/community/ | 2026-02-17 |
-| chat-G-phase1-0217    | Garin     | main   | 10/10 Plan Phase 1             | Stale  | app/api/payments/, modules/book/   | 2026-02-17 |
-| chat-G-funnels-0217   | Garin     | main   | Funnel scripts & landing pages | Active | (planning phase)                   | 2026-02-17 |
+| Chat ID             | Developer | Branch | Focus                          | Type    | Status | Files Owned | Last Sync  |
+| ------------------- | --------- | ------ | ------------------------------ | ------- | ------ | ----------- | ---------- |
+| chat-G-funnels-0217 | Garin     | main   | Funnel scripts & landing pages | Content | Active | scripts/    | 2026-02-17 |
 
 ---
 
 ## Recently Closed Chats
 
-| Chat ID | Developer | Branch | Final Commit | Merged? | Closed |
-| ------- | --------- | ------ | ------------ | ------- | ------ |
-| (none)  | -         | -      | -            | -       | -      |
+| Chat ID               | Developer | Branch | Focus              | Closed     | Reason     |
+| --------------------- | --------- | ------ | ------------------ | ---------- | ---------- |
+| chat-G-community-0217 | Garin     | main   | Community section  | 2026-02-17 | Stale >24h |
+| chat-G-phase1-0217    | Garin     | main   | 10/10 Plan Phase 1 | 2026-02-17 | Stale >24h |
 
 ---
 

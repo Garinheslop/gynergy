@@ -38,10 +38,18 @@ Read `.claude/SHARED-MEMORY.md` to restore shared context.
 
 ---
 
-## Step 1: Developer Identification
+## Step 1: Developer Identification & Session Type
 
 Ask: "Which developer am I working with? (Garin or Bill)"
-WAIT for response. Do NOT proceed until identified.
+Ask: "What type of session? (Code / Content / Strategy / Hotfix)"
+WAIT for response. Do NOT proceed until both are identified.
+
+**Session type determines branch and commit rules (see CLAUDE.md SESSION TYPES):**
+
+- **Code** → Create `feature/[developer]-[topic]` branch, commit every 30 min
+- **Content** → Work on `main`, commit at end of session
+- **Strategy** → Work on `main`, commit at end of session
+- **Hotfix** → Create `hotfix/[topic]` branch, commit after each fix
 
 ## Step 2: Git Sync Check
 
