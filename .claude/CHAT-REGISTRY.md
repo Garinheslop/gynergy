@@ -7,18 +7,20 @@
 
 ## Active Chats
 
-| Chat ID             | Developer | Branch | Focus                          | Type    | Status | Files Owned | Last Sync  |
-| ------------------- | --------- | ------ | ------------------------------ | ------- | ------ | ----------- | ---------- |
-| chat-G-funnels-0217 | Garin     | main   | Funnel scripts & landing pages | Content | Active | scripts/    | 2026-02-17 |
+| Chat ID | Developer | Branch | Focus | Type | Status | Files Owned | Last Sync |
+| ------- | --------- | ------ | ----- | ---- | ------ | ----------- | --------- |
+| (none)  | -         | -      | -     | -    | -      | -           | -         |
 
 ---
 
 ## Recently Closed Chats
 
-| Chat ID               | Developer | Branch | Focus              | Closed     | Reason     |
-| --------------------- | --------- | ------ | ------------------ | ---------- | ---------- |
-| chat-G-community-0217 | Garin     | main   | Community section  | 2026-02-17 | Stale >24h |
-| chat-G-phase1-0217    | Garin     | main   | 10/10 Plan Phase 1 | 2026-02-17 | Stale >24h |
+| Chat ID               | Developer | Branch | Focus                          | Closed     | Reason     | Final Commit |
+| --------------------- | --------- | ------ | ------------------------------ | ---------- | ---------- | ------------ |
+| chat-G-appstore-0217  | Garin     | main   | Phase 4 TypeScript & Redux     | 2026-02-17 | Completed  | `fabb952`    |
+| chat-G-funnels-0217   | Garin     | main   | Funnel scripts & landing pages | 2026-02-17 | Stale >24h | -            |
+| chat-G-community-0217 | Garin     | main   | Community section              | 2026-02-17 | Stale >24h | -            |
+| chat-G-phase1-0217    | Garin     | main   | 10/10 Plan Phase 1             | 2026-02-17 | Stale >24h | -            |
 
 ---
 
