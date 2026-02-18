@@ -285,6 +285,56 @@ export interface ContentNote {
 }
 
 // =============================================================================
+// PLAYLISTS
+// =============================================================================
+
+export interface ContentPlaylist {
+  id: string;
+  userId: string;
+  title: string;
+  description?: string;
+  isPublic: boolean;
+  thumbnailUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ContentPlaylistWithItems extends ContentPlaylist {
+  items: PlaylistItem[];
+  itemCount: number;
+  totalDurationMinutes: number;
+}
+
+export interface PlaylistItem {
+  id: string;
+  playlistId: string;
+  contentId: string;
+  sortOrder: number;
+  addedAt: string;
+  content?: ContentItem;
+}
+
+// =============================================================================
+// RATINGS
+// =============================================================================
+
+export interface ContentRating {
+  id: string;
+  userId: string;
+  contentId: string;
+  rating: number;
+  review?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ContentRatingsSummary {
+  avgRating: number;
+  ratingCount: number;
+  distribution: Record<number, number>;
+}
+
+// =============================================================================
 // API TYPES
 // =============================================================================
 
@@ -387,6 +437,22 @@ export const contentRequestTypes = {
 
   // Video status
   "get-video-status": "get-video-status",
+
+  // Playlists
+  "create-playlist": "create-playlist",
+  "update-playlist": "update-playlist",
+  "delete-playlist": "delete-playlist",
+  "get-playlist": "get-playlist",
+  "list-playlists": "list-playlists",
+  "add-playlist-item": "add-playlist-item",
+  "remove-playlist-item": "remove-playlist-item",
+  "reorder-playlist-items": "reorder-playlist-items",
+
+  // Ratings
+  "rate-content": "rate-content",
+  "get-ratings": "get-ratings",
+  "get-my-rating": "get-my-rating",
+  "delete-rating": "delete-rating",
 
   // Legacy aliases (for backwards compatibility with camelCase usage)
   getContent: "get-content",

@@ -6,6 +6,8 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
+import LessonQuiz from "@modules/courses/components/LessonQuiz";
+
 import { cn } from "@lib/utils/style";
 import {
   CourseWithProgress,
@@ -449,6 +451,18 @@ export default function CoursePage() {
                     <p className="text-content-muted">{activeLesson.description}</p>
                   )}
                 </div>
+
+                {/* Lesson Quiz */}
+                <LessonQuiz
+                  lessonId={activeLesson.id}
+                  onComplete={(passed) => {
+                    if (passed) handleComplete();
+                  }}
+                  onContinue={() => {
+                    const next = findNextLesson();
+                    if (next) setActiveLesson(next);
+                  }}
+                />
               </div>
             </div>
 

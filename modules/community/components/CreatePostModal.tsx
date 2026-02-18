@@ -15,6 +15,7 @@ interface CreatePostModalProps {
     title?: string;
     content: string;
     visibility: PostVisibility;
+    mediaUrls?: string[];
   }) => Promise<{ success: boolean; error?: string }>;
   userImage?: string | null;
   userName?: string;
@@ -110,11 +111,41 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
     setIsSubmitting(true);
     setError(null);
 
+    let mediaUrls: string[] | undefined;
+
+    // Upload media files if any
+    if (mediaFiles.length > 0) {
+      try {
+        const formData = new FormData();
+        mediaFiles.forEach((file) => formData.append("files", file));
+
+        const uploadResponse = await fetch("/api/community/media", {
+          method: "POST",
+          body: formData,
+        });
+
+        const uploadData = await uploadResponse.json();
+
+        if (!uploadResponse.ok) {
+          setIsSubmitting(false);
+          setError(uploadData.error || "Failed to upload images");
+          return;
+        }
+
+        mediaUrls = uploadData.urls;
+      } catch {
+        setIsSubmitting(false);
+        setError("Failed to upload images. Please try again.");
+        return;
+      }
+    }
+
     const result = await onSubmit({
       postType,
       title: title.trim() || undefined,
       content: content.trim(),
       visibility,
+      mediaUrls,
     });
 
     setIsSubmitting(false);
@@ -212,7 +243,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
           <fieldset className="m-0 mb-4 flex flex-wrap gap-2 border-none p-0">
             <legend className="sr-only">Select post type</legend>
             {(
-              Object.entries(POST_TYPE_LABELS) as [PostType, { label: string; emoji: string }][]
+              Object.entries(POST_TYPE_LABELS) as [PostType, { label: string; color: string }][]
             ).map(([type, info]) => (
               <button
                 key={type}
@@ -225,7 +256,10 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                     : "bg-bkg-dark-800 text-grey-400 hover:bg-bkg-dark"
                 )}
               >
-                <span>{info.emoji}</span>
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-full"
+                  style={{ backgroundColor: info.color }}
+                />
                 <span>{info.label}</span>
               </button>
             ))}

@@ -508,6 +508,179 @@ export async function GET(
         });
       }
 
+      // -------------------------------------------------------------------
+      // GET PLAYLIST
+      // -------------------------------------------------------------------
+      case "get-playlist": {
+        const playlistId = searchParams.get("playlistId");
+        if (!playlistId) return errorResponse("Playlist ID is required", 400);
+
+        const { data: playlist, error } = await supabase
+          .from("content_playlists")
+          .select(`
+            *,
+            playlist_items (
+              *,
+              content_items (*)
+            )
+          `)
+          .eq("id", playlistId)
+          .single();
+
+        if (error || !playlist) return errorResponse("Playlist not found", 404);
+
+        // Check access - must be owner or public
+        if (playlist.user_id !== user.id && !playlist.is_public) {
+          return errorResponse("Playlist not found", 404);
+        }
+
+        const items = (playlist.playlist_items || [])
+          .sort((a: any, b: any) => a.sort_order - b.sort_order)
+          .map((item: any) => ({
+            id: item.id,
+            playlistId: item.playlist_id,
+            contentId: item.content_id,
+            sortOrder: item.sort_order,
+            addedAt: item.added_at,
+            content: item.content_items ? mapContentItem(item.content_items) : undefined,
+          }));
+
+        const totalDuration = items.reduce(
+          (sum: number, item: any) => sum + (item.content?.durationSeconds || 0),
+          0
+        );
+
+        return successResponse({
+          playlist: {
+            id: playlist.id,
+            userId: playlist.user_id,
+            title: playlist.title,
+            description: playlist.description,
+            isPublic: playlist.is_public,
+            thumbnailUrl: playlist.thumbnail_url,
+            createdAt: playlist.created_at,
+            updatedAt: playlist.updated_at,
+            items,
+            itemCount: items.length,
+            totalDurationMinutes: Math.round(totalDuration / 60),
+          },
+        });
+      }
+
+      // -------------------------------------------------------------------
+      // LIST PLAYLISTS
+      // -------------------------------------------------------------------
+      case "list-playlists": {
+        const ownerOnly = searchParams.get("mine") === "true";
+        const includePublic = searchParams.get("public") === "true";
+
+        let query = supabase
+          .from("content_playlists")
+          .select("*, playlist_items(id)")
+          .order("updated_at", { ascending: false });
+
+        if (ownerOnly) {
+          query = query.eq("user_id", user.id);
+        } else if (includePublic) {
+          query = query.or(`user_id.eq.${user.id},is_public.eq.true`);
+        } else {
+          query = query.eq("user_id", user.id);
+        }
+
+        const { data: playlists, error } = await query;
+
+        if (error) {
+          log.error("Failed to list playlists", { error });
+          return errorResponse("Failed to list playlists", 500);
+        }
+
+        return successResponse({
+          playlists: (playlists || []).map((p: any) => ({
+            id: p.id,
+            userId: p.user_id,
+            title: p.title,
+            description: p.description,
+            isPublic: p.is_public,
+            thumbnailUrl: p.thumbnail_url,
+            createdAt: p.created_at,
+            updatedAt: p.updated_at,
+            itemCount: p.playlist_items?.length || 0,
+          })),
+        });
+      }
+
+      // -------------------------------------------------------------------
+      // GET RATINGS FOR CONTENT
+      // -------------------------------------------------------------------
+      case "get-ratings": {
+        const contentId = searchParams.get("contentId");
+        if (!contentId) return errorResponse("Content ID is required", 400);
+
+        const { data: ratings, error } = await supabase
+          .from("content_ratings")
+          .select("*")
+          .eq("content_id", contentId)
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          log.error("Failed to get ratings", { error });
+          return errorResponse("Failed to get ratings", 500);
+        }
+
+        // Calculate summary
+        const ratingValues = (ratings || []).map((r: any) => r.rating);
+        const avg = ratingValues.length > 0
+          ? ratingValues.reduce((sum: number, r: number) => sum + r, 0) / ratingValues.length
+          : 0;
+
+        const distribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        ratingValues.forEach((r: number) => { distribution[r] = (distribution[r] || 0) + 1; });
+
+        return successResponse({
+          summary: {
+            avgRating: Math.round(avg * 10) / 10,
+            ratingCount: ratingValues.length,
+            distribution,
+          },
+          ratings: (ratings || []).map((r: any) => ({
+            id: r.id,
+            userId: r.user_id,
+            contentId: r.content_id,
+            rating: r.rating,
+            review: r.review,
+            createdAt: r.created_at,
+            updatedAt: r.updated_at,
+          })),
+        });
+      }
+
+      // -------------------------------------------------------------------
+      // GET MY RATING FOR CONTENT
+      // -------------------------------------------------------------------
+      case "get-my-rating": {
+        const contentId = searchParams.get("contentId");
+        if (!contentId) return errorResponse("Content ID is required", 400);
+
+        const { data: rating } = await supabase
+          .from("content_ratings")
+          .select("*")
+          .eq("content_id", contentId)
+          .eq("user_id", user.id)
+          .single();
+
+        return successResponse({
+          rating: rating ? {
+            id: rating.id,
+            userId: rating.user_id,
+            contentId: rating.content_id,
+            rating: rating.rating,
+            review: rating.review,
+            createdAt: rating.created_at,
+            updatedAt: rating.updated_at,
+          } : null,
+        });
+      }
+
       default:
         return errorResponse(`Unknown request type: ${requestType}`, 400);
     }
@@ -1066,6 +1239,224 @@ export async function POST(
         return successResponse({ success: true });
       }
 
+      // -------------------------------------------------------------------
+      // CREATE PLAYLIST
+      // -------------------------------------------------------------------
+      case "create-playlist": {
+        const body = await request.json();
+        const validation = validateRequiredFields(body, ["title"]);
+        if (!validation.valid) {
+          return errorResponse(`Missing required fields: ${validation.missing.join(", ")}`, 400);
+        }
+
+        const { data: playlist, error } = await supabase
+          .from("content_playlists")
+          .insert({
+            user_id: user.id,
+            title: body.title,
+            description: body.description || null,
+            is_public: body.isPublic ?? false,
+            thumbnail_url: body.thumbnailUrl || null,
+          })
+          .select()
+          .single();
+
+        if (error) {
+          log.error("Failed to create playlist", { error });
+          return errorResponse("Failed to create playlist", 500);
+        }
+
+        return successResponse({
+          playlist: {
+            id: playlist.id,
+            userId: playlist.user_id,
+            title: playlist.title,
+            description: playlist.description,
+            isPublic: playlist.is_public,
+            thumbnailUrl: playlist.thumbnail_url,
+            createdAt: playlist.created_at,
+            updatedAt: playlist.updated_at,
+          },
+        });
+      }
+
+      // -------------------------------------------------------------------
+      // UPDATE PLAYLIST
+      // -------------------------------------------------------------------
+      case "update-playlist": {
+        const body = await request.json();
+        const { playlistId, ...updates } = body;
+        if (!playlistId) return errorResponse("Playlist ID is required", 400);
+
+        // Verify ownership
+        const { data: existing } = await supabase
+          .from("content_playlists")
+          .select("id")
+          .eq("id", playlistId)
+          .eq("user_id", user.id)
+          .single();
+
+        if (!existing) return errorResponse("Playlist not found", 404);
+
+        const dbUpdates: Record<string, unknown> = {};
+        if (updates.title !== undefined) dbUpdates.title = updates.title;
+        if (updates.description !== undefined) dbUpdates.description = updates.description;
+        if (updates.isPublic !== undefined) dbUpdates.is_public = updates.isPublic;
+        if (updates.thumbnailUrl !== undefined) dbUpdates.thumbnail_url = updates.thumbnailUrl;
+
+        const { error } = await supabase
+          .from("content_playlists")
+          .update(dbUpdates)
+          .eq("id", playlistId);
+
+        if (error) {
+          log.error("Failed to update playlist", { error });
+          return errorResponse("Failed to update playlist", 500);
+        }
+
+        return successResponse({ success: true });
+      }
+
+      // -------------------------------------------------------------------
+      // ADD PLAYLIST ITEM
+      // -------------------------------------------------------------------
+      case "add-playlist-item": {
+        const body = await request.json();
+        const validation = validateRequiredFields(body, ["playlistId", "contentId"]);
+        if (!validation.valid) {
+          return errorResponse(`Missing required fields: ${validation.missing.join(", ")}`, 400);
+        }
+
+        // Verify playlist ownership
+        const { data: playlist } = await supabase
+          .from("content_playlists")
+          .select("id")
+          .eq("id", body.playlistId)
+          .eq("user_id", user.id)
+          .single();
+
+        if (!playlist) return errorResponse("Playlist not found", 404);
+
+        // Get max sort order
+        const { data: maxItem } = await supabase
+          .from("playlist_items")
+          .select("sort_order")
+          .eq("playlist_id", body.playlistId)
+          .order("sort_order", { ascending: false })
+          .limit(1)
+          .single();
+
+        const nextOrder = (maxItem?.sort_order ?? -1) + 1;
+
+        const { data: item, error } = await supabase
+          .from("playlist_items")
+          .upsert(
+            {
+              playlist_id: body.playlistId,
+              content_id: body.contentId,
+              sort_order: body.sortOrder ?? nextOrder,
+            },
+            { onConflict: "playlist_id,content_id" }
+          )
+          .select()
+          .single();
+
+        if (error) {
+          log.error("Failed to add playlist item", { error });
+          return errorResponse("Failed to add item to playlist", 500);
+        }
+
+        return successResponse({
+          item: {
+            id: item.id,
+            playlistId: item.playlist_id,
+            contentId: item.content_id,
+            sortOrder: item.sort_order,
+            addedAt: item.added_at,
+          },
+        });
+      }
+
+      // -------------------------------------------------------------------
+      // REORDER PLAYLIST ITEMS
+      // -------------------------------------------------------------------
+      case "reorder-playlist-items": {
+        const body = await request.json();
+        const { playlistId, itemIds } = body;
+        if (!playlistId || !Array.isArray(itemIds)) {
+          return errorResponse("playlistId and itemIds array are required", 400);
+        }
+
+        // Verify ownership
+        const { data: playlist } = await supabase
+          .from("content_playlists")
+          .select("id")
+          .eq("id", playlistId)
+          .eq("user_id", user.id)
+          .single();
+
+        if (!playlist) return errorResponse("Playlist not found", 404);
+
+        // Update sort orders
+        const reorderUpdates = itemIds.map((id: string, index: number) =>
+          supabase
+            .from("playlist_items")
+            .update({ sort_order: index })
+            .eq("id", id)
+            .eq("playlist_id", playlistId)
+        );
+
+        await Promise.all(reorderUpdates);
+
+        return successResponse({ success: true });
+      }
+
+      // -------------------------------------------------------------------
+      // RATE CONTENT
+      // -------------------------------------------------------------------
+      case "rate-content": {
+        const body = await request.json();
+        const validation = validateRequiredFields(body, ["contentId", "rating"]);
+        if (!validation.valid) {
+          return errorResponse(`Missing required fields: ${validation.missing.join(", ")}`, 400);
+        }
+
+        if (body.rating < 1 || body.rating > 5) {
+          return errorResponse("Rating must be between 1 and 5", 400);
+        }
+
+        const { data: rating, error } = await supabase
+          .from("content_ratings")
+          .upsert(
+            {
+              user_id: user.id,
+              content_id: body.contentId,
+              rating: body.rating,
+              review: body.review || null,
+            },
+            { onConflict: "user_id,content_id" }
+          )
+          .select()
+          .single();
+
+        if (error) {
+          log.error("Failed to save rating", { error });
+          return errorResponse("Failed to save rating", 500);
+        }
+
+        return successResponse({
+          rating: {
+            id: rating.id,
+            userId: rating.user_id,
+            contentId: rating.content_id,
+            rating: rating.rating,
+            review: rating.review,
+            createdAt: rating.created_at,
+            updatedAt: rating.updated_at,
+          },
+        });
+      }
+
       default:
         return errorResponse(`Unknown request type: ${requestType}`, 400);
     }
@@ -1248,6 +1639,91 @@ export async function DELETE(
         if (error) {
           log.error("Failed to delete lesson", { error });
           return errorResponse("Failed to delete lesson", 500);
+        }
+
+        return successResponse({ success: true });
+      }
+
+      // -------------------------------------------------------------------
+      // DELETE PLAYLIST
+      // -------------------------------------------------------------------
+      case "delete-playlist": {
+        const playlistId = searchParams.get("playlistId");
+        if (!playlistId) return errorResponse("Playlist ID is required", 400);
+
+        // Verify ownership
+        const { data: playlist } = await supabase
+          .from("content_playlists")
+          .select("id")
+          .eq("id", playlistId)
+          .eq("user_id", user.id)
+          .single();
+
+        if (!playlist) return errorResponse("Playlist not found", 404);
+
+        const { error } = await supabase
+          .from("content_playlists")
+          .delete()
+          .eq("id", playlistId);
+
+        if (error) {
+          log.error("Failed to delete playlist", { error });
+          return errorResponse("Failed to delete playlist", 500);
+        }
+
+        return successResponse({ success: true });
+      }
+
+      // -------------------------------------------------------------------
+      // REMOVE PLAYLIST ITEM
+      // -------------------------------------------------------------------
+      case "remove-playlist-item": {
+        const playlistId = searchParams.get("playlistId");
+        const contentId = searchParams.get("contentId");
+        if (!playlistId || !contentId) {
+          return errorResponse("Playlist ID and Content ID are required", 400);
+        }
+
+        // Verify ownership
+        const { data: playlist } = await supabase
+          .from("content_playlists")
+          .select("id")
+          .eq("id", playlistId)
+          .eq("user_id", user.id)
+          .single();
+
+        if (!playlist) return errorResponse("Playlist not found", 404);
+
+        const { error } = await supabase
+          .from("playlist_items")
+          .delete()
+          .eq("playlist_id", playlistId)
+          .eq("content_id", contentId);
+
+        if (error) {
+          log.error("Failed to remove playlist item", { error });
+          return errorResponse("Failed to remove playlist item", 500);
+        }
+
+        return successResponse({ success: true });
+      }
+
+      // -------------------------------------------------------------------
+      // DELETE RATING
+      // -------------------------------------------------------------------
+      case "delete-rating": {
+        const contentId = searchParams.get("contentId");
+        if (!contentId) return errorResponse("Content ID is required", 400);
+
+        const { error } = await supabase
+          .from("content_ratings")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("content_id", contentId);
+
+        if (error) {
+          log.error("Failed to delete rating", { error });
+          return errorResponse("Failed to delete rating", 500);
         }
 
         return successResponse({ success: true });

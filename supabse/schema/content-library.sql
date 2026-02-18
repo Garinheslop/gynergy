@@ -708,3 +708,114 @@ CREATE TRIGGER trigger_update_enrollment_progress
     AFTER INSERT OR UPDATE OF is_completed ON user_content_progress
     FOR EACH ROW
     EXECUTE FUNCTION update_enrollment_progress();
+
+-- =============================================================================
+-- CONTENT PLAYLISTS - User-created collections of content
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS "content_playlists" (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    is_public BOOLEAN DEFAULT FALSE,
+    thumbnail_url TEXT,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS "playlist_items" (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    playlist_id UUID REFERENCES content_playlists(id) ON DELETE CASCADE NOT NULL,
+    content_id UUID REFERENCES content_items(id) ON DELETE CASCADE NOT NULL,
+    sort_order INTEGER DEFAULT 0,
+    added_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(playlist_id, content_id)
+);
+
+-- =============================================================================
+-- CONTENT RATINGS - User reviews and ratings
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS "content_ratings" (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    content_id UUID REFERENCES content_items(id) ON DELETE CASCADE NOT NULL,
+    rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    review TEXT,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, content_id)
+);
+
+-- Indexes for playlists and ratings
+CREATE INDEX IF NOT EXISTS idx_playlists_user ON content_playlists(user_id);
+CREATE INDEX IF NOT EXISTS idx_playlists_public ON content_playlists(is_public) WHERE is_public = TRUE;
+CREATE INDEX IF NOT EXISTS idx_playlist_items_playlist ON playlist_items(playlist_id, sort_order);
+CREATE INDEX IF NOT EXISTS idx_content_ratings_content ON content_ratings(content_id);
+CREATE INDEX IF NOT EXISTS idx_content_ratings_user ON content_ratings(user_id);
+
+-- RLS for playlists
+ALTER TABLE content_playlists ENABLE ROW LEVEL SECURITY;
+ALTER TABLE playlist_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE content_ratings ENABLE ROW LEVEL SECURITY;
+
+-- Playlists: owners can manage, public playlists are viewable
+CREATE POLICY "Users can manage own playlists" ON content_playlists
+    FOR ALL USING (user_id = auth.uid());
+
+CREATE POLICY "Public playlists are viewable" ON content_playlists
+    FOR SELECT USING (is_public = TRUE);
+
+-- Playlist items: owner can manage, viewable if playlist is accessible
+CREATE POLICY "Users can manage own playlist items" ON playlist_items
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM content_playlists
+            WHERE id = playlist_items.playlist_id
+            AND user_id = auth.uid()
+        )
+    );
+
+CREATE POLICY "Viewable if playlist is accessible" ON playlist_items
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM content_playlists
+            WHERE id = playlist_items.playlist_id
+            AND (user_id = auth.uid() OR is_public = TRUE)
+        )
+    );
+
+-- Ratings: users can manage own, all can view
+CREATE POLICY "Users can manage own ratings" ON content_ratings
+    FOR ALL USING (user_id = auth.uid());
+
+CREATE POLICY "All authenticated users can view ratings" ON content_ratings
+    FOR SELECT USING (auth.uid() IS NOT NULL);
+
+-- Triggers for updated_at
+DROP TRIGGER IF EXISTS update_content_playlists_updated_at ON content_playlists;
+CREATE TRIGGER update_content_playlists_updated_at
+    BEFORE UPDATE ON content_playlists
+    FOR EACH ROW
+    EXECUTE FUNCTION update_content_updated_at();
+
+DROP TRIGGER IF EXISTS update_content_ratings_updated_at ON content_ratings;
+CREATE TRIGGER update_content_ratings_updated_at
+    BEFORE UPDATE ON content_ratings
+    FOR EACH ROW
+    EXECUTE FUNCTION update_content_updated_at();
+
+-- Helper: Get average rating for content
+CREATE OR REPLACE FUNCTION get_content_avg_rating(p_content_id UUID)
+RETURNS TABLE (
+    avg_rating DECIMAL,
+    rating_count INTEGER
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        ROUND(AVG(cr.rating)::DECIMAL, 1) as avg_rating,
+        COUNT(cr.id)::INTEGER as rating_count
+    FROM content_ratings cr
+    WHERE cr.content_id = p_content_id;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
