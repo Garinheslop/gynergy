@@ -5,6 +5,26 @@
 
 ---
 
+## 2026-02-18 | Garin | Automation Engine, Email Drips & Gamification Wiring (3-Phase Plan)
+
+**Summary**: Executed full 3-phase plan from competitor audit. Connected unused gamification system to APIs, built email drip campaigns, and created event-driven automation engine. Fixed 3 critical bugs discovered during E2E testing.
+
+**Key Changes**:
+
+- Phase 1: Created `gamificationHook.ts`, wired into journals + actions APIs for points/badges on completion
+- Phase 2: 3 email drip campaigns (webinar, assessment, purchase), 8 Hormozi-style templates, cron processor
+- Phase 3: Automation engine with event bus, configurable rules, and action execution
+- Wired `emitEvent()` into gamification hook — automation rules fire on real user activity
+- Fixed `streak_count` → per-activity streak columns in pointsService + gamificationHook
+- Fixed journal_type enum values (`"morning-journal"` → `"morning"`) in gamificationHook
+- Deployed email-drips and automation schemas to production Supabase
+- 5 crons now in vercel.json (webinar-reminders, email-drips, automation-processor, win-back, streak-reminders)
+
+**Commits**: `ea05b63`, `cab9ff4`, `58aaaf0`
+**Branch**: `main`
+
+---
+
 ## 2026-02-17 | Garin | Design System Phase 3 — Final Token Cleanup & Accessibility
 
 **Summary**: Completed remaining Design System Phase 3 work. Replaced all hardcoded hex colors with semantic tokens, cleaned up arbitrary spacing in app/ directory, added ARIA accessibility fixes to interactive elements, and added new gradient color tokens.
