@@ -9,6 +9,7 @@ import { useSession } from "@contexts/UseSession";
 import { cn } from "@lib/utils/style";
 import ActionButton from "@modules/common/components/ActionButton";
 import Image from "@modules/common/components/Image";
+import NotificationBell from "@modules/common/components/NotificationBell";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import TransitionWrapper from "@modules/common/components/wrappers/TransitionWrapper";
 import useComponentVisible from "@modules/common/hooks/useComponentVisible";
@@ -64,6 +65,7 @@ const Navbar: FC = () => {
                 "bg-action-50 border border-border-light rounded px-2.5 flex-row-reverse hidden sm:flex"
               }
             />
+            <NotificationBell />
             <DropdownMenu />
           </div>
         ) : (

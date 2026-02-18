@@ -84,12 +84,13 @@ export async function POST(request: NextRequest) {
     });
 
     // Create notification for receiver
-    await supabase.from("notifications").insert({
+    await supabase.from("user_notifications").insert({
       user_id: memberId,
-      type: "encouragement",
+      category: "encouragement",
       title: "You received encouragement!",
-      message: `${sender?.first_name || "Someone"} sent you encouragement. Keep going!`,
-      data: { senderId: user.id },
+      body: `${sender?.first_name || "Someone"} sent you encouragement. Keep going!`,
+      action_type: "navigate",
+      action_data: { route: "/community", senderId: user.id },
     });
 
     return NextResponse.json({

@@ -67,6 +67,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to add reaction" }, { status: 500 });
     }
 
+    // Notify post author (don't notify yourself)
+    const { data: post } = await supabase
+      .from("community_posts")
+      .select("user_id")
+      .eq("id", postId)
+      .single();
+
+    if (post && post.user_id !== user.id) {
+      await supabase.from("user_notifications").insert({
+        user_id: post.user_id,
+        category: "social",
+        title: "Someone reacted to your post",
+        body: `Someone reacted to your post`,
+        action_type: "navigate",
+        action_data: { route: `/community/post/${postId}`, postId },
+      });
+    }
+
     return NextResponse.json({ reaction: { type: reactionType, action: "added" } });
   } catch (error) {
     console.error("Reaction error:", error);

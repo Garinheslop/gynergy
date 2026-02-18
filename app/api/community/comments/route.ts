@@ -232,12 +232,13 @@ export async function POST(request: NextRequest) {
       });
 
       // Notify post author
-      await supabase.from("notifications").insert({
+      await supabase.from("user_notifications").insert({
         user_id: post.user_id,
-        type: "comment",
+        category: "social",
         title: "New comment on your post",
-        message: `Someone commented on your post`,
-        data: { postId, commentId: comment.id },
+        body: `Someone commented on your post`,
+        action_type: "navigate",
+        action_data: { route: `/community/post/${postId}`, postId, commentId: comment.id },
       });
     }
 
