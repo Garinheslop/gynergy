@@ -5,6 +5,7 @@ import { FC, useState, useEffect, useRef } from "react";
 import { formatTimeAgo } from "@lib/utils/date";
 import { Avatar } from "@modules/common/components/ui";
 import { useConfirm } from "@modules/common/components/ui/ConfirmDialog";
+import ReportModal from "@modules/community/components/ReportModal";
 import { Comment } from "@resources/types/community";
 import { RootState } from "@store/configureStore";
 import { useSelector, useDispatch } from "@store/hooks";
@@ -204,6 +205,7 @@ const CommentItem: FC<CommentItemProps> = ({
 }) => {
   const isOwner = currentUserId === comment.userId;
   const isReplying = replyingTo === comment.id;
+  const [reportingCommentId, setReportingCommentId] = useState<string | null>(null);
 
   return (
     <div className="group">
@@ -237,12 +239,19 @@ const CommentItem: FC<CommentItemProps> = ({
             >
               Reply
             </button>
-            {isOwner && (
+            {isOwner ? (
               <button
                 onClick={() => onDelete(comment.id)}
                 className="text-grey-500 hover:text-danger focus-visible:text-danger text-xs font-medium focus-visible:outline-none"
               >
                 Delete
+              </button>
+            ) : (
+              <button
+                onClick={() => setReportingCommentId(comment.id)}
+                className="text-grey-500 hover:text-danger focus-visible:text-danger text-xs font-medium focus-visible:outline-none"
+              >
+                Report
               </button>
             )}
           </div>
@@ -300,14 +309,23 @@ const CommentItem: FC<CommentItemProps> = ({
                         {reply.content}
                       </p>
                     </div>
-                    {currentUserId === reply.userId && (
-                      <button
-                        onClick={() => onDelete(reply.id)}
-                        className="text-grey-500 hover:text-danger focus-visible:text-danger mt-1 text-xs font-medium focus-visible:outline-none"
-                      >
-                        Delete
-                      </button>
-                    )}
+                    <div className="mt-1 flex items-center gap-3">
+                      {currentUserId === reply.userId ? (
+                        <button
+                          onClick={() => onDelete(reply.id)}
+                          className="text-grey-500 hover:text-danger focus-visible:text-danger text-xs font-medium focus-visible:outline-none"
+                        >
+                          Delete
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => setReportingCommentId(reply.id)}
+                          className="text-grey-500 hover:text-danger focus-visible:text-danger text-xs font-medium focus-visible:outline-none"
+                        >
+                          Report
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -315,6 +333,17 @@ const CommentItem: FC<CommentItemProps> = ({
           )}
         </div>
       </div>
+
+      {/* Report Modal for comments/replies */}
+      {reportingCommentId && (
+        <ReportModal
+          isOpen={!!reportingCommentId}
+          onClose={() => setReportingCommentId(null)}
+          contentType="comment"
+          contentId={reportingCommentId}
+          onSuccess={() => setReportingCommentId(null)}
+        />
+      )}
     </div>
   );
 };

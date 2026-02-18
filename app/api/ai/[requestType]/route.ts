@@ -140,6 +140,10 @@ export async function POST(request: Request, { params }: { params: { requestType
 
     // POST: Regular chat (non-streaming)
     if (requestType === aiRequestTypes.chat) {
+      // Check AI consent (Apple Guideline 5.1.1(vii))
+      if (!user.user_metadata?.ai_consent_granted_at) {
+        return NextResponse.json({ error: "ai_consent_required" }, { status: 403 });
+      }
       const { message, characterKey, sessionId, chatSessionId: _chatSessionId } = body;
 
       if (!message || !characterKey) {

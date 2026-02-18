@@ -18,6 +18,14 @@ export async function POST(request: Request) {
     });
   }
 
+  // Check AI consent (Apple Guideline 5.1.1(vii) — must disclose third-party AI processing)
+  if (!user.user_metadata?.ai_consent_granted_at) {
+    return new Response(JSON.stringify({ type: "error", error: "ai_consent_required" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   try {
     const body = await request.json();
     const { message, characterKey, sessionId } = body as {

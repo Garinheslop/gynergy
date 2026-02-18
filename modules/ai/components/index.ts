@@ -1,4 +1,5 @@
 // AI Chat Components
+export { default as AIConsentModal } from "./AIConsentModal";
 export { default as CharacterAvatar } from "./CharacterAvatar";
 export { default as CharacterSelector } from "./CharacterSelector";
 export { default as ChatMessage } from "./ChatMessage";

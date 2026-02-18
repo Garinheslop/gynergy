@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 
+import { checkStrictRateLimit, getRateLimitHeaders } from "@lib/rate-limit";
 import { createClient, createServiceClient } from "@lib/supabase-server";
 
 const REPORT_REASONS = [
@@ -18,6 +19,16 @@ const CONTENT_TYPES = ["post", "comment"] as const;
 
 // POST: Submit a content report
 export async function POST(request: NextRequest) {
+  // Rate limit: 10 requests per minute per IP (prevent report flooding)
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const rateLimitResult = await checkStrictRateLimit(`report:${ip}`);
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429, headers: getRateLimitHeaders(rateLimitResult) }
+    );
+  }
+
   const supabase = createClient();
   const {
     data: { user },

@@ -5,29 +5,17 @@ import { cn } from "@lib/utils/style";
 
 const Footer = ({ sx }: { sx?: string }) => {
   return (
-    <footer className="flex w-full flex-col items-center justify-center pb-5 pt-12 sm:pb-12 sm:pt-24">
+    <footer className="flex w-full flex-col items-center justify-center pt-12 pb-5 sm:pt-24 sm:pb-12">
       <div className="flex flex-col items-center justify-center gap-1 sm:flex-row">
         <div className={cn("text-content-dark flex gap-1 text-center text-base", sx)}>
-          Copyright © 2025 . Gynergy . All rights reserved.
+          Copyright © 2026 . Gynergy . All rights reserved.
         </div>
         <div className={cn("text-content-dark flex gap-1 text-center text-base", sx)}>
-          <Link
-            className="!underline duration-200 hover:opacity-70"
-            href={
-              "https://app.termly.io/policy-viewer/policy.html?policyUUID=547ca51c-f060-400b-baa0-d12d4adb9edf"
-            }
-            target="_blank"
-          >
+          <Link className="!underline duration-200 hover:opacity-70" href="/terms">
             Terms
           </Link>
           .
-          <Link
-            className="!underline duration-200 hover:opacity-70"
-            href={
-              "https://app.termly.io/policy-viewer/policy.html?policyUUID=b816b72f-eba6-4079-9f6e-201d10b19e50"
-            }
-            target="_blank"
-          >
+          <Link className="!underline duration-200 hover:opacity-70" href="/privacy">
             Privacy Policy
           </Link>
         </div>

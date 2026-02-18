@@ -50,6 +50,8 @@ export async function middleware(request: NextRequest) {
     "/assessment", // Five Pillar Self-Assessment
     "/journal", // Journal subscription sales page
     "/blog", // Blog / SEO content
+    "/privacy", // Privacy Policy (required for App Store)
+    "/terms", // Terms of Service (required for App Store)
   ];
 
   if (publicRoutes.some((route) => pathname === route || pathname.startsWith(route + "/"))) {

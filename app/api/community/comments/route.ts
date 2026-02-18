@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { createClient } from "@lib/supabase-server";
+import { createClient, createServiceClient } from "@lib/supabase-server";
 
 // Type definitions for type safety
 interface CommentAuthor {
@@ -56,6 +56,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Post ID is required" }, { status: 400 });
     }
 
+    // Fetch blocked user IDs (bidirectional) for filtering
+    const serviceClient = createServiceClient();
+    const { data: blockedRows } = await serviceClient.rpc("get_blocked_user_ids", {
+      uid: user.id,
+    });
+    const blockedUserIds: string[] = blockedRows || [];
+
     // Build query for comments (top-level only, replies are nested)
     let query = supabase
       .from("post_comments")
@@ -83,6 +90,11 @@ export async function GET(request: NextRequest) {
       .is("parent_id", null) // Only top-level comments
       .order("created_at", { ascending: false })
       .limit(limit);
+
+    // Filter out blocked users (bidirectional)
+    if (blockedUserIds.length > 0) {
+      query = query.not("user_id", "in", `(${blockedUserIds.join(",")})`);
+    }
 
     if (cursor) {
       query = query.lt("created_at", cursor);
@@ -112,23 +124,25 @@ export async function GET(request: NextRequest) {
             profileImage: comment.author.profile_image,
           }
         : null,
-      replies: (comment.replies || []).map((reply) => ({
-        id: reply.id,
-        postId: reply.post_id,
-        userId: reply.user_id,
-        parentId: reply.parent_id,
-        content: reply.content,
-        createdAt: reply.created_at,
-        updatedAt: reply.updated_at,
-        author: reply.author
-          ? {
-              id: reply.author.id,
-              firstName: reply.author.first_name,
-              lastName: reply.author.last_name,
-              profileImage: reply.author.profile_image,
-            }
-          : null,
-      })),
+      replies: (comment.replies || [])
+        .filter((reply) => !blockedUserIds.includes(reply.user_id))
+        .map((reply) => ({
+          id: reply.id,
+          postId: reply.post_id,
+          userId: reply.user_id,
+          parentId: reply.parent_id,
+          content: reply.content,
+          createdAt: reply.created_at,
+          updatedAt: reply.updated_at,
+          author: reply.author
+            ? {
+                id: reply.author.id,
+                firstName: reply.author.first_name,
+                lastName: reply.author.last_name,
+                profileImage: reply.author.profile_image,
+              }
+            : null,
+        })),
     }));
 
     const hasMore = typedComments && typedComments.length === limit;

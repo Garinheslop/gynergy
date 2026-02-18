@@ -25,6 +25,7 @@ import {
   deletePost,
 } from "@store/modules/community";
 
+import BlockUserButton from "./BlockUserButton";
 import CommentSection from "./CommentSection";
 import ReactionIcon from "./ReactionIcon";
 import ReportModal from "./ReportModal";
@@ -286,29 +287,37 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
                     </button>
                   </>
                 ) : (
-                  <button
-                    className="text-grey-300 hover:bg-bkg-dark-800 flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors"
-                    onClick={() => {
-                      setShowOwnerMenu(false);
-                      setShowReportModal(true);
-                    }}
-                  >
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      aria-hidden="true"
+                  <>
+                    <button
+                      className="text-grey-300 hover:bg-bkg-dark-800 flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors"
+                      onClick={() => {
+                        setShowOwnerMenu(false);
+                        setShowReportModal(true);
+                      }}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"
-                      />
-                    </svg>
-                    Report
-                  </button>
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"
+                        />
+                      </svg>
+                      Report
+                    </button>
+                    <BlockUserButton
+                      userId={post.userId}
+                      userName={post.author?.firstName || "this user"}
+                      onBlocked={() => setShowOwnerMenu(false)}
+                      variant="menu-item"
+                    />
+                  </>
                 )}
               </div>
             )}

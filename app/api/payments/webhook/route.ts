@@ -123,6 +123,12 @@ export async function POST(request: NextRequest) {
         break;
       }
 
+      case "charge.refunded": {
+        const charge = event.data.object as Stripe.Charge;
+        await handleChargeRefunded(supabase, charge);
+        break;
+      }
+
       default:
       // Unhandled event type - no action needed
     }
@@ -390,6 +396,57 @@ async function handleCheckoutExpired(session: Stripe.Checkout.Session) {
     firstName,
     productType,
   }).catch((err) => console.error("Cart abandonment drip enrollment error:", err));
+}
+
+async function handleChargeRefunded(
+  supabase: ReturnType<typeof createServiceClient>,
+  charge: Stripe.Charge
+) {
+  const paymentIntentId =
+    typeof charge.payment_intent === "string" ? charge.payment_intent : charge.payment_intent?.id;
+
+  if (!paymentIntentId) return;
+
+  // Find the purchase by payment intent
+  const { data: purchase } = await supabase
+    .from("purchases")
+    .select("id, user_id, purchase_type")
+    .eq("stripe_payment_intent_id", paymentIntentId)
+    .single();
+
+  if (!purchase) return;
+
+  // Update purchase status to refunded
+  await supabase
+    .from("purchases")
+    .update({
+      status: "refunded",
+      refunded_at: new Date().toISOString(),
+    })
+    .eq("id", purchase.id);
+
+  if (!purchase.user_id) return;
+
+  // Revoke challenge entitlements
+  if (
+    purchase.purchase_type === "challenge" ||
+    purchase.purchase_type === "challenge_friend_code"
+  ) {
+    await supabase
+      .from("user_entitlements")
+      .update({
+        has_challenge_access: false,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("user_id", purchase.user_id);
+  }
+
+  // Deactivate unused friend codes from this user's purchase
+  await supabase
+    .from("friend_codes")
+    .update({ is_active: false })
+    .eq("owner_id", purchase.user_id)
+    .is("used_by_id", null);
 }
 
 function mapStripeStatus(

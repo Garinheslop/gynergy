@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { createClient } from "@lib/supabase-server";
+import { createClient, createServiceClient } from "@lib/supabase-server";
 
 // Type definitions for type safety
 interface PostAuthor {
@@ -48,6 +48,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
+    // Fetch blocked user IDs (bidirectional) for filtering
+    const serviceClient = createServiceClient();
+    const { data: blockedRows } = await serviceClient.rpc("get_blocked_user_ids", {
+      uid: user.id,
+    });
+    const blockedUserIds: string[] = blockedRows || [];
+
     const searchParams = request.nextUrl.searchParams;
     const postId = searchParams.get("postId");
     const cursor = searchParams.get("cursor");
@@ -77,6 +84,12 @@ export async function GET(request: NextRequest) {
         .single();
 
       if (singleError || !singlePost) {
+        return NextResponse.json({ error: "Post not found" }, { status: 404 });
+      }
+
+      // Hide posts from blocked users (bidirectional)
+      const typedSinglePost = singlePost as CommunityPost;
+      if (blockedUserIds.includes(typedSinglePost.user_id)) {
         return NextResponse.json({ error: "Post not found" }, { status: 404 });
       }
 
@@ -141,6 +154,11 @@ export async function GET(request: NextRequest) {
       .order("is_pinned", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(limit);
+
+    // Filter out blocked users (bidirectional)
+    if (blockedUserIds.length > 0) {
+      query = query.not("user_id", "in", `(${blockedUserIds.join(",")})`);
+    }
 
     // Filter by visibility - user can see public, their own, and cohort posts if in cohort
     if (cohortId) {

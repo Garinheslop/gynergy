@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 
+import { checkStrictRateLimit, getRateLimitHeaders } from "@lib/rate-limit";
 import {
   createChallengeCheckoutSession,
   createSubscriptionCheckoutSession,
@@ -11,6 +12,16 @@ import { createClient } from "@lib/supabase-server";
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 10 requests per minute per IP (prevent checkout abuse)
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const rateLimitResult = await checkStrictRateLimit(`checkout:${ip}`);
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429, headers: getRateLimitHeaders(rateLimitResult) }
+      );
+    }
+
     const supabase = createClient();
     const {
       data: { user },

@@ -1,11 +1,12 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 
 import { cn } from "@lib/utils/style";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { CharacterKey } from "@resources/types/ai";
 import { paragraphVariants } from "@resources/variants";
 
+import AIConsentModal from "./AIConsentModal";
 import CharacterAvatar from "./CharacterAvatar";
 import CharacterSelector from "./CharacterSelector";
 import ChatInput from "./ChatInput";
@@ -20,6 +21,7 @@ interface ChatContainerProps {
 
 const ChatContainer: React.FC<ChatContainerProps> = ({ onClose, showHeader = true, sx }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [consentStatus, setConsentStatus] = useState<"loading" | "needed" | "granted">("loading");
 
   // Use the AI chat hook
   const {
@@ -38,13 +40,42 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onClose, showHeader = tru
     clearChat,
   } = useAIChat();
 
-  // Fetch characters on mount
+  // Check AI consent on mount
   useEffect(() => {
+    const checkConsent = async () => {
+      try {
+        const res = await fetch("/api/user/consent");
+        const data = await res.json();
+        setConsentStatus(data.hasConsent ? "granted" : "needed");
+      } catch {
+        setConsentStatus("needed");
+      }
+    };
+    checkConsent();
+  }, []);
+
+  const handleConsentAccepted = useCallback(() => {
+    setConsentStatus("granted");
+  }, []);
+
+  const handleConsentDeclined = useCallback(() => {
+    onClose?.();
+  }, [onClose]);
+
+  // Fetch characters on mount (only after consent granted)
+  useEffect(() => {
+    if (consentStatus !== "granted") return;
     if (!characters.fetched && !characters.loading) {
       fetchCharacters();
       fetchSuggestedCharacter();
     }
-  }, [characters.fetched, characters.loading, fetchCharacters, fetchSuggestedCharacter]);
+  }, [
+    consentStatus,
+    characters.fetched,
+    characters.loading,
+    fetchCharacters,
+    fetchSuggestedCharacter,
+  ]);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -106,6 +137,38 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onClose, showHeader = tru
 
   // Get current character info
   const currentCharacter = characters.data.find((c) => c.key === activeCharacter);
+
+  // Show consent modal if consent not yet granted
+  if (consentStatus === "loading") {
+    return (
+      <div className={cn("bg-bkg-dark flex h-full items-center justify-center", sx)}>
+        <div className="flex gap-1">
+          <span
+            className="bg-content-dark-secondary/50 h-2 w-2 animate-bounce rounded-full"
+            style={{ animationDelay: "0ms" }}
+          />
+          <span
+            className="bg-content-dark-secondary/50 h-2 w-2 animate-bounce rounded-full"
+            style={{ animationDelay: "150ms" }}
+          />
+          <span
+            className="bg-content-dark-secondary/50 h-2 w-2 animate-bounce rounded-full"
+            style={{ animationDelay: "300ms" }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (consentStatus === "needed") {
+    return (
+      <AIConsentModal
+        isOpen={true}
+        onAccept={handleConsentAccepted}
+        onDecline={handleConsentDeclined}
+      />
+    );
+  }
 
   // Show character selector if no character selected
   if (!activeCharacter) {

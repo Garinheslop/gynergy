@@ -104,6 +104,26 @@ function LoginPageContent() {
     }
   };
 
+  const handleAppleSignIn = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "apple",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`,
+        },
+      });
+      if (error) throw error;
+    } catch (err: unknown) {
+      const authErr = err as { message?: string };
+      console.error("Apple sign in error:", err);
+      setError(authErr?.message ?? "Error signing in with Apple. Please try again.");
+      setIsLoading(false);
+    }
+  };
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -518,6 +538,25 @@ function LoginPageContent() {
               </svg>
               <span className="font-medium">
                 {authMode === "signup" ? "Sign up with Google" : "Sign in with Google"}
+              </span>
+            </button>
+
+            {/* Apple Sign In Button (Apple Guideline 4.8 — required when offering Google OAuth) */}
+            <button
+              type="button"
+              onClick={handleAppleSignIn}
+              disabled={isLoading || authenticating}
+              className={cn(
+                "flex w-full items-center justify-center gap-3 rounded-lg border border-black bg-black px-4 py-3",
+                "text-white transition-colors hover:bg-gray-900",
+                "disabled:cursor-not-allowed disabled:opacity-60"
+              )}
+            >
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
+              </svg>
+              <span className="font-medium">
+                {authMode === "signup" ? "Sign up with Apple" : "Sign in with Apple"}
               </span>
             </button>
 
