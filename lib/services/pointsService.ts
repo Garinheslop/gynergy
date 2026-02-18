@@ -235,10 +235,10 @@ export async function getActiveMultiplierForUser(
   error?: string;
 }> {
   try {
-    // Get user's current streak from session enrollment
+    // Get user's current streaks from session enrollment
     const { data: enrollment, error: enrollmentError } = await supabase
       .from("session_enrollments")
-      .select("streak_count")
+      .select("morning_streak, evening_streak, gratitude_streak")
       .eq("user_id", userId)
       .eq("session_id", sessionId)
       .single();
@@ -247,7 +247,12 @@ export async function getActiveMultiplierForUser(
       return { multiplier: null, streak: 0, error: enrollmentError.message };
     }
 
-    const streak = enrollment?.streak_count || 0;
+    // Use the highest streak for multiplier display
+    const streak = Math.max(
+      enrollment?.morning_streak || 0,
+      enrollment?.evening_streak || 0,
+      enrollment?.gratitude_streak || 0
+    );
     const multiplier = getStreakMultiplier(streak);
 
     if (multiplier.value === 1.0) {
@@ -295,10 +300,10 @@ export async function awardPoints(
       completedToday = { morning: false, evening: false, dga: false },
     } = params;
 
-    // Get user's current streak
+    // Get user's current streaks
     const { data: enrollment, error: enrollmentError } = await supabase
       .from("session_enrollments")
-      .select("streak_count")
+      .select("morning_streak, evening_streak, gratitude_streak")
       .eq("user_id", userId)
       .eq("session_id", sessionId)
       .single();
@@ -317,7 +322,15 @@ export async function awardPoints(
       };
     }
 
-    const streak = enrollment?.streak_count || 0;
+    // Pick the streak matching the current activity type
+    const streak =
+      activityType === "morning_journal"
+        ? enrollment?.morning_streak || 0
+        : activityType === "evening_journal"
+          ? enrollment?.evening_streak || 0
+          : activityType === "dga"
+            ? enrollment?.gratitude_streak || 0
+            : 0;
 
     // Check if user has combo (all three activities today)
     const hasCombo = completedToday.morning && completedToday.evening && completedToday.dga;

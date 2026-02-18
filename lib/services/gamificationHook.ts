@@ -67,12 +67,18 @@ async function buildBadgeContext(
     // Get enrollment data (streak count, enrollment date)
     const { data: enrollment } = await supabase
       .from("session_enrollments")
-      .select("streak_count, enrollment_date")
+      .select(
+        "morning_streak, evening_streak, gratitude_streak, weekly_reflection_streak, enrollment_date"
+      )
       .eq("user_id", userId)
       .eq("session_id", sessionId)
       .single();
 
-    const streak = enrollment?.streak_count || 0;
+    const morningStreak = enrollment?.morning_streak || 0;
+    const eveningStreak = enrollment?.evening_streak || 0;
+    const gratitudeStreak = enrollment?.gratitude_streak || 0;
+    const combinedStreak = Math.min(morningStreak, eveningStreak, gratitudeStreak);
+    const weeklyStreak = enrollment?.weekly_reflection_streak || 0;
     const enrollmentDate = enrollment?.enrollment_date ? new Date(enrollment.enrollment_date) : now;
     const dayInJourney = Math.max(
       1,
@@ -111,14 +117,14 @@ async function buildBadgeContext(
           .select("id", { count: "exact", head: true })
           .eq("user_id", userId)
           .eq("session_id", sessionId)
-          .eq("journal_type", "morning-journal")
+          .eq("journal_type", "morning")
           .eq("is_completed", true),
         supabase
           .from("journals")
           .select("id", { count: "exact", head: true })
           .eq("user_id", userId)
           .eq("session_id", sessionId)
-          .eq("journal_type", "evening-journal")
+          .eq("journal_type", "evening")
           .eq("is_completed", true),
         supabase
           .from("action_logs")
@@ -134,8 +140,8 @@ async function buildBadgeContext(
     const todayActions = actionsResult.data || [];
     const [morningCount, eveningCount, dgaCount] = countsResult;
 
-    const hasMorningToday = todayJournals.some((j: any) => j.journal_type === "morning-journal");
-    const hasEveningToday = todayJournals.some((j: any) => j.journal_type === "evening-journal");
+    const hasMorningToday = todayJournals.some((j: any) => j.journal_type === "morning");
+    const hasEveningToday = todayJournals.some((j: any) => j.journal_type === "evening");
     const hasDgaToday = todayActions.some((a: any) => a.action_type === "gratitude");
 
     return {
@@ -145,11 +151,11 @@ async function buildBadgeContext(
       timestamp: now,
       userTimezone: "America/New_York",
       streaks: {
-        morning: streak,
-        evening: streak,
-        gratitude: streak,
-        combined: streak,
-        weekly: 0,
+        morning: morningStreak,
+        evening: eveningStreak,
+        gratitude: gratitudeStreak,
+        combined: combinedStreak,
+        weekly: weeklyStreak,
       },
       completedToday: {
         morning: hasMorningToday,
