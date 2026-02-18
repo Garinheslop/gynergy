@@ -67,7 +67,10 @@ export async function GET(request: Request, { params }: { params: { requestType:
   }
 
   if ("error" in data) {
-    return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    const notFoundErrors = ["bad-request", "no-book", "no-book-session", "no-session-enrollment"];
+    const errorMsg = String(data.error);
+    const status = notFoundErrors.includes(errorMsg) ? 404 : 500;
+    return NextResponse.json({ error: { message: data.error } }, { status });
   } else {
     return NextResponse.json({
       [responseName]: data,
@@ -114,7 +117,10 @@ export async function POST(request: Request, { params }: { params: { requestType
   }
 
   if ("error" in data) {
-    return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    const notFoundErrors = ["bad-request", "invalid-book", "no-book-session"];
+    const errorMsg = String(data.error);
+    const status = notFoundErrors.includes(errorMsg) ? 404 : 500;
+    return NextResponse.json({ error: { message: data.error } }, { status });
   } else {
     return NextResponse.json({
       enrollment: data,
@@ -245,7 +251,7 @@ const getBookData = async ({ slug, date }: { slug: string; date: string }) => {
       return { error: errorTypes.noBook };
     }
 
-    const { data: sessionData, error: sessionError } = await supabase
+    const { data: sessionData } = await supabase
       .from("book_sessions")
       .select("*")
       .eq("book_id", bookData.id)
@@ -255,13 +261,26 @@ const getBookData = async ({ slug, date }: { slug: string; date: string }) => {
       .limit(1)
       .single();
 
-    if (sessionError || !sessionData) {
+    // If no session covers today, fall back to the most recent session
+    let latestSession = sessionData;
+    if (!latestSession) {
+      const { data: fallbackSession } = await supabase
+        .from("book_sessions")
+        .select("*")
+        .eq("book_id", bookData.id)
+        .order("start_date", { ascending: false })
+        .limit(1)
+        .single();
+      latestSession = fallbackSession;
+    }
+
+    if (!latestSession) {
       return { error: errorTypes.noBookSession };
     }
 
     const bookWithLatestSession = {
       ...bookData,
-      latestSession: sessionData,
+      latestSession,
     };
 
     return camelcaseKeys(bookWithLatestSession, { deep: true });
