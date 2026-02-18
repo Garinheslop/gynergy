@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -86,6 +86,28 @@ const SettingsPageClient: React.FC = () => {
       });
     }
   }, [profile.updating]);
+
+  // Track reset completion and show success feedback
+  const wasResettingRef = useRef(false);
+  useEffect(() => {
+    if (enrollments.resetting) {
+      wasResettingRef.current = true;
+    } else if (wasResettingRef.current) {
+      wasResettingRef.current = false;
+      if (!enrollments.error) {
+        messagePopupObj.open({
+          popupData: {
+            heading: "Progress Reset",
+            description:
+              "Your journaling history has been reset successfully. You will be redirected to start fresh.",
+          },
+        });
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
+      }
+    }
+  }, [enrollments.resetting]);
 
   const handleSaveChanges = () => {
     setUpdating(true);

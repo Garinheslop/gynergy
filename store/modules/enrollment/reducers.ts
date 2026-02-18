@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
 import { BookEnrollmentData } from "@resources/types/book";
 
 interface EnrollmentState {
@@ -85,9 +86,10 @@ const slice = createSlice({
       state.current = action.payload.enrollment;
       state.loading = false;
     },
-    userEnrollmentReset: (state, action: PayloadAction<{ enrollment: BookEnrollmentData }>) => {
-      state.current = action.payload.enrollment;
+    userEnrollmentReset: (state) => {
+      state.current = null;
       state.resetting = false;
+      state.error = "";
     },
     updateTotalPoints: (
       state,
@@ -117,7 +119,7 @@ const slice = createSlice({
       state.streak.updating = false;
       state.streak.resetting = false;
     },
-    userStreakUpdated: (state, action) => {
+    userStreakUpdated: (state, _action) => {
       state.streak.lastFetched = new Date().getTime();
       state.streak.loading = false;
     },
