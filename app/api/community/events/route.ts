@@ -57,6 +57,10 @@ export async function GET() {
       .limit(20);
 
     if (upcomingError) {
+      // Table may not exist yet — return empty events instead of 500
+      if (upcomingError.code === "42P01" || upcomingError.code === "PGRST204") {
+        return NextResponse.json({ upcoming: [], past: [], attendees: {} });
+      }
       console.error("Error fetching upcoming events:", upcomingError);
       return NextResponse.json({ error: "Failed to fetch events" }, { status: 500 });
     }

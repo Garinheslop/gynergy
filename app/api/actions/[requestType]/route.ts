@@ -143,7 +143,11 @@ export async function GET(request: Request, { params }: { params: { requestType:
   }
 
   if ("error" in data) {
-    return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+    // "no-user-book-session", "no-book-found", "no-action", "bad-request" are data-not-found
+    const notFoundErrors = ["no-user-book-session", "no-book-found", "no-action", "bad-request"];
+    const errorMsg = String(data.error);
+    const status = notFoundErrors.includes(errorMsg) ? 404 : 500;
+    return NextResponse.json({ error: { message: data.error } }, { status });
   } else {
     return NextResponse.json({
       actions: data,

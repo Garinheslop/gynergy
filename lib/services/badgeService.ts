@@ -440,10 +440,10 @@ export async function getAllBadges(supabase: any): Promise<{ badges: Badge[]; er
 export async function getNewBadges(
   supabase: any,
   userId: string,
-  sessionId: string
+  sessionId?: string
 ): Promise<{ badges: UserBadge[]; error?: string }> {
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from("user_badges")
       .select(
         `
@@ -452,9 +452,15 @@ export async function getNewBadges(
       `
       )
       .eq("user_id", userId)
-      .eq("session_id", sessionId)
       .eq("is_new", true)
       .order("unlocked_at", { ascending: false });
+
+    // Scope to session if provided, otherwise return all unseen badges
+    if (sessionId) {
+      query = query.eq("session_id", sessionId);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       return { badges: [], error: error.message };

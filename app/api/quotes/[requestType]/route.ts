@@ -65,13 +65,17 @@ export async function GET(request: Request, { params }: { params: { requestType:
     });
 
     if (data && "error" in data) {
-      return NextResponse.json({ error: { message: data.error } }, { status: 500 });
+      // "no-user-book-session", "no-quotes", "bad-request" are data-not-found, not server errors
+      const notFoundErrors = ["no-user-book-session", "no-quotes", "bad-request"];
+      const errorMsg = String(data.error);
+      const status = notFoundErrors.includes(errorMsg) ? 404 : 500;
+      return NextResponse.json({ error: { message: data.error } }, { status });
     }
 
     return NextResponse.json({ quote: data });
   }
 
-  return NextResponse.json({ error: "Invalid Request type." }, { status: 500 });
+  return NextResponse.json({ error: "Invalid Request type." }, { status: 400 });
 }
 
 const getUserDailtyQuote = async ({

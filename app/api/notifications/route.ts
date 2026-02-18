@@ -42,8 +42,13 @@ export async function GET(request: NextRequest) {
     const { data: notifications, error } = await query;
 
     if (error) {
-      // Table may not exist yet — return empty instead of 500
-      if (error.code === "42P01") {
+      // Table/schema may not exist yet — return empty instead of 500
+      // 42P01 = undefined table, 42703 = undefined column, PGRST = PostgREST schema errors
+      const isSchemaError =
+        error.code === "42P01" ||
+        error.code === "42703" ||
+        (typeof error.code === "string" && error.code.startsWith("PGRST"));
+      if (isSchemaError) {
         return NextResponse.json({
           notifications: [],
           unreadCount: 0,

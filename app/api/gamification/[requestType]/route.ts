@@ -63,10 +63,8 @@ export async function GET(request: Request, { params }: { params: { requestType:
 
     // GET: New (unseen) badges
     if (requestType === gamificationRequestTypes.getNewBadges) {
-      if (!sessionId) {
-        return NextResponse.json({ error: "Session ID is required" }, { status: 400 });
-      }
-      const { badges, error } = await getNewBadges(supabase, user.id, sessionId);
+      // sessionId is optional — when omitted, return all unseen badges for the user
+      const { badges, error } = await getNewBadges(supabase, user.id, sessionId || undefined);
       if (error) {
         return NextResponse.json({ error }, { status: 500 });
       }
