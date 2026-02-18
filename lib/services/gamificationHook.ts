@@ -8,6 +8,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { checkAndAwardBadges } from "@lib/services/badgeService";
+import { emitEvent } from "@lib/services/eventService";
 import { awardPoints } from "@lib/services/pointsService";
 import type {
   ActivityType,
@@ -236,6 +237,11 @@ export async function processGamification(input: GamificationInput): Promise<Gam
     // Sort by priority (highest first)
     celebrations.sort((a, b) => b.priority - a.priority);
 
+    // ---- Emit automation events (non-blocking, fire-and-forget) ----
+    emitAutomationEvents(context, badgeResult.newBadges, userId).catch((err) =>
+      console.error("[gamification] Event emission error:", err)
+    );
+
     return {
       points: totalPoints,
       celebrations,
@@ -243,6 +249,85 @@ export async function processGamification(input: GamificationInput): Promise<Gam
   } catch (error) {
     console.error("[gamification] Hook error:", error);
     return safeResult;
+  }
+}
+
+// ============================================================================
+// Automation Event Emission
+// ============================================================================
+
+// Streak milestones that trigger automation rules
+const STREAK_MILESTONES = new Set([7, 14, 21, 30, 60, 90]);
+
+/**
+ * Emit events to the automation engine based on what just happened.
+ * Completely fire-and-forget — errors are logged but never propagate.
+ */
+async function emitAutomationEvents(
+  context: BadgeCheckContext,
+  newBadges: Array<{ id: string; name: string; key: string }>,
+  userId: string
+): Promise<void> {
+  const { activityType, sessionId, streaks, totalCounts } = context;
+
+  // 1. Emit activity completion event
+  const journalType = activityTypeToJournalType(activityType);
+  if (journalType) {
+    // Determine if this is the user's first of this type
+    const isFirst =
+      (journalType === "morning" && totalCounts.morningJournals <= 1) ||
+      (journalType === "evening" && totalCounts.eveningJournals <= 1);
+
+    await emitEvent(
+      "journal_completed",
+      { journal_type: journalType, sessionId, is_first: isFirst },
+      { userId }
+    );
+  } else if (activityType === "dga") {
+    await emitEvent(
+      "action_completed",
+      { action_type: "gratitude", sessionId, is_first: totalCounts.dgas <= 1 },
+      { userId }
+    );
+  }
+
+  // 2. Emit streak milestone events
+  const streakEntries: Array<{ type: string; count: number }> = [
+    { type: "morning", count: streaks.morning },
+    { type: "evening", count: streaks.evening },
+    { type: "gratitude", count: streaks.gratitude },
+    { type: "combined", count: streaks.combined },
+  ];
+
+  for (const { type, count } of streakEntries) {
+    if (STREAK_MILESTONES.has(count)) {
+      await emitEvent("streak_reached", { streak_type: type, count, sessionId }, { userId });
+    }
+  }
+
+  // 3. Emit badge earned events
+  for (const badge of newBadges) {
+    await emitEvent(
+      "badge_earned",
+      { badge_id: badge.id, badge_name: badge.name, badge_key: badge.key, sessionId },
+      { userId }
+    );
+  }
+}
+
+/**
+ * Map ActivityType back to the DB journal_type for event payloads
+ */
+function activityTypeToJournalType(activityType: ActivityType): string | null {
+  switch (activityType) {
+    case "morning_journal":
+      return "morning";
+    case "evening_journal":
+      return "evening";
+    case "weekly_journal":
+      return "weekly";
+    default:
+      return null;
   }
 }
 
