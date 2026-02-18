@@ -1,7 +1,7 @@
 # Claude Code Chat Registry
 
 > **Purpose**: Track all active Claude Code chat sessions working on this codebase.
-> **Last Updated**: 2026-02-14
+> **Last Updated**: 2026-02-17
 
 ---
 
@@ -17,6 +17,7 @@
 
 | Chat ID               | Developer | Branch | Focus                          | Closed     | Reason     | Final Commit |
 | --------------------- | --------- | ------ | ------------------------------ | ---------- | ---------- | ------------ |
+| chat-G-email-0217     | Garin     | main   | Email system production wiring | 2026-02-17 | Completed  | `d768bdc`    |
 | chat-G-appstore-0217  | Garin     | main   | Phase 4 TypeScript & Redux     | 2026-02-17 | Completed  | `fabb952`    |
 | chat-G-funnels-0217   | Garin     | main   | Funnel scripts & landing pages | 2026-02-17 | Stale >24h | -            |
 | chat-G-community-0217 | Garin     | main   | Community section              | 2026-02-17 | Stale >24h | -            |
