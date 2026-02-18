@@ -10,7 +10,11 @@ import { pick } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
-import { processGamification, journalToActivityType } from "@lib/services/gamificationHook";
+import {
+  processGamification,
+  journalToActivityType,
+  type GamificationResult,
+} from "@lib/services/gamificationHook";
 import { createClient, createServiceClient } from "@lib/supabase-server";
 import { serverErrorTypes } from "@resources/types/error";
 import {
@@ -586,7 +590,7 @@ const createJournal: CreateJournalHandler = async ({
 
     // Process gamification (non-blocking — errors won't fail the request)
     const gamActivityType = journalToActivityType(requestType!);
-    let gamification = { points: 0, celebrations: [] as any[] };
+    let gamification: GamificationResult = { points: 0, celebrations: [] };
     if (gamActivityType && userId && sessionId) {
       gamification = await processGamification({
         supabase: supabaseAdmin,

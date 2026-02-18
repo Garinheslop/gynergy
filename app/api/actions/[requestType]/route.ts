@@ -10,7 +10,11 @@ import { pick } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
-import { processGamification, actionToActivityType } from "@lib/services/gamificationHook";
+import {
+  processGamification,
+  actionToActivityType,
+  type GamificationResult,
+} from "@lib/services/gamificationHook";
 import { createClient, createServiceClient } from "@lib/supabase-server";
 import { actionRequestTypes, ActionLogData, actionLogTypes } from "@resources/types/action";
 import { serverErrorTypes } from "@resources/types/error";
@@ -455,7 +459,7 @@ const createUserActionLog = async ({
 
     // Process gamification (non-blocking — errors won't fail the request)
     const gamActivityType = actionToActivityType(requestType!);
-    let gamification = { points: 0, celebrations: [] as any[] };
+    let gamification: GamificationResult = { points: 0, celebrations: [] };
     if (gamActivityType && userId && sessionId) {
       gamification = await processGamification({
         supabase: supabaseAdmin,

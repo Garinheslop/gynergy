@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
           return errorResponse("Lesson not found", 404);
         }
 
-        const courseId = (lesson as any).course_modules.course_id;
+        const courseId = (lesson.course_modules as unknown as { course_id: string }).course_id;
 
         // Check enrollment
         const { data: enrollment } = await supabase

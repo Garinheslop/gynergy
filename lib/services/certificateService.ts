@@ -254,9 +254,7 @@ export async function issueCertificate(
 
     let pdfUrl: string | undefined;
     if (!uploadError) {
-      const { data: urlData } = supabase.storage
-        .from("content")
-        .getPublicUrl(htmlPath);
+      const { data: urlData } = supabase.storage.from("content").getPublicUrl(htmlPath);
       pdfUrl = urlData?.publicUrl;
     } else {
       log.warn("Failed to upload certificate HTML", { error: uploadError });
@@ -331,7 +329,10 @@ export async function verifyCertificate(
     valid: true,
     certificate: {
       userName: cert.metadata?.userName || "Unknown",
-      courseName: (cert.courses as any)?.title || cert.metadata?.courseName || "Unknown",
+      courseName:
+        (cert.courses as unknown as { title: string } | undefined)?.title ||
+        cert.metadata?.courseName ||
+        "Unknown",
       issuedAt: cert.issued_at,
       certificateNumber: cert.certificate_number,
     },

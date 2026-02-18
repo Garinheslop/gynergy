@@ -517,13 +517,15 @@ export async function GET(
 
         const { data: playlist, error } = await supabase
           .from("content_playlists")
-          .select(`
+          .select(
+            `
             *,
             playlist_items (
               *,
               content_items (*)
             )
-          `)
+          `
+          )
           .eq("id", playlistId)
           .single();
 
@@ -629,12 +631,15 @@ export async function GET(
 
         // Calculate summary
         const ratingValues = (ratings || []).map((r: any) => r.rating);
-        const avg = ratingValues.length > 0
-          ? ratingValues.reduce((sum: number, r: number) => sum + r, 0) / ratingValues.length
-          : 0;
+        const avg =
+          ratingValues.length > 0
+            ? ratingValues.reduce((sum: number, r: number) => sum + r, 0) / ratingValues.length
+            : 0;
 
         const distribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-        ratingValues.forEach((r: number) => { distribution[r] = (distribution[r] || 0) + 1; });
+        ratingValues.forEach((r: number) => {
+          distribution[r] = (distribution[r] || 0) + 1;
+        });
 
         return successResponse({
           summary: {
@@ -669,15 +674,17 @@ export async function GET(
           .single();
 
         return successResponse({
-          rating: rating ? {
-            id: rating.id,
-            userId: rating.user_id,
-            contentId: rating.content_id,
-            rating: rating.rating,
-            review: rating.review,
-            createdAt: rating.created_at,
-            updatedAt: rating.updated_at,
-          } : null,
+          rating: rating
+            ? {
+                id: rating.id,
+                userId: rating.user_id,
+                contentId: rating.content_id,
+                rating: rating.rating,
+                review: rating.review,
+                createdAt: rating.created_at,
+                updatedAt: rating.updated_at,
+              }
+            : null,
         });
       }
 
@@ -1091,11 +1098,13 @@ export async function POST(
           .eq("id", moduleId)
           .single();
 
-        if (!existing || (existing as any).courses?.created_by !== user.id) {
+        const moduleOwner = (existing?.courses as unknown as { created_by: string } | undefined)
+          ?.created_by;
+        if (!existing || moduleOwner !== user.id) {
           return errorResponse("Module not found or not owned", 404);
         }
 
-        const updates: any = {};
+        const updates: Record<string, string> = {};
         if (title !== undefined) updates.title = title;
         if (description !== undefined) updates.description = description;
 
@@ -1128,7 +1137,10 @@ export async function POST(
           .eq("id", moduleId)
           .single();
 
-        if (!module || (module as any).courses?.created_by !== user.id) {
+        const addLessonModuleOwner = (
+          module?.courses as unknown as { created_by: string } | undefined
+        )?.created_by;
+        if (!module || addLessonModuleOwner !== user.id) {
           return errorResponse("Module not found or not owned", 404);
         }
 
@@ -1170,11 +1182,14 @@ export async function POST(
           .eq("id", lessonId)
           .single();
 
-        if (!existing || (existing as any).course_modules?.courses?.created_by !== user.id) {
+        const lessonCourseModules = existing?.course_modules as unknown as
+          | { courses: { created_by: string } }
+          | undefined;
+        if (!existing || lessonCourseModules?.courses?.created_by !== user.id) {
           return errorResponse("Lesson not found or not owned", 404);
         }
 
-        const updates: any = {};
+        const updates: Record<string, string> = {};
         if (title !== undefined) updates.title = title;
         if (description !== undefined) updates.description = description;
         if (contentId !== undefined) updates.content_id = contentId;
@@ -1600,7 +1615,9 @@ export async function DELETE(
           .eq("id", moduleId)
           .single();
 
-        if (!module || (module as any).courses?.created_by !== user.id) {
+        const deleteModuleOwner = (module?.courses as unknown as { created_by: string } | undefined)
+          ?.created_by;
+        if (!module || deleteModuleOwner !== user.id) {
           return errorResponse("Module not found or not owned", 404);
         }
 
@@ -1630,7 +1647,10 @@ export async function DELETE(
           .eq("id", lessonId)
           .single();
 
-        if (!lesson || (lesson as any).course_modules?.courses?.created_by !== user.id) {
+        const deleteLessonModules = lesson?.course_modules as unknown as
+          | { courses: { created_by: string } }
+          | undefined;
+        if (!lesson || deleteLessonModules?.courses?.created_by !== user.id) {
           return errorResponse("Lesson not found or not owned", 404);
         }
 
@@ -1661,10 +1681,7 @@ export async function DELETE(
 
         if (!playlist) return errorResponse("Playlist not found", 404);
 
-        const { error } = await supabase
-          .from("content_playlists")
-          .delete()
-          .eq("id", playlistId);
+        const { error } = await supabase.from("content_playlists").delete().eq("id", playlistId);
 
         if (error) {
           log.error("Failed to delete playlist", { error });
