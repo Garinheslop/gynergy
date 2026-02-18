@@ -15,7 +15,8 @@ import SubscriptionManagement from "@modules/payment/components/SubscriptionMana
 import { loaderTypes } from "@resources/types/loader";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
-import { resetUserBookSessionData } from "@store/modules/enrollment";
+import { getLatestBookSession } from "@store/modules/book";
+import { getUserBookSessionData, resetUserBookSessionData } from "@store/modules/enrollment";
 import { updateUserProfileData } from "@store/modules/profile";
 
 import ProfileImage from "../ProfileImage";
@@ -31,11 +32,14 @@ type File = {
   contentType: string;
 };
 
+const BOOK_SLUG = "date-zero-gratitude";
+
 const SettingsPageClient: React.FC = () => {
   const dispatch = useDispatch();
   const { messagePopupObj } = usePopup();
   const router = useRouter();
   const profile = useSelector((state) => state.profile);
+  const books = useSelector((state) => state.books);
   const enrollments = useSelector((state) => state.enrollments);
   const [firstName, setFirstName] = useState<InputState>({ value: "", error: "" });
   const [lastName, setLastName] = useState<InputState>({ value: "", error: "" });
@@ -56,6 +60,19 @@ const SettingsPageClient: React.FC = () => {
       setLastName({ value: profile?.current?.lastName, error: "" });
     }
   }, [profile?.current]);
+
+  // Ensure book + enrollment data is loaded (normally loaded on dashboard page)
+  useEffect(() => {
+    if (profile?.current?.id && !books.current && !books.loading) {
+      dispatch(getLatestBookSession(BOOK_SLUG));
+    }
+  }, [profile?.current?.id, books.current, books.loading, dispatch]);
+
+  useEffect(() => {
+    if (books.current?.id && !enrollments.current && !enrollments.loading) {
+      dispatch(getUserBookSessionData(books.current.id));
+    }
+  }, [books.current?.id, enrollments.current, enrollments.loading, dispatch]);
 
   useEffect(() => {
     if (!profile?.updating && updating) {

@@ -42,6 +42,15 @@ export async function GET(request: NextRequest) {
     const { data: notifications, error } = await query;
 
     if (error) {
+      // Table may not exist yet — return empty instead of 500
+      if (error.code === "42P01") {
+        return NextResponse.json({
+          notifications: [],
+          unreadCount: 0,
+          hasMore: false,
+          nextCursor: null,
+        });
+      }
       console.error("Error fetching notifications:", error);
       return NextResponse.json({ error: "Failed to fetch notifications" }, { status: 500 });
     }
