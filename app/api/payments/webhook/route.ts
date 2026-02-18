@@ -118,6 +118,11 @@ export async function POST(request: NextRequest) {
         break;
       }
 
+      case "checkout.session.expired": {
+        await handleCheckoutExpired(event.data.object);
+        break;
+      }
+
       default:
       // Unhandled event type - no action needed
     }
@@ -230,6 +235,16 @@ async function handleCheckoutCompleted(
       cancelDrip("webinar_registered", session.customer_email).catch((err) =>
         console.error("Webinar drip cancel error:", err)
       );
+
+      // Enroll in friend code referral reminders (non-blocking)
+      enrollInDrip("friend_codes_issued", session.customer_email, {
+        firstName,
+      }).catch((err) => console.error("Referral drip enrollment error:", err));
+
+      // Enroll in community activation (non-blocking)
+      enrollInDrip("community_activated", session.customer_email, {
+        firstName,
+      }).catch((err) => console.error("Community drip enrollment error:", err));
     }
   } else if (productType === "journal_subscription") {
     // Subscription is handled by invoice.paid event
@@ -357,6 +372,24 @@ async function handleSubscriptionDeleted(
       updated_at: new Date().toISOString(),
     })
     .eq("stripe_subscription_id", subscription.id);
+}
+
+async function handleCheckoutExpired(session: Stripe.Checkout.Session) {
+  const email = session.customer_email;
+  if (!email) return;
+
+  // Only enroll in cart abandonment drip for challenge purchases
+  const productType = session.metadata?.productType;
+  if (productType !== "challenge") return;
+
+  // Get first name from metadata or profile
+  const firstName = session.metadata?.firstName || undefined;
+
+  // Enroll in cart abandonment drip (non-blocking)
+  enrollInDrip("cart_abandoned", email, {
+    firstName,
+    productType,
+  }).catch((err) => console.error("Cart abandonment drip enrollment error:", err));
 }
 
 function mapStripeStatus(

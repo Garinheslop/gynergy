@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/automation-processor",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/win-back",
+      "schedule": "0 10 * * *"
     }
   ]
 }

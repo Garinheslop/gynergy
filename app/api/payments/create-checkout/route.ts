@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
 
     // Get origin for redirect URLs
     const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL;
-    const successUrl = `${origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${origin}/pricing?canceled=true`;
+    const successUrl = `${origin}/payment/upsell?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${origin}/checkout/recovery`;
 
     let session;
 

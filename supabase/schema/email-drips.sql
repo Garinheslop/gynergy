@@ -21,7 +21,11 @@ CREATE TABLE IF NOT EXISTS drip_campaigns (
   trigger_event TEXT NOT NULL CHECK (trigger_event IN (
     'webinar_registered',
     'assessment_completed',
-    'purchase_completed'
+    'purchase_completed',
+    'cart_abandoned',
+    'user_inactive',
+    'friend_codes_issued',
+    'community_activated'
   )),
 
   -- Status
@@ -214,13 +218,111 @@ BEGIN
     ON CONFLICT (campaign_id, sequence_order) DO NOTHING;
   END IF;
 
-  -- Purchase Drip (steps 1-3; step 0 = instant welcome already sent)
+  -- Purchase Drip (steps 1-7; step 0 = instant welcome already sent)
+  -- Includes onboarding (steps 1-3) + milestone celebrations (steps 4-7)
   IF v_purchase_campaign_id IS NOT NULL THEN
     INSERT INTO drip_emails (campaign_id, sequence_order, delay_hours, subject, template_key)
     VALUES
-      (v_purchase_campaign_id, 1, 24,  'Day 0: How to get the most out of this',  'purchase_day_zero_guide'),
-      (v_purchase_campaign_id, 2, 72,  'Your first 3 days matter most',           'purchase_first_three_days'),
-      (v_purchase_campaign_id, 3, 168, 'Week 1 check-in: How are you feeling?',   'purchase_week_one_checkin')
+      (v_purchase_campaign_id, 1, 24,   'Day 0: How to get the most out of this',    'purchase_day_zero_guide'),
+      (v_purchase_campaign_id, 2, 72,   'Your first 3 days matter most',             'purchase_first_three_days'),
+      (v_purchase_campaign_id, 3, 168,  'Week 1 check-in: How are you feeling?',     'purchase_week_one_checkin'),
+      (v_purchase_campaign_id, 4, 336,  'Day 14: The habit is locking in',           'milestone_day_14'),
+      (v_purchase_campaign_id, 5, 504,  'Day 21: Other people are noticing',         'milestone_day_21'),
+      (v_purchase_campaign_id, 6, 720,  'Day 30: You''ve done what 90% couldn''t',   'milestone_day_30'),
+      (v_purchase_campaign_id, 7, 1080, 'Day 45: You did it. Every single one.',     'milestone_day_45')
+    ON CONFLICT (campaign_id, sequence_order) DO NOTHING;
+  END IF;
+END $$;
+
+-- ============================================
+-- ADDITIONAL CAMPAIGNS (Added 2026-02-17)
+-- ============================================
+
+-- Campaign 4: Cart Abandonment
+INSERT INTO drip_campaigns (name, description, trigger_event)
+VALUES (
+  'Cart Abandonment Recovery',
+  'Re-engage users who started checkout but did not complete. 3-email sequence with downsell option.',
+  'cart_abandoned'
+) ON CONFLICT DO NOTHING;
+
+-- Campaign 5: User Inactive / Win-back
+INSERT INTO drip_campaigns (name, description, trigger_event)
+VALUES (
+  'Win-Back / Re-engagement',
+  'Re-engage users who stopped journaling. Triggered by cron detecting inactivity.',
+  'user_inactive'
+) ON CONFLICT DO NOTHING;
+
+-- Campaign 6: Friend Code Referral Reminders
+INSERT INTO drip_campaigns (name, description, trigger_event)
+VALUES (
+  'Referral Reminders',
+  'Remind users to share their unused friend codes. Enrolled after purchase when codes are generated.',
+  'friend_codes_issued'
+) ON CONFLICT DO NOTHING;
+
+-- Campaign 7: Community Activation
+INSERT INTO drip_campaigns (name, description, trigger_event)
+VALUES (
+  'Community Activation',
+  'Welcome and onboard users when they get community access. Tour, introduce yourself prompt, first call.',
+  'community_activated'
+) ON CONFLICT DO NOTHING;
+
+-- Seed emails for new campaigns
+DO $$
+DECLARE
+  v_cart_campaign_id UUID;
+  v_winback_campaign_id UUID;
+  v_referral_campaign_id UUID;
+  v_community_campaign_id UUID;
+BEGIN
+  SELECT id INTO v_cart_campaign_id
+    FROM drip_campaigns WHERE trigger_event = 'cart_abandoned' LIMIT 1;
+  SELECT id INTO v_winback_campaign_id
+    FROM drip_campaigns WHERE trigger_event = 'user_inactive' LIMIT 1;
+  SELECT id INTO v_referral_campaign_id
+    FROM drip_campaigns WHERE trigger_event = 'friend_codes_issued' LIMIT 1;
+  SELECT id INTO v_community_campaign_id
+    FROM drip_campaigns WHERE trigger_event = 'community_activated' LIMIT 1;
+
+  -- Cart Abandonment Drip (3 emails: 1h, 24h, 72h after checkout expiry)
+  IF v_cart_campaign_id IS NOT NULL THEN
+    INSERT INTO drip_emails (campaign_id, sequence_order, delay_hours, subject, template_key)
+    VALUES
+      (v_cart_campaign_id, 1, 1,  'You left something behind',                    'cart_abandoned_reminder'),
+      (v_cart_campaign_id, 2, 24, 'What {{firstName}} would have missed',         'cart_abandoned_proof'),
+      (v_cart_campaign_id, 3, 72, 'Last call: Your assessment score hasn''t changed', 'cart_abandoned_final')
+    ON CONFLICT (campaign_id, sequence_order) DO NOTHING;
+  END IF;
+
+  -- Win-Back Drip (3 emails: 3d, 7d, 14d of inactivity)
+  IF v_winback_campaign_id IS NOT NULL THEN
+    INSERT INTO drip_emails (campaign_id, sequence_order, delay_hours, subject, template_key)
+    VALUES
+      (v_winback_campaign_id, 1, 72,  'Your journal is waiting',            'winback_gentle'),
+      (v_winback_campaign_id, 2, 168, 'The gap gets harder to close',       'winback_pattern'),
+      (v_winback_campaign_id, 3, 336, 'One entry. That''s all.',            'winback_final')
+    ON CONFLICT (campaign_id, sequence_order) DO NOTHING;
+  END IF;
+
+  -- Referral Reminders Drip (3 emails: 3d, 14d, 30d after codes issued)
+  IF v_referral_campaign_id IS NOT NULL THEN
+    INSERT INTO drip_emails (campaign_id, sequence_order, delay_hours, subject, template_key)
+    VALUES
+      (v_referral_campaign_id, 1, 72,  'Your friend codes are worth $1,994',              'referral_day3'),
+      (v_referral_campaign_id, 2, 336, 'The men who share finish stronger',                'referral_day14'),
+      (v_referral_campaign_id, 3, 720, 'Last reminder: 2 spots reserved for your people',  'referral_day30')
+    ON CONFLICT (campaign_id, sequence_order) DO NOTHING;
+  END IF;
+
+  -- Community Activation Drip (2 emails: 1h, 48h after activation)
+  IF v_community_campaign_id IS NOT NULL THEN
+    INSERT INTO drip_emails (campaign_id, sequence_order, delay_hours, subject, template_key)
+    VALUES
+      (v_community_campaign_id, 1, 1,  'Welcome to the room',               'community_welcome'),
+      (v_community_campaign_id, 2, 48, 'Your first call is this week',      'community_first_call')
     ON CONFLICT (campaign_id, sequence_order) DO NOTHING;
   END IF;
 END $$;

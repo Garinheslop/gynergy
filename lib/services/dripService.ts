@@ -12,7 +12,14 @@ import { createServiceClient } from "@lib/supabase-server";
 // Types
 // ============================================================================
 
-export type TriggerEvent = "webinar_registered" | "assessment_completed" | "purchase_completed";
+export type TriggerEvent =
+  | "webinar_registered"
+  | "assessment_completed"
+  | "purchase_completed"
+  | "cart_abandoned"
+  | "user_inactive"
+  | "friend_codes_issued"
+  | "community_activated";
 
 export interface EnrollResult {
   success: boolean;
