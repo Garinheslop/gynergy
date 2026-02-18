@@ -83,7 +83,7 @@ const BlockUserButton: FC<BlockUserButtonProps> = ({
     <>
       {variant === "menu-item" ? (
         <button
-          className="text-grey-300 hover:bg-bkg-dark-800 flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors"
+          className="text-content-dark-secondary hover:bg-grey-100 focus-visible:ring-action flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
           onClick={() => setShowConfirm(true)}
         >
           <svg
@@ -117,7 +117,7 @@ const BlockUserButton: FC<BlockUserButtonProps> = ({
       {/* Confirmation Dialog */}
       <dialog
         ref={dialogRef}
-        className="border-border-dark bg-bkg-dark-secondary fixed inset-0 z-50 m-auto max-w-sm overflow-hidden rounded-xl border p-0 shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+        className="border-border-light bg-bkg-light fixed inset-0 z-50 m-auto max-w-sm overflow-hidden rounded-xl border p-0 shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-sm"
         onKeyDown={handleKeyDown}
         onClick={handleBackdropClick}
         aria-labelledby="block-confirm-title"
@@ -140,12 +140,12 @@ const BlockUserButton: FC<BlockUserButtonProps> = ({
                 />
               </svg>
             </div>
-            <h2 id="block-confirm-title" className="text-content-light text-lg font-semibold">
+            <h2 id="block-confirm-title" className="text-content-dark text-lg font-semibold">
               Block {userName}?
             </h2>
           </div>
 
-          <p className="text-grey-300 mb-6 text-sm leading-relaxed">
+          <p className="text-content-dark-secondary mb-6 text-sm leading-relaxed">
             Blocking this user means you won&apos;t see their posts or comments, and they won&apos;t
             see yours. You can unblock them later from your settings.
           </p>
@@ -162,7 +162,7 @@ const BlockUserButton: FC<BlockUserButtonProps> = ({
               disabled={blocking}
               className={cn(
                 "min-h-[44px] flex-1 rounded-lg px-4 py-2.5 font-medium transition-colors",
-                "border-border-dark text-grey-300 hover:bg-bkg-dark border",
+                "border-border-light text-content-dark-secondary hover:bg-grey-100 border",
                 "focus-visible:ring-action focus-visible:ring-2 focus-visible:outline-none",
                 "disabled:opacity-50"
               )}

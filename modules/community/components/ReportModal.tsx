@@ -149,7 +149,7 @@ const ReportModal: FC<ReportModalProps> = ({
   return (
     <dialog
       ref={dialogRef}
-      className="border-border-dark bg-bkg-dark-secondary fixed inset-0 z-50 m-auto max-h-[85vh] w-full max-w-md overflow-hidden rounded-xl border p-0 shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+      className="border-border-light bg-bkg-light fixed inset-0 z-50 m-auto max-h-[85vh] w-full max-w-md overflow-hidden rounded-xl border p-0 shadow-2xl backdrop:bg-black/50 backdrop:backdrop-blur-sm"
       onKeyDown={handleKeyDown}
       onClick={handleBackdropClick}
       aria-labelledby="report-title"
@@ -174,8 +174,8 @@ const ReportModal: FC<ReportModalProps> = ({
                 />
               </svg>
             </div>
-            <h2 className="text-content-light mb-2 text-lg font-semibold">Report Submitted</h2>
-            <p className="text-grey-400 mb-6 text-sm">
+            <h2 className="text-content-dark mb-2 text-lg font-semibold">Report Submitted</h2>
+            <p className="text-grey-500 mb-6 text-sm">
               Thank you for helping keep our community safe. Our team will review this report.
             </p>
             <button
@@ -189,7 +189,7 @@ const ReportModal: FC<ReportModalProps> = ({
           <>
             {/* Header */}
             <div className="mb-5 flex items-center justify-between">
-              <h2 id="report-title" className="text-content-light text-lg font-semibold">
+              <h2 id="report-title" className="text-content-dark text-lg font-semibold">
                 Report {contentType === "post" ? "Post" : "Comment"}
               </h2>
               <button
@@ -197,7 +197,7 @@ const ReportModal: FC<ReportModalProps> = ({
                 onClick={onClose}
                 disabled={submitting}
                 aria-label="Close"
-                className="text-grey-500 hover:text-content-light focus-visible:ring-action flex h-9 w-9 items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
+                className="text-grey-500 hover:text-content-dark focus-visible:ring-action flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
               >
                 <svg
                   className="h-5 w-5"
@@ -218,7 +218,7 @@ const ReportModal: FC<ReportModalProps> = ({
 
             {/* Reason Selection */}
             <fieldset className="mb-4 border-none p-0">
-              <legend className="text-grey-400 mb-3 text-sm font-medium">
+              <legend className="text-grey-500 mb-3 text-sm font-medium">
                 Why are you reporting this?
               </legend>
               <div className="space-y-2">
@@ -229,8 +229,8 @@ const ReportModal: FC<ReportModalProps> = ({
                     className={cn(
                       "focus-visible:ring-action flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none",
                       selectedReason === value
-                        ? "border-action bg-action/10 text-content-light"
-                        : "border-border-dark text-grey-300 hover:border-grey-500 hover:bg-bkg-dark-800"
+                        ? "border-action bg-action-50 text-content-dark"
+                        : "border-border-light text-content-dark-secondary hover:border-grey-400 hover:bg-grey-100"
                     )}
                   >
                     <svg
@@ -250,7 +250,7 @@ const ReportModal: FC<ReportModalProps> = ({
                     <span>{label}</span>
                     {selectedReason === value && (
                       <svg
-                        className="text-action ml-auto h-5 w-5 flex-shrink-0"
+                        className="text-action-600 ml-auto h-5 w-5 flex-shrink-0"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -274,7 +274,7 @@ const ReportModal: FC<ReportModalProps> = ({
               <div className="mb-4">
                 <label
                   htmlFor="report-details"
-                  className="text-grey-400 mb-1.5 block text-sm font-medium"
+                  className="text-grey-500 mb-1.5 block text-sm font-medium"
                 >
                   Additional details (optional)
                 </label>
@@ -285,9 +285,9 @@ const ReportModal: FC<ReportModalProps> = ({
                   placeholder="Provide any additional context..."
                   rows={3}
                   maxLength={500}
-                  className="border-border-dark bg-bkg-dark text-content-light placeholder:text-grey-600 focus:border-action w-full resize-none rounded-lg border px-3 py-2 text-sm focus:outline-none"
+                  className="border-border-light bg-bkg-light-secondary text-content-dark placeholder:text-grey-400 focus:border-action w-full resize-none rounded-lg border px-3 py-2 text-sm focus:outline-none"
                 />
-                <p className="text-grey-600 mt-1 text-right text-xs">{details.length}/500</p>
+                <p className="text-grey-400 mt-1 text-right text-xs">{details.length}/500</p>
               </div>
             )}
 

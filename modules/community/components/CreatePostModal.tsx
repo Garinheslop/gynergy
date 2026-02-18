@@ -181,18 +181,18 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-post-title"
-        className="rounded-large bg-bkg-dark-secondary relative w-full max-w-lg overflow-hidden shadow-2xl"
+        className="rounded-large bg-bkg-light relative w-full max-w-lg overflow-hidden shadow-2xl"
       >
         {/* Header */}
-        <div className="border-border-dark flex items-center justify-between border-b px-6 py-4">
-          <h2 id="create-post-title" className="text-content-light text-xl font-bold">
+        <div className="border-border-light flex items-center justify-between border-b px-6 py-4">
+          <h2 id="create-post-title" className="text-content-dark text-xl font-bold">
             Share Your {postTypeLabel}
           </h2>
           <button
             ref={firstFocusableRef}
             onClick={onClose}
             aria-label="Close modal"
-            className="text-grey-400 hover:bg-bkg-dark-800 hover:text-grey-300 focus-visible:ring-action min-h-[44px] min-w-[44px] rounded-full p-2 transition-colors focus-visible:ring-2 focus-visible:outline-none"
+            className="text-grey-500 hover:bg-grey-100 hover:text-content-dark-secondary focus-visible:ring-action min-h-[44px] min-w-[44px] rounded-full p-2 transition-colors focus-visible:ring-2 focus-visible:outline-none"
           >
             <svg
               className="h-6 w-6"
@@ -215,7 +215,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
         <div className="p-6">
           {/* User Info */}
           <div className="mb-4 flex items-center gap-3">
-            <div className="bg-bkg-dark-800 relative h-12 w-12 overflow-hidden rounded-full">
+            <div className="bg-grey-100 relative h-12 w-12 overflow-hidden rounded-full">
               {userImage ? (
                 <Image src={userImage} alt={userName || "You"} fill className="object-cover" />
               ) : (
@@ -225,12 +225,12 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
               )}
             </div>
             <div>
-              <p className="text-content-light font-semibold">{userName || "You"}</p>
+              <p className="text-content-dark font-semibold">{userName || "You"}</p>
               <select
                 value={visibility}
                 onChange={(e) => setVisibility(e.target.value as PostVisibility)}
                 aria-label="Post visibility"
-                className="bg-bkg-dark-800 text-grey-400 focus:ring-action min-h-[32px] rounded border-none px-2 py-1 text-xs focus:ring-2 focus-visible:outline-none"
+                className="bg-grey-100 text-grey-500 focus:ring-action min-h-[44px] rounded border-none px-2 py-1 text-xs focus:ring-2 focus-visible:outline-none"
               >
                 <option value="cohort">Cohort Only</option>
                 <option value="public">Public</option>
@@ -252,8 +252,8 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                 className={cn(
                   "focus-visible:ring-action flex min-h-[44px] items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
                   postType === type
-                    ? "bg-action/20 text-action"
-                    : "bg-bkg-dark-800 text-grey-400 hover:bg-bkg-dark"
+                    ? "bg-action-50 text-action-600"
+                    : "bg-grey-100 text-grey-500 hover:bg-grey-200"
                 )}
               >
                 <span
@@ -272,7 +272,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             aria-label="Post title (optional)"
-            className="border-border-dark bg-bkg-dark text-content-light placeholder:text-grey-600 focus:border-action focus:ring-action/20 mb-3 w-full rounded border px-4 py-2 text-lg font-semibold focus:ring-2 focus:outline-none"
+            className="border-border-light bg-bkg-light-secondary text-content-dark placeholder:text-grey-400 focus:border-action focus:ring-action/20 mb-3 w-full rounded border px-4 py-2 text-lg font-semibold focus:ring-2 focus:outline-none"
           />
 
           {/* Content */}
@@ -283,7 +283,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
             rows={5}
             aria-label="Post content"
             aria-required="true"
-            className="border-border-dark bg-bkg-dark text-content-light placeholder:text-grey-600 focus:border-action focus:ring-action/20 mb-4 w-full resize-none rounded border px-4 py-3 focus:ring-2 focus:outline-none"
+            className="border-border-light bg-bkg-light-secondary text-content-dark placeholder:text-grey-400 focus:border-action focus:ring-action/20 mb-4 w-full resize-none rounded border px-4 py-3 focus:ring-2 focus:outline-none"
           />
 
           {/* Media Preview */}
@@ -292,7 +292,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
               {mediaPreview.map((preview, index) => (
                 <div
                   key={preview}
-                  className="bg-bkg-dark-800 relative aspect-video overflow-hidden rounded"
+                  className="bg-grey-100 relative aspect-video overflow-hidden rounded"
                 >
                   <Image
                     src={preview}
@@ -303,7 +303,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                   <button
                     onClick={() => removeMedia(index)}
                     aria-label={`Remove image ${index + 1}`}
-                    className="focus-visible:ring-action absolute top-2 right-2 min-h-[32px] min-w-[32px] rounded-full bg-black/60 p-1 text-white hover:bg-black/80 focus-visible:ring-2 focus-visible:outline-none"
+                    className="focus-visible:ring-action absolute top-2 right-2 min-h-[44px] min-w-[44px] rounded-full bg-black/60 p-1 text-white hover:bg-black/80 focus-visible:ring-2 focus-visible:outline-none"
                   >
                     <svg
                       className="h-4 w-4"
@@ -347,7 +347,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="border-border-dark bg-bkg-dark flex items-center justify-between border-t px-6 py-4">
+        <div className="border-border-light bg-bkg-light-secondary flex items-center justify-between border-t px-6 py-4">
           <div className="flex items-center gap-2">
             <input
               ref={fileInputRef}
@@ -366,7 +366,7 @@ const CreatePostModal: FC<CreatePostModalProps> = ({
                 "focus-visible:ring-action min-h-[44px] min-w-[44px] rounded p-2 transition-colors focus-visible:ring-2 focus-visible:outline-none",
                 mediaFiles.length >= 4
                   ? "text-grey-600 cursor-not-allowed"
-                  : "text-grey-400 hover:bg-bkg-dark-800"
+                  : "text-grey-500 hover:bg-grey-100"
               )}
             >
               <svg

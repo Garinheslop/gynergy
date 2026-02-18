@@ -7,9 +7,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { usePopup } from "@contexts/UsePopup";
 import { useSession } from "@contexts/UseSession";
 import { useCommunityCallState } from "@lib/hooks/useCommunityCallState";
+import { useCommunityRealtime } from "@lib/hooks/useCommunityRealtime";
 import { triggerHaptic } from "@lib/utils/haptic";
 import { cn } from "@lib/utils/style";
 import CommunityCallCard from "@modules/community/components/CommunityCallCard";
+import CommunitySearch from "@modules/community/components/CommunitySearch";
 import CreatePostModal from "@modules/community/components/CreatePostModal";
 import EventsList from "@modules/community/components/EventsList";
 import LiveCallBar from "@modules/community/components/LiveCallBar";
@@ -132,6 +134,12 @@ const CommunityPage: FC = () => {
     rsvp: handleRsvp,
   } = useCommunityCallState();
 
+  // Real-time feed updates via Supabase Realtime
+  const { newPostCount, showNewPosts } = useCommunityRealtime(session?.user?.id);
+
+  // Infinite scroll sentinel ref
+  const feedSentinelRef = useRef<HTMLDivElement | null>(null);
+
   const isCallLive = callState.state === "live_now" || callState.state === "ending_soon";
   const isCallStartingSoon = callState.state === "starting_soon";
 
@@ -212,12 +220,23 @@ const CommunityPage: FC = () => {
     dispatch(toggleReaction(postId, reactionType));
   };
 
-  // Handle load more
-  const handleLoadMore = () => {
-    if (hasMore && !feedLoading) {
-      dispatch(fetchFeed({ append: true, postType: postTypeFilter || undefined }));
-    }
-  };
+  // Infinite scroll: observe sentinel at bottom of feed
+  useEffect(() => {
+    const sentinel = feedSentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.length > 0 && entries[0].isIntersecting && hasMore && !feedLoading) {
+          dispatch(fetchFeed({ append: true, postType: postTypeFilter || undefined }));
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, feedLoading, postTypeFilter, dispatch]);
 
   // Handle filter change
   const handleFilterChange = (type: string | null) => {
@@ -227,14 +246,14 @@ const CommunityPage: FC = () => {
 
   if (authenticating) {
     return (
-      <div className="bg-bkg-dark flex min-h-screen items-center justify-center">
-        <div className="border-action-100 border-t-action h-12 w-12 animate-spin rounded-full border-4" />
+      <div className="bg-bkg-light-secondary flex min-h-screen items-center justify-center">
+        <div className="border-action-200 border-t-action-600 h-12 w-12 animate-spin rounded-full border-4" />
       </div>
     );
   }
 
   return (
-    <div className="bg-bkg-dark min-h-screen">
+    <div className="bg-bkg-light-secondary min-h-screen">
       {/* Hero Header */}
       <div
         className={cn(
@@ -393,7 +412,7 @@ const CommunityPage: FC = () => {
             {/* Main Feed */}
             <div className="space-y-6 lg:col-span-2">
               {/* Create Post CTA */}
-              <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4">
+              <div className="border-border-light bg-bkg-light rounded border p-4">
                 <div className="flex items-center gap-4">
                   <div className="from-action-400 to-action-600 h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-gradient-to-br">
                     {profile?.profileImage ? (
@@ -410,12 +429,18 @@ const CommunityPage: FC = () => {
                   </div>
                   <button
                     onClick={() => dispatch(setCreatePostOpen(true))}
-                    className="border-border-dark bg-bkg-dark text-grey-500 hover:bg-bkg-dark-800 focus-visible:ring-action min-h-[44px] flex-1 rounded-full border px-6 py-3 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                    className="border-border-light bg-bkg-light-secondary text-grey-500 hover:bg-grey-100 focus-visible:ring-action min-h-[44px] flex-1 rounded-full border px-6 py-3 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
                   >
                     Share a win or reflection...
                   </button>
                 </div>
               </div>
+
+              {/* Search */}
+              <CommunitySearch
+                onNavigateToPost={(postId) => router.push(`/community/post/${postId}`)}
+                onNavigateToMember={(memberId) => router.push(`/community/member/${memberId}`)}
+              />
 
               {/* Post Type Filters */}
               <fieldset className="m-0 flex flex-wrap gap-2 border-none p-0">
@@ -427,7 +452,7 @@ const CommunityPage: FC = () => {
                     "focus-visible:ring-action min-h-[44px] rounded-full px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
                     !postTypeFilter
                       ? "bg-action text-content-dark"
-                      : "bg-bkg-dark-secondary text-grey-400 hover:bg-bkg-dark-800"
+                      : "bg-grey-100 text-grey-500 hover:bg-grey-200"
                   )}
                 >
                   All Posts
@@ -441,7 +466,7 @@ const CommunityPage: FC = () => {
                       "focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
                       postTypeFilter === type
                         ? "bg-action text-content-dark"
-                        : "bg-bkg-dark-secondary text-grey-400 hover:bg-bkg-dark-800"
+                        : "bg-grey-100 text-grey-500 hover:bg-grey-200"
                     )}
                   >
                     <span
@@ -459,18 +484,18 @@ const CommunityPage: FC = () => {
                   {[1, 2, 3].map((i) => (
                     <div
                       key={i}
-                      className="border-border-dark bg-bkg-dark-secondary animate-pulse rounded border p-6"
+                      className="border-border-light bg-bkg-light animate-pulse rounded border p-6"
                     >
                       <div className="mb-4 flex items-center gap-3">
-                        <div className="bg-bkg-dark-800 h-12 w-12 rounded-full" />
+                        <div className="bg-grey-100 h-12 w-12 rounded-full" />
                         <div className="space-y-2">
-                          <div className="bg-bkg-dark-800 h-4 w-32 rounded" />
-                          <div className="bg-bkg-dark-800 h-3 w-24 rounded" />
+                          <div className="bg-grey-100 h-4 w-32 rounded" />
+                          <div className="bg-grey-100 h-3 w-24 rounded" />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <div className="bg-bkg-dark-800 h-4 w-full rounded" />
-                        <div className="bg-bkg-dark-800 h-4 w-3/4 rounded" />
+                        <div className="bg-grey-100 h-4 w-full rounded" />
+                        <div className="bg-grey-100 h-4 w-3/4 rounded" />
                       </div>
                     </div>
                   ))}
@@ -486,10 +511,10 @@ const CommunityPage: FC = () => {
                   </button>
                 </div>
               ) : posts.length === 0 ? (
-                <div className="border-border-dark bg-bkg-dark-secondary rounded border py-12 text-center">
-                  <div className="bg-action/20 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
+                <div className="border-border-light bg-bkg-light rounded border py-12 text-center">
+                  <div className="bg-action-50 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
                     <svg
-                      className="text-action h-7 w-7"
+                      className="text-action-600 h-7 w-7"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -503,7 +528,7 @@ const CommunityPage: FC = () => {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-content-light mt-4 text-lg font-semibold">No posts yet</h3>
+                  <h3 className="text-content-dark mt-4 text-lg font-semibold">No posts yet</h3>
                   <p className="text-grey-500 mt-1">
                     Be the first to share a win with the community!
                   </p>
@@ -516,6 +541,16 @@ const CommunityPage: FC = () => {
                 </div>
               ) : (
                 <>
+                  {/* New posts banner */}
+                  {newPostCount > 0 && (
+                    <button
+                      onClick={showNewPosts}
+                      className="bg-action-50 text-action-600 hover:bg-action-100 focus-visible:ring-action w-full rounded-lg py-2.5 text-center text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none"
+                    >
+                      {newPostCount} new {newPostCount === 1 ? "post" : "posts"} — tap to see
+                    </button>
+                  )}
+
                   <div className="space-y-4">
                     {posts.map((post) => (
                       <PostCard
@@ -527,15 +562,17 @@ const CommunityPage: FC = () => {
                     ))}
                   </div>
 
+                  {/* Infinite scroll sentinel */}
                   {hasMore && (
-                    <div className="text-center">
-                      <button
-                        onClick={handleLoadMore}
-                        disabled={feedLoading}
-                        className="bg-bkg-dark-secondary text-content-light hover:bg-bkg-dark-800 focus-visible:ring-action min-h-[44px] rounded px-6 py-3 font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
-                      >
-                        {feedLoading ? "Loading..." : "Load More"}
-                      </button>
+                    <div
+                      ref={feedSentinelRef}
+                      className="flex justify-center py-6"
+                      role="status"
+                      aria-label="Loading more posts"
+                    >
+                      {feedLoading && (
+                        <div className="border-action-200 border-t-action-600 h-8 w-8 animate-spin rounded-full border-4" />
+                      )}
                     </div>
                   )}
                 </>
@@ -555,8 +592,8 @@ const CommunityPage: FC = () => {
 
               {/* Cohort Info */}
               {cohort && (
-                <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4">
-                  <h3 className="text-content-light mb-3 font-semibold">Your Cohort</h3>
+                <div className="border-border-light bg-bkg-light rounded border p-4">
+                  <h3 className="text-content-dark mb-3 font-semibold">Your Cohort</h3>
                   <div className="from-action-900 to-action-800 rounded bg-gradient-to-r p-4">
                     <p className="text-action-200 font-bold">{cohort.name}</p>
                     <p className="text-action-300 text-sm">{members.length} members</p>
@@ -565,8 +602,8 @@ const CommunityPage: FC = () => {
               )}
 
               {/* Top Members */}
-              <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4">
-                <h3 className="text-content-light mb-3 font-semibold">Top Streakers</h3>
+              <div className="border-border-light bg-bkg-light rounded border p-4">
+                <h3 className="text-content-dark mb-3 font-semibold">Top Streakers</h3>
                 <div className="space-y-1">
                   {members
                     .slice()
@@ -583,7 +620,7 @@ const CommunityPage: FC = () => {
                 </div>
                 <button
                   onClick={() => handleTabChange("members")}
-                  className="text-action hover:text-action-100 focus-visible:ring-action mt-3 min-h-[44px] w-full text-center text-sm font-medium focus-visible:ring-2 focus-visible:outline-none"
+                  className="text-action-600 hover:text-action-700 focus-visible:ring-action mt-3 min-h-[44px] w-full text-center text-sm font-medium focus-visible:ring-2 focus-visible:outline-none"
                 >
                   View All Members
                 </button>
@@ -614,24 +651,24 @@ const CommunityPage: FC = () => {
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <div
                     key={i}
-                    className="border-border-dark bg-bkg-dark-secondary animate-pulse rounded border p-4"
+                    className="border-border-light bg-bkg-light animate-pulse rounded border p-4"
                   >
                     <div className="mb-3 flex items-center gap-3">
-                      <div className="bg-bkg-dark-800 h-14 w-14 rounded-full" />
+                      <div className="bg-grey-100 h-14 w-14 rounded-full" />
                       <div className="space-y-2">
-                        <div className="bg-bkg-dark-800 h-4 w-24 rounded" />
-                        <div className="bg-bkg-dark-800 h-3 w-16 rounded" />
+                        <div className="bg-grey-100 h-4 w-24 rounded" />
+                        <div className="bg-grey-100 h-3 w-16 rounded" />
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      <div className="bg-bkg-dark-800 h-16 rounded" />
-                      <div className="bg-bkg-dark-800 h-16 rounded" />
+                      <div className="bg-grey-100 h-16 rounded" />
+                      <div className="bg-grey-100 h-16 rounded" />
                     </div>
                   </div>
                 ))}
               </div>
             ) : membersError ? (
-              <div className="border-border-dark bg-bkg-dark-secondary rounded border py-12 text-center">
+              <div className="border-border-light bg-bkg-light rounded border py-12 text-center">
                 <div className="bg-danger/20 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
                   <svg
                     className="text-danger h-7 w-7"
@@ -648,7 +685,7 @@ const CommunityPage: FC = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-content-light mt-4 text-lg font-semibold">
+                <h3 className="text-content-dark mt-4 text-lg font-semibold">
                   Failed to load members
                 </h3>
                 <p className="text-grey-500 mt-1">{membersError}</p>
@@ -660,10 +697,10 @@ const CommunityPage: FC = () => {
                 </button>
               </div>
             ) : members.length === 0 ? (
-              <div className="border-border-dark bg-bkg-dark-secondary rounded border py-12 text-center">
-                <div className="bg-action/20 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
+              <div className="border-border-light bg-bkg-light rounded border py-12 text-center">
+                <div className="bg-action-50 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
                   <svg
-                    className="text-action h-7 w-7"
+                    className="text-action-600 h-7 w-7"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -677,24 +714,24 @@ const CommunityPage: FC = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-content-light mt-4 text-lg font-semibold">No members yet</h3>
+                <h3 className="text-content-dark mt-4 text-lg font-semibold">No members yet</h3>
                 <p className="text-grey-500 mt-1">Invite friends to join your cohort!</p>
               </div>
             ) : (
               <>
                 {/* Member Stats */}
                 <div className="mb-6 grid gap-4 sm:grid-cols-3">
-                  <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4 text-center">
-                    <p className="text-action text-3xl font-bold">{members.length}</p>
+                  <div className="border-border-light bg-bkg-light rounded border p-4 text-center">
+                    <p className="text-action-600 text-3xl font-bold">{members.length}</p>
                     <p className="text-grey-500 text-sm">Total Members</p>
                   </div>
-                  <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4 text-center">
+                  <div className="border-border-light bg-bkg-light rounded border p-4 text-center">
                     <p className="text-primary text-3xl font-bold">
                       {members.filter((m) => m.streak > 0).length}
                     </p>
                     <p className="text-grey-500 text-sm">Active Today</p>
                   </div>
-                  <div className="border-border-dark bg-bkg-dark-secondary rounded border p-4 text-center">
+                  <div className="border-border-light bg-bkg-light rounded border p-4 text-center">
                     <p className="text-success text-3xl font-bold">
                       {Math.max(...members.map((m) => m.streak), 0)}
                     </p>
@@ -723,7 +760,7 @@ const CommunityPage: FC = () => {
                   <div className="mt-6 text-center">
                     <button
                       onClick={() => setMembersDisplayCount((prev) => prev + 12)}
-                      className="bg-bkg-dark-secondary text-grey-400 hover:bg-bkg-dark-800 hover:text-content-light border-border-dark min-h-[44px] rounded-full border px-8 py-2 font-medium transition-colors"
+                      className="bg-grey-100 text-grey-500 hover:bg-grey-200 hover:text-content-dark border-border-light min-h-[44px] rounded-full border px-8 py-2 font-medium transition-colors"
                     >
                       Show More ({members.length - membersDisplayCount} remaining)
                     </button>
@@ -756,7 +793,7 @@ const CommunityPage: FC = () => {
             aria-labelledby="tab-referrals"
           >
             {referralsError ? (
-              <div className="border-border-dark bg-bkg-dark-secondary rounded border py-12 text-center">
+              <div className="border-border-light bg-bkg-light rounded border py-12 text-center">
                 <div className="bg-danger/20 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
                   <svg
                     className="text-danger h-7 w-7"
@@ -773,7 +810,7 @@ const CommunityPage: FC = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="text-content-light mt-4 text-lg font-semibold">
+                <h3 className="text-content-dark mt-4 text-lg font-semibold">
                   Failed to load referrals
                 </h3>
                 <p className="text-grey-500 mt-1">{referralsError}</p>
@@ -795,32 +832,32 @@ const CommunityPage: FC = () => {
             )}
 
             {/* How It Works */}
-            <div className="border-border-dark bg-bkg-dark-secondary mt-8 rounded border p-6">
-              <h3 className="text-content-light mb-4 text-xl font-bold">How Referrals Work</h3>
+            <div className="border-border-light bg-bkg-light mt-8 rounded border p-6">
+              <h3 className="text-content-dark mb-4 text-xl font-bold">How Referrals Work</h3>
               <div className="grid gap-6 md:grid-cols-3">
                 <div className="text-center">
-                  <div className="bg-action/20 text-action mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full text-2xl">
+                  <div className="bg-action-50 text-action-600 mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full text-2xl">
                     1
                   </div>
-                  <h4 className="text-content-light font-semibold">Share Your Link</h4>
+                  <h4 className="text-content-dark font-semibold">Share Your Link</h4>
                   <p className="text-grey-500 mt-1 text-sm">
                     Copy your unique referral link and share it with friends
                   </p>
                 </div>
                 <div className="text-center">
-                  <div className="bg-action/20 text-action mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full text-2xl">
+                  <div className="bg-action-50 text-action-600 mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full text-2xl">
                     2
                   </div>
-                  <h4 className="text-content-light font-semibold">Friends Join</h4>
+                  <h4 className="text-content-dark font-semibold">Friends Join</h4>
                   <p className="text-grey-500 mt-1 text-sm">
                     When they sign up using your link, they become part of your network
                   </p>
                 </div>
                 <div className="text-center">
-                  <div className="bg-action/20 text-action mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full text-2xl">
+                  <div className="bg-action-50 text-action-600 mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full text-2xl">
                     3
                   </div>
-                  <h4 className="text-content-light font-semibold">Earn Rewards</h4>
+                  <h4 className="text-content-dark font-semibold">Earn Rewards</h4>
                   <p className="text-grey-500 mt-1 text-sm">
                     Get 100 points per referral + unlock milestone bonuses!
                   </p>
@@ -829,11 +866,11 @@ const CommunityPage: FC = () => {
             </div>
 
             {/* Accountability Trio */}
-            <div className="border-action/30 from-action-900/50 to-action-800/50 mt-6 rounded border-2 border-dashed bg-gradient-to-r p-6">
+            <div className="border-action/30 from-action-50 to-action-100 mt-6 rounded border-2 border-dashed bg-gradient-to-r p-6">
               <div className="flex items-start gap-4">
-                <div className="bg-action/20 flex h-12 w-12 items-center justify-center rounded-full">
+                <div className="bg-action-50 flex h-12 w-12 items-center justify-center rounded-full">
                   <svg
-                    className="text-action h-6 w-6"
+                    className="text-action-600 h-6 w-6"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -848,8 +885,8 @@ const CommunityPage: FC = () => {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-action font-bold">Build Your Accountability Trio</h3>
-                  <p className="text-action-200 mt-1 text-sm">
+                  <h3 className="text-action-600 font-bold">Build Your Accountability Trio</h3>
+                  <p className="text-action-700 mt-1 text-sm">
                     Research shows that groups of 3 have the highest completion rates (78%!). Invite
                     2 friends to form your Accountability Trio and support each other through the
                     45-day journey.
@@ -860,7 +897,7 @@ const CommunityPage: FC = () => {
                         "flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold",
                         referralStats.convertedReferrals >= 1
                           ? "bg-success text-content-dark"
-                          : "bg-bkg-dark-800 text-grey-500"
+                          : "bg-grey-100 text-grey-500"
                       )}
                     >
                       {referralStats.convertedReferrals >= 1 ? (
@@ -882,13 +919,13 @@ const CommunityPage: FC = () => {
                         "1"
                       )}
                     </div>
-                    <div className="bg-bkg-dark-800 h-1 w-8" />
+                    <div className="bg-grey-100 h-1 w-8" />
                     <div
                       className={cn(
                         "flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold",
                         referralStats.convertedReferrals >= 2
                           ? "bg-success text-content-dark"
-                          : "bg-bkg-dark-800 text-grey-500"
+                          : "bg-grey-100 text-grey-500"
                       )}
                     >
                       {referralStats.convertedReferrals >= 2 ? (
@@ -910,7 +947,7 @@ const CommunityPage: FC = () => {
                         "2"
                       )}
                     </div>
-                    <div className="bg-bkg-dark-800 h-1 w-8" />
+                    <div className="bg-grey-100 h-1 w-8" />
                     <div className="bg-action text-content-dark flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold">
                       You
                     </div>

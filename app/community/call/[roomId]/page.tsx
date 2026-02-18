@@ -102,10 +102,10 @@ const CommunityCallPage: FC = () => {
   // Loading state
   if (loading || authenticating) {
     return (
-      <div className="bg-bkg-dark flex min-h-screen items-center justify-center">
+      <div className="bg-bkg-light-secondary flex min-h-screen items-center justify-center">
         <div className="text-center">
           <div className="border-action mx-auto mb-4 h-16 w-16 animate-spin rounded-full border-4 border-t-transparent" />
-          <p className="text-content-light text-lg">Loading call...</p>
+          <p className="text-content-dark text-lg">Loading call...</p>
         </div>
       </div>
     );
@@ -114,11 +114,11 @@ const CommunityCallPage: FC = () => {
   // Error state
   if (error || !roomInfo) {
     return (
-      <div className="bg-bkg-dark flex min-h-screen items-center justify-center p-4">
-        <div className="bg-bkg-dark-secondary w-full max-w-md rounded-2xl p-8 text-center">
-          <div className="bg-action/20 mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full">
+      <div className="bg-bkg-light-secondary flex min-h-screen items-center justify-center p-4">
+        <div className="bg-bkg-light w-full max-w-md rounded-2xl p-8 text-center">
+          <div className="bg-action-50 mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full">
             <svg
-              className="text-action h-7 w-7"
+              className="text-action-600 h-7 w-7"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -132,8 +132,8 @@ const CommunityCallPage: FC = () => {
               />
             </svg>
           </div>
-          <h1 className="text-content-light mb-2 text-xl font-bold">Call Not Found</h1>
-          <p className="text-grey-400 mb-6">{error || "This call doesn't exist or has ended."}</p>
+          <h1 className="text-content-dark mb-2 text-xl font-bold">Call Not Found</h1>
+          <p className="text-grey-500 mb-6">{error || "This call doesn't exist or has ended."}</p>
           <Link
             href="/community"
             className="bg-action text-content-dark hover:bg-action-100 inline-block rounded-xl px-6 py-3 font-medium transition-colors"
@@ -148,8 +148,8 @@ const CommunityCallPage: FC = () => {
   // Ended state
   if (roomInfo.status === "ended" || roomInfo.status === "cancelled") {
     return (
-      <div className="bg-bkg-dark flex min-h-screen items-center justify-center p-4">
-        <div className="bg-bkg-dark-secondary w-full max-w-md rounded-2xl p-8 text-center">
+      <div className="bg-bkg-light-secondary flex min-h-screen items-center justify-center p-4">
+        <div className="bg-bkg-light w-full max-w-md rounded-2xl p-8 text-center">
           <div className="bg-success/20 mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full">
             <svg
               className="text-success h-7 w-7"
@@ -166,8 +166,8 @@ const CommunityCallPage: FC = () => {
               />
             </svg>
           </div>
-          <h1 className="text-content-light mb-2 text-xl font-bold">Call Has Ended</h1>
-          <p className="text-grey-400 mb-2">{roomInfo.title}</p>
+          <h1 className="text-content-dark mb-2 text-xl font-bold">Call Has Ended</h1>
+          <p className="text-grey-500 mb-2">{roomInfo.title}</p>
           <p className="text-grey-500 mb-6 text-sm">Hosted by {roomInfo.hostName}</p>
           <Link
             href="/community"
@@ -190,12 +190,12 @@ const CommunityCallPage: FC = () => {
   };
 
   return (
-    <div className="bg-bkg-dark flex min-h-screen items-center justify-center p-4">
+    <div className="bg-bkg-light-secondary flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-lg">
         {/* Back link */}
         <Link
           href="/community"
-          className="text-grey-400 hover:text-content-light mb-6 inline-flex items-center gap-2 text-sm transition-colors"
+          className="text-grey-500 hover:text-content-dark mb-6 inline-flex items-center gap-2 text-sm transition-colors"
         >
           <svg
             className="h-4 w-4"
@@ -215,7 +215,7 @@ const CommunityCallPage: FC = () => {
         </Link>
 
         {/* Pre-join card */}
-        <div className="bg-bkg-dark-secondary overflow-hidden rounded-2xl shadow-2xl">
+        <div className="bg-bkg-light overflow-hidden rounded-2xl shadow-2xl">
           {/* Header gradient */}
           <div
             className={cn(
@@ -248,7 +248,7 @@ const CommunityCallPage: FC = () => {
           <div className="p-6">
             {/* Host */}
             <div className="mb-4 flex items-center gap-3">
-              <div className="relative h-10 w-10 overflow-hidden rounded-full bg-white/10">
+              <div className="bg-grey-100 relative h-10 w-10 overflow-hidden rounded-full">
                 {roomInfo.hostAvatar ? (
                   <Image
                     src={roomInfo.hostAvatar}
@@ -263,17 +263,17 @@ const CommunityCallPage: FC = () => {
                 )}
               </div>
               <div>
-                <p className="text-content-light font-semibold">{roomInfo.hostName}</p>
+                <p className="text-content-dark font-semibold">{roomInfo.hostName}</p>
                 <p className="text-grey-500 text-sm">Host</p>
               </div>
             </div>
 
             {/* Stats */}
-            <div className="border-border-dark mb-4 grid grid-cols-2 gap-3 rounded-lg border p-3">
+            <div className="border-border-light mb-4 grid grid-cols-2 gap-3 rounded-lg border p-3">
               {scheduledDate && (
                 <div>
                   <p className="text-grey-500 text-xs">When</p>
-                  <p className="text-content-light text-sm font-medium">
+                  <p className="text-content-dark text-sm font-medium">
                     {isLive
                       ? "Happening now"
                       : scheduledDate.toLocaleString([], {
@@ -287,13 +287,13 @@ const CommunityCallPage: FC = () => {
               )}
               <div>
                 <p className="text-grey-500 text-xs">Duration</p>
-                <p className="text-content-light text-sm font-medium">
+                <p className="text-content-dark text-sm font-medium">
                   {roomInfo.durationMinutes} minutes
                 </p>
               </div>
               <div>
                 <p className="text-grey-500 text-xs">{isLive ? "In Call" : "RSVPs"}</p>
-                <p className="text-content-light text-sm font-medium">
+                <p className="text-content-dark text-sm font-medium">
                   {isLive ? roomInfo.participantCount : roomInfo.rsvpCount} /{" "}
                   {roomInfo.maxParticipants}
                 </p>

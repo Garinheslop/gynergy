@@ -49,7 +49,7 @@ const CalendarDropdown: FC<CalendarDropdownProps> = ({ event, className }) => {
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-label="Add to calendar"
-        className="text-grey-400 hover:text-action focus-visible:ring-action flex min-h-[36px] items-center gap-1.5 rounded px-2 py-1 text-sm transition-colors hover:bg-white/5 focus-visible:ring-2 focus-visible:outline-none"
+        className="text-grey-500 hover:text-action-600 focus-visible:ring-action hover:bg-grey-50 flex min-h-[44px] items-center gap-1.5 rounded px-2 py-1 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
       >
         <svg
           className="h-4 w-4"
@@ -71,12 +71,12 @@ const CalendarDropdown: FC<CalendarDropdownProps> = ({ event, className }) => {
       {isOpen && (
         <div
           role="menu"
-          className="bg-bkg-dark-secondary border-border-dark absolute right-0 z-10 mt-1 w-52 overflow-hidden rounded-lg border shadow-xl"
+          className="bg-bkg-light border-border-light absolute right-0 z-10 mt-1 w-52 overflow-hidden rounded-lg border shadow-xl"
         >
           <button
             role="menuitem"
             onClick={handleGoogleCalendar}
-            className="text-content-light hover:bg-bkg-dark flex min-h-[44px] w-full items-center gap-3 px-4 py-3 text-sm transition-colors"
+            className="text-content-dark hover:bg-bkg-light-secondary focus-visible:ring-action flex min-h-[44px] w-full items-center gap-3 px-4 py-3 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
           >
             <svg
               className="h-5 w-5 text-blue-400"
@@ -91,10 +91,10 @@ const CalendarDropdown: FC<CalendarDropdownProps> = ({ event, className }) => {
           <button
             role="menuitem"
             onClick={handleICSDownload}
-            className="text-content-light hover:bg-bkg-dark flex min-h-[44px] w-full items-center gap-3 px-4 py-3 text-sm transition-colors"
+            className="text-content-dark hover:bg-bkg-light-secondary focus-visible:ring-action flex min-h-[44px] w-full items-center gap-3 px-4 py-3 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
           >
             <svg
-              className="h-5 w-5 text-gray-400"
+              className="text-grey-500 h-5 w-5"
               viewBox="0 0 24 24"
               fill="currentColor"
               aria-hidden="true"

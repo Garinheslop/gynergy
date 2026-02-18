@@ -78,15 +78,15 @@ const CommunityCallCard: FC<CommunityCallCardProps> = ({ event, state, onRsvp })
   return (
     <div
       className={cn(
-        "border-border-dark rounded-lg border p-4 transition-all",
+        "border-border-light rounded-lg border p-4 transition-all",
         isLive && "border-danger/50 bg-danger/10 shadow-danger/5 shadow-lg",
         isStartingSoon && "border-action/50 bg-action/10",
-        !isLive && !isStartingSoon && "bg-bkg-dark-secondary"
+        !isLive && !isStartingSoon && "bg-bkg-light"
       )}
     >
       {/* Header */}
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-grey-400 text-xs font-semibold tracking-wider uppercase">
+        <h3 className="text-grey-500 text-xs font-semibold tracking-wider uppercase">
           {isLive ? "Live Now" : "Next Call"}
         </h3>
         {isLive && (
@@ -103,13 +103,13 @@ const CommunityCallCard: FC<CommunityCallCardProps> = ({ event, state, onRsvp })
       </div>
 
       {/* Event title */}
-      <p className="text-content-light mb-1 font-semibold">{event.title}</p>
+      <p className="text-content-dark mb-1 font-semibold">{event.title}</p>
 
       {/* Time */}
       <p
         className={cn(
           "mb-3 text-sm font-medium",
-          isLive ? "text-red-400" : isStartingSoon ? "text-action" : "text-grey-400"
+          isLive ? "text-red-400" : isStartingSoon ? "text-action-600" : "text-grey-500"
         )}
       >
         {timeDisplay}
@@ -117,7 +117,7 @@ const CommunityCallCard: FC<CommunityCallCardProps> = ({ event, state, onRsvp })
 
       {/* Host */}
       <div className="mb-3 flex items-center gap-2">
-        <div className="relative h-5 w-5 overflow-hidden rounded-full bg-white/10">
+        <div className="bg-grey-100 relative h-5 w-5 overflow-hidden rounded-full">
           {event.hostAvatar ? (
             <Image src={event.hostAvatar} alt={event.hostName} fill className="object-cover" />
           ) : (
@@ -162,7 +162,7 @@ const CommunityCallCard: FC<CommunityCallCardProps> = ({ event, state, onRsvp })
           className={cn(
             "focus-visible:ring-action flex min-h-[44px] w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-95",
             isRsvped
-              ? "bg-action/20 text-action border-action/30 border"
+              ? "bg-action-50 text-action-600 border-action/30 border"
               : "bg-action text-content-dark hover:bg-action-100"
           )}
         >

@@ -127,22 +127,22 @@ const PostDetailPage: FC = () => {
 
   if (authenticating || isLoading) {
     return (
-      <div className="bg-bkg-dark min-h-screen">
+      <div className="bg-bkg-light-secondary min-h-screen">
         <div className="mx-auto max-w-3xl px-4 py-8">
           <div className="animate-pulse">
-            <div className="bg-bkg-dark-800 mb-6 h-5 w-40 rounded" />
-            <div className="border-border-dark bg-bkg-dark-secondary rounded border p-6">
+            <div className="bg-grey-100 mb-6 h-5 w-40 rounded" />
+            <div className="border-border-light bg-bkg-light rounded border p-6">
               <div className="mb-4 flex items-center gap-3">
-                <div className="bg-bkg-dark-800 h-12 w-12 rounded-full" />
+                <div className="bg-grey-100 h-12 w-12 rounded-full" />
                 <div className="space-y-2">
-                  <div className="bg-bkg-dark-800 h-4 w-32 rounded" />
-                  <div className="bg-bkg-dark-800 h-3 w-24 rounded" />
+                  <div className="bg-grey-100 h-4 w-32 rounded" />
+                  <div className="bg-grey-100 h-3 w-24 rounded" />
                 </div>
               </div>
               <div className="space-y-2">
-                <div className="bg-bkg-dark-800 h-4 w-full rounded" />
-                <div className="bg-bkg-dark-800 h-4 w-3/4 rounded" />
-                <div className="bg-bkg-dark-800 h-4 w-1/2 rounded" />
+                <div className="bg-grey-100 h-4 w-full rounded" />
+                <div className="bg-grey-100 h-4 w-3/4 rounded" />
+                <div className="bg-grey-100 h-4 w-1/2 rounded" />
               </div>
             </div>
           </div>
@@ -153,7 +153,7 @@ const PostDetailPage: FC = () => {
 
   if (error || !post) {
     return (
-      <div className="bg-bkg-dark min-h-screen">
+      <div className="bg-bkg-light-secondary min-h-screen">
         <div className="mx-auto max-w-3xl px-4 py-8">
           <div className="border-danger/30 bg-danger/10 rounded border p-6 text-center">
             <div className="bg-danger/20 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
@@ -175,7 +175,7 @@ const PostDetailPage: FC = () => {
             <p className="text-danger mt-4">{error || "Post not found"}</p>
             <Link
               href="/community"
-              className="text-action hover:text-action-100 mt-4 inline-block font-medium"
+              className="text-action-600 hover:text-action-700 mt-4 inline-block font-medium"
             >
               Back to Community
             </Link>
@@ -188,13 +188,13 @@ const PostDetailPage: FC = () => {
   const postTypeInfo = POST_TYPE_LABELS[post.postType];
 
   return (
-    <div className="bg-bkg-dark min-h-screen">
+    <div className="bg-bkg-light-secondary min-h-screen">
       {/* Back Navigation */}
-      <div className="border-border-dark bg-bkg-dark-secondary border-b">
+      <div className="border-border-light bg-bkg-light border-b">
         <div className="mx-auto max-w-3xl px-4 py-4">
           <Link
             href="/community"
-            className="text-grey-400 hover:text-content-light inline-flex items-center gap-2 transition-colors"
+            className="text-grey-500 hover:text-content-dark inline-flex items-center gap-2 transition-colors"
           >
             <svg
               className="h-5 w-5"
@@ -216,7 +216,7 @@ const PostDetailPage: FC = () => {
       </div>
 
       <div className="mx-auto max-w-3xl px-4 py-8">
-        <article className="border-border-dark bg-bkg-dark-secondary rounded border p-6">
+        <article className="border-border-light bg-bkg-light rounded border p-6">
           {/* Header */}
           <div className="mb-4 flex items-start justify-between">
             <div className="flex items-center gap-3">
@@ -227,7 +227,7 @@ const PostDetailPage: FC = () => {
               />
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-content-light font-semibold">
+                  <span className="text-content-dark font-semibold">
                     {post.author?.firstName} {post.author?.lastName}
                   </span>
                   {post.isPinned && (
@@ -236,7 +236,7 @@ const PostDetailPage: FC = () => {
                     </span>
                   )}
                   {post.isFeatured && (
-                    <span className="bg-action/20 text-action rounded px-2 py-0.5 text-xs font-medium">
+                    <span className="bg-action-50 text-action-600 rounded px-2 py-0.5 text-xs font-medium">
                       Featured
                     </span>
                   )}
@@ -257,12 +257,10 @@ const PostDetailPage: FC = () => {
           </div>
 
           {/* Title */}
-          {post.title && (
-            <h1 className="text-content-light mb-3 text-xl font-bold">{post.title}</h1>
-          )}
+          {post.title && <h1 className="text-content-dark mb-3 text-xl font-bold">{post.title}</h1>}
 
           {/* Content */}
-          <p className="text-grey-300 mb-6 text-lg leading-relaxed whitespace-pre-wrap">
+          <p className="text-content-dark-secondary mb-6 text-lg leading-relaxed whitespace-pre-wrap">
             {post.content}
           </p>
 
@@ -280,7 +278,7 @@ const PostDetailPage: FC = () => {
                 <div
                   key={url}
                   className={cn(
-                    "bg-bkg-dark-800 relative aspect-video overflow-hidden rounded",
+                    "bg-grey-100 relative aspect-video overflow-hidden rounded",
                     post.mediaUrls.length === 1 && "max-h-[500px]"
                   )}
                 >
@@ -315,7 +313,7 @@ const PostDetailPage: FC = () => {
           </div>
 
           {/* Actions */}
-          <div className="border-border-dark flex items-center gap-1 border-t pt-3">
+          <div className="border-border-light flex items-center gap-1 border-t pt-3">
             {/* Reaction Button */}
             <div className="relative">
               <button
@@ -326,8 +324,8 @@ const PostDetailPage: FC = () => {
                 className={cn(
                   "focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
                   post.userReaction
-                    ? "bg-action/20 text-action"
-                    : "text-grey-400 hover:bg-bkg-dark-800"
+                    ? "bg-action-50 text-action-600"
+                    : "text-grey-500 hover:bg-grey-100"
                 )}
                 onClick={() => {
                   if (post.userReaction) {
@@ -359,7 +357,7 @@ const PostDetailPage: FC = () => {
               </button>
 
               {showReactions && (
-                <fieldset className="border-border-dark bg-bkg-dark-secondary absolute bottom-full left-0 m-0 mb-2 flex gap-1 rounded-full border p-2 shadow-lg">
+                <fieldset className="border-border-light bg-bkg-light absolute bottom-full left-0 m-0 mb-2 flex gap-1 rounded-full border p-2 shadow-lg">
                   <legend className="sr-only">Choose a reaction</legend>
                   {Object.keys(REACTION_ICONS).map((type) => (
                     <button
@@ -367,8 +365,8 @@ const PostDetailPage: FC = () => {
                       aria-label={`React with ${type}`}
                       aria-pressed={post.userReaction === type}
                       className={cn(
-                        "hover:bg-bkg-dark-800 focus-visible:ring-action flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-transform hover:scale-125 focus-visible:ring-2 focus-visible:outline-none",
-                        post.userReaction === type && "bg-action/20"
+                        "hover:bg-grey-100 focus-visible:ring-action flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-transform hover:scale-125 focus-visible:ring-2 focus-visible:outline-none",
+                        post.userReaction === type && "bg-action-50"
                       )}
                       onClick={() => handleReaction(type as ReactionType)}
                     >
@@ -382,7 +380,7 @@ const PostDetailPage: FC = () => {
             {/* Comment Button */}
             <button
               aria-label={`Comment on post, ${post.commentCount} comments`}
-              className="text-grey-400 hover:bg-bkg-dark-800 focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none"
+              className="text-grey-500 hover:bg-grey-100 focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none"
               onClick={() => dispatch(toggleExpandComments(post.id))}
             >
               <svg
@@ -405,7 +403,7 @@ const PostDetailPage: FC = () => {
             {/* Share Button */}
             <button
               aria-label="Share post"
-              className="text-grey-400 hover:bg-bkg-dark-800 focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none"
+              className="text-grey-500 hover:bg-grey-100 focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none"
               onClick={handleShare}
             >
               <svg

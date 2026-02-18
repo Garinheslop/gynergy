@@ -70,7 +70,7 @@ const LiveCallBar: FC<LiveCallBarProps> = ({ event, state }) => {
         {/* Join button */}
         <button
           onClick={handleJoin}
-          className="focus-visible:ring-action shrink-0 rounded-lg bg-white px-4 py-2 text-sm font-bold text-gray-900 transition-all hover:bg-white/90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-95"
+          className="focus-visible:ring-action text-content-dark shrink-0 rounded-lg bg-white px-4 py-2 text-sm font-bold transition-all hover:bg-white/90 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-95"
         >
           Join
         </button>
@@ -79,7 +79,7 @@ const LiveCallBar: FC<LiveCallBarProps> = ({ event, state }) => {
         <button
           onClick={handleDismiss}
           aria-label="Dismiss"
-          className="shrink-0 p-1 text-white/50 transition-colors hover:text-white/80"
+          className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center p-2 text-white/50 transition-colors hover:text-white/80"
         >
           <svg
             className="h-4 w-4"

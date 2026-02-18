@@ -48,15 +48,15 @@ const ReferralCard: FC<ReferralCardProps> = ({
 
   if (isLoading) {
     return (
-      <div className="border-border-dark bg-bkg-dark-secondary animate-pulse rounded border p-6">
-        <div className="bg-bkg-dark-800 mb-4 h-6 w-1/3 rounded" />
-        <div className="bg-bkg-dark-800 h-10 rounded" />
+      <div className="border-border-light bg-bkg-light animate-pulse rounded border p-6">
+        <div className="bg-grey-100 mb-4 h-6 w-1/3 rounded" />
+        <div className="bg-grey-100 h-10 rounded" />
       </div>
     );
   }
 
   return (
-    <div className="border-border-dark bg-bkg-dark-secondary overflow-hidden rounded border">
+    <div className="border-border-light bg-bkg-light overflow-hidden rounded border">
       {/* Header */}
       <div className="from-action-700 to-action-500 bg-gradient-to-r p-6 text-white">
         <h3 className="mb-1 text-xl font-bold">Refer Friends, Earn Rewards</h3>
@@ -83,7 +83,7 @@ const ReferralCard: FC<ReferralCardProps> = ({
 
       {/* Tabs */}
       <div
-        className="border-border-dark flex border-b"
+        className="border-border-light flex border-b"
         role="tablist"
         aria-label="Referral sections"
       >
@@ -96,8 +96,8 @@ const ReferralCard: FC<ReferralCardProps> = ({
             className={cn(
               "focus-visible:ring-action min-h-[48px] flex-1 px-4 py-3 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset",
               activeTab === tab
-                ? "border-action text-action border-b-2"
-                : "text-grey-500 hover:text-grey-300"
+                ? "border-action-600 text-action-600 border-b-2"
+                : "text-grey-500 hover:text-content-dark-secondary"
             )}
           >
             {tab === "share" && "Share Link"}
@@ -115,9 +115,11 @@ const ReferralCard: FC<ReferralCardProps> = ({
             {referralCode && (
               <>
                 <div>
-                  <p className="text-grey-300 mb-1 text-sm font-medium">Your Referral Code</p>
+                  <p className="text-content-dark-secondary mb-1 text-sm font-medium">
+                    Your Referral Code
+                  </p>
                   <div className="flex items-center gap-2">
-                    <div className="border-action/30 bg-action/10 text-action flex-1 rounded border-2 border-dashed px-4 py-3 text-center font-mono text-lg font-bold">
+                    <div className="border-action/30 bg-action-50 text-action-600 flex-1 rounded border-2 border-dashed px-4 py-3 text-center font-mono text-lg font-bold">
                       {referralCode.code}
                     </div>
                     <button
@@ -137,7 +139,9 @@ const ReferralCard: FC<ReferralCardProps> = ({
 
                 {/* Share Buttons */}
                 <div>
-                  <p className="text-grey-300 mb-2 text-sm font-medium">Share on Social Media</p>
+                  <p className="text-content-dark-secondary mb-2 text-sm font-medium">
+                    Share on Social Media
+                  </p>
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={shareOnX}
@@ -240,9 +244,9 @@ const ReferralCard: FC<ReferralCardProps> = ({
           <div>
             {referrals.length === 0 ? (
               <div className="py-8 text-center">
-                <div className="bg-action/20 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
+                <div className="bg-action-50 mx-auto flex h-14 w-14 items-center justify-center rounded-full">
                   <svg
-                    className="text-action h-7 w-7"
+                    className="text-action-600 h-7 w-7"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -256,7 +260,7 @@ const ReferralCard: FC<ReferralCardProps> = ({
                     />
                   </svg>
                 </div>
-                <p className="text-grey-300 mt-2 font-medium">No referrals yet</p>
+                <p className="text-content-dark-secondary mt-2 font-medium">No referrals yet</p>
                 <p className="text-grey-500 text-sm">Share your link to start earning rewards!</p>
               </div>
             ) : (
@@ -264,14 +268,14 @@ const ReferralCard: FC<ReferralCardProps> = ({
                 {referrals.map((referral) => (
                   <div
                     key={referral.id}
-                    className="border-border-dark bg-bkg-dark flex items-center justify-between rounded border p-3"
+                    className="border-border-light bg-bkg-light-secondary flex items-center justify-between rounded border p-3"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="bg-action/20 text-action flex h-10 w-10 items-center justify-center rounded-full">
+                      <div className="bg-action-50 text-action-600 flex h-10 w-10 items-center justify-center rounded-full">
                         {referral.referred?.firstName?.[0] || "?"}
                       </div>
                       <div>
-                        <p className="text-content-light font-medium">
+                        <p className="text-content-dark font-medium">
                           {referral.referred?.firstName} {referral.referred?.lastName}
                         </p>
                         <p className="text-grey-500 text-xs">
@@ -310,7 +314,7 @@ const ReferralCard: FC<ReferralCardProps> = ({
                   "rounded border p-4 transition-all",
                   milestone.isAchieved
                     ? "border-success/30 bg-success/10"
-                    : "border-border-dark bg-bkg-dark"
+                    : "border-border-light bg-bkg-light-secondary"
                 )}
               >
                 <div className="flex items-start justify-between">
@@ -347,9 +351,9 @@ const ReferralCard: FC<ReferralCardProps> = ({
                           />
                         </svg>
                       )}
-                      <h4 className="text-content-light font-semibold">{milestone.name}</h4>
+                      <h4 className="text-content-dark font-semibold">{milestone.name}</h4>
                     </div>
-                    <p className="text-grey-400 mt-1 text-sm">{milestone.description}</p>
+                    <p className="text-grey-500 mt-1 text-sm">{milestone.description}</p>
                     <p className="text-grey-500 mt-2 text-xs">{milestone.rewardDescription}</p>
                   </div>
                   <div className="text-right">
@@ -357,7 +361,9 @@ const ReferralCard: FC<ReferralCardProps> = ({
                       {milestone.referralsRequired} referrals
                     </p>
                     {milestone.pointsBonus > 0 && (
-                      <p className="text-action text-sm font-bold">+{milestone.pointsBonus} pts</p>
+                      <p className="text-action-600 text-sm font-bold">
+                        +{milestone.pointsBonus} pts
+                      </p>
                     )}
                   </div>
                 </div>

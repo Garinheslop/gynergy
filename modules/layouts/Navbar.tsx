@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 import { useSession } from "@contexts/UseSession";
+import { useUnreadMessageCount } from "@lib/hooks/useUnreadMessageCount";
 import { cn } from "@lib/utils/style";
 import ActionButton from "@modules/common/components/ActionButton";
 import Image from "@modules/common/components/Image";
@@ -24,6 +25,7 @@ const Navbar: FC = () => {
   const { session } = useSession();
   const router = useRouter();
   const path = usePathname();
+  const unreadMessages = useUnreadMessageCount(session?.user?.id);
 
   const currentBook = useSelector((state) => state.books.current);
 
@@ -65,6 +67,32 @@ const Navbar: FC = () => {
                 "bg-action-50 border border-border-light rounded px-2.5 flex-row-reverse hidden sm:flex"
               }
             />
+            <button
+              onClick={() => router.push("/community/messages")}
+              className="focus-visible:ring-action-500 relative flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+              aria-label={
+                unreadMessages > 0 ? "Messages, " + unreadMessages + " unread" : "Messages"
+              }
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-content-secondary h-5 w-5"
+                aria-hidden="true"
+              >
+                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+              </svg>
+              {unreadMessages > 0 && (
+                <span className="bg-danger absolute -top-0.5 -right-0.5 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-bold text-white">
+                  {unreadMessages > 99 ? "99+" : unreadMessages}
+                </span>
+              )}
+            </button>
             <NotificationBell />
             <DropdownMenu />
           </div>
@@ -247,6 +275,35 @@ const UserMenuItems: FC<UserMenuItemsProps> = ({ onItemClick }) => {
         <Paragraph
           variant={paragraphVariants.regular}
           content={"Community"}
+          sx={"text-content-dark"}
+        />
+      </li>
+      <li
+        role="button"
+        tabIndex={0}
+        className="hover:bg-bkg-dark/10 flex min-h-[44px] cursor-pointer items-center gap-2.5 rounded py-2 sm:hidden"
+        onClick={() => {
+          router.push("/community/messages");
+          onItemClick();
+        }}
+        onKeyDown={(e) => e.key === "Enter" && router.push("/community/messages")}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-content-secondary h-5 w-5"
+          aria-hidden="true"
+        >
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+        </svg>
+        <Paragraph
+          variant={paragraphVariants.regular}
+          content={"Messages"}
           sx={"text-content-dark"}
         />
       </li>

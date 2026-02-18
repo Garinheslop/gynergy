@@ -74,7 +74,7 @@ const EventCard: FC<EventCardProps> = ({ event, attendees = [], onRsvp, onJoin }
   return (
     <div
       className={cn(
-        "border-border-dark bg-bkg-dark-secondary rounded-lg border p-4 transition-colors",
+        "border-border-light bg-bkg-light rounded-lg border p-4 transition-colors",
         isLive && "border-danger/40 bg-danger/5",
         isStartingSoon && "border-action/40 bg-action/5"
       )}
@@ -99,14 +99,14 @@ const EventCard: FC<EventCardProps> = ({ event, attendees = [], onRsvp, onJoin }
       </div>
 
       {/* Title */}
-      <h3 className="text-content-light mb-1 text-base font-semibold">{event.title}</h3>
+      <h3 className="text-content-dark mb-1 text-base font-semibold">{event.title}</h3>
 
       {/* Date/time */}
-      <p className="text-grey-400 mb-3 text-sm">{formattedDate}</p>
+      <p className="text-grey-500 mb-3 text-sm">{formattedDate}</p>
 
       {/* Host */}
       <div className="mb-3 flex items-center gap-2">
-        <div className="relative h-6 w-6 overflow-hidden rounded-full bg-white/10">
+        <div className="bg-grey-100 relative h-6 w-6 overflow-hidden rounded-full">
           {event.hostAvatar ? (
             <Image src={event.hostAvatar} alt={event.hostName} fill className="object-cover" />
           ) : (
@@ -115,7 +115,7 @@ const EventCard: FC<EventCardProps> = ({ event, attendees = [], onRsvp, onJoin }
             </div>
           )}
         </div>
-        <span className="text-grey-400 text-sm">Hosted by {event.hostName}</span>
+        <span className="text-grey-500 text-sm">Hosted by {event.hostName}</span>
       </div>
 
       {/* RSVP count + avatar stack */}
@@ -125,12 +125,12 @@ const EventCard: FC<EventCardProps> = ({ event, attendees = [], onRsvp, onJoin }
             {attendees.slice(0, 5).map((a) => (
               <div
                 key={a.userId}
-                className="border-bkg-dark-secondary relative h-7 w-7 overflow-hidden rounded-full border-2"
+                className="border-bkg-light relative h-7 w-7 overflow-hidden rounded-full border-2"
               >
                 {a.userAvatar ? (
                   <Image src={a.userAvatar} alt={a.userName} fill className="object-cover" />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-white/10 text-xs text-white">
+                  <div className="bg-grey-100 text-grey-500 flex h-full w-full items-center justify-center text-xs">
                     {a.userName[0]}
                   </div>
                 )}
@@ -177,7 +177,7 @@ const EventCard: FC<EventCardProps> = ({ event, attendees = [], onRsvp, onJoin }
             className={cn(
               "focus-visible:ring-action flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 font-semibold transition-all focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-95",
               isRsvped
-                ? "bg-action/20 text-action border-action/30 border"
+                ? "bg-action-50 text-action-600 border-action/30 border"
                 : "bg-action text-content-dark hover:bg-action-100"
             )}
           >
@@ -218,12 +218,12 @@ const EventCard: FC<EventCardProps> = ({ event, attendees = [], onRsvp, onJoin }
 
       {/* Recording available badge */}
       {event.status === "ended" && event.recordingUrl && (
-        <div className="mt-3 border-t border-white/5 pt-3">
+        <div className="border-grey-200 mt-3 border-t pt-3">
           <a
             href={event.recordingUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-action hover:text-action-100 flex items-center gap-2 text-sm font-medium transition-colors"
+            className="text-action-600 hover:text-action-700 flex items-center gap-2 text-sm font-medium transition-colors"
           >
             <svg
               className="h-4 w-4"

@@ -91,7 +91,7 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
   }
 
   return (
-    <div className="border-border-dark mt-4 border-t pt-4">
+    <div className="border-border-light mt-4 border-t pt-4">
       <Dialog />
       {/* Comment Input */}
       <div className="mb-4 flex gap-3">
@@ -104,7 +104,7 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
             placeholder="Write a comment..."
             rows={1}
             aria-label="Write a comment"
-            className="border-border-dark bg-bkg-dark text-content-light placeholder:text-grey-600 focus:border-action focus:ring-action w-full resize-none rounded border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
+            className="border-border-light bg-bkg-light-secondary text-content-dark placeholder:text-grey-400 focus:border-action focus:ring-action w-full resize-none rounded border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -117,7 +117,7 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
               <button
                 onClick={handleSubmitComment}
                 disabled={submittingId === "new"}
-                className="bg-action text-content-dark hover:bg-action-100 focus-visible:ring-action min-h-[32px] rounded px-3 py-1 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
+                className="bg-action text-content-dark hover:bg-action-100 focus-visible:ring-action min-h-[44px] rounded px-3 py-1 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
               >
                 {submittingId === "new" ? "Posting..." : "Post"}
               </button>
@@ -131,10 +131,10 @@ const CommentSection: FC<CommentSectionProps> = ({ postId, isExpanded, onToggle:
         <div className="space-y-3">
           {[1, 2].map((i) => (
             <div key={i} className="flex animate-pulse gap-3">
-              <div className="bg-bkg-dark-800 h-8 w-8 rounded-full" />
+              <div className="bg-grey-100 h-8 w-8 rounded-full" />
               <div className="flex-1 space-y-2">
-                <div className="bg-bkg-dark-800 h-3 w-24 rounded" />
-                <div className="bg-bkg-dark-800 h-4 w-full rounded" />
+                <div className="bg-grey-100 h-3 w-24 rounded" />
+                <div className="bg-grey-100 h-4 w-full rounded" />
               </div>
             </div>
           ))}
@@ -219,14 +219,14 @@ const CommentItem: FC<CommentItemProps> = ({
 
         {/* Content */}
         <div className="min-w-0 flex-1">
-          <div className="bg-bkg-dark-800 rounded px-3 py-2">
+          <div className="bg-grey-100 rounded px-3 py-2">
             <div className="flex items-center gap-2">
-              <span className="text-content-light text-sm font-semibold">
+              <span className="text-content-dark text-sm font-semibold">
                 {comment.author?.firstName} {comment.author?.lastName}
               </span>
               <span className="text-grey-500 text-xs">{formatDate(comment.createdAt)}</span>
             </div>
-            <p className="text-grey-300 mt-1 text-sm break-words whitespace-pre-wrap">
+            <p className="text-content-dark-secondary mt-1 text-sm break-words whitespace-pre-wrap">
               {comment.content}
             </p>
           </div>
@@ -235,21 +235,21 @@ const CommentItem: FC<CommentItemProps> = ({
           <div className="mt-1 flex items-center gap-4">
             <button
               onClick={() => onReply(comment.id)}
-              className="text-grey-500 hover:text-action focus-visible:text-action text-xs font-medium focus-visible:outline-none"
+              className="text-grey-500 hover:text-action-600 focus-visible:text-action-600 inline-flex min-h-[44px] items-center px-1 text-xs font-medium focus-visible:outline-none"
             >
               Reply
             </button>
             {isOwner ? (
               <button
                 onClick={() => onDelete(comment.id)}
-                className="text-grey-500 hover:text-danger focus-visible:text-danger text-xs font-medium focus-visible:outline-none"
+                className="text-grey-500 hover:text-danger focus-visible:text-danger inline-flex min-h-[44px] items-center px-1 text-xs font-medium focus-visible:outline-none"
               >
                 Delete
               </button>
             ) : (
               <button
                 onClick={() => setReportingCommentId(comment.id)}
-                className="text-grey-500 hover:text-danger focus-visible:text-danger text-xs font-medium focus-visible:outline-none"
+                className="text-grey-500 hover:text-danger focus-visible:text-danger inline-flex min-h-[44px] items-center px-1 text-xs font-medium focus-visible:outline-none"
               >
                 Report
               </button>
@@ -266,7 +266,7 @@ const CommentItem: FC<CommentItemProps> = ({
                 placeholder={`Reply to ${comment.author?.firstName}...`}
                 rows={1}
                 aria-label={`Reply to ${comment.author?.firstName}`}
-                className="border-border-dark bg-bkg-dark text-content-light placeholder:text-grey-600 focus:border-action focus:ring-action flex-1 resize-none rounded border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
+                className="border-border-light bg-bkg-light-secondary text-content-dark placeholder:text-grey-400 focus:border-action focus:ring-action flex-1 resize-none rounded border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
@@ -280,7 +280,7 @@ const CommentItem: FC<CommentItemProps> = ({
               <button
                 onClick={() => onSubmitReply(comment.id)}
                 disabled={submittingId === comment.id || !replyContent.trim()}
-                className="bg-action text-content-dark hover:bg-action-100 focus-visible:ring-action min-h-[32px] rounded px-3 py-1 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
+                className="bg-action text-content-dark hover:bg-action-100 focus-visible:ring-action min-h-[44px] rounded px-3 py-1 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
               >
                 {submittingId === comment.id ? "Posting..." : "Reply"}
               </button>
@@ -289,7 +289,7 @@ const CommentItem: FC<CommentItemProps> = ({
 
           {/* Nested Replies */}
           {comment.replies && comment.replies.length > 0 && (
-            <div className="border-border-dark mt-3 space-y-3 border-l-2 pl-4">
+            <div className="border-border-light mt-3 space-y-3 border-l-2 pl-4">
               {comment.replies.map((reply) => (
                 <div key={reply.id} className="flex gap-2">
                   <Avatar
@@ -298,14 +298,14 @@ const CommentItem: FC<CommentItemProps> = ({
                     size="xs"
                   />
                   <div className="min-w-0 flex-1">
-                    <div className="bg-bkg-dark-800 rounded px-3 py-2">
+                    <div className="bg-grey-100 rounded px-3 py-2">
                       <div className="flex items-center gap-2">
-                        <span className="text-content-light text-xs font-semibold">
+                        <span className="text-content-dark text-xs font-semibold">
                           {reply.author?.firstName} {reply.author?.lastName}
                         </span>
                         <span className="text-grey-500 text-xs">{formatDate(reply.createdAt)}</span>
                       </div>
-                      <p className="text-grey-300 mt-1 text-xs break-words whitespace-pre-wrap">
+                      <p className="text-content-dark-secondary mt-1 text-xs break-words whitespace-pre-wrap">
                         {reply.content}
                       </p>
                     </div>
@@ -313,14 +313,14 @@ const CommentItem: FC<CommentItemProps> = ({
                       {currentUserId === reply.userId ? (
                         <button
                           onClick={() => onDelete(reply.id)}
-                          className="text-grey-500 hover:text-danger focus-visible:text-danger text-xs font-medium focus-visible:outline-none"
+                          className="text-grey-500 hover:text-danger focus-visible:text-danger inline-flex min-h-[44px] items-center px-1 text-xs font-medium focus-visible:outline-none"
                         >
                           Delete
                         </button>
                       ) : (
                         <button
                           onClick={() => setReportingCommentId(reply.id)}
-                          className="text-grey-500 hover:text-danger focus-visible:text-danger text-xs font-medium focus-visible:outline-none"
+                          className="text-grey-500 hover:text-danger focus-visible:text-danger inline-flex min-h-[44px] items-center px-1 text-xs font-medium focus-visible:outline-none"
                         >
                           Report
                         </button>

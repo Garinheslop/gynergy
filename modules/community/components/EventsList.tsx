@@ -37,19 +37,19 @@ const EventsList: FC<EventsListProps> = ({ upcoming, past, attendees, loading, o
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="border-border-dark bg-bkg-dark-secondary animate-pulse rounded-lg border p-4"
+            className="border-border-light bg-bkg-light animate-pulse rounded-lg border p-4"
           >
             <div className="mb-3 flex items-center justify-between">
-              <div className="h-5 w-20 rounded bg-white/10" />
-              <div className="h-4 w-12 rounded bg-white/10" />
+              <div className="bg-grey-200 h-5 w-20 rounded" />
+              <div className="bg-grey-200 h-4 w-12 rounded" />
             </div>
-            <div className="mb-2 h-5 w-48 rounded bg-white/10" />
-            <div className="mb-3 h-4 w-32 rounded bg-white/10" />
+            <div className="bg-grey-200 mb-2 h-5 w-48 rounded" />
+            <div className="bg-grey-200 mb-3 h-4 w-32 rounded" />
             <div className="mb-3 flex items-center gap-2">
-              <div className="h-6 w-6 rounded-full bg-white/10" />
-              <div className="h-3 w-24 rounded bg-white/10" />
+              <div className="bg-grey-200 h-6 w-6 rounded-full" />
+              <div className="bg-grey-200 h-3 w-24 rounded" />
             </div>
-            <div className="h-11 w-full rounded-lg bg-white/10" />
+            <div className="bg-grey-200 h-11 w-full rounded-lg" />
           </div>
         ))}
       </div>
@@ -59,9 +59,9 @@ const EventsList: FC<EventsListProps> = ({ upcoming, past, attendees, loading, o
   if (upcoming.length === 0 && past.length === 0) {
     return (
       <div className="py-16 text-center">
-        <div className="bg-action/20 mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full">
+        <div className="bg-action-50 mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full">
           <svg
-            className="text-action h-7 w-7"
+            className="text-action-600 h-7 w-7"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -75,8 +75,8 @@ const EventsList: FC<EventsListProps> = ({ upcoming, past, attendees, loading, o
             />
           </svg>
         </div>
-        <h3 className="text-content-light mb-2 text-xl font-bold">No Upcoming Events</h3>
-        <p className="text-grey-400 mx-auto max-w-sm text-sm">
+        <h3 className="text-content-dark mb-2 text-xl font-bold">No Upcoming Events</h3>
+        <p className="text-grey-500 mx-auto max-w-sm text-sm">
           Community calls will appear here when scheduled. Check back soon for upcoming events!
         </p>
       </div>
@@ -88,7 +88,7 @@ const EventsList: FC<EventsListProps> = ({ upcoming, past, attendees, loading, o
       {/* Upcoming Events */}
       {upcoming.length > 0 && (
         <section>
-          <h3 className="text-content-light mb-4 text-lg font-bold">Upcoming Events</h3>
+          <h3 className="text-content-dark mb-4 text-lg font-bold">Upcoming Events</h3>
           <div className="space-y-3">
             {upcoming.map((event) => (
               <EventCard
@@ -108,7 +108,7 @@ const EventsList: FC<EventsListProps> = ({ upcoming, past, attendees, loading, o
         <section>
           <button
             onClick={() => setShowPast(!showPast)}
-            className="text-grey-400 hover:text-content-light mb-3 flex w-full items-center gap-2 text-sm font-semibold transition-colors"
+            className="text-grey-500 hover:text-content-dark focus-visible:ring-action mb-3 flex w-full items-center gap-2 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none"
             aria-expanded={showPast}
           >
             <svg
@@ -128,12 +128,12 @@ const EventsList: FC<EventsListProps> = ({ upcoming, past, attendees, loading, o
               {past.map((event) => (
                 <div
                   key={event.id}
-                  className="border-border-dark bg-bkg-dark-secondary rounded-lg border p-4 opacity-75"
+                  className="border-border-light bg-bkg-light rounded-lg border p-4 opacity-75"
                 >
                   <div className="mb-1 flex items-center justify-between">
-                    <h4 className="text-content-light font-semibold">{event.title}</h4>
+                    <h4 className="text-content-dark font-semibold">{event.title}</h4>
                     {event.recordingUrl && (
-                      <span className="text-action bg-action/10 rounded px-2 py-0.5 text-xs font-medium">
+                      <span className="text-action-600 bg-action-50 rounded px-2 py-0.5 text-xs font-medium">
                         Recording Available
                       </span>
                     )}
@@ -151,7 +151,7 @@ const EventsList: FC<EventsListProps> = ({ upcoming, past, attendees, loading, o
                       href={event.recordingUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-action hover:text-action-100 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+                      className="text-action-600 hover:text-action-700 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
                     >
                       <svg
                         className="h-4 w-4"

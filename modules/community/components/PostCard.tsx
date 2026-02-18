@@ -177,7 +177,7 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
   const postTypeInfo = POST_TYPE_LABELS[post.postType];
 
   return (
-    <article className="border-border-dark bg-bkg-dark-secondary rounded border p-5 transition-shadow hover:shadow-md">
+    <article className="border-border-light bg-bkg-light rounded border p-5 transition-shadow hover:shadow-md">
       {/* Header */}
       <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center gap-3">
@@ -191,7 +191,7 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
           {/* Name & Time */}
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-content-light font-semibold">
+              <span className="text-content-dark font-semibold">
                 {post.author?.firstName} {post.author?.lastName}
               </span>
               {post.isPinned && (
@@ -200,7 +200,7 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
                 </span>
               )}
               {post.isFeatured && (
-                <span className="bg-action/20 text-action rounded px-2 py-0.5 text-xs font-medium">
+                <span className="bg-action-50 text-action-700 rounded px-2 py-0.5 text-xs font-medium">
                   Featured
                 </span>
               )}
@@ -225,7 +225,7 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
             <button
               aria-label="Post options"
               aria-expanded={showOwnerMenu}
-              className="text-grey-500 hover:text-content-light hover:bg-bkg-dark-800 focus-visible:ring-action flex h-9 w-9 items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:outline-none"
+              className="text-grey-500 hover:text-content-dark hover:bg-grey-100 focus-visible:ring-action flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:outline-none"
               onClick={() => setShowOwnerMenu(!showOwnerMenu)}
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
@@ -234,11 +234,11 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
             </button>
 
             {showOwnerMenu && (
-              <div className="border-border-dark bg-bkg-dark-secondary absolute right-0 z-10 mt-1 w-36 overflow-hidden rounded-lg border shadow-lg">
+              <div className="border-border-light bg-bkg-light absolute right-0 z-10 mt-1 w-36 overflow-hidden rounded-lg border shadow-lg">
                 {isOwner ? (
                   <>
                     <button
-                      className="text-content-light hover:bg-bkg-dark-800 flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors"
+                      className="text-content-dark hover:bg-grey-100 focus-visible:ring-action flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
                       onClick={() => {
                         setIsEditing(true);
                         setEditTitle(post.title || "");
@@ -263,7 +263,7 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
                       Edit
                     </button>
                     <button
-                      className="text-danger hover:bg-danger/10 flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors"
+                      className="text-danger hover:bg-danger/10 focus-visible:ring-action flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
                       onClick={() => {
                         setShowOwnerMenu(false);
                         handleDelete();
@@ -289,7 +289,7 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
                 ) : (
                   <>
                     <button
-                      className="text-grey-300 hover:bg-bkg-dark-800 flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors"
+                      className="text-content-dark-secondary hover:bg-grey-100 focus-visible:ring-action flex w-full items-center gap-2 px-4 py-2.5 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none"
                       onClick={() => {
                         setShowOwnerMenu(false);
                         setShowReportModal(true);
@@ -333,26 +333,26 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
             placeholder="Title (optional)"
-            className="border-border-dark bg-bkg-dark text-content-light focus:border-action w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
+            className="border-border-light bg-bkg-light-secondary text-content-dark focus:border-action w-full rounded-lg border px-3 py-2 text-sm focus:outline-none"
           />
           <textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
             rows={4}
-            className="border-border-dark bg-bkg-dark text-content-light focus:border-action w-full resize-y rounded-lg border px-3 py-2 text-sm focus:outline-none"
+            className="border-border-light bg-bkg-light-secondary text-content-dark focus:border-action w-full resize-y rounded-lg border px-3 py-2 text-sm focus:outline-none"
           />
           <div className="flex items-center gap-2">
             <button
               onClick={handleSaveEdit}
               disabled={editSaving || !editContent.trim()}
-              className="bg-action text-content-dark hover:bg-action-100 focus-visible:ring-action min-h-[36px] rounded-lg px-4 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
+              className="bg-action text-content-dark hover:bg-action-100 focus-visible:ring-action min-h-[44px] rounded-lg px-4 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
             >
               {editSaving ? "Saving..." : "Save"}
             </button>
             <button
               onClick={() => setIsEditing(false)}
               disabled={editSaving}
-              className="text-grey-400 hover:text-content-light focus-visible:ring-action min-h-[36px] rounded-lg px-4 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
+              className="text-grey-500 hover:text-content-dark focus-visible:ring-action min-h-[44px] rounded-lg px-4 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
             >
               Cancel
             </button>
@@ -362,11 +362,11 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
         <>
           {/* Title */}
           {post.title && (
-            <h3 className="text-content-light mb-2 text-lg font-semibold">{post.title}</h3>
+            <h3 className="text-content-dark mb-2 text-lg font-semibold">{post.title}</h3>
           )}
 
           {/* Content */}
-          <p className="text-grey-300 mb-4 whitespace-pre-wrap">{post.content}</p>
+          <p className="text-content-dark-secondary mb-4 whitespace-pre-wrap">{post.content}</p>
         </>
       )}
 
@@ -384,7 +384,7 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
             <div
               key={url}
               className={cn(
-                "bg-bkg-dark-800 relative aspect-video overflow-hidden rounded",
+                "bg-grey-100 relative aspect-video overflow-hidden rounded",
                 post.mediaUrls.length === 1 && "max-h-96"
               )}
             >
@@ -418,7 +418,7 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
       </div>
 
       {/* Actions */}
-      <div className="border-border-dark flex items-center gap-1 border-t pt-3">
+      <div className="border-border-light flex items-center gap-1 border-t pt-3">
         {/* Reaction Button */}
         <div className="relative" ref={reactionPickerRef}>
           <button
@@ -427,7 +427,7 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
             aria-expanded={showReactions}
             className={cn(
               "focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
-              post.userReaction ? "bg-action/20 text-action" : "text-grey-400 hover:bg-bkg-dark-800"
+              post.userReaction ? "bg-action-50 text-action-600" : "text-grey-500 hover:bg-grey-100"
             )}
             onClick={() => {
               if (post.userReaction) {
@@ -460,7 +460,7 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
 
           {/* Reaction Picker */}
           {showReactions && (
-            <fieldset className="border-border-dark bg-bkg-dark-secondary absolute bottom-full left-0 m-0 mb-2 flex gap-1 rounded-full border p-2 shadow-lg">
+            <fieldset className="border-border-light bg-bkg-light absolute bottom-full left-0 m-0 mb-2 flex gap-1 rounded-full border p-2 shadow-lg">
               <legend className="sr-only">Choose a reaction</legend>
               {(Object.keys(REACTION_ICONS) as ReactionType[]).map((type) => (
                 <button
@@ -469,8 +469,8 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
                   aria-pressed={post.userReaction === type}
                   title={REACTION_ICONS[type].label}
                   className={cn(
-                    "hover:bg-bkg-dark-800 focus-visible:ring-action flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-transform hover:scale-125 focus-visible:ring-2 focus-visible:outline-none",
-                    post.userReaction === type && "bg-action/20"
+                    "hover:bg-grey-100 focus-visible:ring-action flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full p-2 transition-transform hover:scale-125 focus-visible:ring-2 focus-visible:outline-none",
+                    post.userReaction === type && "bg-action-50"
                   )}
                   onClick={() => {
                     onReact(post.id, type);
@@ -491,7 +491,7 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
           aria-expanded={isCommentsExpanded}
           className={cn(
             "focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
-            isCommentsExpanded ? "bg-action/20 text-action" : "text-grey-400 hover:bg-bkg-dark-800"
+            isCommentsExpanded ? "bg-action-50 text-action-600" : "text-grey-500 hover:bg-grey-100"
           )}
           onClick={handleToggleComments}
         >
@@ -516,7 +516,7 @@ const PostCard: FC<PostCardProps> = ({ post, currentUserId, onReact }) => {
         <button
           aria-label="Share post"
           disabled={shareLoading}
-          className="text-grey-400 hover:bg-bkg-dark-800 focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
+          className="text-grey-500 hover:bg-grey-100 focus-visible:ring-action flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:opacity-50"
           onClick={handleShare}
         >
           <svg

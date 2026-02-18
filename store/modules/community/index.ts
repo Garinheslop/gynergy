@@ -126,6 +126,8 @@ const communitySlice = createSlice({
       state.nextCursor = action.payload.nextCursor;
     },
     addPost: (state, action: PayloadAction<CommunityPost>) => {
+      // Deduplicate: Realtime INSERT may arrive after a fetch that already includes the post
+      if (state.posts.some((p) => p.id === action.payload.id)) return;
       state.posts = [action.payload, ...state.posts];
     },
     updatePost: (
