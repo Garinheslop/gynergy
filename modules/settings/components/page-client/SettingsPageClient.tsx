@@ -11,13 +11,12 @@ import Loader from "@modules/common/components/Loader";
 import SectionCard from "@modules/common/components/SectionCard";
 import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
+import SubscriptionManagement from "@modules/payment/components/SubscriptionManagement";
 import { loaderTypes } from "@resources/types/loader";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
 import { resetUserBookSessionData } from "@store/modules/enrollment";
 import { updateUserProfileData } from "@store/modules/profile";
-
-import SubscriptionManagement from "@modules/payment/components/SubscriptionManagement";
 
 import ProfileImage from "../ProfileImage";
 
@@ -108,22 +107,32 @@ const SettingsPageClient: React.FC = () => {
     );
   }, [firstName.value, lastName.value, imageFile, profile?.current]);
 
+  const sessionId = enrollments.current?.session?.id;
+
   const handleReset = () => {
-    const sessionId = enrollments.current?.session?.id;
-    if (!enrollments.resetting && sessionId) {
+    if (enrollments.resetting) return;
+    if (!sessionId) {
       messagePopupObj.open({
         popupData: {
+          heading: "No Active Session",
           description:
-            "Are you sure you want to delete all you journals? This action is irreversible.",
-          heading: "Reset Date Zero Progress",
-          cta: {
-            action: () => dispatch(resetUserBookSessionData(sessionId)),
-            label: "Confirm",
-            style: "bg-danger [&>p]:text-content-light",
-          },
+            "No active journaling session found. Please contact support if you believe this is an error.",
         },
       });
+      return;
     }
+    messagePopupObj.open({
+      popupData: {
+        description:
+          "Are you sure you want to delete all your journals? This action is irreversible.",
+        heading: "Reset Date Zero Progress",
+        cta: {
+          action: () => dispatch(resetUserBookSessionData(sessionId)),
+          label: "Confirm",
+          style: "bg-danger [&>p]:text-content-light",
+        },
+      },
+    });
   };
 
   return (
@@ -212,8 +221,8 @@ const SettingsPageClient: React.FC = () => {
           <ActionButton
             label="Reset Your Account"
             onClick={handleReset}
-            sx={"bg-primary"}
-            disabled={updating}
+            sx={sessionId ? "bg-danger [&>p]:text-content-light" : ""}
+            disabled={updating || enrollments.resetting}
           />
         </>
       </SectionCard>
