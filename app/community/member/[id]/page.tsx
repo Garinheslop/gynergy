@@ -9,6 +9,7 @@ import { useParams, useRouter } from "next/navigation";
 import { usePopup } from "@contexts/UsePopup";
 import { useSession } from "@contexts/UseSession";
 import { triggerHaptic } from "@lib/utils/haptic";
+import BadgeShowcase from "@modules/gamification/components/BadgeShowcase";
 import { MemberProfile, CommunityPost } from "@resources/types/community";
 
 const MemberProfilePage: FC = () => {
@@ -255,6 +256,14 @@ const MemberProfilePage: FC = () => {
             <p className="text-grey-500 mt-1 text-xs">Posts</p>
           </div>
         </div>
+
+        {/* Badge Showcase */}
+        {member.showBadges !== false && (member.badgesCount ?? 0) > 0 && (
+          <div className="mb-8">
+            <h2 className="text-content-light mb-4 text-lg font-semibold">Badges</h2>
+            <BadgeShowcase userId={member.id} maxBadges={6} size="small" showEmptySlots={false} />
+          </div>
+        )}
 
         {/* Recent Posts */}
         {posts.length > 0 && (

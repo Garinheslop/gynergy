@@ -67,6 +67,43 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onClose, showHeader = tru
     clearChat();
   };
 
+  // Handle exporting conversation
+  const handleExportChat = () => {
+    if (messages.length === 0) return;
+
+    const charName = currentCharacter?.name || activeCharacter;
+    const date = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    let content = `# Gynergy Coaching Session\n`;
+    content += `**Coach:** ${charName}\n`;
+    content += `**Date:** ${date}\n`;
+    content += `**Messages:** ${messages.length}\n\n---\n\n`;
+
+    messages.forEach((msg) => {
+      const sender = msg.role === "user" ? "You" : charName;
+      const time = msg.timestamp
+        ? new Date(msg.timestamp).toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : "";
+      content += `**${sender}**${time ? ` (${time})` : ""}\n${msg.content}\n\n`;
+    });
+
+    const blob = new Blob([content], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const safeName = (charName || "coach").toLowerCase();
+    a.download = `gynergy-chat-${safeName}-${new Date().toISOString().split("T")[0]}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   // Get current character info
   const currentCharacter = characters.data.find((c) => c.key === activeCharacter);
 
@@ -140,6 +177,16 @@ const ChatContainer: React.FC<ChatContainerProps> = ({ onClose, showHeader = tru
             >
               <i className="gng-refresh text-[18px]" />
             </button>
+            {/* Export chat button */}
+            {messages.length > 0 && (
+              <button
+                onClick={handleExportChat}
+                className="text-content-dark-secondary hover:text-content-dark hover:bg-bkg-light rounded-full p-2"
+                title="Export conversation"
+              >
+                <i className="gng-download text-[18px]" />
+              </button>
+            )}
             {/* Clear chat button */}
             {messages.length > 0 && (
               <button
