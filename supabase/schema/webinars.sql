@@ -365,6 +365,15 @@ CREATE TRIGGER attendance_watch_duration
   EXECUTE FUNCTION update_watch_duration();
 
 -- ============================================
+-- REALTIME PUBLICATION
+-- ============================================
+-- Required for Supabase Realtime postgres_changes subscriptions
+-- Chat and Q&A tables stream live updates to the WebinarViewer client
+
+ALTER PUBLICATION supabase_realtime ADD TABLE webinar_chat;
+ALTER PUBLICATION supabase_realtime ADD TABLE webinar_qa;
+
+-- ============================================
 -- SEED DATA (March 3rd Webinar)
 -- ============================================
 

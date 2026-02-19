@@ -144,7 +144,15 @@ const baseStyles = `
   .calendar-buttons { text-align: center; margin: 20px 0; }
 `;
 
-function emailWrapper(content: string, trackingPixel: string = ""): string {
+function emailWrapper(
+  content: string,
+  trackingPixel: string = "",
+  recipientEmail: string = ""
+): string {
+  const unsubscribeUrl = recipientEmail
+    ? `${BASE_URL}/api/email/unsubscribe?email=${Buffer.from(recipientEmail).toString("base64")}&type=webinar`
+    : "";
+
   return `
 <!DOCTYPE html>
 <html>
@@ -164,6 +172,7 @@ function emailWrapper(content: string, trackingPixel: string = ""): string {
     <div class="footer">
       <p>The Gynergy Effect | Transforming Lives Through Gratitude</p>
       <p>Questions? Reply to this email or contact support@gynergy.app</p>
+      ${unsubscribeUrl ? `<p><a href="${unsubscribeUrl}" style="color: #666; text-decoration: underline;">Unsubscribe from webinar emails</a></p>` : ""}
     </div>
   </div>
   ${trackingPixel}
@@ -284,7 +293,8 @@ export async function sendWebinarConfirmationEmail(params: {
       No replay. Live only. Show up ready.
     </p>
   `,
-    trackingPixel
+    trackingPixel,
+    to
   );
 
   const text = `
@@ -325,13 +335,32 @@ No replay. Live only. Show up ready.
 
 — Garin
 Gynergy
+
+Unsubscribe: ${BASE_URL}/api/email/unsubscribe?email=${Buffer.from(to).toString("base64")}&type=webinar
   `.trim();
+
+  // Generate ICS calendar attachment
+  const icsContent = generateICSContent({
+    title: webinarTitle,
+    description: `Join Garin Heslop for a live training on the Five Pillars of Integrated Power.\n\nJoin link: ${BASE_URL}/webinar/live`,
+    startDate: webinarDate,
+    durationMinutes,
+    location: `${BASE_URL}/webinar/live`,
+    organizer: "Garin Heslop",
+  });
 
   return sendEmail({
     to,
     subject: `You're in! ${webinarTitle} — ${formattedDate}`,
     html,
     text,
+    attachments: [
+      {
+        filename: "webinar-invite.ics",
+        content: Buffer.from(icsContent, "utf-8"),
+        contentType: "text/calendar",
+      },
+    ],
   });
 }
 
@@ -430,7 +459,8 @@ export async function sendWebinarReminderEmail(params: {
       ${is24h ? "See you tomorrow. Come ready." : "We're starting. Don't be late."}
     </p>
   `,
-    trackingPixel
+    trackingPixel,
+    to
   );
 
   const text = `
@@ -448,6 +478,8 @@ Join the webinar: ${BASE_URL}/webinar/live
 ${is24h ? "See you tomorrow. Come ready." : "We're starting. Don't be late."}
 
 — Garin
+
+Unsubscribe: ${BASE_URL}/api/email/unsubscribe?email=${Buffer.from(to).toString("base64")}&type=webinar
   `.trim();
 
   return sendEmail({
@@ -521,7 +553,8 @@ export async function sendWebinarFollowUpEmail(params: {
       <p>Start the practice tomorrow morning. 10 minutes. That's all it takes to begin.</p>
       <p style="color: #7dd3c0;">— Garin</p>
     `,
-      trackingPixel
+      trackingPixel,
+      to
     );
 
     return sendEmail({
@@ -549,6 +582,8 @@ Limited spots. Same intimate group size as today.
 Start the practice tomorrow morning. 10 minutes. That's all it takes to begin.
 
 — Garin
+
+Unsubscribe: ${BASE_URL}/api/email/unsubscribe?email=${Buffer.from(to).toString("base64")}&type=webinar
       `.trim(),
     });
   } else {
@@ -580,7 +615,8 @@ Start the practice tomorrow morning. 10 minutes. That's all it takes to begin.
 
       <p style="color: #7dd3c0; margin-top: 24px;">— Garin</p>
     `,
-      trackingPixel
+      trackingPixel,
+      to
     );
 
     return sendEmail({
@@ -609,6 +645,8 @@ Take the Assessment: ${BASE_URL}/assessment
 When you know your number, everything else makes sense.
 
 — Garin
+
+Unsubscribe: ${BASE_URL}/api/email/unsubscribe?email=${Buffer.from(to).toString("base64")}&type=webinar
       `.trim(),
     });
   }

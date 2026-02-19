@@ -35,12 +35,19 @@ export type EmailType =
   | "password_reset"
   | "friend_code";
 
+export interface EmailAttachment {
+  filename: string;
+  content: Buffer;
+  contentType?: string;
+}
+
 export interface SendEmailOptions {
   to: string;
   subject: string;
   html: string;
   text?: string;
   replyTo?: string;
+  attachments?: EmailAttachment[];
 }
 
 export interface EmailResult {
@@ -63,6 +70,11 @@ export async function sendEmail(options: SendEmailOptions): Promise<EmailResult>
       html: options.html,
       text: options.text,
       replyTo: options.replyTo || EMAIL_CONFIG.replyTo,
+      attachments: options.attachments?.map((a) => ({
+        filename: a.filename,
+        content: a.content,
+        content_type: a.contentType,
+      })),
     });
 
     if (error) {

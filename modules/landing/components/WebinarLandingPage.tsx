@@ -96,9 +96,11 @@ function WebinarLandingPageContent() {
       }
 
       if (data.alreadyRegistered) {
-        toast.success("You're already registered! Check your inbox.");
+        toast.success("You're already registered! Check your inbox for the confirmation email.");
       } else {
-        toast.success("Seat saved! Taking you to the assessment...");
+        toast.success(
+          "Seat saved! Confirmation email sent — check your inbox for calendar details."
+        );
       }
 
       // Redirect to assessment

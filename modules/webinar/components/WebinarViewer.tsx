@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 
 import Hls from "hls.js";
 
+import { createClient } from "@lib/supabase-client";
 import { cn } from "@lib/utils/style";
 
 // ============================================
@@ -199,7 +200,7 @@ export default function WebinarViewer({
           setIsLive(true);
           setStreamUrl(data.hlsStreamUrl);
         }
-        setViewerCount(data.viewerCount || Math.floor(Math.random() * 30) + 20);
+        setViewerCount(data.viewerCount || 0);
       } catch {
         // Ignore polling errors
       }
@@ -238,7 +239,7 @@ export default function WebinarViewer({
     return () => clearInterval(interval);
   }, [isLive, scheduledStart]);
 
-  // Fetch chat messages
+  // Chat: initial fetch + Realtime subscription
   useEffect(() => {
     if (!chatEnabled) return;
 
@@ -253,9 +254,36 @@ export default function WebinarViewer({
     };
 
     fetchChat();
-    const interval = setInterval(fetchChat, 3000);
 
-    return () => clearInterval(interval);
+    // Subscribe to Realtime for instant updates
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`webinar-chat-${webinarId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "webinar_chat",
+          filter: `webinar_id=eq.${webinarId}`,
+        },
+        (payload) => {
+          const newMsg = payload.new as ChatMessage;
+          setChatMessages((prev) => {
+            if (prev.some((m) => m.id === newMsg.id)) return prev;
+            return [...prev, newMsg];
+          });
+        }
+      )
+      .subscribe();
+
+    // Slow fallback poll every 30s as safety net
+    const fallbackInterval = setInterval(fetchChat, 30000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(fallbackInterval);
+    };
   }, [chatEnabled, webinarId]);
 
   // Auto-scroll chat
@@ -265,7 +293,7 @@ export default function WebinarViewer({
     }
   }, [chatMessages]);
 
-  // Fetch Q&A
+  // Q&A: initial fetch + Realtime subscription
   useEffect(() => {
     if (!qaEnabled) return;
 
@@ -280,9 +308,42 @@ export default function WebinarViewer({
     };
 
     fetchQA();
-    const interval = setInterval(fetchQA, 5000);
 
-    return () => clearInterval(interval);
+    // Subscribe to Realtime for instant updates
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`webinar-qa-${webinarId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "webinar_qa",
+          filter: `webinar_id=eq.${webinarId}`,
+        },
+        (payload) => {
+          if (payload.eventType === "DELETE") return;
+          const updated = payload.new as Question;
+          setQuestions((prev) => {
+            const idx = prev.findIndex((q) => q.id === updated.id);
+            if (idx >= 0) {
+              const next = [...prev];
+              next[idx] = updated;
+              return next;
+            }
+            return [updated, ...prev];
+          });
+        }
+      )
+      .subscribe();
+
+    // Slow fallback poll every 30s as safety net
+    const fallbackInterval = setInterval(fetchQA, 30000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(fallbackInterval);
+    };
   }, [qaEnabled, webinarId]);
 
   // Send chat message
@@ -509,6 +570,30 @@ export default function WebinarViewer({
                 <span className="font-extralight">{viewerCount} watching now</span>
               )}
             </div>
+
+            {/* Challenge CTA - visible during live webinar */}
+            {isLive && (
+              <a
+                href="/pricing"
+                className={cn(
+                  "mt-4 flex items-center justify-between gap-4 p-4",
+                  "bg-lp-gold/10 border-lp-gold/30 border",
+                  "hover:bg-lp-gold/20 group transition-colors"
+                )}
+              >
+                <div>
+                  <p className="text-lp-gold text-sm font-medium tracking-wide">
+                    Ready to go deeper?
+                  </p>
+                  <p className="text-lp-muted text-xs font-extralight">
+                    The 45-Day Awakening Challenge opens after this training
+                  </p>
+                </div>
+                <span className="text-lp-gold shrink-0 text-sm font-medium group-hover:underline">
+                  Learn More →
+                </span>
+              </a>
+            )}
           </div>
 
           {/* Sidebar - Chat & Q&A */}

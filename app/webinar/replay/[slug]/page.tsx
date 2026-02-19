@@ -111,6 +111,19 @@ export default function WebinarReplayPage() {
     setSubmitting(false);
   };
 
+  // Track replay view when user gains access
+  useEffect(() => {
+    if (!registered || !replay || expired) return;
+
+    fetch("/api/webinar/replay", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug, email, action: "track_view" }),
+    }).catch(() => {
+      // Non-blocking — don't fail the replay if tracking fails
+    });
+  }, [registered, replay, expired, slug, email]);
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">

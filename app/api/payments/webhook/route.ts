@@ -251,6 +251,21 @@ async function handleCheckoutCompleted(
       enrollInDrip("community_activated", session.customer_email, {
         firstName,
       }).catch((err) => console.error("Community drip enrollment error:", err));
+
+      // Track webinar → purchase conversion (non-blocking)
+      supabase
+        .from("webinar_attendance")
+        .update({
+          converted_to_challenge: true,
+          conversion_date: new Date().toISOString(),
+        })
+        .eq("email", session.customer_email)
+        .eq("converted_to_challenge", false)
+        .then(({ error: convError }) => {
+          if (convError) {
+            console.error("Webinar conversion tracking error:", convError);
+          }
+        });
     }
   } else if (productType === "journal_subscription") {
     // Subscription is handled by invoice.paid event

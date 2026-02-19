@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { WEBINAR_DATE_ONLY, WEBINAR_TITLE } from "@lib/config/webinar";
 import { sendWebinarConfirmationEmail } from "@lib/email/webinar";
 import { enrollInDrip } from "@lib/services/dripService";
 import { createClient } from "@lib/supabase-server";
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
     const normalizedFirstName = firstName?.trim() || null;
 
     // Validate webinar date
-    const eventDate = webinarDate ? new Date(webinarDate) : new Date("2026-03-03");
+    const eventDate = webinarDate ? new Date(webinarDate) : new Date(WEBINAR_DATE_ONLY);
     if (Number.isNaN(eventDate.getTime())) {
       return NextResponse.json(
         { error: "Invalid date", message: "Invalid webinar date" },
@@ -81,7 +82,7 @@ export async function POST(request: Request) {
       await sendWebinarConfirmationEmail({
         to: normalizedEmail,
         firstName: normalizedFirstName || undefined,
-        webinarTitle: "The 5 Pillars of Integrated Power",
+        webinarTitle: WEBINAR_TITLE,
         webinarDate: eventDate,
         durationMinutes: 90,
       });
@@ -94,7 +95,7 @@ export async function POST(request: Request) {
     // Enroll in post-webinar drip campaign (non-blocking)
     enrollInDrip("webinar_registered", normalizedEmail, {
       firstName: normalizedFirstName,
-      webinar_title: "The 5 Pillars of Integrated Power",
+      webinar_title: WEBINAR_TITLE,
     }).catch((err) => console.error("Drip enrollment error:", err));
 
     return NextResponse.json({

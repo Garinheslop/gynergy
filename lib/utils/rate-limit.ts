@@ -137,6 +137,12 @@ export const RateLimits = {
 
   // AI/Chat endpoints (expensive operations)
   ai: { limit: 30, windowSeconds: 60, prefix: "ai" },
+
+  // Webinar chat messages (prevent spam during live)
+  webinarChat: { limit: 10, windowSeconds: 30, prefix: "webinar-chat" },
+
+  // Webinar Q&A submissions
+  webinarQA: { limit: 5, windowSeconds: 60, prefix: "webinar-qa" },
 } as const;
 
 // Periodic cleanup of expired entries (every 5 minutes)
