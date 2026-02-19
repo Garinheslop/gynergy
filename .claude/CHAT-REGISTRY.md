@@ -1,7 +1,7 @@
 # Claude Code Chat Registry
 
 > **Purpose**: Track all active Claude Code chat sessions working on this codebase.
-> **Last Updated**: 2026-02-18
+> **Last Updated**: 2026-02-19
 
 ---
 
@@ -15,15 +15,13 @@
 
 ## Recently Closed Chats
 
-| Chat ID               | Developer | Branch | Focus                                    | Closed     | Reason     | Final Commit |
-| --------------------- | --------- | ------ | ---------------------------------------- | ---------- | ---------- | ------------ |
-| chat-G-automate-0218  | Garin     | main   | Automation engine + drips + gamification | 2026-02-18 | Completed  | `58aaaf0`    |
-| chat-G-ds-phase3-0217 | Garin     | main   | Design System Phase 3 cleanup            | 2026-02-17 | Completed  | `81f7075`    |
-| chat-G-email-0217     | Garin     | main   | Email system production wiring           | 2026-02-17 | Completed  | `d768bdc`    |
-| chat-G-appstore-0217  | Garin     | main   | Phase 4 TypeScript & Redux               | 2026-02-17 | Completed  | `fabb952`    |
-| chat-G-funnels-0217   | Garin     | main   | Funnel scripts & landing pages           | 2026-02-17 | Stale >24h | -            |
-| chat-G-community-0217 | Garin     | main   | Community section                        | 2026-02-17 | Stale >24h | -            |
-| chat-G-phase1-0217    | Garin     | main   | 10/10 Plan Phase 1                       | 2026-02-17 | Stale >24h | -            |
+| Chat ID               | Developer | Branch | Focus                                    | Closed     | Reason    | Final Commit |
+| --------------------- | --------- | ------ | ---------------------------------------- | ---------- | --------- | ------------ |
+| chat-G-fixerrors-0219 | Garin     | main   | Hotfix: auth, settings, community share  | 2026-02-19 | Completed | `4fbc2dc`    |
+| chat-G-automate-0218  | Garin     | main   | Automation engine + drips + gamification | 2026-02-18 | Completed | `58aaaf0`    |
+| chat-G-ds-phase3-0217 | Garin     | main   | Design System Phase 3 cleanup            | 2026-02-17 | Completed | `81f7075`    |
+| chat-G-email-0217     | Garin     | main   | Email system production wiring           | 2026-02-17 | Completed | `d768bdc`    |
+| chat-G-appstore-0217  | Garin     | main   | Phase 4 TypeScript & Redux               | 2026-02-17 | Completed | `fabb952`    |
 
 ---
 

@@ -1,7 +1,7 @@
 # Garin's Developer Tracker
 
 > **Purpose**: Personal tracking file for Garin. Claude Code reads this to understand current work, recent changes, and pending tasks. This file is ONLY modified during Garin's sessions.
-> **Last Updated**: 2026-02-18
+> **Last Updated**: 2026-02-19
 
 ---
 
@@ -10,7 +10,7 @@
 | Field                     | Value      |
 | ------------------------- | ---------- |
 | **Status**                | Inactive   |
-| **Last Active**           | 2026-02-18 |
+| **Last Active**           | 2026-02-19 |
 | **Current Branch**        | main       |
 | **Current Focus**         | -          |
 | **Expected Next Session** | -          |
@@ -27,14 +27,15 @@
 
 ### What I Am Currently Working On
 
-All major initiatives complete. Automation engine, email drips, and gamification wiring all shipped.
+Hotfix session complete. Fixed password reset PKCE bug, settings page infinite retry loop, and missing community share endpoint.
 
 ### Immediate Next Steps
 
-1. Add streak celebration email templates (`streak_7_congrats`, `streak_30_congrats`) to `drip-templates.ts`
-2. Monitor Resend email delivery rates in production
-3. Consider email preferences UI in settings page
-4. Weekly digest email template (schema exists, template not built)
+1. Verify password reset flow works end-to-end (real user test)
+2. Verify reset button renders correctly after deployment
+3. Consider error boundary around SettingsPageClient
+4. Review service worker files (sw.js, workbox) — may cache stale responses
+5. Add streak celebration email templates (`streak_7_congrats`, `streak_30_congrats`) to `drip-templates.ts`
 
 ### Blockers/Questions
 
@@ -43,6 +44,16 @@ All major initiatives complete. Automation engine, email drips, and gamification
 ---
 
 ## Recent Session Log
+
+### Session: 2026-02-19 - Hotfix: Site Errors & Auth Fix
+
+| Field           | Value                                                               |
+| --------------- | ------------------------------------------------------------------- |
+| **Duration**    | ~2 hours (continued across context window)                          |
+| **Branch**      | main                                                                |
+| **Focus**       | Password reset PKCE, settings page infinite loop, community share   |
+| **Commits**     | `b34921c`, `8ff9974`, `4fbc2dc` (+ `bca839e`, `3f2e619`, `4e99628`) |
+| **Session Doc** | `docs/sessions/2026-02/SESSION-2026-02-19-GARIN-HOTFIX-ERRORS.md`   |
 
 ### Session: 2026-02-18 - Automation Engine, Email Drips, Gamification Wiring
 
@@ -106,14 +117,15 @@ All major initiatives complete. Automation engine, email drips, and gamification
 
 ### Recently Completed
 
+- [x] Fix: Password reset PKCE code exchange (route through /auth/callback)
+- [x] Fix: Settings page infinite retry loop (added error checks to useEffects)
+- [x] Fix: Community share endpoint missing (created /api/community/share)
+- [x] Fix: 5 API 500/400 errors (badges, events, notifications, quotes, actions)
+- [x] Fix: Reset reducer setting enrollment to boolean instead of null
+- [x] Fix: Books API 500→404 + session fallback
 - [x] Phase 1: Gamification hook wired into journals + actions APIs
 - [x] Phase 2: Email drip system (3 campaigns, 8 templates, cron processor, DB deployed)
 - [x] Phase 3: Automation engine (event bus, rules, cron processor, DB deployed)
-- [x] Phase 3: emitEvent wired into gamification hook (journal, streak, badge events)
-- [x] Bug fix: streak_count → per-activity streak columns in pointsService + gamificationHook
-- [x] Bug fix: journal_type enum values ("morning-journal" → "morning") in gamificationHook
-- [x] Bug fix: Supabase .catch() type error in community/report route
-- [x] E2E testing: drip enrollments, cron processors, automation events all verified
 
 ---
 
@@ -131,12 +143,11 @@ All major initiatives complete. Automation engine, email drips, and gamification
 
 ### Things Bill Should Know
 
-- Automation engine + email drips + gamification all shipped and deployed
-- 3 new crons in vercel.json: email-drips (15min), automation-processor (5min), streak-reminders (daily)
-- `emitEvent()` fires on every journal/action completion — automation rules evaluate automatically
-- Streak celebration templates (`streak_7_congrats`, `streak_30_congrats`) referenced by automation rules but not yet in drip-templates.ts
-- Email drip schemas deployed to production Supabase
-- Build and type-check both pass clean
+- Password reset was broken due to PKCE flow — now routes through /auth/callback
+- Settings page had infinite API retry loop that froze the browser — now checks for errors
+- Community share endpoint was never created — now exists at /api/community/share
+- Service worker files (sw.js, workbox) are modified but uncommitted — review needed
+- All hotfix commits are on main, deployed to Vercel production
 
 ---
 

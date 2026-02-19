@@ -5,6 +5,22 @@
 
 ---
 
+## 2026-02-19 | Garin | Hotfix: Password Reset, Settings Page, Community Share
+
+**Summary**: Production hotfix session. Fixed password reset broken by PKCE code exchange, settings page infinite API retry loop that froze the browser, and missing community share API endpoint. Also fixed 5 other API errors and reset reducer bug in earlier context window.
+
+**Key Changes**:
+
+- Password reset now routes through `/auth/callback` for PKCE code exchange (was going direct to reset page)
+- Settings page useEffects now check for errors to prevent infinite retry loops
+- Created `/api/community/share` endpoint for share count tracking (was silently 404ing)
+- (Prior context) Fixed 5 API 500/400 errors, reset reducer boolean bug, books API session fallback
+
+**Commits**: `b34921c`, `8ff9974`, `4fbc2dc` (+ `bca839e`, `3f2e619`, `4e99628` from earlier)
+**Branch**: `main`
+
+---
+
 ## 2026-02-18 | Garin | Automation Engine, Email Drips & Gamification Wiring (3-Phase Plan)
 
 **Summary**: Executed full 3-phase plan from competitor audit. Connected unused gamification system to APIs, built email drip campaigns, and created event-driven automation engine. Fixed 3 critical bugs discovered during E2E testing.
