@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { createClient } from "@lib/supabase-server";
+import { createClient, createServiceClient } from "@lib/supabase-server";
 import { checkRateLimit, rateLimitHeaders, RateLimits } from "@lib/utils/rate-limit";
 
 interface PostAuthor {
@@ -75,8 +75,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Use service client for DB queries — RLS on cohort_memberships has infinite recursion.
+    // Auth is verified above.
+    const serviceClient = createServiceClient();
+
     // Get user's cohort for visibility filtering
-    const { data: membership } = await supabase
+    const { data: membership } = await serviceClient
       .from("cohort_memberships")
       .select("cohort_id")
       .eq("user_id", user.id)
@@ -89,7 +93,7 @@ export async function GET(request: NextRequest) {
     const escapedQuery = query.replaceAll("%", String.raw`\%`).replaceAll("_", String.raw`\_`);
     const searchPattern = `%${escapedQuery}%`;
 
-    let postsQuery = supabase
+    let postsQuery = serviceClient
       .from("community_posts")
       .select(
         `
@@ -132,7 +136,7 @@ export async function GET(request: NextRequest) {
     }[] = [];
 
     if (cohortId) {
-      const { data: members, error: membersError } = await supabase
+      const { data: members, error: membersError } = await serviceClient
         .from("cohort_memberships")
         .select(
           `

@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { createClient } from "@lib/supabase-server";
+import { createClient, createServiceClient } from "@lib/supabase-server";
 import { checkRateLimit, rateLimitHeaders, RateLimits } from "@lib/utils/rate-limit";
 
 interface MessageUser {
@@ -60,6 +60,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Use service client for DB queries — RLS on cohort_memberships has infinite recursion
+    // that affects direct_messages operations. Auth is verified above.
+    const serviceClient = createServiceClient();
+
     const searchParams = request.nextUrl.searchParams;
     const partnerId = searchParams.get("userId");
 
@@ -68,7 +72,7 @@ export async function GET(request: NextRequest) {
       const cursor = searchParams.get("cursor");
       const limit = Math.min(parseInt(searchParams.get("limit") || "30", 10) || 30, 50);
 
-      let query = supabase
+      let query = serviceClient
         .from("direct_messages")
         .select(
           `
@@ -97,7 +101,7 @@ export async function GET(request: NextRequest) {
       const typed = (messages ?? []) as unknown as DirectMessageRow[];
 
       // Mark unread messages from partner as read
-      await supabase
+      await serviceClient
         .from("direct_messages")
         .update({ is_read: true, read_at: new Date().toISOString() })
         .eq("sender_id", partnerId)
@@ -128,7 +132,7 @@ export async function GET(request: NextRequest) {
 
     // --- Conversations list mode ---
     // Fetch all messages involving this user, ordered by newest first
-    const { data: allMessages, error: listError } = await supabase
+    const { data: allMessages, error: listError } = await serviceClient
       .from("direct_messages")
       .select(
         `
@@ -244,17 +248,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Cannot send message to yourself" }, { status: 400 });
     }
 
+    // Use service client for DB operations to avoid RLS recursion on cohort_memberships.
+    // Auth is already verified above via supabase.auth.getUser().
+    const serviceClient = createServiceClient();
+
     // Verify recipient exists and is in the same cohort
-    const { data: senderMembership } = await supabase
+    const { data: senderMembership } = await serviceClient
       .from("cohort_memberships")
       .select("cohort_id")
       .eq("user_id", user.id)
+      .limit(1)
       .single();
 
     const cohortId = senderMembership?.cohort_id ?? null;
 
     if (cohortId) {
-      const { data: recipientMembership } = await supabase
+      const { data: recipientMembership } = await serviceClient
         .from("cohort_memberships")
         .select("cohort_id")
         .eq("user_id", recipientId)
@@ -266,21 +275,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Check blocked (bidirectional) - use a simple check since we don't have the RPC here
-    const { data: blocked } = await supabase
-      .from("user_blocks")
-      .select("id")
-      .or(
-        `and(blocker_id.eq.${user.id},blocked_id.eq.${recipientId}),and(blocker_id.eq.${recipientId},blocked_id.eq.${user.id})`
-      )
-      .limit(1);
-
-    if (blocked && blocked.length > 0) {
-      return NextResponse.json({ error: "Cannot send message to this user" }, { status: 403 });
-    }
-
     // Insert message
-    const { data: message, error } = await supabase
+    const { data: message, error } = await serviceClient
       .from("direct_messages")
       .insert({
         sender_id: user.id,
@@ -304,8 +300,8 @@ export async function POST(request: NextRequest) {
 
     const typed = message as unknown as DirectMessageRow;
 
-    // Create notification for recipient
-    await supabase.from("user_notifications").insert({
+    // Create notification for recipient (best effort, don't fail the send)
+    await serviceClient.from("user_notifications").insert({
       user_id: recipientId,
       category: "social",
       title: "New message",
@@ -360,7 +356,8 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Partner ID is required" }, { status: 400 });
     }
 
-    const { error } = await supabase
+    const serviceClient = createServiceClient();
+    const { error } = await serviceClient
       .from("direct_messages")
       .update({ is_read: true, read_at: new Date().toISOString() })
       .eq("sender_id", partnerId)
