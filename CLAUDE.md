@@ -416,6 +416,68 @@ If committed to feature branch, they become orphaned after PR merge and collabor
 | Build Failures           | 0      |
 | Runtime Errors           | 0      |
 | Security Vulnerabilities | 0      |
+| E2E Test Failures        | 0      |
+
+### Verification Gate (MANDATORY before marking work "done")
+
+Run ALL of the following. Every check must pass:
+
+```bash
+# 1. TypeScript compile — must be 0 errors
+npx tsc --noEmit
+
+# 2. ESLint — must be 0 errors (warnings OK if pre-existing)
+npx eslint [modified-files]
+
+# 3. Unit tests — no NEW failures (pre-existing failures documented)
+npx vitest run
+
+# 4. Production build — must succeed
+npx next build
+
+# 5. E2E tests — must pass on Chromium at minimum
+npx playwright test __tests__/e2e/community.spec.ts --project=chromium
+```
+
+If ANY gate fails, fix the issue before committing. Never commit code that breaks a gate.
+
+### E2E Testing Protocol
+
+**When to write E2E tests:**
+
+- After building a new user-facing feature
+- After modifying a critical user flow (auth, payments, navigation)
+- After fixing a bug that was discovered in production
+
+**E2E test structure:**
+
+- Tests live in `__tests__/e2e/`
+- Shared helpers in `__tests__/e2e/helpers/`
+- Auth helper: `__tests__/e2e/helpers/auth.ts` (Supabase cookie-based)
+- Screenshots saved to `test-results/[feature]/`
+
+**Running E2E tests:**
+
+```bash
+# Run specific test file (fastest)
+npx playwright test __tests__/e2e/community.spec.ts --project=chromium
+
+# Run all E2E tests (all browsers)
+npm run test:e2e
+
+# Interactive UI mode (for debugging)
+npm run test:e2e:ui
+```
+
+**Writing E2E tests — rules:**
+
+1. Use `test.describe.configure({ mode: "serial" })` for auth-dependent tests
+2. Navigate via UI interactions (clicks) not direct URLs when middleware redirects
+3. Always take screenshots as evidence (`test-results/[feature]/`)
+4. Never send real data (type in inputs but clear before sending)
+5. Use `page.waitForTimeout()` after navigation for hydration (5s minimum for auth pages)
+6. Soft assertions for optional content (use `.catch(() => false)`)
+7. Hard assertions for critical flows (auth state, URL routing, ARIA structure)
 
 ---
 
