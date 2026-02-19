@@ -110,6 +110,7 @@ interface HostStudioProps {
   webinarId: string;
   authToken: string;
   webinarTitle: string;
+  scheduledStart?: Date;
   onGoLive: () => Promise<void>;
   onEndWebinar: () => Promise<void>;
 }
@@ -122,6 +123,7 @@ function HostStudioContent({
   webinarId,
   authToken,
   webinarTitle,
+  scheduledStart,
   onGoLive,
   onEndWebinar,
 }: HostStudioProps) {
@@ -302,7 +304,19 @@ function HostStudioContent({
               <span className="text-lp-border hidden sm:block">|</span>
               <div className="min-w-0">
                 <h1 className="truncate text-sm font-light sm:text-lg">{webinarTitle}</h1>
-                <p className="text-lp-muted text-xs font-extralight">Host Studio</p>
+                <p className="text-lp-muted text-xs font-extralight">
+                  Host Studio
+                  {!isLive && scheduledStart && (
+                    <span className="text-lp-gold/70 ml-2">
+                      Scheduled:{" "}
+                      {scheduledStart.toLocaleTimeString("en-US", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        timeZoneName: "short",
+                      })}
+                    </span>
+                  )}
+                </p>
               </div>
             </div>
 

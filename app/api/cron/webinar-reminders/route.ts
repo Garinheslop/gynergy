@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { WEBINAR_START_ISO, WEBINAR_TITLE } from "@lib/config/webinar";
 import { sendWebinarReminderEmail } from "@lib/email/webinar";
 import { createClient } from "@lib/supabase-server";
 
@@ -56,8 +57,8 @@ export async function GET(request: NextRequest) {
         // Use hardcoded webinar date for now
         const hardcodedWebinar = {
           id: "default",
-          title: "The 5 Pillars of Integrated Power",
-          scheduled_start: new Date("2026-03-03T17:30:00-08:00"),
+          title: WEBINAR_TITLE,
+          scheduled_start: new Date(WEBINAR_START_ISO),
         };
 
         const hoursUntil =

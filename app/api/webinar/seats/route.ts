@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { WEBINAR_DATE_ONLY, WEBINAR_MAX_SEATS } from "@lib/config/webinar";
 import { createClient } from "@lib/supabase-server";
 
 /**
@@ -9,12 +10,9 @@ import { createClient } from "@lib/supabase-server";
  * for the webinar landing page.
  */
 
-const MAX_SEATS = 100;
-const WEBINAR_DATE = "2026-03-03"; // Default webinar date
-
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const webinarDate = searchParams.get("date") || WEBINAR_DATE;
+  const webinarDate = searchParams.get("date") || WEBINAR_DATE_ONLY;
 
   try {
     const supabase = await createClient();
@@ -31,9 +29,9 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({
           success: true,
           data: {
-            totalSeats: MAX_SEATS,
+            totalSeats: WEBINAR_MAX_SEATS,
             registered: 0,
-            seatsRemaining: MAX_SEATS,
+            seatsRemaining: WEBINAR_MAX_SEATS,
             percentageFilled: 0,
           },
         });
@@ -48,13 +46,13 @@ export async function GET(request: NextRequest) {
     }
 
     const registered = count || 0;
-    const seatsRemaining = Math.max(0, MAX_SEATS - registered);
-    const percentageFilled = Math.round((registered / MAX_SEATS) * 100);
+    const seatsRemaining = Math.max(0, WEBINAR_MAX_SEATS - registered);
+    const percentageFilled = Math.round((registered / WEBINAR_MAX_SEATS) * 100);
 
     return NextResponse.json({
       success: true,
       data: {
-        totalSeats: MAX_SEATS,
+        totalSeats: WEBINAR_MAX_SEATS,
         registered,
         seatsRemaining,
         percentageFilled,

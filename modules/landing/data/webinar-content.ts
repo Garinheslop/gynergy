@@ -1,3 +1,5 @@
+import { WEBINAR_MAX_SEATS, WEBINAR_START_DATE } from "@lib/config/webinar";
+
 import type {
   WebinarHeroContent,
   WebinarLearnContent,
@@ -12,8 +14,8 @@ export const WEBINAR_HERO_CONTENT: WebinarHeroContent = {
   eventTitle: "THE 5 PILLARS OF INTEGRATED POWER",
   eventSubtitle: "Free Live Training",
   presenter: "Garin Heslop | Founder, Gynergy | $40M Builder | 497 Days Straight",
-  eventDate: new Date("2026-03-03T17:30:00-08:00"), // March 3, 2026 @ 5:30pm PST
-  seatsTotal: 100,
+  eventDate: WEBINAR_START_DATE,
+  seatsTotal: WEBINAR_MAX_SEATS,
   seatsRemaining: 47,
   videoId: null, // Placeholder until video is ready
   videoPlatform: "youtube",

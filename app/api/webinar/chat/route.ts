@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 import { createClient } from "@supabase/supabase-js";
 
+import { checkRateLimit, RateLimits } from "@lib/utils/rate-limit";
+
 // Initialize Supabase admin client
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -100,6 +102,15 @@ async function handleSendMessage(body: {
 
   if (!webinarId || !message || !email) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  // Rate limit per email
+  const rateCheck = checkRateLimit(email, RateLimits.webinarChat);
+  if (!rateCheck.success) {
+    return NextResponse.json(
+      { error: "Slow down! You can send another message in a few seconds." },
+      { status: 429 }
+    );
   }
 
   // Basic message validation

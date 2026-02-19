@@ -5,6 +5,12 @@ import Script from "next/script";
 
 import type { Metadata } from "next";
 
+import {
+  WEBINAR_TITLE,
+  WEBINAR_DESCRIPTION,
+  WEBINAR_START_ISO,
+  WEBINAR_END_ISO,
+} from "@lib/config/webinar";
 import { WebinarLandingPage } from "@modules/landing";
 
 // Webinar landing page specific metadata
@@ -61,11 +67,10 @@ export const metadata: Metadata = {
 const eventSchema = {
   "@context": "https://schema.org",
   "@type": "Event",
-  name: "The 5 Pillars of Integrated Power - Free Live Training",
-  description:
-    "Free live training: Why successful men feel empty and the one equation that changes everything. Learn the 10-minute daily practice that transforms your life.",
-  startDate: "2026-03-03T17:30:00-08:00",
-  endDate: "2026-03-03T19:00:00-08:00",
+  name: `${WEBINAR_TITLE} - Free Live Training`,
+  description: WEBINAR_DESCRIPTION,
+  startDate: WEBINAR_START_ISO,
+  endDate: WEBINAR_END_ISO,
   eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
   eventStatus: "https://schema.org/EventScheduled",
   location: {

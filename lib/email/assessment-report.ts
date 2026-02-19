@@ -5,6 +5,7 @@
  * the Five Pillar Assessment. This is the full "mirror" experience.
  */
 
+import { WEBINAR_DATE_SHORT } from "@lib/config/webinar";
 import type {
   AssessmentAnswers,
   RevenueTier,
@@ -297,8 +298,7 @@ const PRIORITY_INSIGHTS: Record<
 
 const READINESS_RESPONSES: Record<Readiness, { response: string; cta: string }> = {
   just_curious: {
-    response:
-      "That's honest. Most men start here. Curiosity is the crack in the armor. The fact that you completed this assessment means some part of you already knows something needs to change.\n\nThe March 3rd training isn't a commitment. It's 90 minutes to understand the full picture. No obligation. Just clarity about what's possible.",
+    response: `That's honest. Most men start here. Curiosity is the crack in the armor. The fact that you completed this assessment means some part of you already knows something needs to change.\n\nThe ${WEBINAR_DATE_SHORT} training isn't a commitment. It's 90 minutes to understand the full picture. No obligation. Just clarity about what's possible.`,
     cta: "Save Your Seat (No Obligation)",
   },
   scared_but_know: {
@@ -307,8 +307,7 @@ const READINESS_RESPONSES: Record<Readiness, { response: string; cta: string }> 
     cta: "Face It — Save Your Seat",
   },
   ready_to_explore: {
-    response:
-      "You want to see the path before you commit. Smart. That's exactly what the March 3rd training provides: the complete methodology, laid out.\n\nYou'll leave with:\n• The exact morning practice I've done for 497 days straight\n• Your Five Pillar Score explained in detail\n• The roadmap for transformation\n\nNo obligation to buy anything. Just the map.",
+    response: `You want to see the path before you commit. Smart. That's exactly what the ${WEBINAR_DATE_SHORT} training provides: the complete methodology, laid out.\n\nYou'll leave with:\n• The exact morning practice I've done for 497 days straight\n• Your Five Pillar Score explained in detail\n• The roadmap for transformation\n\nNo obligation to buy anything. Just the map.`,
     cta: "See the Path — Register Free",
   },
   ready_to_invest: {
@@ -317,8 +316,7 @@ const READINESS_RESPONSES: Record<Readiness, { response: string; cta: string }> 
     cta: "Register for Training (and Challenge Info)",
   },
   desperate: {
-    response:
-      "Something has to give. You know it.\n\nThe men who come to this work from desperation often see the fastest transformation — because they've stopped negotiating with themselves.\n\nThe March 3rd training is the first step. But if you need to move faster, reply to this email right now. We should talk.",
+    response: `Something has to give. You know it.\n\nThe men who come to this work from desperation often see the fastest transformation — because they've stopped negotiating with themselves.\n\nThe ${WEBINAR_DATE_SHORT} training is the first step. But if you need to move faster, reply to this email right now. We should talk.`,
     cta: "I Need This — Register Now",
   },
 };
@@ -902,7 +900,7 @@ function generateAssessmentReportHtml(
       </p>
 
       <a href="${webinarUrl}" style="display: inline-block; background: linear-gradient(90deg, #b8943e, #d4a843); color: #0a0a0a; padding: 16px 40px; text-decoration: none; font-weight: 600; font-size: 16px; border-radius: 4px;">
-        Save Your Seat — March 3rd Training
+        Save Your Seat — ${WEBINAR_DATE_SHORT} Training
       </a>
 
       <p style="color: #b8943e; font-size: 16px; margin: 30px 0 0 0;">
@@ -1107,7 +1105,7 @@ WHAT'S NEXT
 
 ${READINESS_RESPONSES[readiness].response}
 
-→ Register for the March 3rd Training: https://gynergy.app/webinar
+→ Register for the ${WEBINAR_DATE_SHORT} Training: https://gynergy.app/webinar
 `;
   }
 

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 
+import { WEBINAR_FULL_DISPLAY } from "@lib/config/webinar";
 import { cn } from "@lib/utils/style";
 
 interface WebinarVideoProps {
@@ -180,7 +181,7 @@ export default function WebinarVideo({
             {!videoId && (
               <>
                 <span className="font-bebas text-lp-white mt-2 text-xl tracking-wide md:text-2xl">
-                  March 3, 2026 @ 5:30pm PST
+                  {WEBINAR_FULL_DISPLAY}
                 </span>
                 <span className="font-oswald text-lp-gray mt-3 max-w-[300px] text-center text-xs leading-relaxed font-extralight">
                   Register above to secure your seat for the live training with Garin Heslop

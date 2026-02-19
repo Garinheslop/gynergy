@@ -11,6 +11,8 @@
  * - Phase D: The Opening (Q15-16) - Readiness & Priority
  */
 
+import { WEBINAR_DATE_SHORT } from "@lib/config/webinar";
+
 // ============================================
 // TYPES
 // ============================================
@@ -698,8 +700,7 @@ export const READINESS_RESPONSES: Record<
 > = {
   just_curious: {
     label: "Just Curious",
-    response:
-      "That's honest. Most men start here. Curiosity is the crack in the armor. The fact that you completed this assessment means some part of you already knows. The March 3rd training isn't a commitment. It's 90 minutes to understand the full picture.",
+    response: `That's honest. Most men start here. Curiosity is the crack in the armor. The fact that you completed this assessment means some part of you already knows. The ${WEBINAR_DATE_SHORT} training isn't a commitment. It's 90 minutes to understand the full picture.`,
     cta: "Save Your Seat (No Obligation)",
     ctaVariant: "soft",
   },
@@ -712,8 +713,7 @@ export const READINESS_RESPONSES: Record<
   },
   ready_to_explore: {
     label: "Ready to Explore",
-    response:
-      "You want to see the path before you commit. Smart. That's exactly what the March 3rd training provides: the complete methodology, laid out. You'll leave with the exact morning practice I've done for 497 days straight. No obligation to buy anything. Just the map.",
+    response: `You want to see the path before you commit. Smart. That's exactly what the ${WEBINAR_DATE_SHORT} training provides: the complete methodology, laid out. You'll leave with the exact morning practice I've done for 497 days straight. No obligation to buy anything. Just the map.`,
     cta: "See the Path — Register Free",
     ctaVariant: "medium",
   },
@@ -726,8 +726,7 @@ export const READINESS_RESPONSES: Record<
   },
   desperate: {
     label: "Desperate",
-    response:
-      "Something has to give. You know it. The men who come to this work from desperation often see the fastest transformation — because they've stopped negotiating with themselves. The March 3rd training is the first step. But if you need to move faster, reply to your email report. We should talk.",
+    response: `Something has to give. You know it. The men who come to this work from desperation often see the fastest transformation — because they've stopped negotiating with themselves. The ${WEBINAR_DATE_SHORT} training is the first step. But if you need to move faster, reply to your email report. We should talk.`,
     cta: "I Need This — Register Now",
     ctaVariant: "strong",
   },
