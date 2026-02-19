@@ -63,16 +63,16 @@ const SettingsPageClient: React.FC = () => {
 
   // Ensure book + enrollment data is loaded (normally loaded on dashboard page)
   useEffect(() => {
-    if (profile?.current?.id && !books.current && !books.loading) {
+    if (profile?.current?.id && !books.current && !books.loading && !books.error) {
       dispatch(getLatestBookSession(BOOK_SLUG));
     }
-  }, [profile?.current?.id, books.current, books.loading, dispatch]);
+  }, [profile?.current?.id, books.current, books.loading, books.error, dispatch]);
 
   useEffect(() => {
-    if (books.current?.id && !enrollments.current && !enrollments.loading) {
+    if (books.current?.id && !enrollments.current && !enrollments.loading && !enrollments.error) {
       dispatch(getUserBookSessionData(books.current.id));
     }
-  }, [books.current?.id, enrollments.current, enrollments.loading, dispatch]);
+  }, [books.current?.id, enrollments.current, enrollments.loading, enrollments.error, dispatch]);
 
   useEffect(() => {
     if (!profile?.updating && updating) {
@@ -147,9 +147,10 @@ const SettingsPageClient: React.FC = () => {
   }, [firstName.value, lastName.value, imageFile, profile?.current]);
 
   const sessionId = enrollments.current?.session?.id;
+  const dataLoading = books.loading || enrollments.loading;
 
   const handleReset = () => {
-    if (enrollments.resetting) return;
+    if (enrollments.resetting || dataLoading) return;
     if (!sessionId) {
       messagePopupObj.open({
         popupData: {
@@ -258,10 +259,12 @@ const SettingsPageClient: React.FC = () => {
             />
           </div>
           <ActionButton
-            label="Reset Your Account"
+            isSpinner
+            label={dataLoading ? "Loading session data..." : "Reset Your Account"}
             onClick={handleReset}
+            isLoading={dataLoading}
             sx={sessionId ? "bg-danger [&>p]:text-content-light" : ""}
-            disabled={updating || enrollments.resetting}
+            disabled={updating || enrollments.resetting || dataLoading}
           />
         </>
       </SectionCard>
