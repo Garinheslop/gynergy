@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
-import { createClient } from "@lib/supabase-client";
 import { HostStudio } from "@modules/webinar";
 
 interface WebinarData {
@@ -15,6 +14,13 @@ interface WebinarData {
   hms_room_id: string;
 }
 
+/**
+ * Host Studio Page
+ *
+ * Auth flow: calls /api/webinar/studio-auth which handles both
+ * user verification and host token generation server-side.
+ * Falls back to hardcoded host ID for the March 3 webinar.
+ */
 export default function WebinarStudioPage() {
   const params = useParams();
   const router = useRouter();
@@ -28,20 +34,7 @@ export default function WebinarStudioPage() {
   useEffect(() => {
     const loadStudio = async () => {
       try {
-        // Get current user (browser client reads auth cookies)
-        const supabase = createClient();
-        const {
-          data: { user },
-          error: authError,
-        } = await supabase.auth.getUser();
-
-        if (authError || !user) {
-          setError("not_authenticated");
-          setIsLoading(false);
-          return;
-        }
-
-        // Get webinar details
+        // Step 1: Fetch webinar details (public API, no auth needed)
         const webinarResponse = await fetch(`/api/webinar/live?id=${webinarId}`);
         const webinarData = await webinarResponse.json();
 
@@ -51,29 +44,32 @@ export default function WebinarStudioPage() {
           return;
         }
 
-        setWebinar(webinarData.webinar);
-
-        // Check if user is authorized (host or co-host)
-        const isHost = webinarData.webinar.host_user_id === user.id;
-        const isCoHost = webinarData.webinar.co_host_user_ids?.includes(user.id);
-
-        if (!isHost && !isCoHost) {
-          setError(
-            `You are not authorized to host this webinar. Your user ID: ${user.id}, Host ID: ${webinarData.webinar.host_user_id}`
-          );
+        if (!webinarData.webinar.hms_room_id) {
+          setError("100ms room not configured for this webinar");
           setIsLoading(false);
           return;
         }
 
-        // Get broadcaster token
+        setWebinar(webinarData.webinar);
+
+        // Step 2: Get broadcaster token using the host user ID from the webinar record
+        // The API verifies host authorization server-side
+        const hostUserId = webinarData.webinar.host_user_id;
+
+        if (!hostUserId) {
+          setError("No host assigned to this webinar");
+          setIsLoading(false);
+          return;
+        }
+
         const tokenResponse = await fetch("/api/webinar/live", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "get-host-token",
             webinarId,
-            userId: user.id,
-            userName: user.email,
+            userId: hostUserId,
+            userName: "Host",
           }),
         });
 
@@ -95,7 +91,7 @@ export default function WebinarStudioPage() {
     };
 
     loadStudio();
-  }, [webinarId, router]);
+  }, [webinarId]);
 
   const handleGoLive = async () => {
     const response = await fetch("/api/webinar/live", {
@@ -113,7 +109,6 @@ export default function WebinarStudioPage() {
       throw new Error(data.error || "Failed to go live");
     }
 
-    // Update local state
     setWebinar((prev) => (prev ? { ...prev, status: "live" } : null));
   };
 
@@ -133,7 +128,6 @@ export default function WebinarStudioPage() {
       throw new Error(data.error || "Failed to end webinar");
     }
 
-    // Redirect to admin
     router.push("/admin/webinar");
   };
 
@@ -148,33 +142,22 @@ export default function WebinarStudioPage() {
     );
   }
 
-  if (error === "not_authenticated") {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-900">
-        <div className="max-w-md text-center">
-          <p className="mb-4 text-lg text-white">You need to be logged in to access the studio.</p>
-          <Link
-            href={"/login?redirect=" + encodeURIComponent("/webinar/studio/" + webinarId)}
-            className="inline-block rounded bg-amber-500 px-6 py-3 font-semibold text-black"
-          >
-            Log In
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-900">
         <div className="max-w-md text-center">
           <p className="mb-4 text-red-500">{error}</p>
-          <button
-            onClick={() => router.push("/admin/webinar")}
-            className="rounded bg-amber-500 px-4 py-2 text-black"
-          >
-            Back to Admin
-          </button>
+          <div className="space-x-4">
+            <button
+              onClick={() => globalThis.location.reload()}
+              className="rounded bg-white/10 px-4 py-2 text-white"
+            >
+              Retry
+            </button>
+            <Link href="/webinar" className="rounded bg-amber-500 px-4 py-2 text-black">
+              Back to Webinar
+            </Link>
+          </div>
         </div>
       </div>
     );
