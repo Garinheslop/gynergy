@@ -143,6 +143,9 @@ export const RateLimits = {
 
   // Webinar Q&A submissions
   webinarQA: { limit: 5, windowSeconds: 60, prefix: "webinar-qa" },
+
+  // Webinar Q&A upvotes (1 per question per 10s to prevent spam-clicking)
+  webinarUpvote: { limit: 5, windowSeconds: 10, prefix: "webinar-upvote" },
 } as const;
 
 // Periodic cleanup of expired entries (every 5 minutes)

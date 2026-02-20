@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 
-import { checkRateLimit, RateLimits } from "@lib/utils/rate-limit";
+import { checkRateLimit, getClientIP, RateLimits } from "@lib/utils/rate-limit";
 
 // Initialize Supabase admin client
 const supabase = createClient(
@@ -176,7 +176,7 @@ export async function POST(request: Request) {
       case "answer":
         return handleAnswer(body);
       case "upvote":
-        return handleUpvote(body.questionId);
+        return handleUpvote(body.questionId, request);
       case "pin":
         return handlePin(body.questionId, body.isPinned);
       default:
@@ -333,9 +333,16 @@ async function handleAnswer(body: { questionId: string; answer: string }) {
 /**
  * Upvote a question
  */
-async function handleUpvote(questionId: string) {
+async function handleUpvote(questionId: string, request: Request) {
   if (!questionId) {
     return NextResponse.json({ error: "Missing questionId" }, { status: 400 });
+  }
+
+  // Rate limit upvotes by IP to prevent spam-clicking
+  const clientIP = getClientIP(request);
+  const rateCheck = checkRateLimit(`${clientIP}:${questionId}`, RateLimits.webinarUpvote);
+  if (!rateCheck.success) {
+    return NextResponse.json({ error: "Too many upvotes. Please wait a moment." }, { status: 429 });
   }
 
   const { data: question, error } = await supabase

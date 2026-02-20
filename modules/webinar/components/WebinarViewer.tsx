@@ -118,6 +118,8 @@ export default function WebinarViewer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [viewerCount, setViewerCount] = useState(0);
+  const [isHostLate, setIsHostLate] = useState(false);
+  const hlsRetryCount = useRef(0);
 
   // Chat state
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -164,13 +166,28 @@ export default function WebinarViewer({
       hls.on(Hls.Events.ERROR, (_, data) => {
         if (data.fatal) {
           console.error("HLS error:", data);
-          setError("Stream connection lost. Reconnecting...");
 
-          if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-            hls.startLoad();
-          } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-            hls.recoverMediaError();
+          if (hlsRetryCount.current >= 10) {
+            setError("Stream connection lost. Please refresh the page.");
+            return;
           }
+
+          const delay = Math.min(1000 * Math.pow(2, hlsRetryCount.current), 10000);
+          hlsRetryCount.current += 1;
+          setError(`Stream interrupted. Reconnecting in ${Math.round(delay / 1000)}s...`);
+
+          setTimeout(() => {
+            setError(null);
+            if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+              hls.startLoad();
+            } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+              hls.recoverMediaError();
+            } else {
+              hls.destroy();
+              hls.loadSource(streamUrl);
+              hls.attachMedia(video);
+            }
+          }, delay);
         }
       });
 
@@ -189,7 +206,7 @@ export default function WebinarViewer({
     }
   }, [streamUrl]);
 
-  // Poll for webinar status + viewer count
+  // Supabase Realtime: instant GO LIVE detection + fallback polling
   useEffect(() => {
     const checkStatus = async () => {
       try {
@@ -207,8 +224,38 @@ export default function WebinarViewer({
     };
 
     checkStatus();
-    const interval = setInterval(checkStatus, 5000);
-    return () => clearInterval(interval);
+    // Fallback poll every 10s (Realtime handles instant detection)
+    const interval = setInterval(checkStatus, 10000);
+
+    // Realtime subscription for instant go-live
+    const supabase = createClient();
+    const channel = supabase
+      .channel(`webinar-status-${webinarId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "webinars",
+          filter: `id=eq.${webinarId}`,
+        },
+        (payload) => {
+          const updated = payload.new as { status?: string; hls_stream_url?: string };
+          if (updated.status === "live") {
+            setIsLive(true);
+            if (updated.hls_stream_url) {
+              setStreamUrl(updated.hls_stream_url);
+            }
+            checkStatus();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      clearInterval(interval);
+      supabase.removeChannel(channel);
+    };
   }, [webinarId]);
 
   // Countdown timer
@@ -222,6 +269,10 @@ export default function WebinarViewer({
 
       if (diff <= 0) {
         setCountdown(null);
+        // If >5 minutes past scheduled start and still not live, host is late
+        if (Math.abs(diff) > 5 * 60 * 1000) {
+          setIsHostLate(true);
+        }
         return;
       }
 
@@ -547,7 +598,11 @@ export default function WebinarViewer({
 
                     <div className="text-lp-muted flex items-center justify-center gap-2 text-xs sm:text-sm">
                       <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-                      <span className="font-extralight">Connected • Waiting for host</span>
+                      <span className="font-extralight">
+                        {isHostLate
+                          ? "The host is running a few minutes late. We\u2019ll start shortly — stay on this page."
+                          : "Connected \u2022 Waiting for host"}
+                      </span>
                     </div>
                   </div>
                 </div>
