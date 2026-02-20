@@ -6,6 +6,8 @@ import {
   HMSRoomProvider,
   useHMSStore,
   useHMSActions,
+  useDevices,
+  DeviceType,
   selectIsConnectedToRoom,
   selectIsLocalAudioEnabled,
   selectIsLocalVideoEnabled,
@@ -102,6 +104,26 @@ const StopIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const SettingsIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  </svg>
+);
+
+const SpeakerIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
+  </svg>
+);
+
+const ChevronDownIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
 // ============================================
 // TYPES
 // ============================================
@@ -135,12 +157,16 @@ function HostStudioContent({
   const localPeer = useHMSStore(selectLocalPeer);
   const hlsState = useHMSStore(selectHLSState);
 
+  const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
+
   const [isJoining, setIsJoining] = useState(true);
   const [isGoingLive, setIsGoingLive] = useState(false);
   const [isEnding, setIsEnding] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [viewerCount, setViewerCount] = useState(0);
+  const [showSettings, setShowSettings] = useState(false);
   const joinedRef = useRef(false);
+  const settingsRef = useRef<HTMLDivElement>(null);
 
   const isLive = hlsState?.running || false;
 
@@ -208,6 +234,18 @@ function HostStudioContent({
   const toggleVideo = useCallback(async () => {
     await hmsActions.setLocalVideoEnabled(!isVideoEnabled);
   }, [hmsActions, isVideoEnabled]);
+
+  // Close settings when clicking outside
+  useEffect(() => {
+    if (!showSettings) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
+        setShowSettings(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showSettings]);
 
   // Toggle screen share
   const toggleScreenShare = useCallback(async () => {
@@ -496,6 +534,126 @@ function HostStudioContent({
                 )}
               />
             </button>
+
+            {/* Device settings button */}
+            <div className="relative" ref={settingsRef}>
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                className={cn(
+                  "rounded-full p-3 transition-all sm:p-4",
+                  showSettings
+                    ? "bg-lp-gold/20 border-lp-gold border"
+                    : "bg-lp-card border-lp-border hover:border-lp-gold border"
+                )}
+                aria-label="Device settings"
+              >
+                <SettingsIcon
+                  className={cn(
+                    "h-5 w-5 sm:h-6 sm:w-6",
+                    showSettings ? "text-lp-gold" : "text-lp-white"
+                  )}
+                />
+              </button>
+
+              {/* Device settings panel */}
+              {showSettings && (
+                <div className="bg-lp-card border-lp-border absolute bottom-full left-1/2 mb-3 w-72 -translate-x-1/2 border p-4 shadow-xl sm:w-80">
+                  <h4 className="text-lp-gold-light mb-4 text-xs font-medium tracking-wider uppercase">
+                    Device Settings
+                  </h4>
+
+                  {/* Camera */}
+                  <div className="mb-3">
+                    <label className="text-lp-muted mb-1.5 flex items-center gap-2 text-xs font-light">
+                      <VideoIcon className="h-3.5 w-3.5" />
+                      Camera
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={selectedDeviceIDs.videoInput || ""}
+                        onChange={(e) =>
+                          updateDevice({
+                            deviceType: DeviceType.videoInput,
+                            deviceId: e.target.value,
+                          })
+                        }
+                        className="bg-lp-black border-lp-border text-lp-white focus:border-lp-gold w-full appearance-none border px-3 py-2 pr-8 text-xs font-light focus:outline-none"
+                      >
+                        {!allDevices.videoInput?.length && (
+                          <option value="">No cameras found</option>
+                        )}
+                        {allDevices.videoInput?.map((device) => (
+                          <option key={device.deviceId} value={device.deviceId}>
+                            {device.label || `Camera ${device.deviceId.slice(0, 8)}`}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDownIcon className="text-lp-muted pointer-events-none absolute top-1/2 right-2 h-3.5 w-3.5 -translate-y-1/2" />
+                    </div>
+                  </div>
+
+                  {/* Microphone */}
+                  <div className="mb-3">
+                    <label className="text-lp-muted mb-1.5 flex items-center gap-2 text-xs font-light">
+                      <MicIcon className="h-3.5 w-3.5" />
+                      Microphone
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={selectedDeviceIDs.audioInput || ""}
+                        onChange={(e) =>
+                          updateDevice({
+                            deviceType: DeviceType.audioInput,
+                            deviceId: e.target.value,
+                          })
+                        }
+                        className="bg-lp-black border-lp-border text-lp-white focus:border-lp-gold w-full appearance-none border px-3 py-2 pr-8 text-xs font-light focus:outline-none"
+                      >
+                        {!allDevices.audioInput?.length && (
+                          <option value="">No microphones found</option>
+                        )}
+                        {allDevices.audioInput?.map((device) => (
+                          <option key={device.deviceId} value={device.deviceId}>
+                            {device.label || `Microphone ${device.deviceId.slice(0, 8)}`}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDownIcon className="text-lp-muted pointer-events-none absolute top-1/2 right-2 h-3.5 w-3.5 -translate-y-1/2" />
+                    </div>
+                  </div>
+
+                  {/* Speaker */}
+                  <div>
+                    <label className="text-lp-muted mb-1.5 flex items-center gap-2 text-xs font-light">
+                      <SpeakerIcon className="h-3.5 w-3.5" />
+                      Speaker
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={selectedDeviceIDs.audioOutput || ""}
+                        onChange={(e) =>
+                          updateDevice({
+                            deviceType: DeviceType.audioOutput,
+                            deviceId: e.target.value,
+                          })
+                        }
+                        className="bg-lp-black border-lp-border text-lp-white focus:border-lp-gold w-full appearance-none border px-3 py-2 pr-8 text-xs font-light focus:outline-none"
+                      >
+                        {!allDevices.audioOutput?.length && (
+                          <option value="">No speakers found</option>
+                        )}
+                        {allDevices.audioOutput?.map((device) => (
+                          <option key={device.deviceId} value={device.deviceId}>
+                            {device.label || `Speaker ${device.deviceId.slice(0, 8)}`}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDownIcon className="text-lp-muted pointer-events-none absolute top-1/2 right-2 h-3.5 w-3.5 -translate-y-1/2" />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Pre-live checklist */}
