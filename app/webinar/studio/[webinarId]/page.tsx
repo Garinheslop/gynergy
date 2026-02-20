@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
 import { createClient } from "@lib/supabase-client";
@@ -31,10 +32,12 @@ export default function WebinarStudioPage() {
         const supabase = createClient();
         const {
           data: { user },
+          error: authError,
         } = await supabase.auth.getUser();
 
-        if (!user) {
-          router.push("/login?redirect=" + encodeURIComponent(`/webinar/studio/${webinarId}`));
+        if (authError || !user) {
+          setError("not_authenticated");
+          setIsLoading(false);
           return;
         }
 
@@ -55,7 +58,9 @@ export default function WebinarStudioPage() {
         const isCoHost = webinarData.webinar.co_host_user_ids?.includes(user.id);
 
         if (!isHost && !isCoHost) {
-          setError("You are not authorized to host this webinar");
+          setError(
+            `You are not authorized to host this webinar. Your user ID: ${user.id}, Host ID: ${webinarData.webinar.host_user_id}`
+          );
           setIsLoading(false);
           return;
         }
@@ -84,7 +89,7 @@ export default function WebinarStudioPage() {
         setIsLoading(false);
       } catch (err) {
         console.error("Failed to load studio:", err);
-        setError("Failed to load studio");
+        setError(`Failed to load studio: ${err instanceof Error ? err.message : String(err)}`);
         setIsLoading(false);
       }
     };
@@ -138,6 +143,22 @@ export default function WebinarStudioPage() {
         <div className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-amber-500 border-t-transparent" />
           <p className="text-white">Loading studio...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error === "not_authenticated") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-900">
+        <div className="max-w-md text-center">
+          <p className="mb-4 text-lg text-white">You need to be logged in to access the studio.</p>
+          <Link
+            href={"/login?redirect=" + encodeURIComponent("/webinar/studio/" + webinarId)}
+            className="inline-block rounded bg-amber-500 px-6 py-3 font-semibold text-black"
+          >
+            Log In
+          </Link>
         </div>
       </div>
     );
