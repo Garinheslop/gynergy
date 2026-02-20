@@ -8,10 +8,10 @@
 
 ## Current Status Overview
 
-| Developer | Status   | Branch | Focus | Since      |
-| --------- | -------- | ------ | ----- | ---------- |
-| **Garin** | Inactive | main   | -     | 2026-02-19 |
-| **Bill**  | Inactive | main   | -     | 2026-02-14 |
+| Developer | Status   | Branch                          | Focus                                          | Since      |
+| --------- | -------- | ------------------------------- | ---------------------------------------------- | ---------- |
+| **Garin** | Active   | feature/garin-webinar-readiness | Webinar readiness: UX/UI, funnels, assessments | 2026-02-19 |
+| **Bill**  | Inactive | main                            | -                                              | 2026-02-14 |
 
 ### Status Legend
 
@@ -55,6 +55,7 @@
 
 | Timestamp  | Developer | Action         | Details                                                        |
 | ---------- | --------- | -------------- | -------------------------------------------------------------- |
+| 2026-02-19 | Garin     | Session Start  | Webinar readiness: UX/UI, funnels, assessments, sign-ups       |
 | 2026-02-19 | Garin     | Session End    | Hotfix: password reset PKCE, settings infinite loop, share API |
 | 2026-02-18 | Garin     | Session End    | Automation engine + email drips + gamification wiring shipped  |
 | 2026-02-17 | Garin     | Session End    | Design System Phase 3 final cleanup, ARIA fixes, tokens done   |

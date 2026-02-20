@@ -71,10 +71,10 @@ export default function WebinarLivePage() {
           return;
         }
 
-        // Save credentials for next time
-        localStorage.setItem("webinar_email", joinEmail);
+        // Save credentials per webinar slug to avoid cross-webinar collisions
+        localStorage.setItem(`webinar_email_${slug}`, joinEmail);
         if (joinName) {
-          localStorage.setItem("webinar_name", joinName);
+          localStorage.setItem(`webinar_name_${slug}`, joinName);
         }
 
         setWebinar(data.webinar);
@@ -96,8 +96,8 @@ export default function WebinarLivePage() {
 
   // Check localStorage for saved email and auto-join
   useEffect(() => {
-    const savedEmail = localStorage.getItem("webinar_email");
-    const savedName = localStorage.getItem("webinar_name");
+    const savedEmail = localStorage.getItem(`webinar_email_${slug}`);
+    const savedName = localStorage.getItem(`webinar_name_${slug}`);
     if (savedEmail) {
       setEmail(savedEmail);
       setFirstName(savedName || "");

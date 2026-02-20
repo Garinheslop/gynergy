@@ -7,9 +7,9 @@
 
 ## Active Chats
 
-| Chat ID | Developer | Branch | Focus | Type | Status | Files Owned | Last Sync |
-| ------- | --------- | ------ | ----- | ---- | ------ | ----------- | --------- |
-| (none)  | -         | -      | -     | -    | -      | -           | -         |
+| Chat ID             | Developer | Branch                          | Focus                             | Type | Status | Files Owned | Last Sync  |
+| ------------------- | --------- | ------------------------------- | --------------------------------- | ---- | ------ | ----------- | ---------- |
+| chat-G-webinar-0219 | Garin     | feature/garin-webinar-readiness | Webinar readiness: UX/UI, funnels | Code | Active | TBD         | 2026-02-19 |
 
 ---
 

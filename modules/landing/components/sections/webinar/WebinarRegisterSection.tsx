@@ -17,11 +17,13 @@ import {
 interface WebinarRegisterSectionProps {
   onRegister: (email: string, firstName?: string) => Promise<void>;
   isLoading?: boolean;
+  seatsRemaining?: number;
 }
 
 export default function WebinarRegisterSection({
   onRegister,
   isLoading = false,
+  seatsRemaining,
 }: WebinarRegisterSectionProps) {
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -70,7 +72,7 @@ export default function WebinarRegisterSection({
                 "flex-1 sm:max-w-[180px]",
                 "font-oswald text-sm font-light",
                 "px-4 py-3",
-                "border-lp-border border bg-lp-input",
+                "border-lp-border bg-lp-input border",
                 "text-lp-white placeholder:text-lp-gray",
                 "outline-none",
                 "focus:border-lp-gold focus:ring-lp-gold/30 transition-all focus:ring-1"
@@ -87,7 +89,7 @@ export default function WebinarRegisterSection({
                 "flex-1",
                 "font-oswald text-sm font-light",
                 "px-4 py-3",
-                "border-lp-border border bg-lp-input",
+                "border-lp-border bg-lp-input border",
                 "text-lp-white placeholder:text-lp-gray",
                 "outline-none",
                 "focus:border-lp-gold focus:ring-lp-gold/30 transition-all focus:ring-1"
@@ -126,7 +128,7 @@ export default function WebinarRegisterSection({
         <div className="mt-6 flex items-center justify-center gap-2">
           <span className="font-oswald text-lp-muted text-sm font-extralight">Only</span>
           <span className="font-bebas text-lp-gold-light text-2xl">
-            {WEBINAR_HERO_CONTENT.seatsRemaining}
+            {seatsRemaining ?? WEBINAR_HERO_CONTENT.seatsRemaining}
           </span>
           <span className="font-oswald text-lp-muted text-sm font-extralight">seats remaining</span>
         </div>

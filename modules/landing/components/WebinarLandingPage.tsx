@@ -173,12 +173,20 @@ function WebinarLandingPageContent() {
 
       {/* Registration Form */}
       <SectionErrorBoundary sectionName="Registration">
-        <WebinarRegisterSection onRegister={handleRegister} isLoading={registrationLoading} />
+        <WebinarRegisterSection
+          onRegister={handleRegister}
+          isLoading={registrationLoading}
+          seatsRemaining={seatsData.seatsRemaining}
+        />
       </SectionErrorBoundary>
 
       {/* Final CTA */}
       <SectionErrorBoundary sectionName="Final CTA">
-        <WebinarFinalCTASection onRegister={handleRegister} isLoading={registrationLoading} />
+        <WebinarFinalCTASection
+          onRegister={handleRegister}
+          isLoading={registrationLoading}
+          seatsRemaining={seatsData.seatsRemaining}
+        />
       </SectionErrorBoundary>
 
       {/* Footer */}

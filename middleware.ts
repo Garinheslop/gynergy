@@ -36,7 +36,17 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Bypass auth check on public routes
+  // Auth-required routes nested under otherwise-public parents
+  // These must be checked BEFORE the public routes bypass
+  const protectedSubRoutes = [
+    "/webinar/studio", // Host studio requires authenticated host
+  ];
+
+  const isProtectedSubRoute = protectedSubRoutes.some(
+    (route) => pathname === route || pathname.startsWith(route + "/")
+  );
+
+  // Bypass auth check on public routes (unless it's a protected sub-route)
   const publicRoutes = [
     "/", // Marketing/landing page
     "/login", // Login page
@@ -54,7 +64,10 @@ export async function middleware(request: NextRequest) {
     "/terms", // Terms of Service (required for App Store)
   ];
 
-  if (publicRoutes.some((route) => pathname === route || pathname.startsWith(route + "/"))) {
+  if (
+    !isProtectedSubRoute &&
+    publicRoutes.some((route) => pathname === route || pathname.startsWith(route + "/"))
+  ) {
     return NextResponse.next();
   }
 

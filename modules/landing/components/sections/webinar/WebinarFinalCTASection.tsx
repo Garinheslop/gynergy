@@ -14,11 +14,13 @@ import { SectionWrapper, CTAButton, CountdownTimer } from "../../shared";
 interface WebinarFinalCTASectionProps {
   onRegister: (email: string, firstName?: string) => Promise<void>;
   isLoading?: boolean;
+  seatsRemaining?: number;
 }
 
 export default function WebinarFinalCTASection({
   onRegister,
   isLoading = false,
+  seatsRemaining,
 }: WebinarFinalCTASectionProps) {
   const [email, setEmail] = useState("");
   const [honeypot, setHoneypot] = useState("");
@@ -105,7 +107,7 @@ export default function WebinarFinalCTASection({
                 "flex-1",
                 "font-oswald text-sm font-light",
                 "px-4 py-3",
-                "border-lp-border border bg-lp-input",
+                "border-lp-border bg-lp-input border",
                 "text-lp-white placeholder:text-lp-gray",
                 "outline-none",
                 "focus:border-lp-gold focus:ring-lp-gold/30 transition-all focus:ring-1"
@@ -138,7 +140,7 @@ export default function WebinarFinalCTASection({
           <div className="mt-4 flex items-center justify-center gap-2">
             <span className="font-oswald text-lp-muted text-sm font-extralight">Only</span>
             <span className="font-bebas text-lp-gold-light text-2xl">
-              {WEBINAR_HERO_CONTENT.seatsRemaining}
+              {seatsRemaining ?? WEBINAR_HERO_CONTENT.seatsRemaining}
             </span>
             <span className="font-oswald text-lp-muted text-sm font-extralight">
               of {WEBINAR_HERO_CONTENT.seatsTotal} seats left

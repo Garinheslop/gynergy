@@ -15,6 +15,9 @@ const HMS_SECRET = process.env.HMS_SECRET;
 // Use webinar-specific template if available, otherwise fall back to main template
 const HMS_WEBINAR_TEMPLATE_ID = process.env.HMS_WEBINAR_TEMPLATE_ID || process.env.HMS_TEMPLATE_ID;
 
+// Application base URL (for meeting URLs sent to 100ms)
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app";
+
 // 100ms API base URL
 const HMS_API_BASE = "https://api.100ms.live/v2";
 
@@ -249,7 +252,7 @@ export async function startHLSStreaming(options: {
 
   // Build the HLS configuration
   const hlsConfig = {
-    meeting_url: meetingUrl || `https://gynergy.app/webinar/studio/${roomId}`,
+    meeting_url: meetingUrl || `${APP_URL}/webinar/studio/${roomId}`,
     recording: recordingEnabled
       ? {
           single_file_per_layer: true,
@@ -354,7 +357,7 @@ export async function startRecording(roomId: string): Promise<void> {
       Authorization: `Bearer ${managementToken}`,
     },
     body: JSON.stringify({
-      meeting_url: `https://gynergy.app/webinar/studio/${roomId}`,
+      meeting_url: `${APP_URL}/webinar/studio/${roomId}`,
       resolution: {
         width: 1920,
         height: 1080,
