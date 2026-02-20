@@ -1,5 +1,7 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 
@@ -19,6 +21,64 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+/**
+ * Extract authenticated user ID from request cookies.
+ * Returns null if not authenticated.
+ */
+async function getAuthenticatedUserId(): Promise<string | null> {
+  const cookieStore = cookies();
+  const supabaseAuth = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+      },
+    }
+  );
+  const {
+    data: { user },
+  } = await supabaseAuth.auth.getUser();
+  return user?.id || null;
+}
+
+/**
+ * Verify the authenticated user is the host (or co-host) of a webinar.
+ * Returns { authorized, userId, error } — use the admin supabase client for lookup.
+ */
+async function verifyHostAuth(webinarId: string): Promise<{
+  authorized: boolean;
+  userId?: string;
+  error?: string;
+  status?: number;
+}> {
+  const userId = await getAuthenticatedUserId();
+  if (!userId) {
+    return { authorized: false, error: "Authentication required", status: 401 };
+  }
+
+  const { data: webinar } = await supabase
+    .from("webinars")
+    .select("host_user_id, co_host_user_ids")
+    .eq("id", webinarId)
+    .single();
+
+  if (!webinar) {
+    return { authorized: false, error: "Webinar not found", status: 404 };
+  }
+
+  const isHost = webinar.host_user_id === userId;
+  const isCoHost = webinar.co_host_user_ids?.includes(userId);
+
+  if (!isHost && !isCoHost) {
+    return { authorized: false, error: "Not authorized to manage this webinar", status: 403 };
+  }
+
+  return { authorized: true, userId };
+}
 
 // ============================================
 // GET - Get webinar status or list
@@ -231,6 +291,12 @@ async function handleGoLive(body: { webinarId: string }) {
     return NextResponse.json({ error: "Missing webinarId" }, { status: 400 });
   }
 
+  // Verify caller is host
+  const auth = await verifyHostAuth(webinarId);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
+  }
+
   // Get webinar
   const { data: webinar, error: fetchError } = await supabase
     .from("webinars")
@@ -303,6 +369,12 @@ async function handleEnd(body: { webinarId: string; saveRecording?: boolean }) {
     return NextResponse.json({ error: "Missing webinarId" }, { status: 400 });
   }
 
+  // Verify caller is host
+  const auth = await verifyHostAuth(webinarId);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
+  }
+
   // Get webinar
   const { data: webinar, error: fetchError } = await supabase
     .from("webinars")
@@ -359,19 +431,26 @@ async function handleEnd(body: { webinarId: string; saveRecording?: boolean }) {
 }
 
 /**
- * Get host token for broadcasting
+ * Get host token for broadcasting.
+ * Uses the authenticated session user — does NOT trust userId from body.
  */
-async function handleGetHostToken(body: { webinarId: string; userId: string; userName?: string }) {
-  const { webinarId, userId, userName } = body;
+async function handleGetHostToken(body: { webinarId: string; userName?: string }) {
+  const { webinarId, userName } = body;
 
-  if (!webinarId || !userId) {
-    return NextResponse.json({ error: "Missing webinarId or userId" }, { status: 400 });
+  if (!webinarId) {
+    return NextResponse.json({ error: "Missing webinarId" }, { status: 400 });
   }
 
-  // Get webinar
+  // Verify caller is host (uses session cookies, not body)
+  const auth = await verifyHostAuth(webinarId);
+  if (!auth.authorized || !auth.userId) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
+  }
+
+  // Get webinar for room ID
   const { data: webinar, error: fetchError } = await supabase
     .from("webinars")
-    .select("*")
+    .select("hms_room_id")
     .eq("id", webinarId)
     .single();
 
@@ -379,18 +458,6 @@ async function handleGetHostToken(body: { webinarId: string; userId: string; use
     return NextResponse.json({ error: "Webinar not found" }, { status: 404 });
   }
 
-  // Verify user is host or co-host
-  const isHost = webinar.host_user_id === userId;
-  const isCoHost = webinar.co_host_user_ids?.includes(userId);
-
-  if (!isHost && !isCoHost) {
-    return NextResponse.json(
-      { error: "User is not authorized to host this webinar" },
-      { status: 403 }
-    );
-  }
-
-  // Check if 100ms room exists
   if (!webinar.hms_room_id) {
     return NextResponse.json(
       { error: "100ms room not configured for this webinar" },
@@ -399,11 +466,10 @@ async function handleGetHostToken(body: { webinarId: string; userId: string; use
   }
 
   try {
-    // Generate broadcaster token
     const token = generateBroadcasterToken({
       roomId: webinar.hms_room_id,
       peerId: uuidv4(),
-      userId,
+      userId: auth.userId,
       userName,
     });
 

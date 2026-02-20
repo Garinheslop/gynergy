@@ -1,5 +1,7 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 
 import { checkRateLimit, RateLimits } from "@lib/utils/rate-limit";
@@ -9,6 +11,65 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
+
+/**
+ * Verify the caller is the host of the webinar that owns a chat message.
+ */
+async function verifyHostForMessage(messageId: string): Promise<{
+  authorized: boolean;
+  error?: string;
+  status?: number;
+}> {
+  // Get authenticated user from cookies
+  const cookieStore = cookies();
+  const supabaseAuth = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+      },
+    }
+  );
+  const {
+    data: { user },
+  } = await supabaseAuth.auth.getUser();
+  if (!user) {
+    return { authorized: false, error: "Authentication required", status: 401 };
+  }
+
+  // Look up message → webinar → host
+  const { data: message } = await supabase
+    .from("webinar_chat")
+    .select("webinar_id")
+    .eq("id", messageId)
+    .single();
+
+  if (!message) {
+    return { authorized: false, error: "Message not found", status: 404 };
+  }
+
+  const { data: webinar } = await supabase
+    .from("webinars")
+    .select("host_user_id, co_host_user_ids")
+    .eq("id", message.webinar_id)
+    .single();
+
+  if (!webinar) {
+    return { authorized: false, error: "Webinar not found", status: 404 };
+  }
+
+  const isHost = webinar.host_user_id === user.id;
+  const isCoHost = webinar.co_host_user_ids?.includes(user.id);
+
+  if (!isHost && !isCoHost) {
+    return { authorized: false, error: "Not authorized", status: 403 };
+  }
+
+  return { authorized: true };
+}
 
 /**
  * GET /api/webinar/chat
@@ -177,11 +238,16 @@ async function handleSendMessage(body: {
 }
 
 /**
- * Pin/unpin a message
+ * Pin/unpin a message (host-only)
  */
 async function handlePinMessage(messageId: string, isPinned: boolean) {
   if (!messageId) {
     return NextResponse.json({ error: "Missing messageId" }, { status: 400 });
+  }
+
+  const auth = await verifyHostForMessage(messageId);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
   }
 
   const { data: message, error } = await supabase
@@ -202,11 +268,16 @@ async function handlePinMessage(messageId: string, isPinned: boolean) {
 }
 
 /**
- * Delete a message (soft delete)
+ * Delete a message (host-only, soft delete)
  */
 async function handleDeleteMessage(messageId: string, deletedByUserId?: string) {
   if (!messageId) {
     return NextResponse.json({ error: "Missing messageId" }, { status: 400 });
+  }
+
+  const auth = await verifyHostForMessage(messageId);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
   }
 
   const { data: message, error } = await supabase

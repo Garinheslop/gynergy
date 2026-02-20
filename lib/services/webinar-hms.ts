@@ -475,8 +475,8 @@ export async function getViewerCount(roomId: string): Promise<number> {
   }
 
   const data = await response.json();
-  // Count peers with hls-viewer role
-  const viewers = data.peers?.filter((peer: { role: string }) => peer.role === "hls-viewer");
+  // Count peers with guest role (viewers in the Gynergy-Premium template)
+  const viewers = data.peers?.filter((peer: { role: string }) => peer.role === "guest");
   return viewers?.length || 0;
 }
 

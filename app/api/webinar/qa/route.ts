@@ -1,5 +1,7 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 
 import { checkRateLimit, RateLimits } from "@lib/utils/rate-limit";
@@ -11,6 +13,104 @@ const supabase = createClient(
 );
 
 /**
+ * Get authenticated user ID from request cookies.
+ */
+async function getAuthenticatedUserId(): Promise<string | null> {
+  const cookieStore = cookies();
+  const supabaseAuth = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+      },
+    }
+  );
+  const {
+    data: { user },
+  } = await supabaseAuth.auth.getUser();
+  return user?.id || null;
+}
+
+/**
+ * Verify the caller is the host of a webinar.
+ */
+async function verifyHostForWebinar(webinarId: string): Promise<{
+  authorized: boolean;
+  error?: string;
+  status?: number;
+}> {
+  const userId = await getAuthenticatedUserId();
+  if (!userId) {
+    return { authorized: false, error: "Authentication required", status: 401 };
+  }
+
+  const { data: webinar } = await supabase
+    .from("webinars")
+    .select("host_user_id, co_host_user_ids")
+    .eq("id", webinarId)
+    .single();
+
+  if (!webinar) {
+    return { authorized: false, error: "Webinar not found", status: 404 };
+  }
+
+  const isHost = webinar.host_user_id === userId;
+  const isCoHost = webinar.co_host_user_ids?.includes(userId);
+
+  if (!isHost && !isCoHost) {
+    return { authorized: false, error: "Not authorized", status: 403 };
+  }
+
+  return { authorized: true };
+}
+
+/**
+ * Verify the caller is the host of the webinar that owns a question.
+ */
+async function verifyHostForQuestion(questionId: string): Promise<{
+  authorized: boolean;
+  error?: string;
+  status?: number;
+}> {
+  const userId = await getAuthenticatedUserId();
+  if (!userId) {
+    return { authorized: false, error: "Authentication required", status: 401 };
+  }
+
+  const { data: question } = await supabase
+    .from("webinar_qa")
+    .select("webinar_id")
+    .eq("id", questionId)
+    .single();
+
+  if (!question) {
+    return { authorized: false, error: "Question not found", status: 404 };
+  }
+
+  const { data: webinar } = await supabase
+    .from("webinars")
+    .select("host_user_id, co_host_user_ids")
+    .eq("id", question.webinar_id)
+    .single();
+
+  if (!webinar) {
+    return { authorized: false, error: "Webinar not found", status: 404 };
+  }
+
+  const isHost = webinar.host_user_id === userId;
+  const isCoHost = webinar.co_host_user_ids?.includes(userId);
+
+  if (!isHost && !isCoHost) {
+    return { authorized: false, error: "Not authorized", status: 403 };
+  }
+
+  return { authorized: true };
+}
+
+/**
  * GET /api/webinar/qa
  * Get questions for a webinar
  */
@@ -19,10 +119,16 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const webinarId = searchParams.get("webinarId");
     const status = searchParams.get("status");
-    const isHost = searchParams.get("isHost") === "true";
 
     if (!webinarId) {
       return NextResponse.json({ error: "Missing webinarId" }, { status: 400 });
+    }
+
+    // Verify host status server-side (not from query param)
+    let isHost = false;
+    if (searchParams.get("isHost") === "true") {
+      const auth = await verifyHostForWebinar(webinarId);
+      isHost = auth.authorized;
     }
 
     let query = supabase
@@ -31,7 +137,7 @@ export async function GET(request: Request) {
       .eq("webinar_id", webinarId)
       .order("asked_at", { ascending: false });
 
-    // If not host, only show approved/answered questions
+    // If not verified host, only show approved/answered questions
     if (!isHost) {
       query = query.in("status", ["approved", "answered"]);
     } else if (status) {
@@ -159,11 +265,16 @@ async function handleSubmitQuestion(body: {
 }
 
 /**
- * Update question status (approve/dismiss)
+ * Update question status (approve/dismiss) — host-only
  */
 async function handleUpdateStatus(questionId: string, status: "approved" | "dismissed") {
   if (!questionId) {
     return NextResponse.json({ error: "Missing questionId" }, { status: 400 });
+  }
+
+  const auth = await verifyHostForQuestion(questionId);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
   }
 
   const { data: question, error } = await supabase
@@ -184,17 +295,18 @@ async function handleUpdateStatus(questionId: string, status: "approved" | "dism
 }
 
 /**
- * Answer a question
+ * Answer a question — host-only
  */
-async function handleAnswer(body: {
-  questionId: string;
-  answer: string;
-  answeredByUserId?: string;
-}) {
-  const { questionId, answer, answeredByUserId } = body;
+async function handleAnswer(body: { questionId: string; answer: string }) {
+  const { questionId, answer } = body;
 
   if (!questionId || !answer) {
     return NextResponse.json({ error: "Missing questionId or answer" }, { status: 400 });
+  }
+
+  const auth = await verifyHostForQuestion(questionId);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
   }
 
   const { data: question, error } = await supabase
@@ -203,7 +315,6 @@ async function handleAnswer(body: {
       status: "answered",
       answer_text: answer,
       answered_at: new Date().toISOString(),
-      answered_by_user_id: answeredByUserId,
     })
     .eq("id", questionId)
     .select()
@@ -264,11 +375,16 @@ async function handleUpvote(questionId: string) {
 }
 
 /**
- * Pin/unpin a question
+ * Pin/unpin a question — host-only
  */
 async function handlePin(questionId: string, isPinned: boolean) {
   if (!questionId) {
     return NextResponse.json({ error: "Missing questionId" }, { status: 400 });
+  }
+
+  const auth = await verifyHostForQuestion(questionId);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
   }
 
   const { data: question, error } = await supabase

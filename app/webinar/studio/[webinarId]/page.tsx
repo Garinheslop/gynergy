@@ -17,9 +17,9 @@ interface WebinarData {
 /**
  * Host Studio Page
  *
- * Auth flow: calls /api/webinar/studio-auth which handles both
- * user verification and host token generation server-side.
- * Falls back to hardcoded host ID for the March 3 webinar.
+ * Auth flow: The get-host-token API verifies the caller's session
+ * cookies against the webinar's host_user_id. No userId is sent
+ * from the client — auth is entirely server-side.
  */
 export default function WebinarStudioPage() {
   const params = useParams();
@@ -52,23 +52,13 @@ export default function WebinarStudioPage() {
 
         setWebinar(webinarData.webinar);
 
-        // Step 2: Get broadcaster token using the host user ID from the webinar record
-        // The API verifies host authorization server-side
-        const hostUserId = webinarData.webinar.host_user_id;
-
-        if (!hostUserId) {
-          setError("No host assigned to this webinar");
-          setIsLoading(false);
-          return;
-        }
-
+        // Step 2: Get broadcaster token — API verifies session cookies server-side
         const tokenResponse = await fetch("/api/webinar/live", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "get-host-token",
             webinarId,
-            userId: hostUserId,
             userName: "Host",
           }),
         });

@@ -1,3 +1,5 @@
+import crypto from "crypto";
+
 import { NextRequest, NextResponse } from "next/server";
 
 import { createClient } from "@supabase/supabase-js";
@@ -22,19 +24,29 @@ const supabase = createClient(
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    // Read raw body for signature verification, then parse
+    const rawBody = await request.text();
 
-    // Optional: Verify webhook signature if secret is configured
+    // Verify webhook signature if secret is configured
     if (HMS_WEBHOOK_SECRET) {
       const signature = request.headers.get("x-100ms-signature");
       if (!signature) {
         console.warn("100ms webhook: Missing signature header");
         return NextResponse.json({ error: "Missing signature" }, { status: 401 });
       }
-      // 100ms sends HMAC SHA256 signature — verify if needed
-      // For now, we check presence; full verification can be added later
+
+      const expectedSignature = crypto
+        .createHmac("sha256", HMS_WEBHOOK_SECRET)
+        .update(rawBody)
+        .digest("hex");
+
+      if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
+        console.warn("100ms webhook: Invalid signature");
+        return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
+      }
     }
 
+    const body = JSON.parse(rawBody);
     const { type, data } = body;
 
     switch (type) {
