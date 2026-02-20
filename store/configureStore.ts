@@ -116,6 +116,12 @@ const persistConfig: PersistConfig<RootState> = {
     "cohort",
     "notifications",
     "payment",
+    // Slices with nested persist configs — must be in root blacklist
+    // to prevent double-persist and ensure nested blacklists are honored
+    "session",
+    "community",
+    "ai",
+    "video",
   ],
 };
 

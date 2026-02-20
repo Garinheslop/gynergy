@@ -6,14 +6,24 @@ import type { ParticipantRole } from "@resources/types/video";
 
 const HMS_TEMPLATE_ID = process.env.HMS_TEMPLATE_ID;
 
+function ensureTemplateId(): string {
+  if (!HMS_TEMPLATE_ID) {
+    throw new Error(
+      "HMS_TEMPLATE_ID environment variable is not set. Cannot create 100ms rooms without a template."
+    );
+  }
+  return HMS_TEMPLATE_ID;
+}
+
 /**
  * Create a 100ms room for a group session
  */
 export async function createSessionRoom(sessionTitle: string): Promise<string> {
+  const templateId = ensureTemplateId();
   const room = await createRoom({
     name: `session-${sessionTitle.toLowerCase().replace(/\s+/g, "-").slice(0, 50)}`,
     description: sessionTitle,
-    templateId: HMS_TEMPLATE_ID,
+    templateId,
     region: "us",
     recordingEnabled: true,
   });
@@ -27,17 +37,28 @@ export async function createBreakoutRooms(
   sessionTitle: string,
   roomNames: string[]
 ): Promise<Array<{ hmsRoomId: string; name: string }>> {
+  const templateId = ensureTemplateId();
   const results: Array<{ hmsRoomId: string; name: string }> = [];
 
   for (const name of roomNames) {
-    const room = await createRoom({
-      name: `breakout-${sessionTitle.toLowerCase().replace(/\s+/g, "-").slice(0, 30)}-${name.toLowerCase().replace(/\s+/g, "-").slice(0, 20)}`,
-      description: `Breakout: ${name} (${sessionTitle})`,
-      templateId: HMS_TEMPLATE_ID,
-      region: "us",
-      recordingEnabled: false,
-    });
-    results.push({ hmsRoomId: room.id, name });
+    try {
+      const room = await createRoom({
+        name: `breakout-${sessionTitle.toLowerCase().replace(/\s+/g, "-").slice(0, 30)}-${name.toLowerCase().replace(/\s+/g, "-").slice(0, 20)}`,
+        description: `Breakout: ${name} (${sessionTitle})`,
+        templateId,
+        region: "us",
+        recordingEnabled: false,
+      });
+      results.push({ hmsRoomId: room.id, name });
+    } catch (err) {
+      // Rollback: end any rooms already created in this batch
+      if (results.length > 0) {
+        await endBreakoutRooms(results.map((r) => r.hmsRoomId));
+      }
+      throw new Error(
+        `Failed to create breakout room "${name}": ${err instanceof Error ? err.message : String(err)}`
+      );
+    }
   }
 
   return results;

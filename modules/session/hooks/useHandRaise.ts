@@ -96,21 +96,26 @@ export function useHandRaise(sessionId: string | null) {
 
   const lowerHand = useCallback(async () => {
     if (!sessionId) return;
-    await fetch("/api/session/hand-raise", {
+    const res = await fetch("/api/session/hand-raise", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "lower", sessionId }),
     });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.error || "Failed to lower hand");
   }, [sessionId]);
 
   const acknowledgeHand = useCallback(
     async (handRaiseId: string) => {
       if (!sessionId) return;
-      await fetch("/api/session/hand-raise", {
+      const res = await fetch("/api/session/hand-raise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "acknowledge", sessionId, handRaiseId }),
       });
+      const data = await res.json();
+      if (!res.ok || !data.success)
+        throw new Error(data.error || "Failed to acknowledge hand raise");
     },
     [sessionId]
   );
@@ -133,11 +138,13 @@ export function useHandRaise(sessionId: string | null) {
   const completeHotSeat = useCallback(
     async (handRaiseId: string) => {
       if (!sessionId) return;
-      await fetch("/api/session/hand-raise", {
+      const res = await fetch("/api/session/hand-raise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "complete", sessionId, handRaiseId }),
       });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || "Failed to complete hot seat");
       dispatch(sessionActions.hotSeatCleared());
     },
     [sessionId, dispatch]
@@ -146,11 +153,13 @@ export function useHandRaise(sessionId: string | null) {
   const dismissHand = useCallback(
     async (handRaiseId: string) => {
       if (!sessionId) return;
-      await fetch("/api/session/hand-raise", {
+      const res = await fetch("/api/session/hand-raise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "dismiss", sessionId, handRaiseId }),
       });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || "Failed to dismiss hand raise");
     },
     [sessionId]
   );

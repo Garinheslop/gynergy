@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 
 import {
   HMSRoomProvider,
@@ -51,11 +51,15 @@ const VideoRoomContent: React.FC<VideoRoomProps> = ({
   const [isJoining, setIsJoining] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showVirtualBackground, setShowVirtualBackground] = useState(false);
+  const joinedRef = useRef(false);
 
-  // Join room on mount
+  // Join room on mount — uses ref guard to prevent re-join on isConnected change
   useEffect(() => {
+    if (!authToken || joinedRef.current) return;
+
     const joinRoom = async () => {
       try {
+        joinedRef.current = true;
         setIsJoining(true);
         setError(null);
 
@@ -70,22 +74,20 @@ const VideoRoomContent: React.FC<VideoRoomProps> = ({
       } catch (err) {
         console.error("Failed to join room:", err);
         setError(err instanceof Error ? err.message : "Failed to join room");
+        joinedRef.current = false;
       } finally {
         setIsJoining(false);
       }
     };
 
-    if (authToken) {
-      joinRoom();
-    }
+    joinRoom();
 
     // Cleanup on unmount
     return () => {
-      if (isConnected) {
-        hmsActions.leave();
-      }
+      joinedRef.current = false;
+      hmsActions.leave();
     };
-  }, [authToken, userName, hmsActions, isConnected]);
+  }, [authToken, userName, hmsActions]);
 
   // Handle leave
   const handleLeave = useCallback(async () => {

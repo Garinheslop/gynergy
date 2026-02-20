@@ -22,6 +22,7 @@ interface GroupSessionParticipantProps {
   sessionId: string;
   authToken: string;
   sessionTitle: string;
+  userId: string;
   userName: string;
   hotSeatEnabled: boolean;
   breakoutEnabled: boolean;
@@ -33,6 +34,7 @@ const GroupSessionParticipantContent: React.FC<GroupSessionParticipantProps> = (
   sessionId,
   authToken,
   sessionTitle: _sessionTitle,
+  userId,
   userName,
   hotSeatEnabled,
   breakoutEnabled: _breakoutEnabled,
@@ -54,7 +56,7 @@ const GroupSessionParticipantContent: React.FC<GroupSessionParticipantProps> = (
   const timerState = useHotSeatTimer();
 
   // Check if user has a hand raised
-  const myRaise = handRaise.queue.find((h) => h.userName === userName);
+  const myRaise = handRaise.queue.find((h) => h.userId === userId);
 
   // Handle hand raise
   const handleRaiseHand = useCallback(async () => {

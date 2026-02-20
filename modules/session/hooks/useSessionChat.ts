@@ -118,11 +118,13 @@ export function useSessionChat(sessionId: string | null, breakoutRoomId?: string
   const pinMessage = useCallback(
     async (messageId: string, isPinned: boolean) => {
       if (!sessionId) return;
-      await fetch("/api/session/chat", {
+      const res = await fetch("/api/session/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "pin", sessionId, messageId, isPinned }),
       });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || "Failed to pin message");
     },
     [sessionId]
   );
@@ -130,11 +132,13 @@ export function useSessionChat(sessionId: string | null, breakoutRoomId?: string
   const deleteMessage = useCallback(
     async (messageId: string) => {
       if (!sessionId) return;
-      await fetch("/api/session/chat", {
+      const res = await fetch("/api/session/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "delete", sessionId, messageId }),
       });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || "Failed to delete message");
     },
     [sessionId]
   );

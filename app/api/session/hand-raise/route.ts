@@ -217,6 +217,7 @@ async function handleAcknowledge(userId: string, body: { sessionId: string; hand
       acknowledged_at: new Date().toISOString(),
     })
     .eq("id", body.handRaiseId)
+    .eq("session_id", body.sessionId)
     .eq("status", "raised")
     .select()
     .single();
@@ -274,6 +275,7 @@ async function handleActivate(userId: string, body: { sessionId: string; handRai
       hot_seat_duration_seconds: session.hot_seat_duration_seconds || 300,
     })
     .eq("id", body.handRaiseId)
+    .eq("session_id", body.sessionId)
     .in("status", ["raised", "acknowledged"])
     .select()
     .single();
@@ -318,6 +320,7 @@ async function handleComplete(userId: string, body: { sessionId: string; handRai
       hot_seat_ended_at: now,
     })
     .eq("id", body.handRaiseId)
+    .eq("session_id", body.sessionId)
     .eq("status", "active");
 
   if (error) {
@@ -352,6 +355,7 @@ async function handleDismiss(userId: string, body: { sessionId: string; handRais
       completed_at: new Date().toISOString(),
     })
     .eq("id", body.handRaiseId)
+    .eq("session_id", body.sessionId)
     .in("status", ["raised", "acknowledged"]);
 
   return NextResponse.json({ success: true });
@@ -386,6 +390,7 @@ async function handleExtend(
     .from("hand_raises")
     .select("time_extended_seconds")
     .eq("id", body.handRaiseId)
+    .eq("session_id", body.sessionId)
     .eq("status", "active")
     .single();
 
@@ -399,6 +404,7 @@ async function handleExtend(
     .from("hand_raises")
     .update({ time_extended_seconds: newExtended })
     .eq("id", body.handRaiseId)
+    .eq("session_id", body.sessionId)
     .select()
     .single();
 

@@ -1,5 +1,7 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
 
 import { getHLSStreamUrl } from "@lib/services/webinar-hms";
@@ -11,6 +13,33 @@ const supabase = createClient(
 );
 
 /**
+ * Get authenticated user ID from request cookies.
+ * Returns null if not authenticated (e.g. email-only webinar viewers).
+ */
+async function getAuthenticatedUserId(): Promise<string | null> {
+  try {
+    const cookieStore = cookies();
+    const supabaseAuth = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+        },
+      }
+    );
+    const {
+      data: { user },
+    } = await supabaseAuth.auth.getUser();
+    return user?.id || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * POST /api/webinar/join
  * Join a webinar as a viewer
  * Returns the HLS stream URL for watching
@@ -18,7 +47,7 @@ const supabase = createClient(
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { webinarId, slug, email, firstName, userId } = body;
+    const { webinarId, slug, email, firstName } = body;
 
     // Must have webinarId or slug
     if (!webinarId && !slug) {
@@ -61,6 +90,9 @@ export async function POST(request: Request) {
       );
     }
 
+    // Derive userId from auth session — never trust the client
+    const authenticatedUserId = await getAuthenticatedUserId();
+
     // Check/create attendance record
     const { data: existingAttendance } = await supabase
       .from("webinar_attendance")
@@ -72,14 +104,14 @@ export async function POST(request: Request) {
     let attendance = existingAttendance;
 
     if (!attendance) {
-      // Create new attendance record
+      // Create new attendance record — userId derived server-side
       const { data: newAttendance, error: attendanceError } = await supabase
         .from("webinar_attendance")
         .insert({
           webinar_id: webinar.id,
           email,
           first_name: firstName,
-          user_id: userId,
+          user_id: authenticatedUserId,
           registration_source: "direct",
         })
         .select()
@@ -142,19 +174,43 @@ export async function POST(request: Request) {
 
 /**
  * PUT /api/webinar/join
- * Update attendance (e.g., when leaving)
+ * Update attendance (e.g., when leaving).
+ * Requires the caller to own the attendance record (by email match via auth or
+ * by providing the email that matches the record).
  */
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
-    const { attendanceId, action } = body;
+    const { attendanceId, action, email } = body;
 
     if (!attendanceId) {
       return NextResponse.json({ error: "Missing attendanceId" }, { status: 400 });
     }
 
+    // Verify the caller owns this attendance record
+    const { data: attendance } = await supabase
+      .from("webinar_attendance")
+      .select("id, email, user_id")
+      .eq("id", attendanceId)
+      .single();
+
+    if (!attendance) {
+      return NextResponse.json({ error: "Attendance record not found" }, { status: 404 });
+    }
+
+    // Ownership check: authenticated user_id OR matching email
+    const authenticatedUserId = await getAuthenticatedUserId();
+    const ownerByUserId = authenticatedUserId && attendance.user_id === authenticatedUserId;
+    const ownerByEmail = email && attendance.email === email;
+
+    if (!ownerByUserId && !ownerByEmail) {
+      return NextResponse.json(
+        { error: "Not authorized to update this attendance record" },
+        { status: 403 }
+      );
+    }
+
     if (action === "leave") {
-      // Mark as left
       const { error } = await supabase
         .from("webinar_attendance")
         .update({
@@ -170,7 +226,6 @@ export async function PUT(request: Request) {
     }
 
     if (action === "replay") {
-      // Mark as watched replay
       const { error } = await supabase
         .from("webinar_attendance")
         .update({

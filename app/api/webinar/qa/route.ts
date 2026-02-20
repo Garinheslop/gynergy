@@ -189,16 +189,16 @@ export async function POST(request: Request) {
 }
 
 /**
- * Submit a new question
+ * Submit a new question.
+ * Derives userId from auth session — never trusts the client.
  */
 async function handleSubmitQuestion(body: {
   webinarId: string;
   question: string;
   email: string;
   name?: string;
-  userId?: string;
 }) {
-  const { webinarId, question, email, name, userId } = body;
+  const { webinarId, question, email, name } = body;
 
   if (!webinarId || !question || !email) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -228,6 +228,9 @@ async function handleSubmitQuestion(body: {
     return NextResponse.json({ error: "Q&A is not enabled for this webinar" }, { status: 400 });
   }
 
+  // Derive userId from auth session — never trust the client
+  const authenticatedUserId = await getAuthenticatedUserId();
+
   // Create question
   const { data: newQuestion, error } = await supabase
     .from("webinar_qa")
@@ -236,7 +239,7 @@ async function handleSubmitQuestion(body: {
       question,
       asked_by_email: email,
       asked_by_name: name,
-      asked_by_user_id: userId,
+      asked_by_user_id: authenticatedUserId,
       status: "pending",
     })
     .select()

@@ -211,12 +211,16 @@ async function handlePin(
     return NextResponse.json({ error: "Only hosts can pin messages" }, { status: 403 });
   }
 
-  const { error } = await admin
+  // Scope to both messageId AND sessionId to prevent cross-session IDOR
+  const { data: updated, error } = await admin
     .from("session_chat")
     .update({ is_pinned: body.isPinned ?? true })
-    .eq("id", body.messageId);
+    .eq("id", body.messageId)
+    .eq("session_id", body.sessionId)
+    .select("id")
+    .single();
 
-  if (error) {
+  if (error || !updated) {
     return NextResponse.json({ error: "Failed to pin message" }, { status: 500 });
   }
 
@@ -241,12 +245,16 @@ async function handleDelete(userId: string, body: { sessionId: string; messageId
     return NextResponse.json({ error: "Only hosts can delete messages" }, { status: 403 });
   }
 
-  const { error } = await admin
+  // Scope to both messageId AND sessionId to prevent cross-session IDOR
+  const { data: updated, error } = await admin
     .from("session_chat")
     .update({ is_deleted: true })
-    .eq("id", body.messageId);
+    .eq("id", body.messageId)
+    .eq("session_id", body.sessionId)
+    .select("id")
+    .single();
 
-  if (error) {
+  if (error || !updated) {
     return NextResponse.json({ error: "Failed to delete message" }, { status: 500 });
   }
 

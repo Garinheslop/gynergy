@@ -186,7 +186,9 @@ export async function POST(request: Request) {
 // ============================================
 
 /**
- * Create a new webinar
+ * Create a new webinar.
+ * REQUIRES authentication — derives host_user_id from session.
+ * Never trusts hostUserId from the request body.
  */
 async function handleCreate(body: {
   title: string;
@@ -195,11 +197,19 @@ async function handleCreate(body: {
   scheduledStart: string;
   scheduledEnd?: string;
   maxAttendees?: number;
-  hostUserId?: string;
   chatEnabled?: boolean;
   qaEnabled?: boolean;
   recordingEnabled?: boolean;
 }) {
+  // CRITICAL: Require authentication — creating a webinar triggers billed 100ms room creation
+  const authenticatedUserId = await getAuthenticatedUserId();
+  if (!authenticatedUserId) {
+    return NextResponse.json(
+      { error: "Authentication required to create a webinar" },
+      { status: 401 }
+    );
+  }
+
   const {
     title,
     description,
@@ -207,7 +217,6 @@ async function handleCreate(body: {
     scheduledStart,
     scheduledEnd,
     maxAttendees = 500,
-    hostUserId,
     chatEnabled = true,
     qaEnabled = true,
     recordingEnabled = true,
@@ -250,7 +259,7 @@ async function handleCreate(body: {
     }
   }
 
-  // Create webinar in database
+  // Create webinar in database — host_user_id derived from authenticated session
   const { data: webinar, error } = await supabase
     .from("webinars")
     .insert({
@@ -260,7 +269,7 @@ async function handleCreate(body: {
       scheduled_start: scheduledStart,
       scheduled_end: scheduledEnd,
       max_attendees: maxAttendees,
-      host_user_id: hostUserId,
+      host_user_id: authenticatedUserId,
       chat_enabled: chatEnabled,
       qa_enabled: qaEnabled,
       recording_enabled: recordingEnabled,

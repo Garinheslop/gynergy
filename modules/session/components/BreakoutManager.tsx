@@ -36,6 +36,25 @@ const BreakoutManager: React.FC<BreakoutManagerProps> = ({
   const [method, setMethod] = useState<BreakoutAssignmentMethod>("random");
   const [duration, setDuration] = useState(10); // minutes
   const [isCreating, setIsCreating] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const handleReturnToMain = async () => {
+    setActionError(null);
+    try {
+      await onReturnToMain();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to return to main room");
+    }
+  };
+
+  const handleCloseBreakouts = async () => {
+    setActionError(null);
+    try {
+      await onCloseBreakouts();
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Failed to close breakout rooms");
+    }
+  };
 
   const handleRoomCountChange = (count: number) => {
     setRoomCount(count);
@@ -98,17 +117,21 @@ const BreakoutManager: React.FC<BreakoutManagerProps> = ({
             </div>
           ))}
 
+        {actionError && (
+          <p className="rounded bg-red-900/30 px-3 py-2 text-xs text-red-300">{actionError}</p>
+        )}
+
         <div className="flex gap-2 pt-2">
           {!isReturning && (
             <button
-              onClick={onReturnToMain}
+              onClick={handleReturnToMain}
               className="flex-1 rounded-lg bg-amber-600 py-2 text-sm font-medium text-white hover:bg-amber-500"
             >
               Call Everyone Back
             </button>
           )}
           <button
-            onClick={onCloseBreakouts}
+            onClick={handleCloseBreakouts}
             className="flex-1 rounded-lg bg-red-600/80 py-2 text-sm font-medium text-white hover:bg-red-600"
           >
             Close Rooms

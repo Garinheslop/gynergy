@@ -210,6 +210,7 @@ export default function SessionRoomPage() {
         sessionId={sessionId}
         authToken={connection.authToken}
         sessionTitle={session.title}
+        userId={userProfile.id}
         userName={userProfile.name}
         hotSeatEnabled={session.hotSeatEnabled}
         breakoutEnabled={session.breakoutEnabled}

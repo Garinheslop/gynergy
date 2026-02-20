@@ -247,6 +247,18 @@ const sessionSlice = createSlice({
       state.connection.isConnecting = false;
       state.connection.authToken = null;
       state.connection.error = "";
+      // Clear all session-scoped state to prevent stale data on next join
+      state.handRaises.data = [];
+      state.handRaises.loading = false;
+      state.hotSeat.active = null;
+      state.hotSeat.timerState = null;
+      state.chat.messages = [];
+      state.chat.loading = false;
+      state.breakoutRooms.data = [];
+      state.breakoutRooms.loading = false;
+      state.breakoutConnection.isInBreakout = false;
+      state.breakoutConnection.breakoutRoomId = null;
+      state.breakoutConnection.breakoutAuthToken = null;
     },
 
     // Reset

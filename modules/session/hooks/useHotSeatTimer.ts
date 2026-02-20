@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -10,21 +10,29 @@ import { sessionActions } from "@store/modules/session/reducers";
 
 /**
  * Client-side countdown timer for the active hot seat.
- * Computes remaining time from the hand raise data and updates Redux at 60fps.
+ * Computes remaining time and updates Redux once per second (not 60fps).
  */
 export function useHotSeatTimer(onExpired?: (handRaiseId: string) => void) {
   const dispatch = useDispatch<AppDispatch>();
   const hotSeat = useSelector((state: RootState) => state.session.hotSeat);
-  const rafRef = useRef<number>(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const expiredRef = useRef(false);
+  const onExpiredRef = useRef(onExpired);
+  onExpiredRef.current = onExpired;
+
+  const clearTimer = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     const active = hotSeat.active;
     if (!active || active.status !== "active" || !active.hotSeatStartedAt) {
       // Clear timer if no active hot seat
-      if (hotSeat.timerState) {
-        dispatch(sessionActions.hotSeatTimerUpdated(null));
-      }
+      clearTimer();
+      dispatch(sessionActions.hotSeatTimerUpdated(null));
       expiredRef.current = false;
       return;
     }
@@ -37,22 +45,17 @@ export function useHotSeatTimer(onExpired?: (handRaiseId: string) => void) {
 
       if (state.isExpired && !expiredRef.current) {
         expiredRef.current = true;
-        onExpired?.(active.id);
-      }
-
-      if (!state.isExpired) {
-        rafRef.current = requestAnimationFrame(tick);
+        clearTimer();
+        onExpiredRef.current?.(active.id);
       }
     };
 
-    rafRef.current = requestAnimationFrame(tick);
+    // Dispatch immediately, then once per second
+    tick();
+    intervalRef.current = setInterval(tick, 1000);
 
-    return () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
-    };
-  }, [hotSeat.active, dispatch, onExpired, hotSeat.timerState]);
+    return clearTimer;
+  }, [hotSeat.active, dispatch, clearTimer]);
 
   return hotSeat.timerState;
 }

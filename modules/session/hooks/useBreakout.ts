@@ -174,21 +174,29 @@ export function useBreakout(sessionId: string | null) {
 
   const returnToMain = useCallback(async () => {
     if (!sessionId) return;
-    await fetch("/api/session/breakout", {
+    const res = await fetch("/api/session/breakout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "return", sessionId }),
     });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || "Failed to return to main room");
+    }
     dispatch(sessionActions.exitedBreakout());
   }, [sessionId, dispatch]);
 
   const closeBreakouts = useCallback(async () => {
     if (!sessionId) return;
-    await fetch("/api/session/breakout", {
+    const res = await fetch("/api/session/breakout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "close", sessionId }),
     });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || "Failed to close breakout rooms");
+    }
     dispatch(sessionActions.exitedBreakout());
     dispatch(sessionActions.breakoutRoomsCleared());
   }, [sessionId, dispatch]);

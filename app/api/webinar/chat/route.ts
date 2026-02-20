@@ -13,6 +13,51 @@ const supabase = createClient(
 );
 
 /**
+ * Get authenticated user ID from request cookies.
+ * Returns null if not authenticated (e.g. email-only webinar viewers).
+ */
+async function getAuthenticatedUserId(): Promise<string | null> {
+  try {
+    const cookieStore = cookies();
+    const supabaseAuth = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+        },
+      }
+    );
+    const {
+      data: { user },
+    } = await supabaseAuth.auth.getUser();
+    return user?.id || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Determine if a user is the host/co-host of a webinar.
+ * Uses authenticated session — never trusts the client.
+ */
+async function isUserHost(webinarId: string, userId: string | null): Promise<boolean> {
+  if (!userId) return false;
+
+  const { data: webinar } = await supabase
+    .from("webinars")
+    .select("host_user_id, co_host_user_ids")
+    .eq("id", webinarId)
+    .single();
+
+  if (!webinar) return false;
+
+  return webinar.host_user_id === userId || (webinar.co_host_user_ids?.includes(userId) ?? false);
+}
+
+/**
  * Verify the caller is the host of the webinar that owns a chat message.
  */
 async function verifyHostForMessage(messageId: string): Promise<{
@@ -138,7 +183,7 @@ export async function POST(request: Request) {
       case "pin":
         return handlePinMessage(body.messageId, body.isPinned);
       case "delete":
-        return handleDeleteMessage(body.messageId, body.deletedByUserId);
+        return handleDeleteMessage(body.messageId);
       default:
         return handleSendMessage(body); // Default to send
     }
@@ -149,17 +194,16 @@ export async function POST(request: Request) {
 }
 
 /**
- * Send a new chat message
+ * Send a new chat message.
+ * Derives userId and isHost server-side — never trusts the client.
  */
 async function handleSendMessage(body: {
   webinarId: string;
   message: string;
   email: string;
   name?: string;
-  userId?: string;
-  isHost?: boolean;
 }) {
-  const { webinarId, message, email, name, userId, isHost = false } = body;
+  const { webinarId, message, email, name } = body;
 
   if (!webinarId || !message || !email) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -202,6 +246,10 @@ async function handleSendMessage(body: {
     );
   }
 
+  // Derive userId and isHost server-side — NEVER trust client claims
+  const authenticatedUserId = await getAuthenticatedUserId();
+  const hostStatus = await isUserHost(webinarId, authenticatedUserId);
+
   // Create message
   const { data: chatMessage, error } = await supabase
     .from("webinar_chat")
@@ -210,8 +258,8 @@ async function handleSendMessage(body: {
       message,
       sent_by_email: email,
       sent_by_name: name,
-      sent_by_user_id: userId,
-      is_host_message: isHost,
+      sent_by_user_id: authenticatedUserId,
+      is_host_message: hostStatus,
     })
     .select()
     .single();
@@ -268,9 +316,10 @@ async function handlePinMessage(messageId: string, isPinned: boolean) {
 }
 
 /**
- * Delete a message (host-only, soft delete)
+ * Delete a message (host-only, soft delete).
+ * Derives deletedByUserId from auth session — never trusts client.
  */
-async function handleDeleteMessage(messageId: string, deletedByUserId?: string) {
+async function handleDeleteMessage(messageId: string) {
   if (!messageId) {
     return NextResponse.json({ error: "Missing messageId" }, { status: 400 });
   }
@@ -280,11 +329,14 @@ async function handleDeleteMessage(messageId: string, deletedByUserId?: string) 
     return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
   }
 
+  // Derive the deleter's ID from auth session (verifyHostForMessage already authenticated)
+  const authenticatedUserId = await getAuthenticatedUserId();
+
   const { data: message, error } = await supabase
     .from("webinar_chat")
     .update({
       is_deleted: true,
-      deleted_by_user_id: deletedByUserId,
+      deleted_by_user_id: authenticatedUserId,
     })
     .eq("id", messageId)
     .select()

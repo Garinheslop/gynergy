@@ -147,6 +147,8 @@ export default function WebinarViewer({
     if (!streamUrl || !videoRef.current) return;
 
     const video = videoRef.current;
+    let retryTimeout: ReturnType<typeof setTimeout> | null = null;
+    let disposed = false;
 
     if (Hls.isSupported()) {
       const hls = new Hls({
@@ -176,15 +178,17 @@ export default function WebinarViewer({
           hlsRetryCount.current += 1;
           setError(`Stream interrupted. Reconnecting in ${Math.round(delay / 1000)}s...`);
 
-          setTimeout(() => {
+          retryTimeout = setTimeout(() => {
+            retryTimeout = null;
+            if (disposed) return;
             setError(null);
             if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-              hls.startLoad();
+              hlsRef.current?.startLoad();
             } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-              hls.recoverMediaError();
+              hlsRef.current?.recoverMediaError();
             } else {
               // Can't reuse a destroyed instance — create a new one
-              hls.destroy();
+              hlsRef.current?.destroy();
               const newHls = new Hls({ enableWorker: true, lowLatencyMode: true });
               newHls.loadSource(streamUrl);
               newHls.attachMedia(video);
@@ -197,7 +201,10 @@ export default function WebinarViewer({
       hlsRef.current = hls;
 
       return () => {
-        hls.destroy();
+        disposed = true;
+        if (retryTimeout) clearTimeout(retryTimeout);
+        hlsRef.current?.destroy();
+        hlsRef.current = null;
       };
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = streamUrl;

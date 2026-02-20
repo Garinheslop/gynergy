@@ -5,6 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 
 import { is100msConfigured } from "@lib/services/100ms";
 import { createSessionRoom, generateSessionToken, endSessionRoom } from "@lib/services/session-hms";
+import { checkRateLimit, RateLimits } from "@lib/utils/rate-limit";
 import type { GroupSessionRow } from "@resources/types/session";
 import { sessionRowToSession } from "@resources/types/session";
 
@@ -126,6 +127,12 @@ export async function POST(request: NextRequest) {
   const user = await getAuthUser(request);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Rate limit all session mutations per user
+  const rateCheck = checkRateLimit(user.id, RateLimits.standard);
+  if (!rateCheck.success) {
+    return NextResponse.json({ error: "Too many requests. Please wait." }, { status: 429 });
   }
 
   const body = await request.json();
@@ -388,29 +395,25 @@ async function handleEnd(userId: string, body: { sessionId: string }) {
     }
   }
 
-  // End any active breakout rooms
+  // End any active breakout rooms (include "returning" status to catch all non-closed rooms)
+  const activeStatuses = ["pending", "active", "returning"];
   const { data: breakouts } = await admin
     .from("breakout_rooms")
     .select("hms_room_id")
     .eq("session_id", body.sessionId)
-    .in("status", ["pending", "active"]);
+    .in("status", activeStatuses);
 
   if (breakouts) {
-    for (const br of breakouts) {
-      if (br.hms_room_id) {
-        try {
-          await endSessionRoom(br.hms_room_id);
-        } catch (err) {
-          console.warn("Failed to end breakout room:", err);
-        }
-      }
-    }
+    // End 100ms rooms in parallel
+    await Promise.allSettled(
+      breakouts.filter((br) => br.hms_room_id).map((br) => endSessionRoom(br.hms_room_id))
+    );
 
     await admin
       .from("breakout_rooms")
       .update({ status: "closed", ended_at: new Date().toISOString() })
       .eq("session_id", body.sessionId)
-      .in("status", ["pending", "active"]);
+      .in("status", activeStatuses);
   }
 
   // Update session
