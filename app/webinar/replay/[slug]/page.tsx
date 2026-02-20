@@ -33,7 +33,7 @@ export default function WebinarReplayPage() {
 
   // Check for saved credentials
   useEffect(() => {
-    const saved = localStorage.getItem("gynergy_replay_access");
+    const saved = localStorage.getItem(`gynergy_replay_${slug}`);
     if (saved) {
       try {
         const { email: savedEmail } = JSON.parse(saved);
@@ -45,7 +45,7 @@ export default function WebinarReplayPage() {
         // Ignore parse errors
       }
     }
-  }, []);
+  }, [slug]);
 
   // Fetch replay data
   useEffect(() => {
@@ -106,7 +106,7 @@ export default function WebinarReplayPage() {
     setSubmitting(true);
 
     // Save access locally
-    localStorage.setItem("gynergy_replay_access", JSON.stringify({ email, name }));
+    localStorage.setItem(`gynergy_replay_${slug}`, JSON.stringify({ email, name }));
     setRegistered(true);
     setSubmitting(false);
   };

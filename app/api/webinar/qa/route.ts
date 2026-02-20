@@ -362,9 +362,13 @@ async function handleUpvote(questionId: string, request: Request) {
       .eq("id", questionId)
       .single();
 
+    if (!current) {
+      return NextResponse.json({ error: "Question not found" }, { status: 404 });
+    }
+
     const { data: updated } = await supabase
       .from("webinar_qa")
-      .update({ upvotes: (current?.upvotes || 0) + 1 })
+      .update({ upvotes: (current.upvotes || 0) + 1 })
       .eq("id", questionId)
       .select()
       .single();
@@ -373,6 +377,10 @@ async function handleUpvote(questionId: string, request: Request) {
       success: true,
       question: updated,
     });
+  }
+
+  if (!question) {
+    return NextResponse.json({ error: "Question not found" }, { status: 404 });
   }
 
   return NextResponse.json({

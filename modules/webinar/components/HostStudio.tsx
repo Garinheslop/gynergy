@@ -493,7 +493,7 @@ function HostStudioContent({
     if (!chatInput.trim() || isSendingChat) return;
     setIsSendingChat(true);
     try {
-      await fetch("/api/webinar/chat", {
+      const response = await fetch("/api/webinar/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -505,6 +505,7 @@ function HostStudioContent({
           isHost: true,
         }),
       });
+      if (!response.ok) throw new Error("Send failed");
       setChatInput("");
     } catch {
       setError("Failed to send message");

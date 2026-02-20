@@ -183,9 +183,12 @@ export default function WebinarViewer({
             } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
               hls.recoverMediaError();
             } else {
+              // Can't reuse a destroyed instance — create a new one
               hls.destroy();
-              hls.loadSource(streamUrl);
-              hls.attachMedia(video);
+              const newHls = new Hls({ enableWorker: true, lowLatencyMode: true });
+              newHls.loadSource(streamUrl);
+              newHls.attachMedia(video);
+              hlsRef.current = newHls;
             }
           }, delay);
         }
@@ -198,11 +201,22 @@ export default function WebinarViewer({
       };
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = streamUrl;
-      video.addEventListener("loadedmetadata", () => {
+      const onLoaded = () => {
         video.play().catch(() => {
           setIsPlaying(false);
         });
-      });
+      };
+      const onError = () => {
+        setError("Stream playback error. Please refresh the page.");
+      };
+      video.addEventListener("loadedmetadata", onLoaded);
+      video.addEventListener("error", onError);
+
+      return () => {
+        video.removeEventListener("loadedmetadata", onLoaded);
+        video.removeEventListener("error", onError);
+        video.src = "";
+      };
     }
   }, [streamUrl]);
 

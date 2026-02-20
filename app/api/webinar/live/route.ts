@@ -122,7 +122,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ webinar });
     }
 
-    // List webinars
+    // List webinars — requires host/admin auth to prevent data leak
+    const auth = await verifyHostAuth("00000000-0000-0000-0000-000000000000");
+    if (!auth.authorized) {
+      return NextResponse.json({ error: "Missing webinar ID" }, { status: 400 });
+    }
+
     const status = searchParams.get("status");
     const limit = parseInt(searchParams.get("limit") || "10");
 

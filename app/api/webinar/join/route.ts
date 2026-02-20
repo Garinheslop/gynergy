@@ -50,6 +50,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "This webinar is not yet published" }, { status: 400 });
     }
 
+    if (webinar.status === "ended") {
+      return NextResponse.json(
+        {
+          error: "This webinar has ended.",
+          replayAvailable: webinar.replay_available,
+          replaySlug: webinar.slug,
+        },
+        { status: 410 }
+      );
+    }
+
     // Check/create attendance record
     const { data: existingAttendance } = await supabase
       .from("webinar_attendance")
