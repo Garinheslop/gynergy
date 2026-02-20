@@ -79,7 +79,7 @@ const LiveCallBar: FC<LiveCallBarProps> = ({ event, state }) => {
         <button
           onClick={handleDismiss}
           aria-label="Dismiss"
-          className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center p-2 text-white/50 transition-colors hover:text-white/80"
+          className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded p-2 text-white/50 transition-colors hover:text-white/80 focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:outline-none"
         >
           <svg
             className="h-4 w-4"

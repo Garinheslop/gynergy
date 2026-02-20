@@ -235,21 +235,21 @@ const CommentItem: FC<CommentItemProps> = ({
           <div className="mt-1 flex items-center gap-4">
             <button
               onClick={() => onReply(comment.id)}
-              className="text-grey-500 hover:text-action-600 focus-visible:text-action-600 inline-flex min-h-[44px] items-center px-1 text-xs font-medium focus-visible:outline-none"
+              className="text-grey-500 hover:text-action-600 focus-visible:text-action-600 focus-visible:ring-action inline-flex min-h-[44px] items-center rounded px-1 text-xs font-medium focus-visible:ring-2 focus-visible:outline-none"
             >
               Reply
             </button>
             {isOwner ? (
               <button
                 onClick={() => onDelete(comment.id)}
-                className="text-grey-500 hover:text-danger focus-visible:text-danger inline-flex min-h-[44px] items-center px-1 text-xs font-medium focus-visible:outline-none"
+                className="text-grey-500 hover:text-danger focus-visible:text-danger focus-visible:ring-action inline-flex min-h-[44px] items-center rounded px-1 text-xs font-medium focus-visible:ring-2 focus-visible:outline-none"
               >
                 Delete
               </button>
             ) : (
               <button
                 onClick={() => setReportingCommentId(comment.id)}
-                className="text-grey-500 hover:text-danger focus-visible:text-danger inline-flex min-h-[44px] items-center px-1 text-xs font-medium focus-visible:outline-none"
+                className="text-grey-500 hover:text-danger focus-visible:text-danger focus-visible:ring-action inline-flex min-h-[44px] items-center rounded px-1 text-xs font-medium focus-visible:ring-2 focus-visible:outline-none"
               >
                 Report
               </button>
@@ -313,14 +313,14 @@ const CommentItem: FC<CommentItemProps> = ({
                       {currentUserId === reply.userId ? (
                         <button
                           onClick={() => onDelete(reply.id)}
-                          className="text-grey-500 hover:text-danger focus-visible:text-danger inline-flex min-h-[44px] items-center px-1 text-xs font-medium focus-visible:outline-none"
+                          className="text-grey-500 hover:text-danger focus-visible:text-danger focus-visible:ring-action inline-flex min-h-[44px] items-center rounded px-1 text-xs font-medium focus-visible:ring-2 focus-visible:outline-none"
                         >
                           Delete
                         </button>
                       ) : (
                         <button
                           onClick={() => setReportingCommentId(reply.id)}
-                          className="text-grey-500 hover:text-danger focus-visible:text-danger inline-flex min-h-[44px] items-center px-1 text-xs font-medium focus-visible:outline-none"
+                          className="text-grey-500 hover:text-danger focus-visible:text-danger focus-visible:ring-action inline-flex min-h-[44px] items-center rounded px-1 text-xs font-medium focus-visible:ring-2 focus-visible:outline-none"
                         >
                           Report
                         </button>
