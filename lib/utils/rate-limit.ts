@@ -146,6 +146,12 @@ export const RateLimits = {
 
   // Webinar Q&A upvotes (1 per question per 10s to prevent spam-clicking)
   webinarUpvote: { limit: 5, windowSeconds: 10, prefix: "webinar-upvote" },
+
+  // Session chat messages (prevent spam during live coaching)
+  sessionChat: { limit: 10, windowSeconds: 30, prefix: "session-chat" },
+
+  // Session hand raises (prevent rapid raise/lower abuse)
+  sessionHandRaise: { limit: 3, windowSeconds: 60, prefix: "session-hand" },
 } as const;
 
 // Periodic cleanup of expired entries (every 5 minutes)

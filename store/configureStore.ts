@@ -75,11 +75,28 @@ const migrations = {
       },
     };
   },
+  2: (state: PersistedState) => {
+    if (!state) return state;
+    // Migration v2: Add session module for group coaching / hot seat / breakout rooms
+    return {
+      ...state,
+      session: {
+        sessions: { data: [], loading: false, fetched: false, error: "" },
+        currentSession: { data: null, participants: [], loading: false, error: "" },
+        handRaises: { data: [], loading: false },
+        breakoutRooms: { data: [], loading: false },
+        hotSeat: { active: null, timerState: null },
+        chat: { messages: [], loading: false },
+        connection: { isConnected: false, isConnecting: false, authToken: null, error: "" },
+        breakoutConnection: { isInBreakout: false, breakoutRoomId: null, breakoutAuthToken: null },
+      },
+    };
+  },
 };
 
 const persistConfig: PersistConfig<RootState> = {
   key: "root",
-  version: 1, // Bumped from 0 to 1 for new modules
+  version: 2, // Bumped from 1 to 2 for session module
   storage,
   debug: true,
   stateReconciler: autoMergeLevel2,

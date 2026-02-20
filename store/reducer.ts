@@ -1,8 +1,6 @@
 import { combineReducers } from "redux";
 import { persistReducer } from "redux-persist";
 
-import storage from "./storage";
-
 import actionReducer from "@store/modules/action";
 import aiReducer from "@store/modules/ai/reducers";
 import bookReducer from "@store/modules/book";
@@ -17,11 +15,13 @@ import meditationReducer from "@store/modules/meditation";
 import { paymentReducer } from "@store/modules/payment";
 import profileReducer from "@store/modules/profile";
 import quoteReducer from "@store/modules/quote";
+import sessionReducer from "@store/modules/session/reducers";
 import videoReducer from "@store/modules/video/reducers";
 import visionReducer from "@store/modules/vision";
 
 import globalStatesReducer from "./modules/global/globalStateReducers";
 import { successReducerTypes } from "./resources/reducerActionTypes";
+import storage from "./storage";
 
 const persistBooksConfig = {
   key: "books",
@@ -96,6 +96,21 @@ const persistVideoConfig = {
   ],
 };
 
+const persistSessionConfig = {
+  key: "session",
+  storage,
+  blacklist: [
+    "sessions.loading",
+    "currentSession.loading",
+    "handRaises.loading",
+    "breakoutRooms.loading",
+    "chat.loading",
+    "connection",
+    "breakoutConnection",
+    "hotSeat",
+  ],
+};
+
 const persistPaymentConfig = {
   key: "payment",
   storage,
@@ -125,6 +140,7 @@ const appReducer = combineReducers({
   gamification: persistReducer(persistGamificationConfig, gamificationReducer),
   ai: persistReducer(persistAIConfig, aiReducer),
   video: persistReducer(persistVideoConfig, videoReducer.reducer),
+  session: persistReducer(persistSessionConfig, sessionReducer.reducer),
   payment: persistReducer(persistPaymentConfig, paymentReducer),
 });
 const rootReducer = (

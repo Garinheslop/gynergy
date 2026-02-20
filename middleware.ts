@@ -21,6 +21,7 @@ const PUBLIC_FILE_PATTERNS = [
 const CHALLENGE_PROTECTED_PATTERNS = [
   /^\/date-zero-gratitude/, // Main challenge routes
   /^\/video\//, // Video call routes (cohort calls)
+  /^\/session/, // Group coaching sessions (hot seat / breakout)
 ];
 
 export async function middleware(request: NextRequest) {
