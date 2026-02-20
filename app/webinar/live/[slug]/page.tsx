@@ -4,6 +4,19 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useParams } from "next/navigation";
 
+// Prevent search engines from indexing live webinar pages
+function useNoIndex() {
+  useEffect(() => {
+    const meta = document.createElement("meta");
+    meta.name = "robots";
+    meta.content = "noindex, nofollow";
+    document.head.appendChild(meta);
+    return () => {
+      document.head.removeChild(meta);
+    };
+  }, []);
+}
+
 import { WebinarViewer } from "@modules/webinar";
 
 interface WebinarData {
@@ -30,6 +43,7 @@ interface JoinResponse {
 }
 
 export default function WebinarLivePage() {
+  useNoIndex();
   const params = useParams();
   const slug = params.slug as string;
 
@@ -106,7 +120,7 @@ export default function WebinarLivePage() {
     } else {
       setIsLoading(false);
     }
-  }, [handleJoin]);
+  }, [handleJoin, slug]);
 
   const handleSubmitJoin = (e: React.FormEvent) => {
     e.preventDefault();

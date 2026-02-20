@@ -6,6 +6,19 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
+// Prevent search engines from indexing replay pages
+function useNoIndex() {
+  useEffect(() => {
+    const meta = document.createElement("meta");
+    meta.name = "robots";
+    meta.content = "noindex, nofollow";
+    document.head.appendChild(meta);
+    return () => {
+      document.head.removeChild(meta);
+    };
+  }, []);
+}
+
 // Dynamic import to avoid SSR issues with HLS.js
 const VideoPlayer = dynamic(() => import("@modules/content/components/VideoPlayer"), {
   ssr: false,
@@ -19,6 +32,7 @@ interface ReplayData {
 }
 
 export default function WebinarReplayPage() {
+  useNoIndex();
   const params = useParams();
   const slug = params.slug as string;
 

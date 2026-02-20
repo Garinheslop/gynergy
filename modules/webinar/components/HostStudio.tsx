@@ -229,6 +229,9 @@ function HostStudioContent({
   const [showSettings, setShowSettings] = useState(false);
   const joinedRef = useRef(false);
   const settingsRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const goLiveInFlight = useRef(false);
+  const endingInFlight = useRef(false);
 
   // Sidebar state
   const [activeTab, setActiveTab] = useState<"chat" | "qa">("qa");
@@ -240,8 +243,17 @@ function HostStudioContent({
   const [answeringQuestionId, setAnsweringQuestionId] = useState<string | null>(null);
   const [answerText, setAnswerText] = useState("");
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [hostEmail, setHostEmail] = useState("host@gynergy.app");
 
   const isLive = hlsState?.running || false;
+
+  // Get authenticated host email
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user?.email) setHostEmail(data.user.email);
+    });
+  }, []);
 
   // Join room on mount (ref guard prevents double-join from React strict mode)
   useEffect(() => {
@@ -277,6 +289,17 @@ function HostStudioContent({
       joinedRef.current = false;
     };
   }, [authToken, hmsActions]);
+
+  // Attach/detach video track to preview element
+  useEffect(() => {
+    if (!videoRef.current || !localPeer?.videoTrack || !hmsActions) return;
+    hmsActions.attachVideo(localPeer.videoTrack, videoRef.current);
+    const el = videoRef.current;
+    const trackId = localPeer.videoTrack;
+    return () => {
+      hmsActions.detachVideo(trackId, el);
+    };
+  }, [localPeer?.videoTrack, hmsActions]);
 
   // Poll viewer count
   useEffect(() => {
@@ -396,10 +419,13 @@ function HostStudioContent({
     };
   }, [webinarId]);
 
-  // Auto-scroll chat
+  // Auto-scroll chat (only if user is near the bottom)
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    const el = chatContainerRef.current;
+    if (!el) return;
+    const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+    if (isNearBottom) {
+      el.scrollTop = el.scrollHeight;
     }
   }, [chatMessages]);
 
@@ -415,11 +441,13 @@ function HostStudioContent({
 
   // Toggle audio
   const toggleAudio = useCallback(async () => {
+    if (!hmsActions) return;
     await hmsActions.setLocalAudioEnabled(!isAudioEnabled);
   }, [hmsActions, isAudioEnabled]);
 
   // Toggle video
   const toggleVideo = useCallback(async () => {
+    if (!hmsActions) return;
     await hmsActions.setLocalVideoEnabled(!isVideoEnabled);
   }, [hmsActions, isVideoEnabled]);
 
@@ -437,15 +465,14 @@ function HostStudioContent({
 
   // Toggle screen share
   const toggleScreenShare = useCallback(async () => {
-    if (isScreenSharing) {
-      await hmsActions.setScreenShareEnabled(false);
-    } else {
-      await hmsActions.setScreenShareEnabled(true);
-    }
+    if (!hmsActions) return;
+    await hmsActions.setScreenShareEnabled(!isScreenSharing);
   }, [hmsActions, isScreenSharing]);
 
-  // Handle go live
+  // Handle go live (ref guard prevents double-click race)
   const handleGoLive = useCallback(async () => {
+    if (!hmsActions || goLiveInFlight.current) return;
+    goLiveInFlight.current = true;
     try {
       setIsGoingLive(true);
       setError(null);
@@ -460,20 +487,25 @@ function HostStudioContent({
       setError(err instanceof Error ? err.message : "Failed to go live");
     } finally {
       setIsGoingLive(false);
+      goLiveInFlight.current = false;
     }
   }, [hmsActions, onGoLive]);
 
-  // Handle end webinar
+  // Handle end webinar (ref guard prevents double-click race)
   const handleEndWebinar = useCallback(async () => {
+    if (!hmsActions || endingInFlight.current) return;
     if (!confirm("Are you sure you want to end this webinar? This will disconnect all viewers."))
       return;
 
+    endingInFlight.current = true;
     try {
       setIsEnding(true);
       setError(null);
 
       // Stop HLS streaming
-      await hmsActions.stopHLSStreaming().catch(() => {});
+      await hmsActions.stopHLSStreaming().catch((err: unknown) => {
+        console.warn("Failed to stop HLS:", err);
+      });
 
       // Leave room
       await hmsActions.leave();
@@ -485,6 +517,7 @@ function HostStudioContent({
       setError(err instanceof Error ? err.message : "Failed to end webinar");
     } finally {
       setIsEnding(false);
+      endingInFlight.current = false;
     }
   }, [hmsActions, onEndWebinar]);
 
@@ -500,7 +533,7 @@ function HostStudioContent({
           action: "send",
           webinarId,
           message: chatInput.trim(),
-          email: "host@gynergy.app",
+          email: hostEmail,
           name: "Host",
           isHost: true,
         }),
@@ -512,7 +545,7 @@ function HostStudioContent({
     } finally {
       setIsSendingChat(false);
     }
-  }, [chatInput, isSendingChat, webinarId]);
+  }, [chatInput, isSendingChat, webinarId, hostEmail]);
 
   // Pin/unpin chat message
   const togglePinMessage = useCallback(async (messageId: string, isPinned: boolean) => {
@@ -726,11 +759,7 @@ function HostStudioContent({
             {/* Local video preview */}
             {localPeer?.videoTrack ? (
               <video
-                ref={(el) => {
-                  if (el && localPeer.videoTrack) {
-                    hmsActions.attachVideo(localPeer.videoTrack, el);
-                  }
-                }}
+                ref={videoRef}
                 autoPlay
                 muted
                 playsInline

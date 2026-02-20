@@ -33,6 +33,15 @@ function createTrackingPixel(emailId: string, recipientEmail: string, emailType:
   return `<img src="${BASE_URL}/api/email/track?type=open&id=${emailId}&email=${encodedEmail}&et=${emailType}" width="1" height="1" style="display:none;" alt="" />`;
 }
 
+// Escape text for ICS format per RFC 5545 Section 3.3.11
+function escapeICS(text: string): string {
+  return text
+    .replace(/\\/g, "\\\\") // backslash first
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\r?\n/g, "\\n");
+}
+
 // Generate ICS calendar file content
 function generateICSContent(params: {
   title: string;
@@ -67,21 +76,21 @@ UID:${uid}
 DTSTAMP:${now}
 DTSTART:${formatICSDate(startDate)}
 DTEND:${formatICSDate(endDate)}
-SUMMARY:${title}
-DESCRIPTION:${description.replace(/\n/g, "\\n")}
-LOCATION:${location}
-ORGANIZER;CN=${organizer}:mailto:hello@gynergy.app
+SUMMARY:${escapeICS(title)}
+DESCRIPTION:${escapeICS(description)}
+LOCATION:${escapeICS(location)}
+ORGANIZER;CN=${escapeICS(organizer)}:mailto:hello@gynergy.app
 STATUS:CONFIRMED
 SEQUENCE:0
 BEGIN:VALARM
 TRIGGER:-PT24H
 ACTION:DISPLAY
-DESCRIPTION:Reminder: ${title} tomorrow
+DESCRIPTION:Reminder: ${escapeICS(title)} tomorrow
 END:VALARM
 BEGIN:VALARM
 TRIGGER:-PT1H
 ACTION:DISPLAY
-DESCRIPTION:Reminder: ${title} in 1 hour
+DESCRIPTION:Reminder: ${escapeICS(title)} in 1 hour
 END:VALARM
 END:VEVENT
 END:VCALENDAR`;

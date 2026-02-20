@@ -276,8 +276,11 @@ export default function WebinarViewer({
   useEffect(() => {
     if (isLive) return;
 
+    // eslint-disable-next-line prefer-const
+    let intervalId: ReturnType<typeof setInterval>;
+
     const updateCountdown = () => {
-      const now = new Date().getTime();
+      const now = Date.now();
       const target = new Date(scheduledStart).getTime();
       const diff = target - now;
 
@@ -287,6 +290,8 @@ export default function WebinarViewer({
         if (Math.abs(diff) > 5 * 60 * 1000) {
           setIsHostLate(true);
         }
+        // Stop ticking — countdown is done
+        clearInterval(intervalId);
         return;
       }
 
@@ -299,9 +304,9 @@ export default function WebinarViewer({
     };
 
     updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
+    intervalId = setInterval(updateCountdown, 1000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(intervalId);
   }, [isLive, scheduledStart]);
 
   // Chat: initial fetch + Realtime subscription
@@ -351,10 +356,13 @@ export default function WebinarViewer({
     };
   }, [chatEnabled, webinarId]);
 
-  // Auto-scroll chat
+  // Auto-scroll chat (only if user is near the bottom)
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    const el = chatContainerRef.current;
+    if (!el) return;
+    const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 100;
+    if (isNearBottom) {
+      el.scrollTop = el.scrollHeight;
     }
   }, [chatMessages]);
 
@@ -387,7 +395,13 @@ export default function WebinarViewer({
           filter: `webinar_id=eq.${webinarId}`,
         },
         (payload) => {
-          if (payload.eventType === "DELETE") return;
+          if (payload.eventType === "DELETE") {
+            const deletedId = (payload.old as { id?: string })?.id;
+            if (deletedId) {
+              setQuestions((prev) => prev.filter((q) => q.id !== deletedId));
+            }
+            return;
+          }
           const updated = payload.new as Question;
           setQuestions((prev) => {
             const idx = prev.findIndex((q) => q.id === updated.id);
