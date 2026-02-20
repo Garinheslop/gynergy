@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 
 import {
   HMSRoomProvider,
@@ -140,13 +140,17 @@ function HostStudioContent({
   const [isEnding, setIsEnding] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [viewerCount, setViewerCount] = useState(0);
+  const joinedRef = useRef(false);
 
   const isLive = hlsState?.running || false;
 
-  // Join room on mount
+  // Join room on mount (ref guard prevents double-join from React strict mode)
   useEffect(() => {
+    if (!authToken || joinedRef.current) return;
+
     const joinRoom = async () => {
       try {
+        joinedRef.current = true;
         setIsJoining(true);
         setError(null);
 
@@ -155,27 +159,25 @@ function HostStudioContent({
           userName: "Host",
           settings: {
             isAudioMuted: true,
-            isVideoMuted: false,
+            isVideoMuted: true, // Start muted — host enables camera when ready
           },
         });
       } catch (err) {
         console.error("Failed to join studio:", err);
         setError(err instanceof Error ? err.message : "Failed to join studio");
+        joinedRef.current = false; // Allow retry on error
       } finally {
         setIsJoining(false);
       }
     };
 
-    if (authToken) {
-      joinRoom();
-    }
+    joinRoom();
 
     return () => {
-      if (isConnected) {
-        hmsActions.leave();
-      }
+      hmsActions.leave();
+      joinedRef.current = false;
     };
-  }, [authToken, hmsActions, isConnected]);
+  }, [authToken, hmsActions]);
 
   // Poll viewer count
   useEffect(() => {
