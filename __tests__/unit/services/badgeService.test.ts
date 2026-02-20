@@ -717,10 +717,16 @@ describe("Badge Service - Database Operations", () => {
         },
       ];
 
+      const mockResult = { data: mockNewBadges, error: null };
+      // order() returns an object whose eq() resolves with data
+      // This handles the optional .eq("session_id", ...) after .order()
+      const afterOrder = {
+        eq: vi.fn().mockResolvedValue(mockResult),
+      };
       const query = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
-        order: vi.fn().mockResolvedValue({ data: mockNewBadges, error: null }),
+        order: vi.fn().mockReturnValue(afterOrder),
       };
 
       const mockSupabase = { from: vi.fn(() => query) };

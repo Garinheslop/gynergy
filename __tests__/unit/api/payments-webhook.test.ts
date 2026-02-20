@@ -90,6 +90,7 @@ function createMockSupabase(tableResponses?: {
         .fn()
         .mockResolvedValue({ error: tableName === "purchases" ? responses.purchases.error : null }),
       update: vi.fn().mockReturnValue(chainable),
+      upsert: vi.fn().mockResolvedValue({ error: null }),
     };
   });
 
@@ -314,8 +315,12 @@ describe("Payments Webhook API Route", () => {
 
       expect(response.status).toBe(200);
       expect(data.received).toBe(true);
-      // Should not have made any database calls for unhandled events
-      expect(mockSupabase.from).not.toHaveBeenCalled();
+      // Should not have made any business table calls for unhandled events
+      // (webhook_events calls are expected for deduplication/tracking)
+      const businessCalls = mockSupabase.from.mock.calls.filter(
+        ([table]: [string]) => table !== "webhook_events"
+      );
+      expect(businessCalls).toHaveLength(0);
     });
 
     it("returns 500 when handler throws error", async () => {
@@ -347,8 +352,11 @@ describe("Payments Webhook API Route", () => {
       const response = await POST(request);
       const data = await response.json();
 
-      expect(response.status).toBe(500);
-      expect(data.error).toBe("Webhook handler failed");
+      // Route returns 200 to Stripe even on error (prevents retry storms)
+      // Failed events are stored in webhook_events for manual retry
+      expect(response.status).toBe(200);
+      expect(data.received).toBe(true);
+      expect(data.error).toBe("Handler failed, queued for retry");
     });
   });
 });
