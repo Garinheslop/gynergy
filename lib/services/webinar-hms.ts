@@ -81,7 +81,7 @@ export function generateBroadcasterToken(options: {
     access_key: HMS_ACCESS_KEY,
     room_id: roomId,
     user_id: userId,
-    role: "broadcaster", // Webinar host role
+    role: "host", // Maps to template's "host" role (can publish audio/video/screen)
     type: "app",
     version: 2,
     iat: Math.floor(Date.now() / 1000),
@@ -98,7 +98,7 @@ export function generateBroadcasterToken(options: {
     token,
     roomId,
     userId,
-    role: "broadcaster",
+    role: "host",
   };
 }
 
@@ -122,7 +122,7 @@ export function generateViewerToken(options: {
     access_key: HMS_ACCESS_KEY,
     room_id: roomId,
     user_id: userId,
-    role: "hls-viewer", // View-only role for HLS
+    role: "guest", // Maps to template's "guest" role (can view streams)
     type: "app",
     version: 2,
     iat: Math.floor(Date.now() / 1000),
@@ -139,7 +139,7 @@ export function generateViewerToken(options: {
     token,
     roomId,
     userId,
-    role: "hls-viewer",
+    role: "guest",
   };
 }
 

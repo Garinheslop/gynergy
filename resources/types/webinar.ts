@@ -190,7 +190,7 @@ export interface HMSWebinarToken {
   token: string;
   roomId: string;
   userId: string;
-  role: "broadcaster" | "hls-viewer";
+  role: "host" | "guest" | "co-host";
 }
 
 // ============================================
