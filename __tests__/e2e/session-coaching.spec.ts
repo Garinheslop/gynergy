@@ -215,7 +215,7 @@ test.describe("Session - Authenticated Flows", () => {
 
   // ─── Session Detail Page ──────────────────────
 
-  test("10 - Nonexistent session shows error, not-found, or loading", async ({ page }) => {
+  test("10 - Nonexistent session shows error with action buttons", async ({ page }) => {
     await page.goto(`${BASE_URL}/session/${FAKE_SESSION_ID}`, {
       waitUntil: "domcontentloaded",
       timeout: 30000,
@@ -226,42 +226,29 @@ test.describe("Session - Authenticated Flows", () => {
       return;
     }
 
-    // Wait for loading to resolve OR time out to loading state
-    // The page shows "Loading session..." until both profile + session fetch complete.
-    // For a fake session, the API returns 404 but Redux may hold loading=true.
+    // Wait for error state to render (API returns 404, error shows before loading gate)
     await page.waitForFunction(
       () => {
         const text = document.body?.innerText || "";
         return (
           text.includes("not found") ||
           text.includes("Session not found") ||
-          text.includes("error") ||
-          text.includes("Error") ||
           text.includes("Back to Sessions") ||
-          text.includes("Retry") ||
-          text.includes("Loading session")
+          text.includes("Retry")
         );
       },
       { timeout: 20000 }
     );
 
-    const pageText = await page.locator("body").innerText();
+    // Should show error message
+    const errorText = page.locator("text=/not found|Session not found/i");
+    await expect(errorText.first()).toBeVisible();
 
-    // "Loading session..." is a valid intermediate state (profile fetch gates the error render)
-    const isStillLoading = pageText.includes("Loading session");
-    const hasErrorState = /not found|error|failed/i.test(pageText) && !isStillLoading;
-
-    if (hasErrorState) {
-      // Error state should have actionable buttons
-      const backBtn = page.getByRole("button", { name: /Back to Sessions/i });
-      const retryBtn = page.getByRole("button", { name: /Retry/i });
-      const hasBackBtn = await backBtn.isVisible().catch(() => false);
-      const hasRetryBtn = await retryBtn.isVisible().catch(() => false);
-      expect(hasBackBtn || hasRetryBtn).toBe(true);
-    } else {
-      // Loading state means the API call resolved but page hasn't transitioned
-      expect(isStillLoading).toBe(true);
-    }
+    // Should have actionable buttons
+    const backBtn = page.getByRole("button", { name: /Back to Sessions/i });
+    const retryBtn = page.getByRole("button", { name: /Retry/i });
+    await expect(backBtn).toBeVisible();
+    await expect(retryBtn).toBeVisible();
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/10-session-nonexistent.png`,
@@ -269,7 +256,7 @@ test.describe("Session - Authenticated Flows", () => {
     });
   });
 
-  test("11 - Session detail page loads and has expected structure", async ({ page }) => {
+  test("11 - Session error page back button navigates to list", async ({ page }) => {
     await page.goto(`${BASE_URL}/session/${FAKE_SESSION_ID}`, {
       waitUntil: "domcontentloaded",
       timeout: 30000,
@@ -280,39 +267,20 @@ test.describe("Session - Authenticated Flows", () => {
       return;
     }
 
-    // Wait for page to render (loading or error state)
-    await page.waitForFunction(
-      () => {
-        const text = document.body?.innerText || "";
-        return (
-          text.includes("Loading session") || text.includes("not found") || text.includes("Retry")
-        );
-      },
-      { timeout: 20000 }
-    );
+    // Wait for error state
+    const backBtn = page.getByRole("button", { name: /Back to Sessions/i });
+    await expect(backBtn).toBeVisible({ timeout: 20000 });
 
-    const pageText = await page.locator("body").innerText();
-    const isStillLoading = pageText.includes("Loading session");
+    // Click back button
+    await backBtn.click();
+    await page.waitForTimeout(3000);
 
-    if (!isStillLoading) {
-      // If error rendered, test back button navigation
-      const backBtn = page.getByRole("button", { name: /Back to Sessions/i });
-      const hasBackBtn = await backBtn.isVisible().catch(() => false);
-
-      if (hasBackBtn) {
-        await backBtn.click();
-        await page.waitForTimeout(3000);
-        expect(page.url()).toContain("/session");
-        expect(page.url()).not.toContain(FAKE_SESSION_ID);
-      }
-    } else {
-      // Page is in loading state — verify spinner is visible
-      const spinner = page.locator(".animate-spin");
-      await expect(spinner).toBeVisible();
-    }
+    // Should navigate to session list
+    expect(page.url()).toContain("/session");
+    expect(page.url()).not.toContain(FAKE_SESSION_ID);
 
     await page.screenshot({
-      path: `${SCREENSHOT_DIR}/11-session-detail-structure.png`,
+      path: `${SCREENSHOT_DIR}/11-session-back-nav.png`,
       fullPage: false,
     });
   });
@@ -606,7 +574,7 @@ test.describe("Session Pages - Mobile", () => {
     });
   });
 
-  test("34 - Session detail renders on mobile (loading or error)", async ({ page }) => {
+  test("34 - Session detail error renders on mobile", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded", timeout: 30000 });
     await page.waitForTimeout(500);
     const auth = await authenticatePage(page, BASE_URL, AGENT_PRIMARY);
@@ -629,21 +597,13 @@ test.describe("Session Pages - Mobile", () => {
       return;
     }
 
-    // Wait for loading or error text to appear
-    await page.waitForFunction(
-      () => {
-        const text = document.body?.innerText || "";
-        return (
-          text.includes("Loading session") || text.includes("not found") || text.includes("Retry")
-        );
-      },
-      { timeout: 20000 }
-    );
+    // Wait for error state to render
+    const backBtn = page.getByRole("button", { name: /Back to Sessions/i });
+    await expect(backBtn).toBeVisible({ timeout: 20000 });
 
-    // Page should have session-related content (loading or error)
-    const pageText = await page.locator("body").innerText();
-    const hasContent = /Loading session|not found|error|failed|session|back|retry/i.test(pageText);
-    expect(hasContent).toBe(true);
+    // Error text visible
+    const errorText = page.locator("text=/not found/i");
+    await expect(errorText.first()).toBeVisible();
 
     // No horizontal overflow on mobile
     const hasOverflow = await page.evaluate(() => {
@@ -652,7 +612,7 @@ test.describe("Session Pages - Mobile", () => {
     expect(hasOverflow).toBe(false);
 
     await page.screenshot({
-      path: `${SCREENSHOT_DIR}/34-mobile-session-detail.png`,
+      path: `${SCREENSHOT_DIR}/34-mobile-session-detail-error.png`,
       fullPage: false,
     });
   });
@@ -712,7 +672,7 @@ test.describe("Session - Accessibility", () => {
     });
   });
 
-  test("36 - Session detail page uses proper semantic elements", async ({ page }) => {
+  test("36 - Session error page uses proper button semantics", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded", timeout: 30000 });
     await page.waitForTimeout(500);
     const auth = await authenticatePage(page, BASE_URL, AGENT_PRIMARY);
@@ -732,34 +692,16 @@ test.describe("Session - Accessibility", () => {
       return;
     }
 
-    // Wait for loading or error state
-    await page.waitForFunction(
-      () => {
-        const text = document.body?.innerText || "";
-        return (
-          text.includes("Loading session") || text.includes("not found") || text.includes("Retry")
-        );
-      },
-      { timeout: 20000 }
-    );
+    // Wait for error state
+    const backBtn = page.getByRole("button", { name: /Back to Sessions/i });
+    await expect(backBtn).toBeVisible({ timeout: 20000 });
 
-    const pageText = await page.locator("body").innerText();
-    const isStillLoading = pageText.includes("Loading session");
-
-    if (isStillLoading) {
-      // Loading state: spinner should be rendered with proper CSS animation
-      const spinner = page.locator(".animate-spin");
-      await expect(spinner).toBeVisible();
-      // Text content should be present
-      const loadingText = page.locator("text=Loading session");
-      await expect(loadingText).toBeVisible();
-    } else {
-      // Error state: buttons should use <button> elements (not styled divs)
-      const buttons = await page.locator("button").allTextContents();
-      const hasActionButtons =
-        buttons.some((t) => /Back to Sessions/i.test(t)) || buttons.some((t) => /Retry/i.test(t));
-      expect(hasActionButtons).toBe(true);
-    }
+    // Error buttons should use proper <button> elements (not styled divs)
+    const buttons = await page.locator("button").allTextContents();
+    const hasBack = buttons.some((t) => /Back to Sessions/i.test(t));
+    const hasRetry = buttons.some((t) => /Retry/i.test(t));
+    expect(hasBack).toBe(true);
+    expect(hasRetry).toBe(true);
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/36-session-error-a11y.png`,

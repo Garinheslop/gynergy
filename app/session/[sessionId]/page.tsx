@@ -115,19 +115,8 @@ export default function SessionRoomPage() {
     router.push("/session");
   }, [sessionId, endSession, router]);
 
-  // Loading state
-  if (currentSession.loading || !userProfile) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-900">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-teal-500 border-t-transparent" />
-          <p className="text-white">Loading session...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Error state
+  // Error state — check BEFORE loading gate so errors display immediately
+  // (don't wait for profile fetch to finish before showing a 404)
   if (currentSession.error || error) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-900">
@@ -147,6 +136,18 @@ export default function SessionRoomPage() {
               Retry
             </button>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading state — only show spinner if no error
+  if (currentSession.loading || !userProfile) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-900">
+        <div className="text-center">
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-teal-500 border-t-transparent" />
+          <p className="text-white">Loading session...</p>
         </div>
       </div>
     );
