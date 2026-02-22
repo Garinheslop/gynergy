@@ -117,7 +117,7 @@ test.describe("Community Detail - APIs (Authenticated)", () => {
   test("10 - GET community/events returns data", async () => {
     const { status, data } = await apiCall(authedPage, BASE_URL, "/api/community/events");
 
-    expect([200, 404, 500]).toContain(status);
+    expect([200, 500]).toContain(status);
     if (status === 200) {
       expect(data).toBeTruthy();
     }
@@ -126,7 +126,7 @@ test.describe("Community Detail - APIs (Authenticated)", () => {
   test("11 - GET community/referrals returns data", async () => {
     const { status, data } = await apiCall(authedPage, BASE_URL, "/api/community/referrals");
 
-    expect([200, 404, 500]).toContain(status);
+    expect([200, 500]).toContain(status);
     if (status === 200) {
       expect(data).toBeTruthy();
     }
@@ -135,7 +135,7 @@ test.describe("Community Detail - APIs (Authenticated)", () => {
   test("12 - GET community/stats returns data", async () => {
     const { status, data } = await apiCall(authedPage, BASE_URL, "/api/community/stats");
 
-    expect([200, 404, 500]).toContain(status);
+    expect([200, 500]).toContain(status);
     if (status === 200) {
       expect(data).toBeTruthy();
     }
@@ -144,8 +144,8 @@ test.describe("Community Detail - APIs (Authenticated)", () => {
   test("13 - GET community/comments needs postId", async () => {
     const { status } = await apiCall(authedPage, BASE_URL, "/api/community/comments");
 
-    // Missing postId should fail
-    expect([400, 404, 500]).toContain(status);
+    // Missing postId should return 400
+    expect(status).toBe(400);
   });
 
   test("14 - GET community/comments with fake postId", async () => {
@@ -155,8 +155,8 @@ test.describe("Community Detail - APIs (Authenticated)", () => {
       "/api/community/comments?postId=00000000-0000-0000-0000-000000000000"
     );
 
-    // Fake postId — returns empty or error
-    expect([200, 400, 404, 500]).toContain(status);
+    // Fake postId — returns empty result or not found
+    expect([200, 404]).toContain(status);
   });
 
   test("15 - POST community/reactions with fake postId", async () => {
@@ -218,13 +218,10 @@ test.describe("Community Detail - Post Detail Page", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await authedPage.waitForTimeout(5000);
+    await authedPage.waitForLoadState("networkidle").catch(() => {});
 
-    const url = authedPage.url();
-    if (!url.includes("/community") || url.includes("/login")) {
-      // Auth redirect — skip remaining post detail tests
-      return;
-    }
+    // AGENT_PRIMARY has challenge access — community should load
+    expect(authedPage.url()).toContain("/community");
 
     // Look for a clickable post link
     const postLink = authedPage.locator("a[href*='/community/post/']");
@@ -232,16 +229,16 @@ test.describe("Community Detail - Post Detail Page", () => {
 
     if (postCount > 0) {
       await postLink.first().click();
-      await authedPage.waitForTimeout(3000);
+      await authedPage.waitForLoadState("networkidle").catch(() => {});
 
       const newUrl = authedPage.url();
-      if (newUrl.includes("/community/post/")) {
-        postDetailLoaded = true;
-      }
+      expect(newUrl).toContain("/community/post/");
+      postDetailLoaded = true;
+    } else {
+      // No posts exist — verify the feed page itself loaded with content
+      const content = await authedPage.textContent("body");
+      expect(postCount > 0 || content!.length > 50).toBe(true);
     }
-
-    // Either navigated to post detail or no posts exist
-    expect(true).toBe(true);
 
     await authedPage.screenshot({
       path: `${SCREENSHOT_DIR}/18-post-detail-nav.png`,
@@ -276,7 +273,7 @@ test.describe("Community Detail - Post Detail Page", () => {
     );
     const iconCount = await icons.count();
 
-    expect(reactionCount + iconCount).toBeGreaterThanOrEqual(0);
+    expect(reactionCount + iconCount).toBeGreaterThanOrEqual(1);
 
     await authedPage.screenshot({
       path: `${SCREENSHOT_DIR}/20-post-reactions.png`,
@@ -335,12 +332,10 @@ test.describe("Community Detail - Member Profile", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await authedPage.waitForTimeout(5000);
+    await authedPage.waitForLoadState("networkidle").catch(() => {});
 
-    const url = authedPage.url();
-    if (!url.includes("/community") || url.includes("/login")) {
-      return;
-    }
+    // AGENT_PRIMARY has challenge access — community should load
+    expect(authedPage.url()).toContain("/community");
 
     // Look for member profile links
     const memberLink = authedPage.locator("a[href*='/community/member/']");
@@ -348,15 +343,16 @@ test.describe("Community Detail - Member Profile", () => {
 
     if (memberCount > 0) {
       await memberLink.first().click();
-      await authedPage.waitForTimeout(3000);
+      await authedPage.waitForLoadState("networkidle").catch(() => {});
 
       const newUrl = authedPage.url();
-      if (newUrl.includes("/community/member/")) {
-        profileLoaded = true;
-      }
+      expect(newUrl).toContain("/community/member/");
+      profileLoaded = true;
+    } else {
+      // No member links — verify the page itself loaded with content
+      const content = await authedPage.textContent("body");
+      expect(memberCount > 0 || content!.length > 50).toBe(true);
     }
-
-    expect(true).toBe(true);
 
     await authedPage.screenshot({
       path: `${SCREENSHOT_DIR}/22-member-profile-nav.png`,
@@ -396,7 +392,7 @@ test.describe("Community Detail - Member Profile", () => {
       .filter({ hasText: /message|encourage|connect|follow/i });
     const btnCount = await actionBtns.count();
 
-    expect(btnCount).toBeGreaterThanOrEqual(0);
+    expect(btnCount).toBeGreaterThanOrEqual(1);
 
     await authedPage.screenshot({
       path: `${SCREENSHOT_DIR}/24-member-profile-actions.png`,
@@ -437,7 +433,6 @@ test.describe("Community Detail - Events Tab", () => {
   test.describe.configure({ mode: "serial" });
 
   let authedPage: Page;
-  let eventsLoaded = false;
 
   test.beforeAll(async ({ browser }) => {
     const ctx = await browser.newContext();
@@ -456,17 +451,13 @@ test.describe("Community Detail - Events Tab", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await authedPage.waitForTimeout(5000);
+    await authedPage.waitForLoadState("networkidle").catch(() => {});
 
-    const url = authedPage.url();
-    if (url.includes("/community") && !url.includes("/login")) {
-      eventsLoaded = true;
-      const content = await authedPage.textContent("body");
-      expect(content!.length).toBeGreaterThan(50);
-    } else {
-      // Redirected — auth or challenge access issue (acceptable)
-      expect(url.length).toBeGreaterThan(0);
-    }
+    // AGENT_PRIMARY has challenge access — community should load
+    expect(authedPage.url()).toContain("/community");
+
+    const content = await authedPage.textContent("body");
+    expect(content!.length).toBeGreaterThan(50);
 
     await authedPage.screenshot({
       path: `${SCREENSHOT_DIR}/26-events-tab.png`,
@@ -475,19 +466,13 @@ test.describe("Community Detail - Events Tab", () => {
   });
 
   test("27 - Events tab shows event cards or empty state", async () => {
-    test.skip(!eventsLoaded, "Events tab did not load");
+    // Structural assertion: page has headings and substantial content
+    const headings = authedPage.locator("h1, h2, h3, h4");
+    const headingCount = await headings.count();
+    expect(headingCount).toBeGreaterThanOrEqual(1);
 
     const content = await authedPage.textContent("body");
-    const hasEvents =
-      content?.toLowerCase().includes("event") ||
-      content?.toLowerCase().includes("call") ||
-      content?.toLowerCase().includes("session") ||
-      content?.toLowerCase().includes("upcoming") ||
-      content?.toLowerCase().includes("schedule") ||
-      content?.toLowerCase().includes("no events") ||
-      content?.toLowerCase().includes("no upcoming");
-
-    expect(hasEvents).toBe(true);
+    expect(content!.length).toBeGreaterThan(100);
 
     await authedPage.screenshot({
       path: `${SCREENSHOT_DIR}/27-events-content.png`,
@@ -504,7 +489,6 @@ test.describe("Community Detail - Referrals Tab", () => {
   test.describe.configure({ mode: "serial" });
 
   let authedPage: Page;
-  let referralsLoaded = false;
 
   test.beforeAll(async ({ browser }) => {
     const ctx = await browser.newContext();
@@ -523,17 +507,13 @@ test.describe("Community Detail - Referrals Tab", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await authedPage.waitForTimeout(5000);
+    await authedPage.waitForLoadState("networkidle").catch(() => {});
 
-    const url = authedPage.url();
-    if (url.includes("/community") && !url.includes("/login")) {
-      referralsLoaded = true;
-      const content = await authedPage.textContent("body");
-      expect(content!.length).toBeGreaterThan(50);
-    } else {
-      // Redirected — auth or challenge access issue (acceptable)
-      expect(url.length).toBeGreaterThan(0);
-    }
+    // AGENT_PRIMARY has challenge access — community should load
+    expect(authedPage.url()).toContain("/community");
+
+    const content = await authedPage.textContent("body");
+    expect(content!.length).toBeGreaterThan(50);
 
     await authedPage.screenshot({
       path: `${SCREENSHOT_DIR}/28-referrals-tab.png`,
@@ -542,18 +522,13 @@ test.describe("Community Detail - Referrals Tab", () => {
   });
 
   test("29 - Referrals tab shows referral content or empty state", async () => {
-    test.skip(!referralsLoaded, "Referrals tab did not load");
+    // Structural assertion: page has headings and substantial content
+    const headings = authedPage.locator("h1, h2, h3, h4");
+    const headingCount = await headings.count();
+    expect(headingCount).toBeGreaterThanOrEqual(1);
 
     const content = await authedPage.textContent("body");
-    const hasReferrals =
-      content?.toLowerCase().includes("referral") ||
-      content?.toLowerCase().includes("invite") ||
-      content?.toLowerCase().includes("share") ||
-      content?.toLowerCase().includes("earn") ||
-      content?.toLowerCase().includes("link") ||
-      content?.toLowerCase().includes("no referral");
-
-    expect(hasReferrals).toBe(true);
+    expect(content!.length).toBeGreaterThan(100);
 
     await authedPage.screenshot({
       path: `${SCREENSHOT_DIR}/29-referrals-content.png`,
@@ -588,8 +563,8 @@ test.describe("Community Detail - Member API", () => {
       "/api/community/members/00000000-0000-0000-0000-000000000000"
     );
 
-    // Fake member ID should fail
-    expect([404, 400, 500]).toContain(status);
+    // Fake member ID should fail with client error
+    expect([400, 404]).toContain(status);
   });
 });
 
@@ -609,14 +584,14 @@ test.describe("Community Detail - Mobile", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(5000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
-    const url = page.url();
-    if (url.includes("/community") && !url.includes("/login")) {
-      const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
-      const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
-      expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 5);
-    }
+    // AGENT_PRIMARY has challenge access — community should load
+    expect(page.url()).toContain("/community");
+
+    const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
+    expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 5);
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/32-community-events-mobile.png`,
@@ -639,14 +614,14 @@ test.describe("Community Detail - Accessibility", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(5000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
-    const url = page.url();
-    if (url.includes("/community") && !url.includes("/login")) {
-      const interactive = page.locator("button, a[href]");
-      const count = await interactive.count();
-      expect(count).toBeGreaterThanOrEqual(3);
-    }
+    // AGENT_PRIMARY has challenge access — community should load
+    expect(page.url()).toContain("/community");
+
+    const interactive = page.locator("button, a[href]");
+    const count = await interactive.count();
+    expect(count).toBeGreaterThanOrEqual(3);
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/33-community-a11y.png`,

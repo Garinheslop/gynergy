@@ -14,6 +14,7 @@
 
 import { expect, test, Page } from "@playwright/test";
 
+import { CONTENT_ROUTES } from "./helpers/agent-capabilities";
 import { authenticatePage, apiCall, AGENT_PRIMARY } from "./helpers/auth";
 
 const SCREENSHOT_DIR = "test-results/courses-library";
@@ -30,14 +31,8 @@ test.describe("Courses/Library - Access Control", () => {
       timeout: 30000,
     });
 
-    await page.waitForTimeout(5000);
-    const url = page.url();
-    expect(
-      url.includes("/login") ||
-        url.includes("/courses") ||
-        url === `${BASE_URL}/` ||
-        url === BASE_URL
-    ).toBe(true);
+    await page.waitForURL("**/login**", { timeout: 15000 });
+    expect(page.url()).toContain("/login");
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/01-courses-redirect.png`,
@@ -51,14 +46,8 @@ test.describe("Courses/Library - Access Control", () => {
       timeout: 30000,
     });
 
-    await page.waitForTimeout(5000);
-    const url = page.url();
-    expect(
-      url.includes("/login") ||
-        url.includes("/library") ||
-        url === `${BASE_URL}/` ||
-        url === BASE_URL
-    ).toBe(true);
+    await page.waitForURL("**/login**", { timeout: 15000 });
+    expect(page.url()).toContain("/login");
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/02-library-redirect.png`,
@@ -72,14 +61,8 @@ test.describe("Courses/Library - Access Control", () => {
       timeout: 30000,
     });
 
-    await page.waitForTimeout(5000);
-    const url = page.url();
-    expect(
-      url.includes("/login") ||
-        url.includes("/courses") ||
-        url === `${BASE_URL}/` ||
-        url === BASE_URL
-    ).toBe(true);
+    await page.waitForURL("**/login**", { timeout: 15000 });
+    expect(page.url()).toContain("/login");
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/03-course-detail-redirect.png`,
@@ -93,14 +76,8 @@ test.describe("Courses/Library - Access Control", () => {
       timeout: 30000,
     });
 
-    await page.waitForTimeout(5000);
-    const url = page.url();
-    expect(
-      url.includes("/login") ||
-        url.includes("/courses") ||
-        url === `${BASE_URL}/` ||
-        url === BASE_URL
-    ).toBe(true);
+    await page.waitForURL("**/login**", { timeout: 15000 });
+    expect(page.url()).toContain("/login");
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/04-course-editor-redirect.png`,
@@ -116,44 +93,44 @@ test.describe("Courses/Library - Access Control", () => {
 test.describe("Content - API Auth (Unauthenticated)", () => {
   test("05 - GET content/list-courses requires auth", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
-    const { status } = await apiCall(page, BASE_URL, "/api/content/list-courses");
-    expect([401, 403]).toContain(status);
+    const { status } = await apiCall(page, BASE_URL, CONTENT_ROUTES.listCourses);
+    expect(status).toBe(401);
   });
 
   test("06 - GET content/list-content requires auth", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
-    const { status } = await apiCall(page, BASE_URL, "/api/content/list-content");
-    expect([401, 403]).toContain(status);
+    const { status } = await apiCall(page, BASE_URL, CONTENT_ROUTES.listContent);
+    expect(status).toBe(401);
   });
 
   test("07 - GET content/get-course requires auth", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
-    const { status } = await apiCall(page, BASE_URL, "/api/content/get-course?courseId=fake");
-    expect([401, 403]).toContain(status);
+    const { status } = await apiCall(page, BASE_URL, `${CONTENT_ROUTES.getCourse}?courseId=fake`);
+    expect(status).toBe(401);
   });
 
   test("08 - POST content/create-course requires auth", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
-    const { status } = await apiCall(page, BASE_URL, "/api/content/create-course", {
+    const { status } = await apiCall(page, BASE_URL, CONTENT_ROUTES.createCourse, {
       method: "POST",
       body: { title: "Test Course" },
     });
-    expect([401, 403]).toContain(status);
+    expect(status).toBe(401);
   });
 
   test("09 - POST content/enroll requires auth", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
-    const { status } = await apiCall(page, BASE_URL, "/api/content/enroll", {
+    const { status } = await apiCall(page, BASE_URL, CONTENT_ROUTES.enroll, {
       method: "POST",
       body: { courseId: "fake" },
     });
-    expect([401, 403]).toContain(status);
+    expect(status).toBe(401);
   });
 
   test("10 - GET content/get-bookmarks requires auth", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
-    const { status } = await apiCall(page, BASE_URL, "/api/content/get-bookmarks");
-    expect([401, 403]).toContain(status);
+    const { status } = await apiCall(page, BASE_URL, CONTENT_ROUTES.getBookmarks);
+    expect(status).toBe(401);
   });
 });
 
@@ -179,20 +156,30 @@ test.describe("Content - API Auth (Authenticated)", () => {
   });
 
   test("11 - GET content/list-courses returns data", async () => {
-    const { status, data } = await apiCall(authedPage, BASE_URL, "/api/content/list-courses");
+    const { status, data } = await apiCall(authedPage, BASE_URL, CONTENT_ROUTES.listCourses);
 
-    expect([200, 404, 500]).toContain(status);
+    // list-courses may return 500 due to a known server-side issue (not an auth problem).
+    // Accept both 200 (working) and 500 (known server error) as valid outcomes.
+    expect([200, 500]).toContain(status);
+
     if (status === 200) {
-      expect(data).toBeTruthy();
+      const body = data as Record<string, unknown>;
+      expect(body).toBeTruthy();
+      expect(body.success === true || body.data !== undefined).toBe(true);
     }
   });
 
   test("12 - GET content/list-content returns data", async () => {
-    const { status, data } = await apiCall(authedPage, BASE_URL, "/api/content/list-content");
+    const { status, data } = await apiCall(authedPage, BASE_URL, CONTENT_ROUTES.listContent);
 
-    expect([200, 404, 500]).toContain(status);
+    // list-content may return 500 due to a known server-side issue (not an auth problem).
+    // Accept both 200 (working) and 500 (known server error) as valid outcomes.
+    expect([200, 500]).toContain(status);
+
     if (status === 200) {
-      expect(data).toBeTruthy();
+      const body = data as Record<string, unknown>;
+      expect(body).toBeTruthy();
+      expect(body.success === true || body.data !== undefined).toBe(true);
     }
   });
 
@@ -200,33 +187,43 @@ test.describe("Content - API Auth (Authenticated)", () => {
     const { status } = await apiCall(
       authedPage,
       BASE_URL,
-      "/api/content/get-course?courseId=00000000-0000-0000-0000-000000000000"
+      `${CONTENT_ROUTES.getCourse}?courseId=00000000-0000-0000-0000-000000000000`
     );
 
-    expect([404, 400, 500]).toContain(status);
+    // A fake course ID should return 400 (bad request) or 404 (not found).
+    // 500 is NOT acceptable here — it would indicate unhandled error logic.
+    expect([400, 404]).toContain(status);
   });
 
   test("14 - GET content/get-bookmarks returns data", async () => {
-    const { status } = await apiCall(authedPage, BASE_URL, "/api/content/get-bookmarks");
+    const { status, data } = await apiCall(authedPage, BASE_URL, CONTENT_ROUTES.getBookmarks);
 
-    expect([200, 404, 500]).toContain(status);
+    expect(status).toBe(200);
+
+    const body = data as Record<string, unknown>;
+    expect(body).toBeTruthy();
+    expect(body.success === true || body.data !== undefined).toBe(true);
   });
 
   test("15 - POST content/enroll with fake courseId fails", async () => {
-    const { status } = await apiCall(authedPage, BASE_URL, "/api/content/enroll", {
+    const { status } = await apiCall(authedPage, BASE_URL, CONTENT_ROUTES.enroll, {
       method: "POST",
       body: { courseId: "00000000-0000-0000-0000-000000000000" },
     });
 
+    // Enrolling with a non-existent courseId may fail with 400/404 (validation)
+    // or 500 (FK constraint violation at the database level).
     expect([400, 404, 500]).toContain(status);
   });
 
   test("16 - POST content/add-bookmark with fake contentId fails", async () => {
-    const { status } = await apiCall(authedPage, BASE_URL, "/api/content/add-bookmark", {
+    const { status } = await apiCall(authedPage, BASE_URL, CONTENT_ROUTES.addBookmark, {
       method: "POST",
       body: { contentId: "00000000-0000-0000-0000-000000000000" },
     });
 
+    // Adding a bookmark with a non-existent contentId may fail with 400/404 (validation)
+    // or 500 (FK constraint violation at the database level).
     expect([400, 404, 500]).toContain(status);
   });
 });
@@ -243,7 +240,7 @@ test.describe("Quiz - APIs", () => {
       BASE_URL,
       "/api/courses/quiz?type=get-quiz-by-lesson&lessonId=fake"
     );
-    expect([401, 403]).toContain(status);
+    expect(status).toBe(401);
   });
 
   test("18 - POST quiz start-attempt requires auth", async ({ page }) => {
@@ -252,7 +249,7 @@ test.describe("Quiz - APIs", () => {
       method: "POST",
       body: { type: "start-attempt", quizId: "fake" },
     });
-    expect([401, 403]).toContain(status);
+    expect(status).toBe(401);
   });
 
   test("19 - GET quiz with fake lessonId returns error (authed)", async ({ page }) => {
@@ -278,7 +275,6 @@ test.describe("Courses - Page (Authenticated)", () => {
   test.describe.configure({ mode: "serial" });
 
   let authedPage: Page;
-  let coursesLoaded = false;
 
   test.beforeAll(async ({ browser }) => {
     const ctx = await browser.newContext();
@@ -297,17 +293,13 @@ test.describe("Courses - Page (Authenticated)", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await authedPage.waitForTimeout(5000);
+    await authedPage.waitForLoadState("networkidle").catch(() => {});
 
-    const url = authedPage.url();
-    if (url.includes("/courses") && !url.includes("/login")) {
-      coursesLoaded = true;
-      const content = await authedPage.textContent("body");
-      expect(content!.length).toBeGreaterThan(20);
-    } else {
-      // Redirect — acceptable
-      expect(url.length).toBeGreaterThan(0);
-    }
+    // AGENT_PRIMARY has challenge access, so the courses page should load directly.
+    expect(authedPage.url()).toContain("/courses");
+
+    const content = await authedPage.textContent("body");
+    expect(content!.length).toBeGreaterThan(50);
 
     await authedPage.screenshot({
       path: `${SCREENSHOT_DIR}/20-courses-page.png`,
@@ -315,19 +307,14 @@ test.describe("Courses - Page (Authenticated)", () => {
     });
   });
 
-  test("21 - Courses page shows course cards or empty state", async () => {
-    test.skip(!coursesLoaded, "Courses page did not load");
+  test("21 - Courses page has structural content", async () => {
+    // Verify the page has meaningful heading structure and content,
+    // regardless of whether courses exist yet.
+    const headings = authedPage.locator("h1, h2, h3");
+    expect(await headings.count()).toBeGreaterThanOrEqual(1);
 
     const content = await authedPage.textContent("body");
-    const hasCourses =
-      content?.toLowerCase().includes("course") ||
-      content?.toLowerCase().includes("enroll") ||
-      content?.toLowerCase().includes("lesson") ||
-      content?.toLowerCase().includes("module") ||
-      content?.toLowerCase().includes("no courses") ||
-      content?.toLowerCase().includes("create");
-
-    expect(hasCourses).toBe(true);
+    expect(content!.length).toBeGreaterThan(50);
 
     await authedPage.screenshot({
       path: `${SCREENSHOT_DIR}/21-courses-cards.png`,
@@ -344,7 +331,6 @@ test.describe("Library - Page (Authenticated)", () => {
   test.describe.configure({ mode: "serial" });
 
   let authedPage: Page;
-  let libraryLoaded = false;
 
   test.beforeAll(async ({ browser }) => {
     const ctx = await browser.newContext();
@@ -363,16 +349,13 @@ test.describe("Library - Page (Authenticated)", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await authedPage.waitForTimeout(5000);
+    await authedPage.waitForLoadState("networkidle").catch(() => {});
 
-    const url = authedPage.url();
-    if (url.includes("/library") && !url.includes("/login")) {
-      libraryLoaded = true;
-      const content = await authedPage.textContent("body");
-      expect(content!.length).toBeGreaterThan(20);
-    } else {
-      expect(url.length).toBeGreaterThan(0);
-    }
+    // AGENT_PRIMARY has challenge access, so the library page should load directly.
+    expect(authedPage.url()).toContain("/library");
+
+    const content = await authedPage.textContent("body");
+    expect(content!.length).toBeGreaterThan(50);
 
     await authedPage.screenshot({
       path: `${SCREENSHOT_DIR}/22-library-page.png`,
@@ -381,8 +364,6 @@ test.describe("Library - Page (Authenticated)", () => {
   });
 
   test("23 - Library page has search and filter controls", async () => {
-    test.skip(!libraryLoaded, "Library page did not load");
-
     const searchInput = authedPage.locator(
       "input[type='search'], input[placeholder*='search' i], input[type='text']"
     );
@@ -401,19 +382,14 @@ test.describe("Library - Page (Authenticated)", () => {
     });
   });
 
-  test("24 - Library page shows content or empty state", async () => {
-    test.skip(!libraryLoaded, "Library page did not load");
+  test("24 - Library page has structural content", async () => {
+    // Verify the page has meaningful heading structure and content,
+    // regardless of whether library items exist yet.
+    const headings = authedPage.locator("h1, h2, h3");
+    expect(await headings.count()).toBeGreaterThanOrEqual(1);
 
     const content = await authedPage.textContent("body");
-    const hasContent =
-      content?.toLowerCase().includes("library") ||
-      content?.toLowerCase().includes("content") ||
-      content?.toLowerCase().includes("video") ||
-      content?.toLowerCase().includes("document") ||
-      content?.toLowerCase().includes("upload") ||
-      content?.toLowerCase().includes("no content");
-
-    expect(hasContent).toBe(true);
+    expect(content!.length).toBeGreaterThan(50);
 
     await authedPage.screenshot({
       path: `${SCREENSHOT_DIR}/24-library-content.png`,
@@ -438,13 +414,13 @@ test.describe("Courses/Library - Mobile", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(5000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
-    if (page.url().includes("/courses")) {
-      const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
-      const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
-      expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 5);
-    }
+    expect(page.url()).toContain("/courses");
+
+    const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
+    expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 5);
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/25-courses-mobile.png`,
@@ -467,12 +443,12 @@ test.describe("Courses/Library - Accessibility", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(5000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
-    if (page.url().includes("/courses")) {
-      const headings = page.locator("h1, h2, h3");
-      expect(await headings.count()).toBeGreaterThanOrEqual(1);
-    }
+    expect(page.url()).toContain("/courses");
+
+    const headings = page.locator("h1, h2, h3");
+    expect(await headings.count()).toBeGreaterThanOrEqual(1);
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/26-courses-a11y.png`,
@@ -489,13 +465,13 @@ test.describe("Courses/Library - Accessibility", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(5000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
-    if (page.url().includes("/library")) {
-      const interactive = page.locator("button, a[href], input");
-      const count = await interactive.count();
-      expect(count).toBeGreaterThanOrEqual(2);
-    }
+    expect(page.url()).toContain("/library");
+
+    const interactive = page.locator("button, a[href], input");
+    const count = await interactive.count();
+    expect(count).toBeGreaterThanOrEqual(2);
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/27-library-a11y.png`,

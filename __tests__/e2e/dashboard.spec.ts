@@ -6,12 +6,17 @@
  * - Journal dashboard: vision cards, journal cards, growth/leaderboard
  * - History page: journal history grid, card navigation
  * - Journal APIs: create/read validation, auth requirements
+ * - Book & action APIs: auth requirements, response shapes
  * - Mobile responsiveness
  * - Accessibility
+ *
+ * AGENT_PRIMARY state (verified via diagnostic):
+ *   IS_ADMIN: true | HAS_CHALLENGE_ACCESS: true | HAS_AI_CONSENT: false
  */
 
 import { expect, test, Page } from "@playwright/test";
 
+import { BOOK_ROUTES, JOURNAL_ROUTES } from "./helpers/agent-capabilities";
 import { authenticatePage, apiCall, AGENT_PRIMARY } from "./helpers/auth";
 
 const SCREENSHOT_DIR = "test-results/dashboard";
@@ -77,7 +82,6 @@ test.describe("Dashboard - Authenticated", () => {
   test.describe.configure({ mode: "serial" });
 
   let authedPage: Page;
-  let dashboardLoaded = false;
 
   test.beforeAll(async ({ browser }) => {
     const ctx = await browser.newContext();
@@ -96,27 +100,21 @@ test.describe("Dashboard - Authenticated", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await authedPage.waitForTimeout(7000);
+    await authedPage.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
 
-    const url = authedPage.url();
+    // AGENT_PRIMARY has challenge access — dashboard must load
+    expect(authedPage.url()).toContain(BOOK_SLUG);
 
-    if (url.includes(BOOK_SLUG) && !url.includes("/login") && !url.includes("/pricing")) {
-      dashboardLoaded = true;
-      await authedPage.screenshot({
-        path: `${SCREENSHOT_DIR}/04-dashboard.png`,
-        fullPage: false,
-      });
-    } else {
-      // Challenge access redirect — acceptable
-      expect(url.includes("/login") || url.includes("/pricing") || url === `${BASE_URL}/`).toBe(
-        true
-      );
-    }
+    const content = await authedPage.textContent("body");
+    expect(content!.length).toBeGreaterThan(100);
+
+    await authedPage.screenshot({
+      path: `${SCREENSHOT_DIR}/04-dashboard.png`,
+      fullPage: false,
+    });
   });
 
   test("05 - Dashboard shows journal section", async () => {
-    test.skip(!dashboardLoaded, "Dashboard did not load (auth/access redirect)");
-
     // Journal section should have morning/evening/weekly options
     const journalText = authedPage.locator("text=/morning|evening|journal|gratitude|weekly/i");
     const journalCount = await journalText.count();
@@ -129,10 +127,10 @@ test.describe("Dashboard - Authenticated", () => {
   });
 
   test("06 - Dashboard has navigation header", async () => {
-    test.skip(!dashboardLoaded, "Dashboard did not load (auth/access redirect)");
-
     // Nav should have Community and Journaling History links
-    const navLinks = authedPage.locator("text=/community|journaling history|history/i");
+    const navLinks = authedPage.locator(
+      "nav a, header a, a[href*='community'], a[href*='history']"
+    );
     const navCount = await navLinks.count();
     expect(navCount).toBeGreaterThanOrEqual(1);
 
@@ -142,26 +140,13 @@ test.describe("Dashboard - Authenticated", () => {
     });
   });
 
-  test("07 - Dashboard shows vision section or onboarding", async () => {
-    test.skip(!dashboardLoaded, "Dashboard did not load (auth/access redirect)");
+  test("07 - Dashboard shows substantial content", async () => {
+    // Should have headings and meaningful content loaded
+    const headings = authedPage.locator("h1, h2, h3");
+    expect(await headings.count()).toBeGreaterThanOrEqual(1);
 
-    // Should show either vision cards or onboarding content
     const content = await authedPage.textContent("body");
-    const hasVisions =
-      content?.toLowerCase().includes("highest self") ||
-      content?.toLowerCase().includes("mantra") ||
-      content?.toLowerCase().includes("creed") ||
-      content?.toLowerCase().includes("vision");
-    const hasOnboarding =
-      content?.toLowerCase().includes("get started") ||
-      content?.toLowerCase().includes("welcome") ||
-      content?.toLowerCase().includes("begin");
-    const hasDashboard =
-      content?.toLowerCase().includes("journal") ||
-      content?.toLowerCase().includes("day ") ||
-      content?.toLowerCase().includes("congratulations");
-
-    expect(hasVisions || hasOnboarding || hasDashboard).toBe(true);
+    expect(content!.length).toBeGreaterThan(100);
 
     await authedPage.screenshot({
       path: `${SCREENSHOT_DIR}/07-visions-or-onboarding.png`,
@@ -193,19 +178,19 @@ test.describe("Dashboard - Journal APIs", () => {
 
   test("08 - GET user-daily-journals requires auth", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
-    const { status } = await apiCall(page, BASE_URL, "/api/journals/user-daily-journals");
+    const { status } = await apiCall(page, BASE_URL, JOURNAL_ROUTES.userDailyJournals);
     expect(status).toBe(401);
   });
 
   test("09 - GET user-daily-journals needs sessionId param", async () => {
-    const { status } = await apiCall(authedPage, BASE_URL, "/api/journals/user-daily-journals");
-    // Missing sessionId → should error
-    expect([400, 500]).toContain(status);
+    const { status } = await apiCall(authedPage, BASE_URL, JOURNAL_ROUTES.userDailyJournals);
+    // Missing sessionId → should return 400 (bad request)
+    expect(status).toBe(400);
   });
 
   test("10 - POST create-morning-journal requires auth", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
-    const { status } = await apiCall(page, BASE_URL, "/api/journals/create-morning-journal", {
+    const { status } = await apiCall(page, BASE_URL, JOURNAL_ROUTES.createMorningJournal, {
       method: "POST",
       body: {},
     });
@@ -216,7 +201,7 @@ test.describe("Dashboard - Journal APIs", () => {
     const { status, data } = await apiCall(
       authedPage,
       BASE_URL,
-      "/api/journals/create-morning-journal",
+      JOURNAL_ROUTES.createMorningJournal,
       {
         method: "POST",
         body: { sessionId: "00000000-0000-0000-0000-000000000000" },
@@ -224,16 +209,14 @@ test.describe("Dashboard - Journal APIs", () => {
     );
 
     // Should fail validation (missing affirmations, gratitudes, etc.)
-    expect([400, 422, 500]).toContain(status);
-    if (status === 400) {
-      const typed = data as { error: unknown };
-      expect(typed).toHaveProperty("error");
-    }
+    expect([400, 422]).toContain(status);
+    const typed = data as { error: unknown };
+    expect(typed).toHaveProperty("error");
   });
 
   test("12 - POST create-evening-journal requires auth", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
-    const { status } = await apiCall(page, BASE_URL, "/api/journals/create-evening-journal", {
+    const { status } = await apiCall(page, BASE_URL, JOURNAL_ROUTES.createEveningJournal, {
       method: "POST",
       body: {},
     });
@@ -242,7 +225,7 @@ test.describe("Dashboard - Journal APIs", () => {
 
   test("13 - POST create-weekly-journal requires auth", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
-    const { status } = await apiCall(page, BASE_URL, "/api/journals/create-weekly-journal", {
+    const { status } = await apiCall(page, BASE_URL, JOURNAL_ROUTES.createWeeklyJournal, {
       method: "POST",
       body: {},
     });
@@ -251,7 +234,7 @@ test.describe("Dashboard - Journal APIs", () => {
 
   test("14 - PATCH update-journal requires auth", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
-    const { status } = await apiCall(page, BASE_URL, "/api/journals/update-journal", {
+    const { status } = await apiCall(page, BASE_URL, JOURNAL_ROUTES.updateJournal, {
       method: "PATCH",
       body: { journalId: "fake-id" },
     });
@@ -260,7 +243,7 @@ test.describe("Dashboard - Journal APIs", () => {
 
   test("15 - DELETE delete-journal requires auth", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
-    const { status } = await apiCall(page, BASE_URL, "/api/journals/delete-journal", {
+    const { status } = await apiCall(page, BASE_URL, JOURNAL_ROUTES.deleteJournal, {
       method: "DELETE",
       body: { journalId: "fake-id" },
     });
@@ -294,7 +277,7 @@ test.describe("Dashboard - Book & Action APIs", () => {
     const { status } = await apiCall(
       page,
       BASE_URL,
-      `/api/books/get-latest-book-session?bookSlug=${BOOK_SLUG}`
+      `${BOOK_ROUTES.latestBookSessions}?bookSlug=${BOOK_SLUG}`
     );
     expect(status).toBe(401);
   });
@@ -303,11 +286,11 @@ test.describe("Dashboard - Book & Action APIs", () => {
     const { status, data } = await apiCall(
       authedPage,
       BASE_URL,
-      `/api/books/get-latest-book-session?bookSlug=${BOOK_SLUG}`
+      `${BOOK_ROUTES.latestBookSessions}?bookSlug=${BOOK_SLUG}`
     );
 
-    // Should succeed or return structured error
-    expect([200, 404, 500]).toContain(status);
+    // AGENT_PRIMARY has challenge access — should succeed or return known server error
+    expect([200, 500]).toContain(status);
     if (status === 200) {
       const typed = data as { book: unknown };
       expect(typed).toHaveProperty("book");
@@ -351,14 +334,14 @@ test.describe("Dashboard - Mobile", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(7000);
+    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
 
-    const url = page.url();
-    if (url.includes(BOOK_SLUG) && !url.includes("/login")) {
-      const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
-      const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
-      expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 5);
-    }
+    // AGENT_PRIMARY has challenge access — dashboard must load
+    expect(page.url()).toContain(BOOK_SLUG);
+
+    const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
+    expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 5);
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/20-dashboard-mobile.png`,
@@ -381,15 +364,14 @@ test.describe("Dashboard - Accessibility", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(7000);
+    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
 
-    const url = page.url();
-    if (url.includes(BOOK_SLUG) && !url.includes("/login")) {
-      // Should have clickable elements (buttons, links)
-      const interactive = page.locator("button, a[href]");
-      const count = await interactive.count();
-      expect(count).toBeGreaterThanOrEqual(3);
-    }
+    expect(page.url()).toContain(BOOK_SLUG);
+
+    // Should have clickable elements (buttons, links)
+    const interactive = page.locator("button, a[href]");
+    const count = await interactive.count();
+    expect(count).toBeGreaterThanOrEqual(3);
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/21-dashboard-a11y.png`,
@@ -406,16 +388,15 @@ test.describe("Dashboard - Accessibility", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(7000);
+    await page.waitForLoadState("networkidle", { timeout: 15000 }).catch(() => {});
 
-    const url = page.url();
-    if (url.includes(BOOK_SLUG) && !url.includes("/login")) {
-      await page.keyboard.press("Tab");
-      await page.keyboard.press("Tab");
+    expect(page.url()).toContain(BOOK_SLUG);
 
-      const focusedTag = await page.evaluate(() => document.activeElement?.tagName);
-      expect(["INPUT", "BUTTON", "A", "SELECT", "TEXTAREA", "DIV"]).toContain(focusedTag);
-    }
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Tab");
+
+    const focusedTag = await page.evaluate(() => document.activeElement?.tagName);
+    expect(["INPUT", "BUTTON", "A", "SELECT", "TEXTAREA", "DIV"]).toContain(focusedTag);
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/22-dashboard-keyboard.png`,

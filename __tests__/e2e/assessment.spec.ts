@@ -29,7 +29,7 @@ test.describe("Assessment - Intro Page", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     const content = await page.textContent("body");
     const hasIntroContent =
@@ -51,7 +51,7 @@ test.describe("Assessment - Intro Page", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     const startBtn = page.locator("button, a").filter({ hasText: /start|begin|take|retake/i });
     const btnCount = await startBtn.count();
@@ -68,7 +68,7 @@ test.describe("Assessment - Intro Page", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     const content = await page.textContent("body");
     const hasEstimate =
@@ -116,7 +116,7 @@ test.describe("Assessment - Question Flow", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await assessmentPage.waitForTimeout(3000);
+    await assessmentPage.waitForLoadState("networkidle").catch(() => {});
 
     // Clear any previous progress
     await assessmentPage.evaluate(() => {
@@ -128,7 +128,7 @@ test.describe("Assessment - Question Flow", () => {
     expect(btnCount).toBeGreaterThanOrEqual(1);
 
     await startBtn.first().click();
-    await assessmentPage.waitForTimeout(2000);
+    await assessmentPage.waitForLoadState("networkidle").catch(() => {});
 
     // Should now show question content
     const content = await assessmentPage.textContent("body");
@@ -143,10 +143,9 @@ test.describe("Assessment - Question Flow", () => {
       content?.toLowerCase().includes("freedom") ||
       content?.toLowerCase().includes("dream");
 
-    if (hasQuestionContent) {
-      questionsReached = true;
-    }
+    // Fail hard if questions don't appear — downstream tests depend on this
     expect(hasQuestionContent).toBe(true);
+    questionsReached = true;
 
     await assessmentPage.screenshot({
       path: `${SCREENSHOT_DIR}/04-assessment-question-1.png`,
@@ -191,15 +190,11 @@ test.describe("Assessment - Question Flow", () => {
       await assessmentPage.waitForTimeout(500);
     }
 
-    // Should have a Next or Continue button
+    // Should have a Next or Continue button after selecting an option
     const nextBtn = assessmentPage.locator("button").filter({ hasText: /next|continue|→/i });
     const nextCount = await nextBtn.count();
 
-    // Some assessments auto-advance, so check either next button or new question
-    const content = await assessmentPage.textContent("body");
-    const hasProgress = nextCount >= 1 || content?.includes("2");
-
-    expect(hasProgress).toBe(true);
+    expect(nextCount).toBeGreaterThanOrEqual(1);
 
     await assessmentPage.screenshot({
       path: `${SCREENSHOT_DIR}/06-assessment-selected.png`,
@@ -214,7 +209,7 @@ test.describe("Assessment - Question Flow", () => {
     const nextBtn = assessmentPage.locator("button").filter({ hasText: /next|continue|→/i });
     if ((await nextBtn.count()) > 0) {
       await nextBtn.first().click();
-      await assessmentPage.waitForTimeout(1000);
+      await assessmentPage.waitForTimeout(500);
     }
 
     // Should show a different question or progress indicator
@@ -258,7 +253,7 @@ test.describe("Assessment - Question Flow", () => {
 
     if (prevCount > 0) {
       await prevBtn.first().click();
-      await assessmentPage.waitForTimeout(1000);
+      await assessmentPage.waitForTimeout(500);
 
       // Should go back to previous question
       const content = await assessmentPage.textContent("body");
@@ -287,8 +282,8 @@ test.describe("Assessment - Submit API", () => {
       body: {},
     });
 
-    // Empty submission should fail validation
-    expect([400, 422, 500]).toContain(status);
+    // Empty submission should fail validation, not crash the server
+    expect([400, 422]).toContain(status);
   });
 
   test("11 - POST submit with partial data returns error", async ({ page }) => {
@@ -305,8 +300,8 @@ test.describe("Assessment - Submit API", () => {
       },
     });
 
-    // Partial submission may succeed (API is lenient) or fail validation
-    expect([200, 400, 422, 500]).toContain(status);
+    // Partial submission may succeed (API is lenient) or fail validation, but should not crash
+    expect([200, 400, 422]).toContain(status);
   });
 
   test("12 - POST submit with invalid email format", async ({ page }) => {
@@ -327,8 +322,8 @@ test.describe("Assessment - Submit API", () => {
       },
     });
 
-    // Invalid email should fail
-    expect([400, 422, 500]).toContain(status);
+    // Invalid email is a validation error, not a server crash
+    expect([400, 422]).toContain(status);
   });
 });
 
@@ -344,19 +339,23 @@ test.describe("Assessment - Admin Analytics API", () => {
 
     const { status } = await apiCall(page, BASE_URL, "/api/admin/assessment-analytics");
 
-    // Should reject unauthenticated request
-    expect([401, 403]).toContain(status);
+    // Unauthenticated request must return 401
+    expect(status).toBe(401);
   });
 
-  test("14 - GET admin analytics requires admin role", async ({ page }) => {
+  test("14 - GET admin analytics succeeds for admin user", async ({ page }) => {
     await page.goto(`${BASE_URL}/login`, { waitUntil: "domcontentloaded" });
     const result = await authenticatePage(page, BASE_URL, AGENT_PRIMARY);
     expect(result.success).toBe(true);
 
-    const { status } = await apiCall(page, BASE_URL, "/api/admin/assessment-analytics");
+    const { status, data } = await apiCall(page, BASE_URL, "/api/admin/assessment-analytics");
 
-    // Regular user should get 403 (not admin)
-    expect([403, 200]).toContain(status);
+    // AGENT_PRIMARY IS admin, so this should succeed
+    expect(status).toBe(200);
+
+    // Verify response has expected analytics shape
+    expect(data).toBeDefined();
+    expect(typeof data).toBe("object");
   });
 });
 
@@ -370,38 +369,37 @@ test.describe("Assessment - Progress Persistence", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     // Clear existing progress
     await page.evaluate(() => {
       localStorage.removeItem("gynergy_assessment_v3_progress");
     });
 
-    // Start assessment
+    // Start assessment — button MUST exist
     const startBtn = page.locator("button").filter({ hasText: /start|begin|take/i });
-    if ((await startBtn.count()) > 0) {
-      await startBtn.first().click();
-      await page.waitForTimeout(2000);
+    expect(await startBtn.count()).toBeGreaterThanOrEqual(1);
 
-      // Try selecting an option
-      const options = page.locator(
-        "button:not(:has-text('next')):not(:has-text('back')):not(:has-text('previous')), [role='radio']"
-      );
-      if ((await options.count()) > 0) {
-        await options.first().click();
-        await page.waitForTimeout(1000);
-      }
+    await startBtn.first().click();
+    await page.waitForLoadState("networkidle").catch(() => {});
 
-      // Check localStorage for saved progress
-      const hasProgress = await page.evaluate(() => {
-        const progress = localStorage.getItem("gynergy_assessment_v3_progress");
-        return progress !== null;
-      });
-
-      // Progress should be saved (or not — depends on implementation timing)
-      // Soft assertion since save may happen on navigation
-      expect(typeof hasProgress).toBe("boolean");
+    // Try selecting an option
+    const options = page.locator(
+      "button:not(:has-text('next')):not(:has-text('back')):not(:has-text('previous')), [role='radio']"
+    );
+    if ((await options.count()) > 0) {
+      await options.first().click();
+      await page.waitForTimeout(500);
     }
+
+    // Check localStorage for saved progress
+    const hasProgress = await page.evaluate(() => {
+      const progress = localStorage.getItem("gynergy_assessment_v3_progress");
+      return progress !== null;
+    });
+
+    // Progress should actually be saved after starting and selecting an option
+    expect(hasProgress).toBe(true);
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/15-assessment-progress-save.png`,
@@ -414,7 +412,7 @@ test.describe("Assessment - Progress Persistence", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     // Set mock progress in localStorage
     await page.evaluate(() => {
@@ -430,7 +428,7 @@ test.describe("Assessment - Progress Persistence", () => {
 
     // Reload to trigger resume detection
     await page.reload({ waitUntil: "domcontentloaded" });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     const content = await page.textContent("body");
     const hasResume =
@@ -465,7 +463,7 @@ test.describe("Assessment - Mobile", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
     const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
@@ -482,7 +480,7 @@ test.describe("Assessment - Mobile", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     const startBtn = page.locator("button, a").filter({ hasText: /start|begin|take|discover/i });
     const btnCount = await startBtn.count();
@@ -510,7 +508,7 @@ test.describe("Assessment - Accessibility", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     const headings = page.locator("h1, h2, h3");
     expect(await headings.count()).toBeGreaterThanOrEqual(1);
@@ -526,7 +524,7 @@ test.describe("Assessment - Accessibility", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     // Tab into the page
     await page.keyboard.press("Tab");
@@ -546,7 +544,7 @@ test.describe("Assessment - Accessibility", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     const interactive = page.locator("button, a[href], input");
     const count = await interactive.count();

@@ -30,19 +30,14 @@ test.describe("Webinar - Landing Page", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
+
+    // Structural check: page has at least one heading and substantial content
+    const headings = page.locator("h1, h2, h3");
+    expect(await headings.count()).toBeGreaterThanOrEqual(1);
 
     const content = await page.textContent("body");
-    const hasContent =
-      content?.toLowerCase().includes("webinar") ||
-      content?.toLowerCase().includes("live") ||
-      content?.toLowerCase().includes("register") ||
-      content?.toLowerCase().includes("watch") ||
-      content?.toLowerCase().includes("event") ||
-      content?.toLowerCase().includes("training") ||
-      content?.toLowerCase().includes("masterclass");
-
-    expect(hasContent).toBe(true);
+    expect(content!.length).toBeGreaterThan(200);
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/01-webinar-landing.png`,
@@ -55,7 +50,7 @@ test.describe("Webinar - Landing Page", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     // Look for email input, name input, or register button
     const emailInput = page.locator("input[type='email'], input[placeholder*='email' i]");
@@ -79,9 +74,12 @@ test.describe("Webinar - Landing Page", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
-    // Should have substantial marketing content
+    // Structural check: at least one heading and substantial body text
+    const headings = page.locator("h1, h2, h3");
+    expect(await headings.count()).toBeGreaterThanOrEqual(1);
+
     const bodyText = await page.textContent("body");
     expect(bodyText!.length).toBeGreaterThan(200);
 
@@ -105,8 +103,8 @@ test.describe("Webinar - APIs", () => {
       body: { email: "test@example.com" },
     });
 
-    // Missing slug should fail
-    expect([400, 404, 422, 500]).toContain(status);
+    // Missing slug should fail with validation error
+    expect([400, 422]).toContain(status);
   });
 
   test("05 - POST webinar/join with missing email returns error", async ({ page }) => {
@@ -117,8 +115,8 @@ test.describe("Webinar - APIs", () => {
       body: { slug: "nonexistent-webinar" },
     });
 
-    // Missing email should fail
-    expect([400, 404, 422, 500]).toContain(status);
+    // Missing email should fail with validation error
+    expect([400, 422]).toContain(status);
   });
 
   test("06 - POST webinar/join with nonexistent slug returns error", async ({ page }) => {
@@ -133,8 +131,8 @@ test.describe("Webinar - APIs", () => {
       },
     });
 
-    // Nonexistent webinar should fail
-    expect([404, 400, 500]).toContain(status);
+    // Nonexistent webinar should fail with not found or bad request
+    expect([400, 404]).toContain(status);
   });
 
   test("07 - GET webinar/live with no params returns error", async ({ page }) => {
@@ -142,8 +140,8 @@ test.describe("Webinar - APIs", () => {
 
     const { status } = await apiCall(page, BASE_URL, "/api/webinar/live");
 
-    // Missing id/slug should fail
-    expect([400, 404, 500]).toContain(status);
+    // Missing id/slug should fail with bad request
+    expect(status).toBe(400);
   });
 
   test("08 - GET webinar/live status action works", async ({ page }) => {
@@ -151,8 +149,8 @@ test.describe("Webinar - APIs", () => {
 
     const { status } = await apiCall(page, BASE_URL, "/api/webinar/live?action=status");
 
-    // Status check should return something (400 if no active webinar found)
-    expect([200, 400, 404, 500]).toContain(status);
+    // Status check should return data or bad request if no active webinar
+    expect([200, 400]).toContain(status);
   });
 
   test("09 - GET webinar/replay with nonexistent slug returns error", async ({ page }) => {
@@ -164,8 +162,8 @@ test.describe("Webinar - APIs", () => {
       "/api/webinar/replay?slug=fake-webinar-replay"
     );
 
-    // Nonexistent replay should fail
-    expect([404, 410, 400, 500]).toContain(status);
+    // Nonexistent replay should fail with not found, gone, or bad request
+    expect([400, 404, 410]).toContain(status);
   });
 
   test("10 - GET webinar/seats returns data or error", async ({ page }) => {
@@ -173,8 +171,8 @@ test.describe("Webinar - APIs", () => {
 
     const { status } = await apiCall(page, BASE_URL, "/api/webinar/seats");
 
-    // Should return seats data or error
-    expect([200, 400, 404, 500]).toContain(status);
+    // Should return seats data or bad request
+    expect([200, 400]).toContain(status);
   });
 
   test("11 - POST webinar/live create requires auth", async ({ page }) => {
@@ -185,8 +183,8 @@ test.describe("Webinar - APIs", () => {
       body: { action: "create", title: "Test Webinar" },
     });
 
-    // Creating webinar requires auth
-    expect([401, 403, 400, 500]).toContain(status);
+    // Creating webinar requires auth — unauthenticated = 401
+    expect(status).toBe(401);
   });
 });
 
@@ -249,12 +247,10 @@ test.describe("Video Room - Access Control", () => {
       timeout: 30000,
     });
 
-    // Studio should require auth
-    await page.waitForTimeout(5000);
+    // Studio requires auth — unauthenticated user should be redirected
+    await page.waitForURL(/\/(login|pricing)/, { timeout: 15000 });
     const url = page.url();
-    expect(
-      url.includes("/login") || url.includes("/webinar/studio") || url.includes("/webinar")
-    ).toBe(true);
+    expect(url.includes("/login") || url.includes("/pricing")).toBe(true);
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/15-studio-redirect.png`,
@@ -293,8 +289,8 @@ test.describe("Video - APIs", () => {
   test("17 - GET video/get-rooms returns data when authenticated", async () => {
     const { status, data } = await apiCall(authedPage, BASE_URL, "/api/video/get-rooms");
 
-    // Should succeed or return empty array
-    expect([200, 404, 500]).toContain(status);
+    // Should succeed or return server error (external service dependency)
+    expect([200, 500]).toContain(status);
     if (status === 200) {
       expect(data).toBeTruthy();
     }
@@ -303,8 +299,8 @@ test.describe("Video - APIs", () => {
   test("18 - GET video/get-room requires roomId param", async () => {
     const { status } = await apiCall(authedPage, BASE_URL, "/api/video/get-room");
 
-    // Missing roomId should fail
-    expect([400, 404, 500]).toContain(status);
+    // Missing roomId should fail with bad request or not found
+    expect([400, 404]).toContain(status);
   });
 
   test("19 - GET video/get-upcoming requires auth", async ({ page }) => {
@@ -368,8 +364,8 @@ test.describe("Session - APIs", () => {
   test("24 - GET session with upcoming flag returns data when authenticated", async () => {
     const { status, data } = await apiCall(authedPage, BASE_URL, "/api/session?upcoming=true");
 
-    // Should succeed or return appropriate error
-    expect([200, 404, 500]).toContain(status);
+    // Should succeed or return server error (external service dependency)
+    expect([200, 500]).toContain(status);
     if (status === 200) {
       expect(data).toBeTruthy();
     }
@@ -382,8 +378,8 @@ test.describe("Session - APIs", () => {
       "/api/session?id=00000000-0000-0000-0000-000000000000"
     );
 
-    // Nonexistent session should fail
-    expect([404, 400, 500]).toContain(status);
+    // Nonexistent session should fail with bad request or not found
+    expect([400, 404]).toContain(status);
   });
 
   test("26 - POST session create requires auth", async ({ page }) => {
@@ -415,15 +411,11 @@ test.describe("Webinar - Live & Replay Pages", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
-    // Should show error, not found, or registration form
+    // Should show error, not found, or registration form with substantial content
     const content = await page.textContent("body");
-    const isHandled =
-      content!.length > 10 || // Has some content
-      page.url().includes("/webinar"); // Stayed on webinar routes
-
-    expect(isHandled).toBe(true);
+    expect(content!.length).toBeGreaterThan(50);
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/28-webinar-live-fake.png`,
@@ -436,13 +428,11 @@ test.describe("Webinar - Live & Replay Pages", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
-    // Should show error, expired, or not found
+    // Should show error, expired, or not found with substantial content
     const content = await page.textContent("body");
-    const isHandled = content!.length > 10 || page.url().includes("/webinar");
-
-    expect(isHandled).toBe(true);
+    expect(content!.length).toBeGreaterThan(50);
 
     await page.screenshot({
       path: `${SCREENSHOT_DIR}/29-webinar-replay-fake.png`,
@@ -463,7 +453,7 @@ test.describe("Video/Webinar - Mobile", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
     const clientWidth = await page.evaluate(() => document.documentElement.clientWidth);
@@ -486,7 +476,7 @@ test.describe("Video/Webinar - Accessibility", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     const headings = page.locator("h1, h2, h3");
     expect(await headings.count()).toBeGreaterThanOrEqual(1);
@@ -502,7 +492,7 @@ test.describe("Video/Webinar - Accessibility", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     const interactive = page.locator("button, a[href], input");
     const count = await interactive.count();
@@ -519,7 +509,7 @@ test.describe("Video/Webinar - Accessibility", () => {
       waitUntil: "domcontentloaded",
       timeout: 30000,
     });
-    await page.waitForTimeout(3000);
+    await page.waitForLoadState("networkidle").catch(() => {});
 
     await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
