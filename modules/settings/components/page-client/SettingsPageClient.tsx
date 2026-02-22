@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { usePopup } from "@contexts/UsePopup";
 import ActionButton from "@modules/common/components/ActionButton";
+import { SectionErrorBoundary } from "@modules/common/components/ErrorBoundary";
 import Input from "@modules/common/components/Input";
 import Loader from "@modules/common/components/Loader";
 import SectionCard from "@modules/common/components/SectionCard";
@@ -219,7 +220,9 @@ const SettingsPageClient: React.FC = () => {
       </SectionCard>
 
       <SectionCard sx={"mb-[55px]"}>
-        <SubscriptionManagement />
+        <SectionErrorBoundary sectionName="Subscription Management">
+          <SubscriptionManagement />
+        </SectionErrorBoundary>
       </SectionCard>
 
       <SectionCard sx={"gap-8"}>
