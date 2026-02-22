@@ -60,6 +60,7 @@ export async function middleware(request: NextRequest) {
     "/webinar", // Webinar registration landing page
     "/assessment", // Five Pillar Self-Assessment
     "/journal", // Journal subscription sales page
+    "/subscribe", // Post-challenge subscription page
     "/blog", // Blog / SEO content
     "/privacy", // Privacy Policy (required for App Store)
     "/terms", // Terms of Service (required for App Store)
@@ -119,18 +120,31 @@ export async function middleware(request: NextRequest) {
   );
 
   if (requiresChallengeAccess) {
-    // Check user entitlements
+    // Check user entitlements including expiration and subscription fallback
     const { data: entitlements } = await supabase
       .from("user_entitlements")
-      .select("has_challenge_access")
+      .select("has_challenge_access, challenge_expires_at, has_journal_access")
       .eq("user_id", user.id)
       .single();
 
-    // If no entitlements or no challenge access, redirect to pricing
+    // No entitlements at all — redirect to pricing
     if (!entitlements?.has_challenge_access) {
       const pricingUrl = new URL("/pricing", request.url);
       pricingUrl.searchParams.set("access_required", "true");
       return NextResponse.redirect(pricingUrl);
+    }
+
+    // Has challenge access — check if it's expired
+    if (entitlements.challenge_expires_at) {
+      const isExpired = new Date(entitlements.challenge_expires_at) < new Date();
+      if (isExpired && !entitlements.has_journal_access) {
+        // Challenge expired and no active subscription — redirect to subscribe
+        return NextResponse.redirect(new URL("/subscribe", request.url));
+      }
+    } else if (!entitlements.has_journal_access) {
+      // Legacy user: has_challenge_access=true but challenge_expires_at=NULL
+      // Without an active subscription, treat as expired
+      return NextResponse.redirect(new URL("/subscribe", request.url));
     }
   }
 

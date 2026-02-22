@@ -103,7 +103,8 @@ CREATE TABLE IF NOT EXISTS "user_entitlements" (
     has_challenge_access BOOLEAN DEFAULT FALSE,
     challenge_access_type TEXT CHECK (challenge_access_type IN ('purchased', 'friend_code', NULL)),
     challenge_access_granted_at TIMESTAMPTZ,
-    challenge_expires_at TIMESTAMPTZ,           -- NULL = lifetime access
+    challenge_expires_at TIMESTAMPTZ,           -- Set to grace_period_end of session (end_date + 30 days)
+    challenge_session_id UUID REFERENCES book_sessions(id) ON DELETE SET NULL,  -- Which cohort session
 
     -- Journal subscription access
     has_journal_access BOOLEAN DEFAULT FALSE,
@@ -194,18 +195,34 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Function to grant challenge access after successful purchase
+-- p_session_id links the user to a specific cohort session and sets expiration
 CREATE OR REPLACE FUNCTION grant_challenge_access(
     p_user_id UUID,
-    p_access_type TEXT
+    p_access_type TEXT,
+    p_session_id UUID DEFAULT NULL
 )
 RETURNS VOID AS $$
+DECLARE
+    v_grace_end TIMESTAMPTZ;
 BEGIN
-    INSERT INTO user_entitlements (user_id, has_challenge_access, challenge_access_type, challenge_access_granted_at)
-    VALUES (p_user_id, TRUE, p_access_type, NOW())
+    -- Calculate expiration: session grace_period_end (end_date + 30 days)
+    IF p_session_id IS NOT NULL THEN
+        SELECT COALESCE(grace_period_end, end_date + INTERVAL '30 days')
+        INTO v_grace_end
+        FROM book_sessions WHERE id = p_session_id;
+    END IF;
+
+    INSERT INTO user_entitlements (
+        user_id, has_challenge_access, challenge_access_type,
+        challenge_access_granted_at, challenge_expires_at, challenge_session_id
+    )
+    VALUES (p_user_id, TRUE, p_access_type, NOW(), v_grace_end, p_session_id)
     ON CONFLICT (user_id) DO UPDATE SET
         has_challenge_access = TRUE,
         challenge_access_type = p_access_type,
         challenge_access_granted_at = COALESCE(user_entitlements.challenge_access_granted_at, NOW()),
+        challenge_expires_at = COALESCE(v_grace_end, user_entitlements.challenge_expires_at),
+        challenge_session_id = COALESCE(p_session_id, user_entitlements.challenge_session_id),
         updated_at = NOW();
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -223,6 +240,8 @@ $$ LANGUAGE plpgsql;
 -- Function to create friend codes after purchase (2 codes per purchase = Accountability Trio)
 CREATE OR REPLACE FUNCTION create_friend_code_for_purchase()
 RETURNS TRIGGER AS $$
+DECLARE
+    v_session_id UUID;
 BEGIN
     -- Only create friend codes for completed challenge purchases with a user_id
     -- Handle both INSERT (new completed purchase) and UPDATE (status changed to completed)
@@ -230,6 +249,14 @@ BEGIN
         -- For UPDATE: only trigger if status actually changed to completed
         -- For INSERT: always trigger for completed purchases
         IF TG_OP = 'INSERT' OR (TG_OP = 'UPDATE' AND OLD.status != 'completed') THEN
+            -- Find the current active or upcoming session for enrollment
+            SELECT id INTO v_session_id
+            FROM book_sessions
+            WHERE is_personal = FALSE
+              AND status IN ('active', 'upcoming')
+            ORDER BY start_date ASC
+            LIMIT 1;
+
             -- Create TWO friend codes per purchase (Accountability Trio model)
             -- This creates optimal group dynamics: purchaser + 2 friends = trio
             -- Each code expires in 90 days by default
@@ -238,8 +265,8 @@ BEGIN
                 (generate_friend_code(), NEW.user_id, NEW.id, get_friend_code_expiration()),
                 (generate_friend_code(), NEW.user_id, NEW.id, get_friend_code_expiration());
 
-            -- Grant challenge access to purchaser
-            PERFORM grant_challenge_access(NEW.user_id, 'purchased');
+            -- Grant challenge access to purchaser, linked to the cohort session
+            PERFORM grant_challenge_access(NEW.user_id, 'purchased', v_session_id);
         END IF;
     END IF;
 
@@ -262,6 +289,7 @@ CREATE OR REPLACE FUNCTION redeem_friend_code(
 RETURNS JSONB AS $$
 DECLARE
     v_friend_code RECORD;
+    v_session_id UUID;
     v_result JSONB;
 BEGIN
     -- Find and lock the friend code
@@ -288,14 +316,29 @@ BEGIN
         );
     END IF;
 
+    -- Find the creator's session so the friend joins the same cohort
+    SELECT challenge_session_id INTO v_session_id
+    FROM user_entitlements
+    WHERE user_id = v_friend_code.creator_id;
+
+    -- Fallback: find current active/upcoming session
+    IF v_session_id IS NULL THEN
+        SELECT id INTO v_session_id
+        FROM book_sessions
+        WHERE is_personal = FALSE
+          AND status IN ('active', 'upcoming')
+        ORDER BY start_date ASC
+        LIMIT 1;
+    END IF;
+
     -- Mark code as used
     UPDATE friend_codes
     SET used_by_id = p_user_id,
         used_at = NOW()
     WHERE id = v_friend_code.id;
 
-    -- Grant challenge access to the user
-    PERFORM grant_challenge_access(p_user_id, 'friend_code');
+    -- Grant challenge access to the user, linked to same session as creator
+    PERFORM grant_challenge_access(p_user_id, 'friend_code', v_session_id);
 
     RETURN jsonb_build_object(
         'success', TRUE,

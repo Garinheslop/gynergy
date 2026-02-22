@@ -38,5 +38,13 @@ export interface BookSessionData {
   startDate: string;
   endDate: string;
 
+  // Cohort lifecycle (migration 007)
+  cohortLabel?: string;
+  status?: "upcoming" | "active" | "grace_period" | "completed";
+  gracePeriodEnd?: string;
+  maxEnrollments?: number;
+  isPersonal?: boolean;
+  ownerUserId?: string;
+
   createdAt: string;
 }

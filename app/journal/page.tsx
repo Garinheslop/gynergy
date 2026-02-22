@@ -39,11 +39,11 @@ export default function JournalSalesPage() {
           G Y N E R G Y
         </span>
         <h1 className="mb-6 text-4xl leading-tight font-bold md:text-5xl">
-          What Happens After Day 45?
+          Start Your Daily Gratitude Practice
         </h1>
         <p className="mx-auto max-w-2xl text-xl leading-relaxed text-gray-300">
-          Most programs end. The habit dies. Three months later you&apos;re back to empty. The
-          journal keeps the practice alive.
+          10 minutes morning and evening. Mood tracking, affirmations, AI coaching, streak
+          accountability. The practice that transforms men who commit to it.
         </p>
       </section>
 
@@ -180,12 +180,31 @@ export default function JournalSalesPage() {
         </div>
       </section>
 
+      {/* Challenge Upsell */}
+      <section className="mx-auto max-w-3xl px-6 pb-10">
+        <div className="rounded-xl border border-white/10 bg-gradient-to-br from-[#1a1a2e] to-[#16213e] p-8 text-center">
+          <h3 className="mb-3 text-lg font-semibold text-white">
+            Ready for the Full Transformation?
+          </h3>
+          <p className="mx-auto mb-4 max-w-xl text-gray-300">
+            Join a 45-Day Challenge Cohort for group coaching calls, accountability partners, a
+            dedicated leaderboard, and the complete experience that accelerates your growth.
+          </p>
+          <Link
+            href="/"
+            className="inline-block rounded-lg border border-teal-500/30 px-6 py-2.5 text-sm font-medium text-teal-400 transition-all hover:bg-teal-500/10"
+          >
+            Learn About the Challenge
+          </Link>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="mx-auto max-w-3xl px-6 pb-20 text-center">
         <p className="mb-6 text-lg text-gray-300">
-          You didn&apos;t do 45 days to go back to nothing.
+          The practice changes everything.
           <br />
-          <span className="font-semibold text-white">Keep the practice. Keep the progress.</span>
+          <span className="font-semibold text-white">Start today. Less than $1.30/day.</span>
         </p>
         <Link href="/assessment" className="text-sm text-teal-400 hover:underline">
           Not sure yet? Take the free Five Pillar Assessment first &rarr;

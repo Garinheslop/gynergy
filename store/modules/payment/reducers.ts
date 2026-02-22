@@ -119,6 +119,7 @@ const paymentSlice = createSlice({
           challengeAccessType: "friend_code",
           challengeAccessGrantedAt: new Date().toISOString(),
           challengeExpiresAt: null,
+          challengeSessionId: null,
           hasJournalAccess: false,
           journalSubscriptionId: null,
           hasCommunityAccess: false,
