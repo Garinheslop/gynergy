@@ -6,9 +6,8 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
-import LessonQuiz from "@modules/courses/components/LessonQuiz";
-
 import { cn } from "@lib/utils/style";
+import LessonQuiz from "@modules/courses/components/LessonQuiz";
 import {
   CourseWithProgress,
   CourseModuleWithLessons,
