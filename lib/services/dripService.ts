@@ -19,7 +19,9 @@ export type TriggerEvent =
   | "cart_abandoned"
   | "user_inactive"
   | "friend_codes_issued"
-  | "community_activated";
+  | "community_activated"
+  | "challenge_completed_purchaser"
+  | "challenge_completed_friend_code";
 
 export interface EnrollResult {
   success: boolean;

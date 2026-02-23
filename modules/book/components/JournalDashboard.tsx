@@ -1,26 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { useRouter, useSearchParams } from "next/navigation";
-
-import dayjs from "dayjs";
 
 import { useSession } from "@contexts/UseSession";
 import Card from "@modules/common/components/Card";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import Leaderboard from "@modules/leaderboard/components/Leaderboard";
-import { pagePaths } from "@resources/paths";
-import { visionTypes, UserVision } from "@resources/types/vision";
 import { paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
-import { setEditorDataStates } from "@store/modules/editor";
 import { setHideBookMessageState } from "@store/modules/global/states";
 
 import BookCompletion from "./BookCompletion";
 import Journals from "./Journals";
-import Mantra from "./Mantra";
 import Visions from "./Visions";
 import Growth from "../../growth/components/Growth";
-import useCheckEnrollmentSession from "../hooks/useCheckEnrollmentSession";
 
 const JournalDashboard = () => {
   const router = useRouter();
@@ -29,6 +22,8 @@ const JournalDashboard = () => {
 
   const globalStates = useSelector((state) => state.global);
   const currentBook = useSelector((state) => state.books.current);
+  const enrollment = useSelector((state) => state.enrollments.current);
+  const isPersonalSession = enrollment?.session?.isPersonal === true;
 
   const searchParams = useSearchParams().get("section");
 
@@ -78,7 +73,25 @@ const JournalDashboard = () => {
       <Visions />
       <Journals />
       <Growth ref={growthSectionRef} />
-      <Leaderboard />
+      {isPersonalSession ? (
+        <Card
+          title="Ready for the Full Experience?"
+          sx="bg-gradient-to-r from-action-50 to-purple/10"
+        >
+          <Paragraph
+            content="Join a 45-Day Challenge Cohort for group coaching calls, cohort leaderboard, accountability partners, and the full transformation experience."
+            variant={paragraphVariants.regular}
+          />
+          <a
+            href="/"
+            className="bg-action-600 hover:bg-action-700 mt-4 inline-block rounded-lg px-6 py-2.5 text-sm font-medium text-white transition-colors"
+          >
+            Learn About the Challenge
+          </a>
+        </Card>
+      ) : (
+        <Leaderboard />
+      )}
     </section>
   );
 };

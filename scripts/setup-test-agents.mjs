@@ -105,11 +105,7 @@ async function ensureUser(agent) {
   }
 
   // Ensure public.users record exists
-  const { data: publicUser } = await supabase
-    .from("users")
-    .select("id")
-    .eq("id", userId)
-    .single();
+  const { data: publicUser } = await supabase.from("users").select("id").eq("id", userId).single();
 
   if (!publicUser) {
     console.log(`  Creating public.users record...`);
@@ -253,7 +249,9 @@ async function main() {
   for (let i = 0; i < TEST_AGENTS.length; i++) {
     const agent = TEST_AGENTS[i];
     const uid = userIds[i];
-    console.log(`  ${agent.firstName} ${agent.lastName}: ${agent.email} / ${agent.password} (${uid || "FAILED"})`);
+    console.log(
+      `  ${agent.firstName} ${agent.lastName}: ${agent.email} / ${agent.password} (${uid || "FAILED"})`
+    );
   }
 
   console.log("\nUse these in Playwright E2E tests with the multi-user auth helper.");

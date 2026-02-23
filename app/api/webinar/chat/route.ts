@@ -1,16 +1,12 @@
+export const dynamic = "force-dynamic";
+
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
 
+import { createServiceClient } from "@lib/supabase-server";
 import { checkRateLimit, RateLimits } from "@lib/utils/rate-limit";
-
-// Initialize Supabase admin client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 /**
  * Get authenticated user ID from request cookies.
@@ -46,6 +42,7 @@ async function getAuthenticatedUserId(): Promise<string | null> {
 async function isUserHost(webinarId: string, userId: string | null): Promise<boolean> {
   if (!userId) return false;
 
+  const supabase = createServiceClient();
   const { data: webinar } = await supabase
     .from("webinars")
     .select("host_user_id, co_host_user_ids")
@@ -86,6 +83,7 @@ async function verifyHostForMessage(messageId: string): Promise<{
   }
 
   // Look up message → webinar → host
+  const supabase = createServiceClient();
   const { data: message } = await supabase
     .from("webinar_chat")
     .select("webinar_id")
@@ -131,6 +129,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Missing webinarId" }, { status: 400 });
     }
 
+    const supabase = createServiceClient();
     let query = supabase
       .from("webinar_chat")
       .select("*")
@@ -224,6 +223,7 @@ async function handleSendMessage(body: {
   }
 
   // Verify webinar exists and has chat enabled
+  const supabase = createServiceClient();
   const { data: webinar } = await supabase
     .from("webinars")
     .select("id, chat_enabled, status")
@@ -298,6 +298,7 @@ async function handlePinMessage(messageId: string, isPinned: boolean) {
     return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
   }
 
+  const supabase = createServiceClient();
   const { data: message, error } = await supabase
     .from("webinar_chat")
     .update({ is_pinned: isPinned })
@@ -332,6 +333,7 @@ async function handleDeleteMessage(messageId: string) {
   // Derive the deleter's ID from auth session (verifyHostForMessage already authenticated)
   const authenticatedUserId = await getAuthenticatedUserId();
 
+  const supabase = createServiceClient();
   const { data: message, error } = await supabase
     .from("webinar_chat")
     .update({

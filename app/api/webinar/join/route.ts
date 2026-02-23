@@ -1,16 +1,12 @@
+export const dynamic = "force-dynamic";
+
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
 
 import { getHLSStreamUrl } from "@lib/services/webinar-hms";
-
-// Initialize Supabase admin client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { createServiceClient } from "@lib/supabase-server";
 
 /**
  * Get authenticated user ID from request cookies.
@@ -58,6 +54,8 @@ export async function POST(request: Request) {
     if (!email) {
       return NextResponse.json({ error: "Email is required to join" }, { status: 400 });
     }
+
+    const supabase = createServiceClient();
 
     // Get webinar
     const { data: webinar, error: fetchError } = await supabase
@@ -186,6 +184,8 @@ export async function PUT(request: Request) {
     if (!attendanceId) {
       return NextResponse.json({ error: "Missing attendanceId" }, { status: 400 });
     }
+
+    const supabase = createServiceClient();
 
     // Verify the caller owns this attendance record
     const { data: attendance } = await supabase

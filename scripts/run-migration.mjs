@@ -1,6 +1,7 @@
+import { resolve } from "path";
+
 import { createClient } from "@supabase/supabase-js";
 import { config } from "dotenv";
-import { resolve } from "path";
 
 config({ path: resolve(process.cwd(), ".env.local") });
 
@@ -17,10 +18,7 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Test if column exists by trying to select it
-const { error } = await supabase
-  .from("assessment_results")
-  .select("prior_coaching")
-  .limit(1);
+const { error } = await supabase.from("assessment_results").select("prior_coaching").limit(1);
 
 if (error?.message?.includes("does not exist")) {
   console.log("❌ Column 'prior_coaching' does not exist yet.");

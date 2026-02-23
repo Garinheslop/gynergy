@@ -16,11 +16,9 @@ import useGenerateHistoryCards from "@modules/history/hooks/useGenerateHistoryCa
 import icons from "@resources/icons";
 import { pagePaths } from "@resources/paths";
 import { JournalCardData } from "@resources/types/history";
-import { pageTypes } from "@resources/types/page";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
 import { setHistoryCurrentStates } from "@store/modules/history";
-import { setJournalCurrentStates } from "@store/modules/journal";
 
 import JournalHistoryCard from "../cards/JournalHistoryCard";
 import HistoryCardSkeleton from "../skeleton/HistoryCardSkeleton";
@@ -43,7 +41,7 @@ const HistoryPageClient: React.FC = () => {
           {currentBook?.shortName} Journal History
         </Heading>
         {dayjs(enrollments.current?.enrollmentDate)
-          .add(currentBook?.durationDays!, "day")
+          .add(currentBook?.durationDays ?? 45, "day")
           .isBefore(dayjs()) && (
           <Paragraph
             variant={paragraphVariants.meta}
@@ -66,7 +64,7 @@ const HistoryPageClient: React.FC = () => {
             content={`${dayjs(enrollments.current?.enrollmentDate).format("MMM DD, YYYY")} - ${dayjs(
               enrollments.current?.enrollmentDate
             )
-              .add(currentBook?.durationDays!, "day")
+              .add(currentBook?.durationDays ?? 45, "day")
               .format("MMM DD, YYYY")}`}
             sx="!font-bold"
           />
@@ -152,7 +150,7 @@ const Onboardings = () => {
   return (
     <>
       <div
-        className="flex min-h-[178px] cursor-pointer flex-col gap-5 rounded bg-meditation-light p-5 shadow-2xs"
+        className="bg-meditation-light flex min-h-[178px] cursor-pointer flex-col gap-5 rounded p-5 shadow-2xs"
         onClick={() => openOnboardingHandler({ isOnboardingInspiration: true })}
       >
         <Paragraph
@@ -162,7 +160,7 @@ const Onboardings = () => {
         />
       </div>
       <div
-        className="flex min-h-[178px] cursor-pointer flex-col gap-5 rounded bg-meditation-light p-5 shadow-2xs"
+        className="bg-meditation-light flex min-h-[178px] cursor-pointer flex-col gap-5 rounded p-5 shadow-2xs"
         onClick={() => openOnboardingHandler({ isOnboardingPotentialSelf: true })}
       >
         <Paragraph

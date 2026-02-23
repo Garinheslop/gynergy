@@ -3,11 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 
 import { cn } from "@lib/utils/style";
-import {
-  Quiz,
-  QuizQuestion as QuizQuestionType,
-  QuizAttempt,
-} from "@resources/types/content";
+import { Quiz, QuizQuestion as QuizQuestionType, QuizAttempt } from "@resources/types/content";
 
 import QuizQuestion from "./QuizQuestion";
 import QuizResults from "./QuizResults";
@@ -18,7 +14,15 @@ interface LessonQuizProps {
   onContinue?: () => void;
 }
 
-type QuizState = "loading" | "ready" | "in-progress" | "submitting" | "results" | "review" | "error" | "no-quiz";
+type QuizState =
+  | "loading"
+  | "ready"
+  | "in-progress"
+  | "submitting"
+  | "results"
+  | "review"
+  | "error"
+  | "no-quiz";
 
 export default function LessonQuiz({ lessonId, onComplete, onContinue }: LessonQuizProps) {
   const [quizState, setQuizState] = useState<QuizState>("loading");
@@ -32,10 +36,14 @@ export default function LessonQuiz({ lessonId, onComplete, onContinue }: LessonQ
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
 
   // Track answers per question
-  const [answers, setAnswers] = useState<Record<string, { selectedIds: string[]; textAnswer: string }>>({});
+  const [answers, setAnswers] = useState<
+    Record<string, { selectedIds: string[]; textAnswer: string }>
+  >({});
 
   // Review state (shows correct/incorrect after completion)
-  const [reviewResponses, setReviewResponses] = useState<Record<string, { isCorrect: boolean; explanation?: string }>>({});
+  const [reviewResponses, setReviewResponses] = useState<
+    Record<string, { isCorrect: boolean; explanation?: string }>
+  >({});
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -241,9 +249,7 @@ export default function LessonQuiz({ lessonId, onComplete, onContinue }: LessonQ
     if (!attemptId) return;
 
     try {
-      const res = await fetch(
-        `/api/courses/quiz?type=get-attempt-details&attemptId=${attemptId}`
-      );
+      const res = await fetch(`/api/courses/quiz?type=get-attempt-details&attemptId=${attemptId}`);
       const data = await res.json();
 
       if (!res.ok) {
@@ -362,10 +368,7 @@ export default function LessonQuiz({ lessonId, onComplete, onContinue }: LessonQ
       <div className="border-border mt-6 rounded-xl border bg-white p-6">
         <div className="text-center">
           <p className="text-sm text-red-600">{error}</p>
-          <button
-            onClick={fetchQuiz}
-            className="text-action mt-2 text-sm hover:underline"
-          >
+          <button onClick={fetchQuiz} className="text-action mt-2 text-sm hover:underline">
             Try again
           </button>
         </div>
@@ -381,8 +384,18 @@ export default function LessonQuiz({ lessonId, onComplete, onContinue }: LessonQ
       <div className="border-border mt-6 rounded-xl border bg-white p-6">
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="bg-action/10 flex h-12 w-12 items-center justify-center rounded-full">
-            <svg className="text-action h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            <svg
+              className="text-action h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
             </svg>
           </div>
           <div>
@@ -398,16 +411,21 @@ export default function LessonQuiz({ lessonId, onComplete, onContinue }: LessonQ
               Passing: <span className="text-content-dark font-medium">{quiz.passingScore}%</span>
             </span>
             <span className="text-content-muted">
-              Attempts: <span className="text-content-dark font-medium">{userAttempts}/{quiz.maxAttempts}</span>
+              Attempts:{" "}
+              <span className="text-content-dark font-medium">
+                {userAttempts}/{quiz.maxAttempts}
+              </span>
             </span>
             {quiz.timeLimitMinutes && (
               <span className="text-content-muted">
-                Time: <span className="text-content-dark font-medium">{quiz.timeLimitMinutes} min</span>
+                Time:{" "}
+                <span className="text-content-dark font-medium">{quiz.timeLimitMinutes} min</span>
               </span>
             )}
             {quiz.pointsReward > 0 && (
               <span className="text-content-muted">
-                Reward: <span className="text-content-dark font-medium">{quiz.pointsReward} pts</span>
+                Reward:{" "}
+                <span className="text-content-dark font-medium">{quiz.pointsReward} pts</span>
               </span>
             )}
           </div>
@@ -477,8 +495,15 @@ export default function LessonQuiz({ lessonId, onComplete, onContinue }: LessonQ
                   i === currentQuestionIndex && "bg-action",
                   i !== currentQuestionIndex && !isReview && hasAnswer && "bg-action/40",
                   i !== currentQuestionIndex && !isReview && !hasAnswer && "bg-gray-200",
-                  i !== currentQuestionIndex && isReview && reviewResult?.isCorrect && "bg-green-500",
-                  i !== currentQuestionIndex && isReview && reviewResult && !reviewResult.isCorrect && "bg-red-500",
+                  i !== currentQuestionIndex &&
+                    isReview &&
+                    reviewResult?.isCorrect &&
+                    "bg-green-500",
+                  i !== currentQuestionIndex &&
+                    isReview &&
+                    reviewResult &&
+                    !reviewResult.isCorrect &&
+                    "bg-red-500",
                   i !== currentQuestionIndex && isReview && !reviewResult && "bg-gray-200"
                 )}
               />
@@ -516,7 +541,13 @@ export default function LessonQuiz({ lessonId, onComplete, onContinue }: LessonQ
                 : "text-content-dark hover:bg-gray-100"
             )}
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
             Previous
@@ -553,7 +584,13 @@ export default function LessonQuiz({ lessonId, onComplete, onContinue }: LessonQ
               )}
             >
               {hasAnswered ? "Next" : "Skip"}
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </button>

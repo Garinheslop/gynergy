@@ -4,9 +4,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 import Stripe from "stripe";
 
+import { DEFAULT_BOOK_ID } from "@lib/constants";
 import { sendPurchaseConfirmationEmail } from "@lib/email";
 import { enrollInDrip, cancelDrip } from "@lib/services/dripService";
-import { verifyWebhookSignature, formatPrice, STRIPE_PRODUCTS } from "@lib/stripe";
+import { syncPurchaseCompleted, syncCartAbandoned } from "@lib/services/ghlService";
+import {
+  verifyWebhookSignature,
+  formatPrice,
+  STRIPE_PRODUCTS,
+  getOrCreateCustomer,
+  createAutoSubscription,
+} from "@lib/stripe";
 import { createServiceClient } from "@lib/supabase-server";
 
 // ============================================================================
@@ -232,6 +240,55 @@ async function handleCheckoutCompleted(
         console.error("Failed to send purchase confirmation email:", err);
       });
 
+      // Auto-create journal subscription with 90-day trial (non-blocking)
+      // This is the monetization engine: Day 91 → first $39.95 charge
+      if (userId) {
+        // P0-4: Check if user already has an active/trialing subscription (dedup)
+        const { data: existingSub } = await supabase
+          .from("subscriptions")
+          .select("id, status")
+          .eq("user_id", userId)
+          .in("status", ["active", "trialing"])
+          .limit(1)
+          .single();
+
+        if (existingSub) {
+          console.log(
+            `[webhook] Skip auto-sub: user ${userId} already has ${existingSub.status} sub ${existingSub.id}`
+          );
+        } else {
+          const customerId =
+            typeof session.customer === "string" ? session.customer : session.customer?.id;
+
+          if (customerId) {
+            createAutoSubscription({
+              customerId,
+              userId,
+              trialDays: 90,
+            }).catch((err) => {
+              console.error("Auto-subscription creation error:", err);
+            });
+          } else {
+            // No customer ID from checkout — create one then subscribe
+            getOrCreateCustomer({
+              email: session.customer_email,
+              userId,
+              name: firstName !== "Friend" ? firstName : undefined,
+            })
+              .then((customer) =>
+                createAutoSubscription({
+                  customerId: customer.id,
+                  userId,
+                  trialDays: 90,
+                })
+              )
+              .catch((err) => {
+                console.error("Auto-subscription (with customer creation) error:", err);
+              });
+          }
+        }
+      }
+
       // Enroll in post-purchase drip + cancel webinar nurture (non-blocking)
       enrollInDrip("purchase_completed", session.customer_email, {
         firstName,
@@ -241,6 +298,14 @@ async function handleCheckoutCompleted(
       cancelDrip("webinar_registered", session.customer_email).catch((err) =>
         console.error("Webinar drip cancel error:", err)
       );
+
+      // Sync purchase to GoHighLevel CRM (non-blocking)
+      syncPurchaseCompleted({
+        email: session.customer_email,
+        firstName,
+        productName: STRIPE_PRODUCTS.CHALLENGE.name,
+        amount: formatPrice(session.amount_total || STRIPE_PRODUCTS.CHALLENGE.amount),
+      }).catch((err) => console.error("[ghl] Purchase sync error:", err));
 
       // Enroll in friend code referral reminders (non-blocking)
       enrollInDrip("friend_codes_issued", session.customer_email, {
@@ -319,22 +384,96 @@ async function handleInvoicePaid(
     const priceId = lineItem?.price?.id || "";
     const interval = lineItem?.price?.recurring?.interval || "month";
 
-    await supabase.from("subscriptions").insert({
-      user_id: userId,
-      stripe_subscription_id: subscriptionId,
-      stripe_customer_id: customerId || "",
-      stripe_price_id: priceId,
-      status: "active",
-      amount_cents: invoice.amount_paid,
-      currency: invoice.currency,
-      interval: interval,
-      current_period_start: invoice.period_start
-        ? new Date(invoice.period_start * 1000).toISOString()
-        : null,
-      current_period_end: invoice.period_end
-        ? new Date(invoice.period_end * 1000).toISOString()
-        : null,
-    });
+    const { data: newSub } = await supabase
+      .from("subscriptions")
+      .insert({
+        user_id: userId,
+        stripe_subscription_id: subscriptionId,
+        stripe_customer_id: customerId || "",
+        stripe_price_id: priceId,
+        status: "active",
+        amount_cents: invoice.amount_paid,
+        currency: invoice.currency,
+        interval: interval,
+        current_period_start: invoice.period_start
+          ? new Date(invoice.period_start * 1000).toISOString()
+          : null,
+        current_period_end: invoice.period_end
+          ? new Date(invoice.period_end * 1000).toISOString()
+          : null,
+      })
+      .select("id")
+      .single();
+
+    // Grant journal access and create personal session for standalone subscribers
+    if (newSub) {
+      // Check if user already has challenge access (challenge purchaser renewing)
+      const { data: entitlements } = await supabase
+        .from("user_entitlements")
+        .select("has_challenge_access, challenge_session_id")
+        .eq("user_id", userId)
+        .single();
+
+      const hasExistingChallengeSession = entitlements?.challenge_session_id;
+
+      // Update or create entitlements with journal access
+      await supabase.from("user_entitlements").upsert(
+        {
+          user_id: userId,
+          has_journal_access: true,
+          journal_subscription_id: newSub.id,
+          has_community_access: true,
+          community_access_granted_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id" }
+      );
+
+      // If user doesn't have a challenge session, create a personal session
+      // This is for standalone journal subscribers who never bought the challenge
+      if (!hasExistingChallengeSession) {
+        // P1-6: Check if user already has a personal session (idempotency)
+        const { data: existingPersonalSession } = await supabase
+          .from("book_sessions")
+          .select("id")
+          .eq("is_personal", true)
+          .eq("owner_user_id", userId)
+          .limit(1)
+          .single();
+
+        if (!existingPersonalSession) {
+          const now = new Date();
+          const endDate = new Date(now);
+          endDate.setFullYear(endDate.getFullYear() + 10); // Personal sessions don't expire
+
+          const { data: personalSession } = await supabase
+            .from("book_sessions")
+            .insert({
+              book_id: DEFAULT_BOOK_ID,
+              duration_days: 3650,
+              start_date: now.toISOString(),
+              end_date: endDate.toISOString(),
+              is_personal: true,
+              owner_user_id: userId,
+              status: "active",
+              cohort_label: "Personal Journal",
+              max_enrollments: 1,
+            })
+            .select("id")
+            .single();
+
+          if (personalSession) {
+            // Enroll user in their personal session
+            await supabase.from("session_enrollments").insert({
+              user_id: userId,
+              book_id: DEFAULT_BOOK_ID,
+              session_id: personalSession.id,
+              enrollment_date: now.toISOString(),
+            });
+          }
+        }
+      }
+    }
   }
 }
 
@@ -411,6 +550,12 @@ async function handleCheckoutExpired(session: Stripe.Checkout.Session) {
     firstName,
     productType,
   }).catch((err) => console.error("Cart abandonment drip enrollment error:", err));
+
+  // Sync cart abandonment to GoHighLevel CRM (non-blocking)
+  syncCartAbandoned({
+    email,
+    firstName,
+  }).catch((err) => console.error("[ghl] Cart abandonment sync error:", err));
 }
 
 async function handleChargeRefunded(

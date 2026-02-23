@@ -87,11 +87,9 @@ test.describe("Full App Visual Audit - Desktop", () => {
       await page.screenshot({ path: "test-results/audit/16-assessment-q1.png", fullPage: false });
 
       // Try answering - look for rating buttons or options
-      const options = page
-        .locator("[role='radio'], [role='option'], [data-value], button")
-        .filter({
-          hasText: /^[1-5]$|strongly|agree|disagree|never|always|rarely|sometimes|often/i,
-        });
+      const options = page.locator("[role='radio'], [role='option'], [data-value], button").filter({
+        hasText: /^[1-5]$|strongly|agree|disagree|never|always|rarely|sometimes|often/i,
+      });
       if (
         await options
           .first()

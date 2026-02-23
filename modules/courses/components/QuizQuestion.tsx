@@ -48,9 +48,7 @@ export default function QuizQuestion({
           <span
             className={cn(
               "rounded-full px-3 py-1 text-xs font-semibold",
-              isCorrect
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
+              isCorrect ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
             )}
           >
             {isCorrect ? "Correct" : "Incorrect"}
@@ -81,11 +79,16 @@ export default function QuizQuestion({
                 disabled={showResult}
                 className={cn(
                   "flex items-center gap-3 rounded-lg border p-4 text-left transition-all",
-                  !showResult && !isSelected && "border-border hover:border-action/50 hover:bg-action/5",
+                  !showResult &&
+                    !isSelected &&
+                    "border-border hover:border-action/50 hover:bg-action/5",
                   !showResult && isSelected && "border-action bg-action/10",
                   showCorrectHighlight && "border-green-500 bg-green-50",
                   showIncorrectHighlight && "border-red-500 bg-red-50",
-                  showResult && !showCorrectHighlight && !showIncorrectHighlight && "border-border opacity-60",
+                  showResult &&
+                    !showCorrectHighlight &&
+                    !showIncorrectHighlight &&
+                    "border-border opacity-60",
                   showResult && "cursor-default"
                 )}
               >
@@ -101,7 +104,13 @@ export default function QuizQuestion({
                   )}
                 >
                   {(isSelected || showCorrectHighlight) && (
-                    <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <svg
+                      className="h-3 w-3 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={3}
+                    >
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                   )}
@@ -114,7 +123,10 @@ export default function QuizQuestion({
                     isSelected && !showResult && "text-action font-medium",
                     showCorrectHighlight && "font-medium text-green-700",
                     showIncorrectHighlight && "font-medium text-red-700",
-                    !isSelected && !showCorrectHighlight && !showIncorrectHighlight && "text-content-dark"
+                    !isSelected &&
+                      !showCorrectHighlight &&
+                      !showIncorrectHighlight &&
+                      "text-content-dark"
                   )}
                 >
                   {answer.answerText}
@@ -134,7 +146,7 @@ export default function QuizQuestion({
             placeholder="Type your answer..."
             className={cn(
               "border-border w-full rounded-lg border px-4 py-3 text-sm transition-colors",
-              "focus:border-action focus:ring-action/20 focus:outline-none focus:ring-2",
+              "focus:border-action focus:ring-action/20 focus:ring-2 focus:outline-none",
               showResult && isCorrect && "border-green-500 bg-green-50",
               showResult && !isCorrect && "border-red-500 bg-red-50",
               showResult && "cursor-default"

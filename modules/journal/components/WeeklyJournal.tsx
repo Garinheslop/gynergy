@@ -47,10 +47,10 @@ const WeeklyJournal = () => {
   }, [histories.current?.entryDate, userEnrollment]);
 
   return (
-    <section className="bg-bkg-light flex w-full flex-col gap-8 rounded-large sm:p-8">
+    <section className="bg-bkg-light rounded-large flex w-full flex-col gap-8 sm:p-8">
       <div className="flex flex-col items-center justify-between gap-2.5 sm:flex-row sm:items-start">
         <Heading variant={headingVariants.titleLg} sx={cn("!font-bold")}>
-          {getHeaderData(histories.current?.entryType!)}
+          {getHeaderData(histories.current?.entryType ?? "")}
         </Heading>
       </div>
       <div className="border-border-light w-full border-b" />
@@ -70,7 +70,7 @@ const WeeklyJournal = () => {
           {!historyData?.action?.isEulogy && !historyData?.action?.isJourneyTable && (
             <Question
               heading="Did you complete the weekly challenge?"
-              isCompleted={historyData?.isCompleted!}
+              isCompleted={historyData?.isCompleted ?? false}
             />
           )}
           {historyData?.action?.isJourneyTable && (
@@ -112,7 +112,7 @@ const WeeklyJournal = () => {
                     className="h-auto w-[210px] rounded object-cover"
                   />
                 ) : (
-                  <Paragraph content={historyData?.freeflow!} sx="text-content-dark" />
+                  <Paragraph content={historyData?.freeflow} sx="text-content-dark" />
                 )}
               </div>
             )}
@@ -181,11 +181,11 @@ const MeditationCard = () => {
   return (
     <div
       className={cn(
-        "items-between relative flex flex-col justify-center gap-5 rounded bg-meditation-bg p-5 md:p-8"
+        "items-between bg-meditation-bg relative flex flex-col justify-center gap-5 rounded p-5 md:p-8"
       )}
     >
       <div className={cn("flex flex-col gap-2.5")}>
-        <i className={cn(`gng-meditation text-2xl text-meditation`)} />
+        <i className={cn(`gng-meditation text-meditation text-2xl`)} />
         <Heading variant={headingVariants.cardHeading} sx="font-bold">
           {meditations.total} out of 7 Daily Meditations Completed
         </Heading>

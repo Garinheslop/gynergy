@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 
 import { WEBINAR_START_ISO, WEBINAR_TITLE } from "@lib/config/webinar";

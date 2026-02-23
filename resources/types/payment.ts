@@ -88,6 +88,7 @@ export interface UserEntitlements {
   challengeAccessType: ChallengeAccessType;
   challengeAccessGrantedAt: string | null;
   challengeExpiresAt: string | null;
+  challengeSessionId: string | null;
   hasJournalAccess: boolean;
   journalSubscriptionId: string | null;
   hasCommunityAccess: boolean;

@@ -59,6 +59,7 @@ export async function GET() {
           challengeAccessType: entitlements.challenge_access_type,
           challengeAccessGrantedAt: entitlements.challenge_access_granted_at,
           challengeExpiresAt: entitlements.challenge_expires_at,
+          challengeSessionId: entitlements.challenge_session_id,
           hasJournalAccess: entitlements.has_journal_access,
           journalSubscriptionId: entitlements.journal_subscription_id,
           hasCommunityAccess: entitlements.has_community_access,

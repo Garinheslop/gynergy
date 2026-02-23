@@ -211,6 +211,9 @@ const getUserEnrolledBookSession = async ({
         sessionId: sessionEnrollmentData.book_session.sessionId,
         startDate: sessionEnrollmentData.book_session.start_date,
         endDate: sessionEnrollmentData.book_session.end_date,
+        isPersonal: sessionEnrollmentData.book_session.is_personal || false,
+        cohortLabel: sessionEnrollmentData.book_session.cohort_label,
+        status: sessionEnrollmentData.book_session.status,
         createdAt: sessionEnrollmentData.book_session.created_at,
       },
 
@@ -300,45 +303,138 @@ const createUserBookEnrollment = async ({
   userTimezone: string;
 }) => {
   const supabase = createClient();
+  const supabaseAdmin = createServiceClient();
   const date = dayjs().tz(userTimezone).startOf("day").utc().toISOString();
   try {
     if (!userId || !bookId || !date) {
       return { error: "bad-request" };
     }
+
+    // Find the appropriate session: active or upcoming, non-personal
     const { data: bookSession, error: bookSessionError } = await supabase
       .from("book_sessions")
       .select(`*`)
       .eq("book_id", bookId)
+      .eq("is_personal", false)
+      .in("status", ["active", "upcoming"])
       .lte("start_date", date)
       .gte("end_date", date)
+      .order("start_date", { ascending: false })
+      .limit(1)
       .single();
 
-    if (bookSessionError || !bookSession) return { error: "invalid-book" };
+    // Fallback: try any active/upcoming session for this book
+    let targetSession = bookSession;
+    if (bookSessionError || !bookSession) {
+      const { data: fallbackSession } = await supabase
+        .from("book_sessions")
+        .select(`*`)
+        .eq("book_id", bookId)
+        .eq("is_personal", false)
+        .in("status", ["active", "upcoming"])
+        .order("start_date", { ascending: true })
+        .limit(1)
+        .single();
 
-    const supabaseAdmin = createServiceClient();
+      if (!fallbackSession) {
+        // Final fallback: any non-personal session (for backward compatibility with mega-session)
+        const { data: anySession } = await supabase
+          .from("book_sessions")
+          .select(`*`)
+          .eq("book_id", bookId)
+          .eq("is_personal", false)
+          .order("start_date", { ascending: false })
+          .limit(1)
+          .single();
+
+        if (!anySession) return { error: "invalid-book" };
+        targetSession = anySession;
+      } else {
+        targetSession = fallbackSession;
+      }
+    }
+
+    // Check max_enrollments for the session's cohort
+    if (targetSession.max_enrollments) {
+      const { count, error: countError } = await supabaseAdmin
+        .from("session_enrollments")
+        .select("id", { count: "exact", head: true })
+        .eq("session_id", targetSession.id);
+
+      if (!countError && count !== null && count >= targetSession.max_enrollments) {
+        // Find next available session to suggest
+        const { data: nextSession } = await supabase
+          .from("book_sessions")
+          .select("start_date, cohort_label")
+          .eq("book_id", bookId)
+          .eq("is_personal", false)
+          .in("status", ["upcoming"])
+          .gt("start_date", targetSession.start_date)
+          .order("start_date", { ascending: true })
+          .limit(1)
+          .single();
+
+        const nextLaunch = nextSession
+          ? ` Next cohort launches ${dayjs(nextSession.start_date).format("MMMM D, YYYY")}.`
+          : "";
+
+        return { error: `cohort-full:This cohort is full.${nextLaunch}` };
+      }
+    }
+
+    // Create session enrollment
     const { data: sessionEnrollment, error } = await supabaseAdmin
       .from("session_enrollments")
       .insert({
         user_id: userId,
         book_id: bookId,
-        session_id: bookSession.id,
+        session_id: targetSession.id,
         enrollment_date: date,
       })
       .select()
       .single();
 
-    if (error || !sessionEnrollment) return { error: "no-book-session" };
+    if (error) {
+      // DB trigger enforces enrollment capacity atomically (race condition guard)
+      if (error.code === "23514" || error.message?.includes("capacity reached")) {
+        return { error: "cohort-full:This cohort is full. Please try the next available cohort." };
+      }
+      return { error: "no-book-session" };
+    }
+    if (!sessionEnrollment) return { error: "no-book-session" };
+
+    // Auto-assign to cohort: find the cohort linked to this session
+    const { data: cohort } = await supabaseAdmin
+      .from("cohorts")
+      .select("id")
+      .eq("session_id", targetSession.id)
+      .eq("is_active", true)
+      .limit(1)
+      .single();
+
+    if (cohort) {
+      await supabaseAdmin.from("cohort_memberships").upsert(
+        {
+          cohort_id: cohort.id,
+          user_id: userId,
+          role: "member",
+        },
+        { onConflict: "cohort_id,user_id" }
+      );
+    }
 
     return {
       id: sessionEnrollment.id,
       userId: sessionEnrollment.user_id,
       session: {
-        id: bookSession.id,
-        bookId: bookSession.book_id,
-        sessionId: bookSession.sessionId,
-        startDate: bookSession.start_date,
-        endDate: bookSession.end_date,
-        createdAt: bookSession.created_at,
+        id: targetSession.id,
+        bookId: targetSession.book_id,
+        sessionId: targetSession.id,
+        startDate: targetSession.start_date,
+        endDate: targetSession.end_date,
+        cohortLabel: targetSession.cohort_label,
+        status: targetSession.status,
+        createdAt: targetSession.created_at,
       },
 
       enrollmentDate: sessionEnrollment.enrollment_date,

@@ -17,26 +17,24 @@ import VisionMantraEditor from "@modules/editor/components/vision/VisionMantraEd
 // pagePaths import removed - unused
 import { actionRequestTypes } from "@resources/types/action";
 import { buttonActionTypes } from "@resources/types/button";
+import { journalRequestTypes, journalTypes } from "@resources/types/journal";
+import { loaderTypes } from "@resources/types/loader";
+import { visionRequestTypes, visionTypes } from "@resources/types/vision";
+import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
+import { createUserActionLog } from "@store/modules/action";
 import { editorDataCreationRequested, resetEditorDataStates } from "@store/modules/editor";
+import { createUserjournal } from "@store/modules/journal";
+import { updateUserVisions } from "@store/modules/vision";
 
 import EveningJournalEditor from "../daily-journal/EveningJournalEditor";
+import GratitudeActionJournalEditor from "../daily-journal/GratitudeActionJournalEditor";
 import MorningJournalEditor from "../daily-journal/MorningJournalEditor";
 import EditorHeader from "../EditorHeader";
-import { journalRequestTypes, journalTypes } from "@resources/types/journal";
 import VisionCreedEditor from "../vision/VisionCreedEditor";
 import VisionDiscoveryEditor from "../vision/VisionDiscoveryEditor";
-import { headingVariants, paragraphVariants } from "@resources/variants";
-
-import GratitudeActionJournalEditor from "../daily-journal/GratitudeActionJournalEditor";
 import WeeklyChallengeJournalEditor from "../weekly-journal/WeeklyChallengeJournalEditor";
 import WeeklyJournalEditor from "../weekly-journal/WeeklyJournalEditor";
-
-import { loaderTypes } from "@resources/types/loader";
-import { createUserjournal } from "@store/modules/journal";
-import { visionRequestTypes, visionTypes } from "@resources/types/vision";
-import { createUserActionLog } from "@store/modules/action";
-import { updateUserVisions } from "@store/modules/vision";
 
 const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
   const router = useRouter();
@@ -163,7 +161,7 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
           />
         </div>
       )}
-      <div className="bg-bkg-light flex w-full flex-col gap-8 rounded-large sm:p-8">
+      <div className="bg-bkg-light rounded-large flex w-full flex-col gap-8 sm:p-8">
         {(
           [
             journalTypes.morningJournal,
@@ -183,7 +181,7 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
         ) : (
           <>
             <EditorHeader
-              heading={getHeaderData(editorType)?.heading!}
+              heading={getHeaderData(editorType)?.heading ?? ""}
               description={getHeaderData(editorType)?.description}
             />
             {editorType === visionTypes.highestSelf && <VisionHighestSelfEditor />}
@@ -221,7 +219,7 @@ const EditorClient = ({ bookSlug }: { bookSlug: string }) => {
                   className={cn(
                     "bg-grey-300 h-[10px] w-[10px] cursor-pointer rounded-full duration-200",
                     {
-                      "bg-dark-pure w-[30px] rounded-large":
+                      "bg-dark-pure rounded-large w-[30px]":
                         (index === 0 && intro) || (index === 1 && !intro),
                     }
                   )}

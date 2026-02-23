@@ -221,7 +221,7 @@ export async function fetchUserContext(userId: string): Promise<UserContextForAI
 
   // Fetch recent DGAs (last 7 days)
   const { data: dgas } = await supabase
-    .from("dgactions")
+    .from("action_logs")
     .select("id, created_at, reflection, is_completed")
     .eq("user_id", userId)
     .eq("is_completed", true)

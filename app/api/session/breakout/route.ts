@@ -1,7 +1,8 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
 
 import { is100msConfigured } from "@lib/services/100ms";
 import {
@@ -9,14 +10,12 @@ import {
   generateSessionToken,
   endBreakoutRooms as endBreakoutHmsRooms,
 } from "@lib/services/session-hms";
+import { createServiceClient } from "@lib/supabase-server";
 import type { BreakoutRoomRow, GroupSessionRow } from "@resources/types/session";
 import { breakoutRowToBreakout } from "@resources/types/session";
 
 function getAdminClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  return createServiceClient();
 }
 
 async function getAuthUser(request: NextRequest) {

@@ -10,6 +10,7 @@ import { pick } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import { z } from "zod";
 
+import { getOrGenerateDGA } from "@lib/ai/dga-generator";
 import {
   processGamification,
   actionToActivityType,
@@ -63,6 +64,7 @@ interface EnrollmentDataRow {
     id: string;
     book: Array<{
       id: string;
+      duration_days: number;
     }>;
   }>;
 }
@@ -222,7 +224,7 @@ const getUserActions = async ({
     }
     const { data: enrollmentData, error: enrollmentDataError } = await supabase
       .from("session_enrollments")
-      .select("enrollment_date, session: book_sessions(id, book: books(id)) ")
+      .select("enrollment_date, session: book_sessions(id, book: books(id, duration_days)) ")
       .eq("user_id", userId)
       .eq("id", enrollmentId)
       .limit(1);
@@ -244,6 +246,36 @@ const getUserActions = async ({
     const enrollmentRow = enrollmentData[0] as EnrollmentDataRow;
     const bookId = enrollmentRow.session[0]?.book[0]?.id;
     if (!bookId) return { error: "no-book-found" };
+
+    const bookDurationDays = enrollmentRow.session[0]?.book[0]?.duration_days ?? 45;
+
+    // Post-challenge: AI-generated DGA + cycled weekly challenge
+    if (currentSessionDay > bookDurationDays) {
+      const generatedAction = await getOrGenerateDGA({
+        userId,
+        bookId,
+        currentDay: currentSessionDay,
+        userTimezone: timezone,
+      });
+
+      const results: Record<string, unknown>[] = [
+        generatedAction as unknown as Record<string, unknown>,
+      ];
+
+      // Cycle weekly challenges (6 total → week 7 = week 1, etc.)
+      const cycledWeek = ((currentSessionWeek - 1) % 6) + 1;
+      const { data: weeklyAction } = await supabase
+        .from("actions")
+        .select("*")
+        .eq("book_id", bookId)
+        .eq("period", cycledWeek)
+        .eq("action_type", "weekly")
+        .single();
+
+      if (weeklyAction) results.push(camelcaseKeys(weeklyAction));
+
+      return results;
+    }
 
     const { data, error } = await supabase
       .from("actions")

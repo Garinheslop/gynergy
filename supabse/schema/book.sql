@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS "books" (
     UNIQUE(slug)
 );
 
--- Book sessions
+-- Book sessions (each session = one cohort launch with specific dates)
 CREATE TABLE IF NOT EXISTS "book_sessions" (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     book_id UUID REFERENCES books(id) ON DELETE CASCADE NOT NULL,
@@ -36,9 +36,20 @@ CREATE TABLE IF NOT EXISTS "book_sessions" (
     start_date TIMESTAMPTZ NOT NULL,
     end_date TIMESTAMPTZ NOT NULL,
 
+    -- Cohort lifecycle (added migration 007)
+    cohort_label TEXT,                                  -- Display name, e.g. "March 2026 Cohort"
+    status TEXT DEFAULT 'active'                        -- upcoming, active, grace_period, completed
+      CHECK (status IN ('upcoming', 'active', 'grace_period', 'completed')),
+    grace_period_end TIMESTAMPTZ,                       -- end_date + 30 days (auto-calculated)
+    max_enrollments INTEGER DEFAULT 15,                 -- Flexible per cohort
+
+    -- Personal session support (for standalone journal subscribers)
+    is_personal BOOLEAN DEFAULT FALSE,                  -- TRUE = individual, not a cohort
+    owner_user_id UUID REFERENCES users(id) ON DELETE CASCADE,  -- Only set for personal sessions
+
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-    
+
 );
 
 -- Book sessions

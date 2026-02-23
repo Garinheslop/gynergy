@@ -146,7 +146,10 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         isSpinner={isSpinner}
         onHover={onHover}
         disabled={disabled}
-        sx={cn("bg-bkg-dark-secondary hover:bg-bkg-dark-secondary/80 border border-border-light", sx)}
+        sx={cn(
+          "bg-bkg-dark-secondary hover:bg-bkg-dark-secondary/80 border border-border-light",
+          sx
+        )}
       />
     );
   else if (buttonActionType === buttonActionTypes.text)

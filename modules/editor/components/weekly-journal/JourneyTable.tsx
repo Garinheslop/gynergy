@@ -182,13 +182,10 @@ const JourneyTable = ({
             >
               {/* Row header */}
               <div
-                className={cn(
-                  "border-border-light flex min-h-[57px] items-center border-r px-4",
-                  {
-                    "bg-action-50": !tbl.isSecondary,
-                    "bg-gray-100": tbl.isSecondary,
-                  }
-                )}
+                className={cn("border-border-light flex min-h-[57px] items-center border-r px-4", {
+                  "bg-action-50": !tbl.isSecondary,
+                  "bg-gray-100": tbl.isSecondary,
+                })}
               >
                 <Paragraph content={row.label} sx="font-semibold" />
               </div>

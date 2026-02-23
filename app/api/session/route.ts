@@ -1,20 +1,19 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
 
 import { is100msConfigured } from "@lib/services/100ms";
 import { createSessionRoom, generateSessionToken, endSessionRoom } from "@lib/services/session-hms";
+import { createServiceClient } from "@lib/supabase-server";
 import { checkRateLimit, RateLimits } from "@lib/utils/rate-limit";
 import type { GroupSessionRow } from "@resources/types/session";
 import { sessionRowToSession } from "@resources/types/session";
 
 // Admin client for DB writes
 function getAdminClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  return createServiceClient();
 }
 
 // Get authenticated user from cookies

@@ -79,7 +79,7 @@ const Accordion = ({
       aria-label="accordion"
       ref={accordionRef}
       className={cn(
-        "bg-bkg-light group flex h-full w-full flex-col rounded p-5 sm:rounded-large md:p-8",
+        "bg-bkg-light group sm:rounded-large flex h-full w-full flex-col rounded p-5 md:p-8",
         sx
       )}
       onClick={accordionHandler}

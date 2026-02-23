@@ -72,9 +72,7 @@ const Input: FC<InputProps> = ({
   };
 
   return (
-    <section
-      className={cn("relative flex w-full flex-col items-start justify-center gap-1", sx)}
-    >
+    <section className={cn("relative flex w-full flex-col items-start justify-center gap-1", sx)}>
       {label && <Paragraph content={label} variant={paragraphVariant} sx="text-content-dark" />}
       {icon && <i className={`gng-${icon} text-body text-content-dark ml-4`} />}
       <section
@@ -126,7 +124,7 @@ const Input: FC<InputProps> = ({
           >
             <i className="gng-eye text-content-dark-secondary relative">
               {!show && (
-                <span className="absolute top-2 right-[-2px] w-5 -rotate-45 border-t border-grey-500" />
+                <span className="border-grey-500 absolute top-2 right-[-2px] w-5 -rotate-45 border-t" />
               )}
             </i>
           </button>

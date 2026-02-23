@@ -1,8 +1,9 @@
+export const dynamic = "force-dynamic";
+
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from "uuid";
 
 import {
@@ -15,12 +16,7 @@ import {
   generateBroadcasterToken,
   getWebinarConfig,
 } from "@lib/services/webinar-hms";
-
-// Initialize Supabase admin client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { createServiceClient } from "@lib/supabase-server";
 
 /**
  * Extract authenticated user ID from request cookies.
@@ -60,6 +56,7 @@ async function verifyHostAuth(webinarId: string): Promise<{
     return { authorized: false, error: "Authentication required", status: 401 };
   }
 
+  const supabase = createServiceClient();
   const { data: webinar } = await supabase
     .from("webinars")
     .select("host_user_id, co_host_user_ids")
@@ -90,6 +87,8 @@ export async function GET(request: Request) {
     const webinarId = searchParams.get("id");
     const slug = searchParams.get("slug");
     const action = searchParams.get("action");
+
+    const supabase = createServiceClient();
 
     // Get single webinar by ID or slug
     if (webinarId || slug) {
@@ -230,6 +229,8 @@ async function handleCreate(body: {
     );
   }
 
+  const supabase = createServiceClient();
+
   // Check if slug is unique
   const { data: existing } = await supabase.from("webinars").select("id").eq("slug", slug).single();
 
@@ -311,6 +312,8 @@ async function handleGoLive(body: { webinarId: string }) {
     return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
   }
 
+  const supabase = createServiceClient();
+
   // Get webinar
   const { data: webinar, error: fetchError } = await supabase
     .from("webinars")
@@ -389,6 +392,8 @@ async function handleEnd(body: { webinarId: string; saveRecording?: boolean }) {
     return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
   }
 
+  const supabase = createServiceClient();
+
   // Get webinar
   const { data: webinar, error: fetchError } = await supabase
     .from("webinars")
@@ -460,6 +465,8 @@ async function handleGetHostToken(body: { webinarId: string; userName?: string }
   if (!auth.authorized || !auth.userId) {
     return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
   }
+
+  const supabase = createServiceClient();
 
   // Get webinar for room ID
   const { data: webinar, error: fetchError } = await supabase

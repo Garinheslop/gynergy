@@ -89,7 +89,7 @@ const JournalHistoryCard = ({ data, onCardClick, isMeditation, isMeditationCompl
             />
             {isMeditation && (
               <i
-                className={cn("gng-meditation text-xl text-meditation", {
+                className={cn("gng-meditation text-meditation text-xl", {
                   "text-content-lighter": !isMeditationCompleted,
                 })}
               />

@@ -1,8 +1,11 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 
 import { WEBINAR_DATE_ONLY, WEBINAR_TITLE } from "@lib/config/webinar";
 import { sendWebinarConfirmationEmail } from "@lib/email/webinar";
 import { enrollInDrip } from "@lib/services/dripService";
+import { syncWebinarRegistration } from "@lib/services/ghlService";
 import { createClient } from "@lib/supabase-server";
 
 export async function POST(request: Request) {
@@ -97,6 +100,14 @@ export async function POST(request: Request) {
       firstName: normalizedFirstName,
       webinar_title: WEBINAR_TITLE,
     }).catch((err) => console.error("Drip enrollment error:", err));
+
+    // Sync contact to GoHighLevel CRM (non-blocking)
+    syncWebinarRegistration({
+      email: normalizedEmail,
+      firstName: normalizedFirstName || undefined,
+      webinarTitle: WEBINAR_TITLE,
+      source,
+    }).catch((err) => console.error("[ghl] Webinar sync error:", err));
 
     return NextResponse.json({
       success: true,

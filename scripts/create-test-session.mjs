@@ -61,7 +61,9 @@ async function createTestSession() {
       const partialUser = usersAfter?.find((u) => u.email === testEmail);
       if (partialUser) {
         console.log("  User was partially created:", partialUser.id);
-        console.log("  The auth.users INSERT worked but the trigger (handle_new_user) may have failed.");
+        console.log(
+          "  The auth.users INSERT worked but the trigger (handle_new_user) may have failed."
+        );
         userId = partialUser.id;
 
         // Manually insert into users table

@@ -173,7 +173,7 @@ const Journals = () => {
           userEnrollments?.streak?.loading
         }
       />
-      {dayjs().diff(dayjs(userEnrollments.current?.enrollmentDate).startOf("d"), "d") + 1 < 50 && (
+      {
         <Tasks
           heading="Your Tasks This Week"
           type={sectionTypes.weekly}
@@ -187,7 +187,7 @@ const Journals = () => {
             userEnrollments?.streak?.loading
           }
         />
-      )}
+      }
     </>
   );
 };

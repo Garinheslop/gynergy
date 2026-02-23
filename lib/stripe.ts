@@ -276,3 +276,37 @@ export async function getCustomerInvoices(
   });
   return invoices.data;
 }
+
+/**
+ * Create an auto-subscription with trial for challenge purchasers.
+ * Called after $997 payment succeeds. Creates a $39.95/mo subscription
+ * with a 90-day trial so the first charge happens on Day 91.
+ */
+export async function createAutoSubscription({
+  customerId,
+  userId,
+  trialDays = 90,
+}: {
+  customerId: string;
+  userId: string;
+  trialDays?: number;
+}): Promise<Stripe.Subscription> {
+  const stripe = getStripe();
+
+  const subscription = await stripe.subscriptions.create({
+    customer: customerId,
+    items: [{ price: STRIPE_PRODUCTS.JOURNAL_MONTHLY.priceId }],
+    trial_period_days: trialDays,
+    metadata: {
+      userId,
+      autoCreated: "true",
+      source: "challenge_purchase",
+    },
+    payment_behavior: "allow_incomplete",
+    payment_settings: {
+      save_default_payment_method: "on_subscription",
+    },
+  });
+
+  return subscription;
+}

@@ -76,7 +76,7 @@ const DailyJournal = ({ day }: { day: number }) => {
   return (
     <>
       {(morningData || histories.loading) && (
-        <section className="bg-bkg-light flex flex-col gap-5 rounded-large md:p-8">
+        <section className="bg-bkg-light rounded-large flex flex-col gap-5 md:p-8">
           <Header type={journalTypes.morningJournal} />
 
           <div className="border-border-light w-full border-b" />
@@ -88,11 +88,11 @@ const DailyJournal = ({ day }: { day: number }) => {
               <Question
                 heading="Did You Dream?"
                 isCompleted={morningData?.capturedEssence ? true : false}
-                description={morningData?.capturedEssence!}
+                description={morningData?.capturedEssence ?? ""}
               />
               <MoodScore
-                score={morningData?.moodScore!}
-                contributions={morningData?.moodContribution!}
+                score={morningData?.moodScore ?? 0}
+                contributions={morningData?.moodContribution ?? undefined}
               />
               <div className={cn("flex flex-col gap-2.5")}>
                 <Heading variant={headingVariants.cardHeading} sx="!font-bold">
@@ -131,13 +131,13 @@ const DailyJournal = ({ day }: { day: number }) => {
                   </div>
                 </div>
               </div>
-              <TextInputs heading="My Mantra" description={morningData?.mantra!} />
+              <TextInputs heading="My Mantra" description={morningData?.mantra ?? ""} />
             </div>
           )}
         </section>
       )}
       {(eveningData || histories.loading) && (
-        <section className="bg-bkg-light flex flex-col gap-5 rounded-large md:p-8">
+        <section className="bg-bkg-light rounded-large flex flex-col gap-5 md:p-8">
           <Header type={journalTypes.eveningJournal} />
 
           <div className="border-border-light w-full border-b" />
@@ -145,14 +145,14 @@ const DailyJournal = ({ day }: { day: number }) => {
             <Loader type={loaderTypes.spinner} sx={"h-[500px]"} />
           ) : (
             <div className="flex flex-col gap-5">
-              <MoodScore score={eveningData?.moodScore!} />
+              <MoodScore score={eveningData?.moodScore ?? 0} />
               <TextInputs
                 heading="Thought of the Day"
-                description={eveningData?.insight!}
-                subDescription={eveningData?.insightImpact!}
+                description={eveningData?.insight ?? ""}
+                subDescription={eveningData?.insightImpact ?? undefined}
               />
-              <TextInputs heading="What Went Well" description={eveningData?.success!} />
-              <TextInputs heading="Changes for Tomorrow" description={eveningData?.changes!} />
+              <TextInputs heading="What Went Well" description={eveningData?.success ?? ""} />
+              <TextInputs heading="Changes for Tomorrow" description={eveningData?.changes ?? ""} />
 
               <div className="flex flex-col gap-2.5">
                 <Heading variant={headingVariants.title} sx="!font-bold">
@@ -165,7 +165,10 @@ const DailyJournal = ({ day }: { day: number }) => {
                     onErrorImage={images.placeholders.image}
                   />
                 ) : (
-                  <Paragraph content={eveningData?.freeflow!} sx="text-content-dark-secondary" />
+                  <Paragraph
+                    content={eveningData?.freeflow ?? undefined}
+                    sx="text-content-dark-secondary"
+                  />
                 )}
               </div>
               <div className={cn("flex flex-col gap-2.5")}>
@@ -188,7 +191,7 @@ const DailyJournal = ({ day }: { day: number }) => {
         </section>
       )}
       {(actionData || histories.loading) && (
-        <section className="bg-bkg-light flex flex-col gap-5 rounded-large md:p-8">
+        <section className="bg-bkg-light rounded-large flex flex-col gap-5 md:p-8">
           <Header type={journalTypes.gratitudeAction} />
 
           <div className="border-border-light w-full border-b" />
@@ -222,8 +225,8 @@ const DailyJournal = ({ day }: { day: number }) => {
               )}
               <Question
                 heading="Did you complete today’s daily gratitude action?"
-                isCompleted={actionData?.isCompleted!}
-                description={actionData?.obstacles! ?? actionData?.reflection!}
+                isCompleted={actionData?.isCompleted ?? false}
+                description={actionData?.obstacles ?? actionData?.reflection ?? ""}
               />
             </div>
           )}

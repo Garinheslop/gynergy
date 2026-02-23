@@ -17,6 +17,7 @@ const navItems: AdminNavItem[] = [
   { label: "Dashboard", href: "/admin", icon: "gng-dashboard" },
   { label: "Users", href: "/admin/users", icon: "gng-user" },
   { label: "Content", href: "/admin/content", icon: "gng-book" },
+  { label: "Cohorts", href: "/admin/cohorts", icon: "gng-users" },
   { label: "Community", href: "/admin/community", icon: "gng-community" },
   { label: "Payments", href: "/admin/payments", icon: "gng-credit-card" },
   { label: "Analytics", href: "/admin/analytics", icon: "gng-stats" },

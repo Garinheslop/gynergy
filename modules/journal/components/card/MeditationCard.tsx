@@ -61,13 +61,13 @@ const MeditationCard: React.FC<MeditationCardProps> = ({
   return (
     <div
       className={cn(
-        "items-between relative flex flex-col justify-center gap-5 rounded-large bg-meditation-bg p-5 md:p-8",
+        "items-between rounded-large bg-meditation-bg relative flex flex-col justify-center gap-5 p-5 md:p-8",
         { "card-loading grayscale": isLoading }
       )}
     >
       <div className="flex h-full flex-col gap-5">
         <div className={cn("flex flex-col gap-2.5")}>
-          <i className={cn("gng-meditation text-2xl text-meditation")} />
+          <i className={cn("gng-meditation text-meditation text-2xl")} />
           <Heading
             variant={headingVariants.cardHeading}
             sx={cn("!font-bold", {
@@ -95,7 +95,7 @@ const MeditationCard: React.FC<MeditationCardProps> = ({
         </div>
       </div>
       {!isStatic && (
-        <div className="flex w-full items-center gap-2.5 border-t border-meditation-border pt-4">
+        <div className="border-meditation-border flex w-full items-center gap-2.5 border-t pt-4">
           <i className="gng-info text-content-dark text-xl" />
           <Paragraph
             content={`Complete this meditation as part of this week’s challenge`}
@@ -124,7 +124,7 @@ const MeditationCard: React.FC<MeditationCardProps> = ({
                   popupAction: (reflection: string) => {
                     dispatch(
                       createUserMeditations({
-                        sessionId: userEnrollment?.session?.id!,
+                        sessionId: userEnrollment?.session?.id ?? "",
                         reflection,
                       })
                     );
