@@ -47,14 +47,15 @@ export async function POST(request: NextRequest) {
     // Fetch current platform metrics for context
     const [usersResult, paymentsResult, moderationResult] = await Promise.all([
       supabase.from("users").select("id", { count: "exact", head: true }),
-      supabase.from("payments").select("amount").eq("status", "succeeded"),
+      supabase.from("purchases").select("amount_cents").eq("status", "completed"),
       supabase
         .from("moderation_queue")
         .select("id", { count: "exact", head: true })
         .eq("status", "pending"),
     ]);
 
-    const totalRevenue = paymentsResult.data?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
+    const totalRevenue =
+      paymentsResult.data?.reduce((sum, p) => sum + (p.amount_cents || 0), 0) || 0;
 
     const dashboardMetrics = {
       totalUsers: usersResult.count || 0,

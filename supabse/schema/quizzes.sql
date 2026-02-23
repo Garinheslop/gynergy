@@ -109,7 +109,7 @@ ALTER TABLE course_certificates ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view quizzes for enrolled courses" ON course_quizzes
   FOR SELECT USING (
     EXISTS (
-      SELECT 1 FROM user_course_enrollments uce
+      SELECT 1 FROM course_enrollments uce
       WHERE uce.user_id = auth.uid()
       AND uce.course_id = course_quizzes.course_id
     )
@@ -126,7 +126,7 @@ CREATE POLICY "Users can view questions for enrolled courses" ON quiz_questions
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM course_quizzes cq
-      JOIN user_course_enrollments uce ON uce.course_id = cq.course_id
+      JOIN course_enrollments uce ON uce.course_id = cq.course_id
       WHERE cq.id = quiz_questions.quiz_id
       AND uce.user_id = auth.uid()
     )
