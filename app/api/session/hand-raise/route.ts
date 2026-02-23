@@ -1,17 +1,16 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
 
+import { createServiceClient } from "@lib/supabase-server";
 import { checkRateLimit } from "@lib/utils/rate-limit";
 import type { HandRaiseRow, GroupSessionRow } from "@resources/types/session";
 import { handRaiseRowToHandRaise } from "@resources/types/session";
 
 function getAdminClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  return createServiceClient();
 }
 
 async function getAuthUser(request: NextRequest) {
