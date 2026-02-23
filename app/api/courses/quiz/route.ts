@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 // Quiz System API Routes
 // Handles quiz retrieval, attempts, and scoring
 

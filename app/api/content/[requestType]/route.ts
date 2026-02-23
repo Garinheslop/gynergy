@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 // Content Library API Routes
 // Handles content upload, management, progress tracking, and courses
 
