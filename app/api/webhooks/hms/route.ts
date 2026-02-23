@@ -1,8 +1,10 @@
+export const dynamic = "force-dynamic";
+
 import crypto from "crypto";
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { createClient } from "@supabase/supabase-js";
+import { createServiceClient } from "@lib/supabase-server";
 
 /**
  * 100ms Webhook Handler
@@ -16,11 +18,6 @@ import { createClient } from "@supabase/supabase-js";
  */
 
 const HMS_WEBHOOK_SECRET = process.env.HMS_WEBHOOK_SECRET;
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export async function POST(request: NextRequest) {
   try {
@@ -124,6 +121,7 @@ async function handleRecordingSuccess(data: {
   }
 
   // Update webinar with recording URL
+  const supabase = createServiceClient();
   const { error } = await supabase
     .from("webinars")
     .update({
@@ -155,6 +153,7 @@ async function handleRecordingFailed(data: {
 
   // Optionally update webinar metadata with failure info
   if (data.room_id) {
+    const supabase = createServiceClient();
     await supabase
       .from("webinars")
       .update({
