@@ -1,8 +1,9 @@
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 
-import { createClient } from "@supabase/supabase-js";
-
 import { sendWebinarFollowUpEmail } from "@lib/email/webinar";
+import { createServiceClient } from "@lib/supabase-server";
 
 /**
  * Webinar Follow-Up Cron Job
@@ -18,12 +19,6 @@ import { sendWebinarFollowUpEmail } from "@lib/email/webinar";
 
 const CRON_SECRET = process.env.CRON_SECRET;
 
-// Initialize Supabase admin client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function GET(request: NextRequest) {
   // Verify cron secret (mandatory)
   const authHeader = request.headers.get("authorization");
@@ -32,6 +27,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const supabase = createServiceClient();
     const now = new Date();
     const results = {
       webinarsChecked: 0,

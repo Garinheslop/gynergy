@@ -1,16 +1,12 @@
+export const dynamic = "force-dynamic";
+
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { createServerClient } from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
 
+import { createServiceClient } from "@lib/supabase-server";
 import { checkRateLimit, getClientIP, RateLimits } from "@lib/utils/rate-limit";
-
-// Initialize Supabase admin client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 /**
  * Get authenticated user ID from request cookies.
@@ -47,6 +43,7 @@ async function verifyHostForWebinar(webinarId: string): Promise<{
     return { authorized: false, error: "Authentication required", status: 401 };
   }
 
+  const supabase = createServiceClient();
   const { data: webinar } = await supabase
     .from("webinars")
     .select("host_user_id, co_host_user_ids")
@@ -80,6 +77,7 @@ async function verifyHostForQuestion(questionId: string): Promise<{
     return { authorized: false, error: "Authentication required", status: 401 };
   }
 
+  const supabase = createServiceClient();
   const { data: question } = await supabase
     .from("webinar_qa")
     .select("webinar_id")
@@ -131,6 +129,7 @@ export async function GET(request: Request) {
       isHost = auth.authorized;
     }
 
+    const supabase = createServiceClient();
     let query = supabase
       .from("webinar_qa")
       .select("*")
@@ -213,6 +212,8 @@ async function handleSubmitQuestion(body: {
     );
   }
 
+  const supabase = createServiceClient();
+
   // Verify webinar exists and is live or scheduled
   const { data: webinar } = await supabase
     .from("webinars")
@@ -280,6 +281,7 @@ async function handleUpdateStatus(questionId: string, status: "approved" | "dism
     return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
   }
 
+  const supabase = createServiceClient();
   const { data: question, error } = await supabase
     .from("webinar_qa")
     .update({ status })
@@ -312,6 +314,7 @@ async function handleAnswer(body: { questionId: string; answer: string }) {
     return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
   }
 
+  const supabase = createServiceClient();
   const { data: question, error } = await supabase
     .from("webinar_qa")
     .update({
@@ -348,6 +351,7 @@ async function handleUpvote(questionId: string, request: Request) {
     return NextResponse.json({ error: "Too many upvotes. Please wait a moment." }, { status: 429 });
   }
 
+  const supabase = createServiceClient();
   const { data: question, error } = await supabase
     .from("webinar_qa")
     .update({
@@ -405,6 +409,7 @@ async function handlePin(questionId: string, isPinned: boolean) {
     return NextResponse.json({ error: auth.error }, { status: auth.status || 403 });
   }
 
+  const supabase = createServiceClient();
   const { data: question, error } = await supabase
     .from("webinar_qa")
     .update({ is_pinned: isPinned })

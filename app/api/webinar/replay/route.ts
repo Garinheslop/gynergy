@@ -1,14 +1,9 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 
-import { createClient } from "@supabase/supabase-js";
-
 import { getRecordings } from "@lib/services/webinar-hms";
-
-// Initialize Supabase admin client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { createServiceClient } from "@lib/supabase-server";
 
 // Replay window: 48 hours after webinar ends
 const REPLAY_WINDOW_HOURS = 48;
@@ -33,6 +28,8 @@ export async function GET(request: Request) {
     if (!slug) {
       return NextResponse.json({ error: "Missing slug parameter" }, { status: 400 });
     }
+
+    const supabase = createServiceClient();
 
     // Fetch webinar by slug
     const { data: webinar, error } = await supabase
@@ -117,6 +114,8 @@ export async function POST(request: Request) {
     if (action !== "track_view" || !slug || !email) {
       return NextResponse.json({ error: "Invalid request" }, { status: 400 });
     }
+
+    const supabase = createServiceClient();
 
     // Find webinar by slug
     const { data: webinar } = await supabase
