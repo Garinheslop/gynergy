@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 
 import dayjs from "dayjs";
 
-import { useSession } from "@contexts/UseSession";
 import { cn } from "@lib/utils/style";
 import Heading from "@modules/common/components/typography/Heading";
 import MeditationCard from "@modules/journal/components/card/MeditationCard";
@@ -202,7 +201,6 @@ interface TasksProps {
   isLoading: boolean;
 }
 const Tasks = ({ heading, type, journalCardContents, onJournalWrite, isLoading }: TasksProps) => {
-  const { bookSession } = useSession();
   const dispatch = useDispatch();
   const userEnrollment = useSelector((state) => state.enrollments.current);
   const meditations = useSelector((state) => state.meditations);
@@ -224,7 +222,7 @@ const Tasks = ({ heading, type, journalCardContents, onJournalWrite, isLoading }
           <Quote />
         </div>
       )}
-      {(type === sectionTypes.weekly || !bookSession.isCompleted) && (
+      {
         <div
           className={cn("xmd:grid-cols-[386px_1fr] xmd:gap-5 grid w-full grid-cols-1 gap-y-5", {
             "xmd:grid-cols-2 gap-5 lg:grid-cols-3": type === sectionTypes.daily,
@@ -256,7 +254,7 @@ const Tasks = ({ heading, type, journalCardContents, onJournalWrite, isLoading }
             );
           })}
         </div>
-      )}
+      }
       {type === sectionTypes.daily &&
         dayjs().diff(dayjs(userEnrollment?.enrollmentDate).startOf("d"), "d") + 1 > 14 &&
         dayjs().diff(dayjs(userEnrollment?.enrollmentDate).startOf("d"), "d") + 1 < 22 && (
