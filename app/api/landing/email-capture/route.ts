@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 
+import { syncLeadCapture } from "@lib/services/ghlService";
 import { createClient } from "@lib/supabase-server";
 
 export async function POST(request: Request) {
@@ -40,6 +41,12 @@ export async function POST(request: Request) {
       console.error("Email capture error:", error);
       return NextResponse.json({ error: "Failed to save email" }, { status: 500 });
     }
+
+    // Sync lead to GoHighLevel CRM (non-blocking)
+    syncLeadCapture({
+      email: normalizedEmail,
+      source,
+    }).catch((err) => console.error("[ghl] Lead capture sync error:", err));
 
     return NextResponse.json({ success: true, message: "Email captured successfully" });
   } catch (error) {

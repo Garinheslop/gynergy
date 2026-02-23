@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 
 import { sendAssessmentReportEmail } from "@lib/email/assessment-report";
 import { enrollInDrip } from "@lib/services/dripService";
+import { syncAssessmentCompletion } from "@lib/services/ghlService";
 import { createClient } from "@lib/supabase-server";
 import {
   calculateTotalScore,
@@ -195,6 +196,15 @@ export async function POST(request: Request) {
         lowest_pillar: lowestPillar,
       }).catch((err) => console.error("Drip enrollment error:", err));
 
+      // Sync assessment completion to GoHighLevel CRM (non-blocking)
+      syncAssessmentCompletion({
+        email: normalizedEmail,
+        firstName: first_name || undefined,
+        totalScore,
+        lowestPillar: lowestPillar?.pillar || "unknown",
+        interpretation,
+      }).catch((err) => console.error("[ghl] Assessment sync error:", err));
+
       return NextResponse.json({
         success: true,
         message: "V3 Assessment saved successfully",
@@ -290,6 +300,15 @@ export async function POST(request: Request) {
       score: totalScore,
       lowest_pillar: lowestPillar,
     }).catch((err) => console.error("Drip enrollment error:", err));
+
+    // Sync assessment completion to GoHighLevel CRM (non-blocking)
+    syncAssessmentCompletion({
+      email: normalizedEmail,
+      firstName: first_name || undefined,
+      totalScore,
+      lowestPillar: lowestPillar?.pillar || "unknown",
+      interpretation,
+    }).catch((err) => console.error("[ghl] Assessment sync error:", err));
 
     return NextResponse.json({
       success: true,

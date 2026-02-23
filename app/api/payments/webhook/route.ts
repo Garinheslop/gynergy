@@ -7,6 +7,7 @@ import Stripe from "stripe";
 import { DEFAULT_BOOK_ID } from "@lib/constants";
 import { sendPurchaseConfirmationEmail } from "@lib/email";
 import { enrollInDrip, cancelDrip } from "@lib/services/dripService";
+import { syncPurchaseCompleted, syncCartAbandoned } from "@lib/services/ghlService";
 import {
   verifyWebhookSignature,
   formatPrice,
@@ -298,6 +299,14 @@ async function handleCheckoutCompleted(
         console.error("Webinar drip cancel error:", err)
       );
 
+      // Sync purchase to GoHighLevel CRM (non-blocking)
+      syncPurchaseCompleted({
+        email: session.customer_email,
+        firstName,
+        productName: STRIPE_PRODUCTS.CHALLENGE.name,
+        amount: formatPrice(session.amount_total || STRIPE_PRODUCTS.CHALLENGE.amount),
+      }).catch((err) => console.error("[ghl] Purchase sync error:", err));
+
       // Enroll in friend code referral reminders (non-blocking)
       enrollInDrip("friend_codes_issued", session.customer_email, {
         firstName,
@@ -541,6 +550,12 @@ async function handleCheckoutExpired(session: Stripe.Checkout.Session) {
     firstName,
     productType,
   }).catch((err) => console.error("Cart abandonment drip enrollment error:", err));
+
+  // Sync cart abandonment to GoHighLevel CRM (non-blocking)
+  syncCartAbandoned({
+    email,
+    firstName,
+  }).catch((err) => console.error("[ghl] Cart abandonment sync error:", err));
 }
 
 async function handleChargeRefunded(
