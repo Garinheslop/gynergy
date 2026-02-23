@@ -69,7 +69,7 @@ const BookOnboarding = () => {
           icon="arrow-right"
           onClick={() => {
             if (step === 4) {
-              dispatch(enrollUserToBookSession(book?.id));
+              dispatch(enrollUserToBookSession(book?.id ?? ""));
             } else {
               setStep((prev) => prev + 1);
             }

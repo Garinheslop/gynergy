@@ -92,7 +92,7 @@ const DailyJournal = ({ day }: { day: number }) => {
               />
               <MoodScore
                 score={morningData?.moodScore ?? 0}
-                contributions={morningData?.moodContribution}
+                contributions={morningData?.moodContribution ?? undefined}
               />
               <div className={cn("flex flex-col gap-2.5")}>
                 <Heading variant={headingVariants.cardHeading} sx="!font-bold">
@@ -149,7 +149,7 @@ const DailyJournal = ({ day }: { day: number }) => {
               <TextInputs
                 heading="Thought of the Day"
                 description={eveningData?.insight ?? ""}
-                subDescription={eveningData?.insightImpact}
+                subDescription={eveningData?.insightImpact ?? undefined}
               />
               <TextInputs heading="What Went Well" description={eveningData?.success ?? ""} />
               <TextInputs heading="Changes for Tomorrow" description={eveningData?.changes ?? ""} />
@@ -165,7 +165,10 @@ const DailyJournal = ({ day }: { day: number }) => {
                     onErrorImage={images.placeholders.image}
                   />
                 ) : (
-                  <Paragraph content={eveningData?.freeflow} sx="text-content-dark-secondary" />
+                  <Paragraph
+                    content={eveningData?.freeflow ?? undefined}
+                    sx="text-content-dark-secondary"
+                  />
                 )}
               </div>
               <div className={cn("flex flex-col gap-2.5")}>
