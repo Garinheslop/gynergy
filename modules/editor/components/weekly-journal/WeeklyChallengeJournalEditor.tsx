@@ -8,13 +8,19 @@ import { getBase64 } from "@lib/utils/image";
 import { handleImageCompress } from "@lib/utils/ImageCompressor";
 import { cn } from "@lib/utils/style";
 import FileInput from "@modules/common/components/FileInput";
+import Image from "@modules/common/components/Image";
 import Spinner from "@modules/common/components/Spinner";
 import TextArea from "@modules/common/components/TextArea";
 import TextAreaWithHeading from "@modules/common/components/TextAreaWithHeading";
+import Heading from "@modules/common/components/typography/Heading";
+import Paragraph from "@modules/common/components/typography/Paragraph";
 import useSetEditorData from "@modules/journal/hooks/useSetEditorData";
+import { pagePaths } from "@resources/paths";
+import { ActionData } from "@resources/types/action";
 import { JourneyTableData, WeeklyChallengeData } from "@resources/types/journal";
-import { useSelector } from "@store/hooks";
 import { ImageRawData } from "@resources/types/ocr";
+import { headingVariants, paragraphVariants } from "@resources/variants";
+import { useSelector } from "@store/hooks";
 import {
   setEditorLoadingState,
   updateEditorCurrentState,
@@ -23,15 +29,6 @@ import {
 
 import EditorActionBtns from "../EditorActionBtns";
 import EditorHeader from "../EditorHeader";
-
-import { headingVariants, paragraphVariants } from "@resources/variants";
-import Heading from "@modules/common/components/typography/Heading";
-import Paragraph from "@modules/common/components/typography/Paragraph";
-import { ActionData } from "@resources/types/action";
-
-import { pagePaths } from "@resources/paths";
-import Image from "@modules/common/components/Image";
-
 import EulogyIntro from "./EulogyIntro";
 import JourneyTable from "./JourneyTable";
 
@@ -272,11 +269,11 @@ const MeditationCard = () => {
   return (
     <div
       className={cn(
-        "items-between relative flex flex-col justify-center gap-5 rounded bg-meditation-bg p-5 md:p-8"
+        "items-between bg-meditation-bg relative flex flex-col justify-center gap-5 rounded p-5 md:p-8"
       )}
     >
       <div className={cn("flex flex-col gap-2.5")}>
-        <i className={cn(`gng-meditation text-2xl text-meditation`)} />
+        <i className={cn(`gng-meditation text-meditation text-2xl`)} />
         <Heading variant={headingVariants.cardHeading} sx="font-bold">
           {meditations.total} out of 7 Daily Meditations Completed
         </Heading>
@@ -316,12 +313,11 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
   const handleFileInput = async (url: string, file: File) => {
     setImage(url);
     setLoading(true);
-    let filteData;
     const compressedFile = await handleImageCompress(file);
     const arrBuffer = await compressedFile.arrayBuffer();
     const buffer = Buffer.from(arrBuffer);
 
-    filteData = {
+    const filteData = {
       file: buffer,
       name: compressedFile?.name ?? new Date().getTime(),
       contentType: compressedFile?.type,
@@ -344,9 +340,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
       />
       <div className="flex w-full grid-cols-3 flex-col gap-8 sm:grid sm:h-[280px] sm:flex-row sm:items-start sm:justify-between">
         {image ? (
-          <div
-            className={cn("relative flex max-h-[270px] w-full gap-2.5 overflow-hidden rounded")}
-          >
+          <div className={cn("relative flex max-h-[270px] w-full gap-2.5 overflow-hidden rounded")}>
             {!loading && (
               <button
                 onClick={() => {

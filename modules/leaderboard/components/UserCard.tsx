@@ -25,9 +25,9 @@ function UserCard({ rank, data, sx }: Props) {
       <div
         className={cn(
           "relative mr-2 flex h-12 w-16 items-center justify-center rounded sm:mr-5 md:w-20",
-          { "bg-gradient-to-r from-rank-gold to-rank-gold-light": rank == 1 },
-          { "bg-gradient-to-r from-rank-silver to-rank-silver-dark": rank == 2 },
-          { "bg-gradient-to-r from-rank-bronze to-rank-bronze-light": rank == 3 }
+          { "from-rank-gold to-rank-gold-light bg-gradient-to-r": rank == 1 },
+          { "from-rank-silver to-rank-silver-dark bg-gradient-to-r": rank == 2 },
+          { "from-rank-bronze to-rank-bronze-light bg-gradient-to-r": rank == 3 }
         )}
       >
         {rank < 4 && (

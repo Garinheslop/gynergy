@@ -7,7 +7,6 @@ import { headingVariants, paragraphVariants } from "@resources/variants";
 
 import Accordion from "./Accordion";
 import ActionButton from "./ActionButton";
-import TextSkeleton from "./skeleton/TextSkeleton";
 import Heading from "./typography/Heading";
 import Paragraph from "./typography/Paragraph";
 
@@ -57,7 +56,7 @@ const Card = ({
   isOpen = false,
   isStatic = false,
   isAccordion = false,
-  isCompleted,
+  isCompleted: _isCompleted,
   icon,
   actionBtn,
   primaryActionIconBtn,
@@ -81,7 +80,7 @@ const Card = ({
     return (
       <section
         className={cn(
-          "bg-bkg-light flex h-full w-full flex-col gap-8 rounded p-5 duration-150 sm:rounded-large md:p-8",
+          "bg-bkg-light sm:rounded-large flex h-full w-full flex-col gap-8 rounded p-5 duration-150 md:p-8",
           {
             "cursor-pointer": onClick,
             "hover:translate-y-[-2px]": onClick,

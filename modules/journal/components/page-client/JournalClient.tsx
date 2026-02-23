@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 
 import dayjs from "dayjs";
 
-import { usePopup } from "@contexts/UsePopup";
 import Inspiration from "@modules/book/components/onboarding/Inspiration";
 import PotentialSelf from "@modules/book/components/onboarding/PotentialSelf";
 import ActionButton from "@modules/common/components/ActionButton";
@@ -14,10 +13,8 @@ import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import { pagePaths } from "@resources/paths";
 import { buttonActionTypes } from "@resources/types/button";
-import { journalTypes } from "@resources/types/journal";
-import { useDispatch, useSelector } from "@store/hooks";
-import { resetEditorDataStates } from "@store/modules/editor";
 import { headingVariants, paragraphVariants } from "@resources/variants";
+import { useDispatch, useSelector } from "@store/hooks";
 import { resetHistoryCurrentState } from "@store/modules/history";
 
 import DailyJournal from "../DailyJournal";
@@ -28,7 +25,7 @@ const JournalClient = ({ bookSlug }: { bookSlug: string }) => {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const journals = useSelector((state) => state.journals);
+  const _journals = useSelector((state) => state.journals);
   const histories = useSelector((state) => state.histories);
   const userEnrollment = useSelector((state) => state.enrollments.current);
 
@@ -73,7 +70,7 @@ const JournalClient = ({ bookSlug }: { bookSlug: string }) => {
         {histories.current?.isWeeklyJournal && <WeeklyJournal />}
         {(histories.current?.isOnboardingInspiration ||
           histories.current?.isOnboardingPotentialSelf) && (
-          <div className="bg-bkg-light mx-auto flex max-w-[1200px] flex-col items-center gap-8 rounded-large p-5 pb-[20px] md:gap-10 md:p-[50px] md:pb-8">
+          <div className="bg-bkg-light rounded-large mx-auto flex max-w-[1200px] flex-col items-center gap-8 p-5 pb-[20px] md:gap-10 md:p-[50px] md:pb-8">
             {histories.current?.isOnboardingInspiration && <Inspiration />}
             {histories.current?.isOnboardingPotentialSelf && <PotentialSelf />}
           </div>

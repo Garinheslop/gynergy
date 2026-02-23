@@ -6,7 +6,6 @@ import { useSession } from "@contexts/UseSession";
 import { cn } from "@lib/utils/style";
 import ActionButton from "@modules/common/components/ActionButton";
 import Image from "@modules/common/components/Image";
-import TextAreaWithHeading from "@modules/common/components/TextAreaWithHeading";
 import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
 import {
@@ -15,16 +14,8 @@ import {
   visionInputData,
 } from "@resources/data/input/visions";
 import { pagePaths } from "@resources/paths";
-import { pageTypes } from "@resources/types/page";
-import {
-  visionCreedKeys,
-  visionDiscoveryKeys,
-  visionHighestSelfKeys,
-  VisionMantra,
-  visionMantraKeys,
-  visionTypes,
-} from "@resources/types/vision";
-import { headingVariants, paragraphVariants } from "@resources/variants";
+import { visionTypes } from "@resources/types/vision";
+import { headingVariants } from "@resources/variants";
 import { useDispatch, useSelector } from "@store/hooks";
 import { setEditorDataStates } from "@store/modules/editor";
 
@@ -50,10 +41,10 @@ const VisionJournal = () => {
   }, [currentHistories]);
 
   return (
-    <section className="bg-bkg-light flex w-full flex-col gap-8 rounded-large sm:p-8">
+    <section className="bg-bkg-light rounded-large flex w-full flex-col gap-8 sm:p-8">
       <div className="flex flex-col items-center justify-between gap-2.5 sm:flex-row sm:items-start">
         <Heading variant={headingVariants.heading} sx={cn("!font-bold")}>
-          {getHeaderData(currentHistories?.entryType!)}
+          {getHeaderData(currentHistories?.entryType ?? "")}
         </Heading>
         {!bookSession.isCompleted && (
           <ActionButton

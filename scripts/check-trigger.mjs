@@ -231,7 +231,11 @@ async function checkTrigger() {
     console.log("  Auth user created:", newUser.user.id);
 
     // The trigger should have handled public.users insertion
-    const { data: checkUser } = await supabase.from("users").select("id").eq("id", newUser.user.id).single();
+    const { data: checkUser } = await supabase
+      .from("users")
+      .select("id")
+      .eq("id", newUser.user.id)
+      .single();
     if (checkUser) {
       console.log("  Trigger worked - user exists in public.users!");
     } else {

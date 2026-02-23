@@ -9,8 +9,6 @@ import ActionButton from "@modules/common/components/ActionButton";
 import Image from "@modules/common/components/Image";
 import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
-import VideoPlayback from "@modules/common/components/VideoPlayback";
-import images from "@resources/images";
 import { buttonActionTypes } from "@resources/types/button";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { RootState } from "@store/configureStore";
@@ -26,7 +24,7 @@ const BookOnboarding = () => {
 
   const book = useSelector((state: RootState) => state.books.current);
   return (
-    <section className="bg-bkg-light mx-auto flex max-w-[1200px] flex-col items-center gap-8 rounded-large p-5 pb-[20px] md:gap-10 md:p-[50px] md:pb-8">
+    <section className="bg-bkg-light rounded-large mx-auto flex max-w-[1200px] flex-col items-center gap-8 p-5 pb-[20px] md:gap-10 md:p-[50px] md:pb-8">
       {step > 1 && (
         <ActionButton
           label={"Back"}
@@ -59,7 +57,7 @@ const BookOnboarding = () => {
               className={cn(
                 "bg-grey-300 h-[10px] w-[10px] cursor-pointer rounded-full duration-200",
                 {
-                  "bg-dark-pure w-[30px] rounded-large": step === index + 1,
+                  "bg-dark-pure rounded-large w-[30px]": step === index + 1,
                 }
               )}
               onClick={() => setStep(index + 1)}
@@ -71,7 +69,7 @@ const BookOnboarding = () => {
           icon="arrow-right"
           onClick={() => {
             if (step === 4) {
-              dispatch(enrollUserToBookSession(book?.id!));
+              dispatch(enrollUserToBookSession(book?.id));
             } else {
               setStep((prev) => prev + 1);
             }
@@ -107,7 +105,7 @@ const BookDetails = () => {
           variant={paragraphVariants.regular}
           sx="flex flex-col gap-1 text-content-dark-secondary [&>p>a]:!text-action-400 [&>p>a]:hover:!text-action-900"
         />
-        <Image className="h-auto w-full rounded-large" path={book?.cover} />
+        <Image className="rounded-large h-auto w-full" path={book?.cover} />
       </div>
     </>
   );
@@ -160,10 +158,7 @@ const AppDetails = () => {
       />
       <div className="xmd:grid-cols-3 grid w-full grid-cols-1 gap-2.5 sm:grid-cols-2">
         {features.map((feature, index) => (
-          <div
-            key={index}
-            className="border-border-light flex flex-col gap-2.5 rounded border p-5"
-          >
+          <div key={index} className="border-border-light flex flex-col gap-2.5 rounded border p-5">
             <div className="bg-grey-50 border-grey-100 mx-auto flex h-[80px] w-[80px] items-center justify-center rounded border">
               <i className={`gng-${feature.icon} text-[34px]`} />
             </div>

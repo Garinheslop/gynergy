@@ -4,12 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@lib/utils/style";
 import images from "@resources/images";
 
-import ActionButton from "./ActionButton";
 import Image from "./Image";
 
 const VideoPlayback = ({ url = "", sx }: { url: string; sx?: string }) => {
   const iframeRef = useRef(null);
-  const [play, setPlay] = useState(false);
+  const [play, _setPlay] = useState(false);
   const [videoSrc, setVideoSrc] = useState(url);
 
   useEffect(() => {
@@ -29,7 +28,7 @@ const VideoPlayback = ({ url = "", sx }: { url: string; sx?: string }) => {
   return (
     <div
       className={cn(
-        "border-border-light relative aspect-video overflow-hidden rounded-large border",
+        "border-border-light rounded-large relative aspect-video overflow-hidden border",
         sx
       )}
     >

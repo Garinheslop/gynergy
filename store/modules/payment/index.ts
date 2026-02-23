@@ -119,8 +119,7 @@ export const cancelUserSubscription =
 
 // Resume subscription (undo cancellation)
 export const resumeUserSubscription =
-  (): AppThunk<Promise<{ success: boolean; error?: string }>> =>
-  async (dispatch) => {
+  (): AppThunk<Promise<{ success: boolean; error?: string }>> => async (dispatch) => {
     dispatch(cancelSubscriptionStart());
 
     try {

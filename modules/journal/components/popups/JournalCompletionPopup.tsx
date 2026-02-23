@@ -1,26 +1,19 @@
 //context
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
 import ReactConfetti from "react-confetti";
-import Webcam from "react-webcam";
 
 import { usePopup } from "@contexts/UsePopup";
-import { base64ToArrayBuffer, getBase64 } from "@lib/utils/image";
 import { cn } from "@lib/utils/style";
 import ActionButton from "@modules/common/components/ActionButton";
-import FileInput from "@modules/common/components/FileInput";
 import Image from "@modules/common/components/Image";
 import Modal from "@modules/common/components/modal";
-
 import Heading from "@modules/common/components/typography/Heading";
 import Paragraph from "@modules/common/components/typography/Paragraph";
-import icons from "@resources/icons";
 import images from "@resources/images";
-import { buttonActionTypes } from "@resources/types/button";
 import { journalTypes } from "@resources/types/journal";
-import { ImageRawData } from "@resources/types/ocr";
 import { headingVariants, paragraphVariants } from "@resources/variants";
 import { useSelector } from "@store/hooks";
 
@@ -59,7 +52,7 @@ const JournalCompletionPopup = () => {
 
   return (
     <Modal open={journalCompletionPopupObj.show} onClose={journalCompletionPopupObj.close}>
-      <section className="bg-bkg-light relative mx-auto flex min-h-[430px] w-[90vw] flex-col gap-8 overflow-auto rounded-large p-8 md:w-[500px]">
+      <section className="bg-bkg-light rounded-large relative mx-auto flex min-h-[430px] w-[90vw] flex-col gap-8 overflow-auto p-8 md:w-[500px]">
         <ReactConfetti
           className="h-full w-full"
           run={showConfetti}

@@ -5,6 +5,7 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { cn } from "@lib/utils/style";
 
 import { CTAButton } from "./shared";
+import { generateCalendarInvite } from "../data/assessment-content";
 import {
   ASSESSMENT_V2_QUESTIONS,
   ASSESSMENT_V2_CONTENT,
@@ -14,19 +15,14 @@ import {
   LAST_PRESENT_MEANINGS,
   READINESS_RESPONSES,
   PRIORITY_INSIGHTS,
-  REVENUE_DISPLAY,
-  ACHIEVEMENT_DISPLAY,
-  SACRIFICE_DISPLAY,
   calculateTotalScore,
   getInterpretation,
   getLowestPillar,
   calculateLeadScore,
   type AssessmentAnswers,
   type AssessmentQuestion,
-  type Interpretation,
 } from "../data/assessment-v2-content";
 import { WEBINAR_HERO_CONTENT } from "../data/webinar-content";
-import { generateCalendarInvite } from "../data/assessment-content";
 
 // ============================================
 // TYPES
@@ -89,31 +85,25 @@ function SingleChoiceQuestion({ question, value, onChange }: QuestionProps) {
           key={option.value}
           onClick={() => onChange(option.value)}
           className={cn(
-            "w-full text-left p-4 border transition-all",
+            "w-full border p-4 text-left transition-all",
             "hover:border-lp-gold/50",
-            value === option.value
-              ? "border-lp-gold bg-lp-gold/10"
-              : "border-lp-border bg-lp-card"
+            value === option.value ? "border-lp-gold bg-lp-gold/10" : "border-lp-border bg-lp-card"
           )}
         >
           <div className="flex items-start gap-3">
             <div
               className={cn(
-                "w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5",
+                "mt-0.5 h-5 w-5 flex-shrink-0 rounded-full border-2",
                 "flex items-center justify-center",
                 value === option.value ? "border-lp-gold bg-lp-gold" : "border-lp-border"
               )}
             >
-              {value === option.value && (
-                <div className="w-2 h-2 rounded-full bg-lp-dark" />
-              )}
+              {value === option.value && <div className="bg-lp-dark h-2 w-2 rounded-full" />}
             </div>
             <div>
-              <p className="font-oswald text-lp-white text-base font-light">
-                {option.label}
-              </p>
+              <p className="font-oswald text-lp-white text-base font-light">{option.label}</p>
               {option.description && (
-                <p className="font-oswald text-lp-muted text-sm font-extralight mt-1">
+                <p className="font-oswald text-lp-muted mt-1 text-sm font-extralight">
                   {option.description}
                 </p>
               )}
@@ -149,27 +139,25 @@ function MultiSelectQuestion({ question, value, onChange }: QuestionProps) {
             onClick={() => !isDisabled && toggleOption(option.value)}
             disabled={isDisabled}
             className={cn(
-              "w-full text-left p-4 border transition-all",
-              isDisabled ? "opacity-50 cursor-not-allowed" : "hover:border-lp-gold/50",
+              "w-full border p-4 text-left transition-all",
+              isDisabled ? "cursor-not-allowed opacity-50" : "hover:border-lp-gold/50",
               isSelected ? "border-lp-gold bg-lp-gold/10" : "border-lp-border bg-lp-card"
             )}
           >
             <div className="flex items-start gap-3">
               <div
                 className={cn(
-                  "w-5 h-5 border-2 flex-shrink-0 mt-0.5",
+                  "mt-0.5 h-5 w-5 flex-shrink-0 border-2",
                   "flex items-center justify-center",
                   isSelected ? "border-lp-gold bg-lp-gold" : "border-lp-border"
                 )}
               >
-                {isSelected && <CheckIcon className="w-3 h-3 text-lp-dark" />}
+                {isSelected && <CheckIcon className="text-lp-dark h-3 w-3" />}
               </div>
               <div>
-                <p className="font-oswald text-lp-white text-base font-light">
-                  {option.label}
-                </p>
+                <p className="font-oswald text-lp-white text-base font-light">{option.label}</p>
                 {option.description && (
-                  <p className="font-oswald text-lp-muted text-sm font-extralight mt-1">
+                  <p className="font-oswald text-lp-muted mt-1 text-sm font-extralight">
                     {option.description}
                   </p>
                 )}
@@ -179,7 +167,7 @@ function MultiSelectQuestion({ question, value, onChange }: QuestionProps) {
         );
       })}
       {maxSelections < 99 && (
-        <p className="font-oswald text-lp-muted text-xs font-extralight text-center mt-2">
+        <p className="font-oswald text-lp-muted mt-2 text-center text-xs font-extralight">
           {selectedValues.length}/{maxSelections} selected
         </p>
       )}
@@ -221,8 +209,8 @@ function SliderQuestion({ question, value, onChange }: QuestionProps) {
         />
 
         {/* Labels */}
-        <div className="flex justify-between mt-3">
-          <span className="font-oswald text-lp-muted text-xs font-extralight max-w-[30%]">
+        <div className="mt-3 flex justify-between">
+          <span className="font-oswald text-lp-muted max-w-[30%] text-xs font-extralight">
             {config.lowLabel}
           </span>
           <span
@@ -231,7 +219,7 @@ function SliderQuestion({ question, value, onChange }: QuestionProps) {
           >
             {currentValue}
           </span>
-          <span className="font-oswald text-lp-muted text-xs font-extralight max-w-[30%] text-right">
+          <span className="font-oswald text-lp-muted max-w-[30%] text-right text-xs font-extralight">
             {config.highLabel}
           </span>
         </div>
@@ -293,10 +281,7 @@ export default function AssessmentPageV2() {
   // Save progress
   useEffect(() => {
     if (state === "questions") {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ answers, currentQuestionIndex })
-      );
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ answers, currentQuestionIndex }));
     }
   }, [answers, currentQuestionIndex, state]);
 
@@ -465,9 +450,7 @@ export default function AssessmentPageV2() {
           <div className="font-oswald text-lp-gold mb-1 text-sm font-normal tracking-[0.5em] uppercase">
             G Y N E R G Y
           </div>
-          <div className="font-oswald text-lp-gold/40 mb-6 text-2xl font-extralight">
-            &infin;
-          </div>
+          <div className="font-oswald text-lp-gold/40 mb-6 text-2xl font-extralight">&infin;</div>
 
           <h1 className="font-bebas text-lp-white mb-4 text-4xl md:text-5xl">
             {ASSESSMENT_V2_CONTENT.title}
@@ -478,20 +461,18 @@ export default function AssessmentPageV2() {
           </p>
 
           <div className="bg-lp-card border-lp-border mb-8 border p-6 text-left">
-            <p className="font-oswald text-lp-muted text-sm font-extralight mb-4">
+            <p className="font-oswald text-lp-muted mb-4 text-sm font-extralight">
               What you&apos;ll discover:
             </p>
             <ul className="space-y-2">
-              <li className="font-oswald text-lp-white text-sm font-light flex items-start gap-2">
-                <span className="text-lp-gold">→</span> Your Five Pillar Score (and what
-                it means)
+              <li className="font-oswald text-lp-white flex items-start gap-2 text-sm font-light">
+                <span className="text-lp-gold">→</span> Your Five Pillar Score (and what it means)
               </li>
-              <li className="font-oswald text-lp-white text-sm font-light flex items-start gap-2">
+              <li className="font-oswald text-lp-white flex items-start gap-2 text-sm font-light">
                 <span className="text-lp-gold">→</span> Which pillar is silently bleeding
               </li>
-              <li className="font-oswald text-lp-white text-sm font-light flex items-start gap-2">
-                <span className="text-lp-gold">→</span> Personalized insights you
-                won&apos;t expect
+              <li className="font-oswald text-lp-white flex items-start gap-2 text-sm font-light">
+                <span className="text-lp-gold">→</span> Personalized insights you won&apos;t expect
               </li>
             </ul>
           </div>
@@ -517,9 +498,7 @@ export default function AssessmentPageV2() {
               <span className="font-oswald text-lp-muted text-sm font-extralight">
                 {currentQuestionIndex + 1} of {totalQuestions}
               </span>
-              <span className="font-oswald text-lp-gold text-sm">
-                {phaseInfo.name}
-              </span>
+              <span className="font-oswald text-lp-gold text-sm">{phaseInfo.name}</span>
             </div>
             <div className="bg-lp-border h-1 w-full overflow-hidden">
               <div
@@ -608,11 +587,10 @@ export default function AssessmentPageV2() {
             Your assessment is complete.
           </p>
           <p className="font-oswald text-lp-muted mb-8 text-sm font-extralight">
-            Enter your email to see your personalized results and receive your full
-            report.
+            Enter your email to see your personalized results and receive your full report.
           </p>
 
-          <div className="space-y-4 mb-6">
+          <div className="mb-6 space-y-4">
             <input
               type="text"
               placeholder="First name (optional)"
@@ -664,7 +642,7 @@ export default function AssessmentPageV2() {
       {state === "results" && (
         <div className="relative z-10 w-full max-w-[700px]">
           {/* Score Header */}
-          <div className="text-center mb-8">
+          <div className="mb-8 text-center">
             <p className="font-oswald text-lp-muted mb-2 text-sm font-extralight tracking-wider uppercase">
               Your Five Pillar Score
             </p>
@@ -686,7 +664,7 @@ export default function AssessmentPageV2() {
               interpretation === "critical" && "border-red-500/30"
             )}
           >
-            <p className="font-bebas text-lp-gold text-2xl mb-2">
+            <p className="font-bebas text-lp-gold mb-2 text-2xl">
               {SCORE_INTERPRETATIONS[interpretation].headline}
             </p>
             <p className="font-oswald text-lp-white text-base leading-relaxed font-light">
@@ -712,13 +690,13 @@ export default function AssessmentPageV2() {
           {/* 2am Thought Insight */}
           {answers.two_am_thought && answers.two_am_thought !== "other" && (
             <div className="bg-lp-card border-lp-border mb-6 border p-6">
-              <p className="font-oswald text-lp-muted text-xs font-extralight tracking-wider uppercase mb-3">
+              <p className="font-oswald text-lp-muted mb-3 text-xs font-extralight tracking-wider uppercase">
                 At 2am, you&apos;ve been asking yourself:
               </p>
-              <p className="font-oswald text-lp-white text-lg font-light italic mb-3">
+              <p className="font-oswald text-lp-white mb-3 text-lg font-light italic">
                 &ldquo;{TWO_AM_MEANINGS[answers.two_am_thought].thought}&rdquo;
               </p>
-              <p className="font-oswald text-lp-gray text-sm font-extralight leading-relaxed">
+              <p className="font-oswald text-lp-gray text-sm leading-relaxed font-extralight">
                 {TWO_AM_MEANINGS[answers.two_am_thought].insight}
               </p>
             </div>
@@ -727,13 +705,13 @@ export default function AssessmentPageV2() {
           {/* Last Present Insight */}
           {answers.last_present && answers.last_present !== "last_week" && (
             <div className="bg-lp-card border-lp-border mb-6 border p-6">
-              <p className="font-oswald text-lp-muted text-xs font-extralight tracking-wider uppercase mb-3">
+              <p className="font-oswald text-lp-muted mb-3 text-xs font-extralight tracking-wider uppercase">
                 Time Since You Felt Present
               </p>
-              <p className="font-bebas text-lp-gold-light text-3xl mb-2">
+              <p className="font-bebas text-lp-gold-light mb-2 text-3xl">
                 {LAST_PRESENT_MEANINGS[answers.last_present].hoursSince}
               </p>
-              <p className="font-oswald text-lp-gray text-sm font-extralight leading-relaxed">
+              <p className="font-oswald text-lp-gray text-sm leading-relaxed font-extralight">
                 {LAST_PRESENT_MEANINGS[answers.last_present].insight}
               </p>
             </div>
@@ -742,16 +720,16 @@ export default function AssessmentPageV2() {
           {/* Body Tension Insight */}
           {answers.body_tension && answers.body_tension !== "relaxed" && (
             <div className="bg-lp-card border-lp-border mb-6 border p-6">
-              <p className="font-oswald text-lp-muted text-xs font-extralight tracking-wider uppercase mb-3">
+              <p className="font-oswald text-lp-muted mb-3 text-xs font-extralight tracking-wider uppercase">
                 Your Body Has Been Keeping Score
               </p>
-              <p className="font-oswald text-lp-white text-base font-light mb-2">
+              <p className="font-oswald text-lp-white mb-2 text-base font-light">
                 Tension in your {BODY_TENSION_MEANINGS[answers.body_tension].location}:{" "}
                 <span className="text-lp-gold">
                   {BODY_TENSION_MEANINGS[answers.body_tension].meaning}
                 </span>
               </p>
-              <p className="font-oswald text-lp-gray text-sm font-extralight leading-relaxed">
+              <p className="font-oswald text-lp-gray text-sm leading-relaxed font-extralight">
                 {BODY_TENSION_MEANINGS[answers.body_tension].insight}
               </p>
             </div>
@@ -759,32 +737,27 @@ export default function AssessmentPageV2() {
 
           {/* Pillar Breakdown */}
           <div className="bg-lp-card border-lp-border mb-6 border p-6">
-            <p className="font-oswald text-lp-muted text-xs font-extralight tracking-wider uppercase mb-4">
+            <p className="font-oswald text-lp-muted mb-4 text-xs font-extralight tracking-wider uppercase">
               The Multiplier Equation
             </p>
-            <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
-              {["wealth", "health", "relationships", "growth", "purpose"].map(
-                (pillar, index) => {
-                  const score =
-                    answers[`${pillar}_score` as keyof AssessmentAnswers] as number;
-                  const isLowest = lowestPillar?.pillar === pillar;
-                  return (
-                    <span key={pillar}>
-                      <span
-                        className={cn(
-                          "font-bebas text-2xl",
-                          isLowest && score <= 5 ? "text-red-400" : "text-lp-gold"
-                        )}
-                      >
-                        {score || "?"}
-                      </span>
-                      {index < 4 && (
-                        <span className="font-oswald text-lp-muted mx-1">×</span>
+            <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
+              {["wealth", "health", "relationships", "growth", "purpose"].map((pillar, index) => {
+                const score = answers[`${pillar}_score` as keyof AssessmentAnswers] as number;
+                const isLowest = lowestPillar?.pillar === pillar;
+                return (
+                  <span key={pillar}>
+                    <span
+                      className={cn(
+                        "font-bebas text-2xl",
+                        isLowest && score <= 5 ? "text-red-400" : "text-lp-gold"
                       )}
+                    >
+                      {score || "?"}
                     </span>
-                  );
-                }
-              )}
+                    {index < 4 && <span className="font-oswald text-lp-muted mx-1">×</span>}
+                  </span>
+                );
+              })}
               <span className="font-oswald text-lp-muted mx-2">=</span>
               <span
                 className={cn(
@@ -792,15 +765,15 @@ export default function AssessmentPageV2() {
                   interpretation === "critical"
                     ? "text-red-400"
                     : interpretation === "gap"
-                    ? "text-lp-gold/70"
-                    : "text-lp-gold"
+                      ? "text-lp-gold/70"
+                      : "text-lp-gold"
                 )}
               >
                 {interpretation === "critical"
                   ? "Fractured"
                   : interpretation === "gap"
-                  ? "Divided"
-                  : "Multiplied"}
+                    ? "Divided"
+                    : "Multiplied"}
               </span>
             </div>
 
@@ -808,8 +781,7 @@ export default function AssessmentPageV2() {
             <div className="space-y-3">
               {(["wealth", "health", "relationships", "growth", "purpose"] as const).map(
                 (pillar) => {
-                  const score =
-                    answers[`${pillar}_score` as keyof AssessmentAnswers] as number;
+                  const score = answers[`${pillar}_score` as keyof AssessmentAnswers] as number;
                   const isLowest = lowestPillar?.pillar === pillar;
                   return (
                     <div key={pillar} className="flex items-center gap-4">
@@ -851,16 +823,16 @@ export default function AssessmentPageV2() {
           {/* Priority Pillar Insight */}
           {answers.priority_pillar && (
             <div className="bg-lp-gold/10 border-lp-gold/30 mb-6 border p-6">
-              <p className="font-oswald text-lp-muted text-xs font-extralight tracking-wider uppercase mb-3">
+              <p className="font-oswald text-lp-muted mb-3 text-xs font-extralight tracking-wider uppercase">
                 Your Leverage Point
               </p>
-              <p className="font-oswald text-lp-gold text-lg font-light mb-2">
+              <p className="font-oswald text-lp-gold mb-2 text-lg font-light">
                 {PRIORITY_INSIGHTS[answers.priority_pillar].validation}
               </p>
-              <p className="font-oswald text-lp-white text-sm font-extralight leading-relaxed mb-3">
+              <p className="font-oswald text-lp-white mb-3 text-sm leading-relaxed font-extralight">
                 {PRIORITY_INSIGHTS[answers.priority_pillar].whyFirst}
               </p>
-              <p className="font-oswald text-lp-gray text-sm font-extralight leading-relaxed italic">
+              <p className="font-oswald text-lp-gray text-sm leading-relaxed font-extralight italic">
                 {PRIORITY_INSIGHTS[answers.priority_pillar].rippleEffect}
               </p>
             </div>
@@ -869,7 +841,7 @@ export default function AssessmentPageV2() {
           {/* Readiness-Based CTA */}
           {answers.readiness && (
             <div className="bg-lp-card border-lp-gold/50 mb-6 border p-6 text-center">
-              <p className="font-oswald text-lp-white text-base leading-relaxed font-light mb-4">
+              <p className="font-oswald text-lp-white mb-4 text-base leading-relaxed font-light">
                 {READINESS_RESPONSES[answers.readiness].response}
               </p>
               <CTAButton
@@ -886,13 +858,13 @@ export default function AssessmentPageV2() {
 
           {/* Lead Score (hidden but useful for debugging) */}
           {process.env.NODE_ENV === "development" && (
-            <p className="text-center font-oswald text-lp-muted/50 text-xs">
+            <p className="font-oswald text-lp-muted/50 text-center text-xs">
               Lead Score: {leadScore}
             </p>
           )}
 
           {/* Back to webinar link */}
-          <div className="text-center mt-6">
+          <div className="mt-6 text-center">
             <a
               href="/webinar"
               className="font-oswald text-lp-muted hover:text-lp-white text-sm font-extralight underline"

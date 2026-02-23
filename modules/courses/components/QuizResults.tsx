@@ -40,14 +40,7 @@ export default function QuizResults({
       <div className="relative">
         <svg className="h-36 w-36 -rotate-90" viewBox="0 0 140 140">
           {/* Background circle */}
-          <circle
-            cx="70"
-            cy="70"
-            r={radius}
-            fill="none"
-            stroke="#e5e7eb"
-            strokeWidth="8"
-          />
+          <circle cx="70" cy="70" r={radius} fill="none" stroke="#e5e7eb" strokeWidth="8" />
           {/* Progress circle */}
           <circle
             cx="70"
@@ -63,12 +56,7 @@ export default function QuizResults({
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span
-            className={cn(
-              "text-3xl font-bold",
-              passed ? "text-green-600" : "text-red-600"
-            )}
-          >
+          <span className={cn("text-3xl font-bold", passed ? "text-green-600" : "text-red-600")}>
             {Math.round(percentage)}%
           </span>
           <span className="text-content-muted text-xs">
@@ -79,12 +67,7 @@ export default function QuizResults({
 
       {/* Result Message */}
       <div className="text-center">
-        <h3
-          className={cn(
-            "text-xl font-bold",
-            passed ? "text-green-600" : "text-red-600"
-          )}
-        >
+        <h3 className={cn("text-xl font-bold", passed ? "text-green-600" : "text-red-600")}>
           {passed ? "Quiz Passed!" : "Quiz Not Passed"}
         </h3>
         <p className="text-content-muted mt-1 text-sm">
@@ -117,7 +100,8 @@ export default function QuizResults({
         {attempt.timeTakenSeconds && (
           <div className="flex-1 rounded-lg bg-gray-50 p-3 text-center">
             <p className="text-content-dark text-lg font-bold">
-              {Math.floor(attempt.timeTakenSeconds / 60)}:{(attempt.timeTakenSeconds % 60).toString().padStart(2, "0")}
+              {Math.floor(attempt.timeTakenSeconds / 60)}:
+              {(attempt.timeTakenSeconds % 60).toString().padStart(2, "0")}
             </p>
             <p className="text-content-muted text-xs">Time</p>
           </div>

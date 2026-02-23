@@ -10,10 +10,13 @@ import Image from "@modules/common/components/Image";
 import Spinner from "@modules/common/components/Spinner";
 import TextArea from "@modules/common/components/TextArea";
 import TextAreaWithHeading from "@modules/common/components/TextAreaWithHeading";
+import Heading from "@modules/common/components/typography/Heading";
+import Paragraph from "@modules/common/components/typography/Paragraph";
 import useSetEditorData from "@modules/journal/hooks/useSetEditorData";
 import { EveningJournalData, journalEntryTypes } from "@resources/types/journal";
-import { useSelector } from "@store/hooks";
 import { ImageRawData } from "@resources/types/ocr";
+import { headingVariants, paragraphVariants } from "@resources/variants";
+import { useSelector } from "@store/hooks";
 import {
   setEditorLoadingState,
   updateEditorCurrentState,
@@ -22,13 +25,7 @@ import {
 
 import EditorActionBtns from "../EditorActionBtns";
 import EditorHeader from "../EditorHeader";
-
-import { headingVariants, paragraphVariants } from "@resources/variants";
-
 import MoodTracker from "../MoodTracker";
-
-import Paragraph from "@modules/common/components/typography/Paragraph";
-import Heading from "@modules/common/components/typography/Heading";
 
 const EveningJournalEditor: FC = () => {
   const { imageScanPopupObj } = usePopup();
@@ -139,7 +136,7 @@ const EveningJournalEditor: FC = () => {
 const Entries = ({
   heading,
   values,
-  entryType,
+  entryType: _entryType,
   onEntryInput,
   sx,
 }: {
@@ -150,7 +147,7 @@ const Entries = ({
   sx?: string;
 }) => {
   const [entries, setEntries] = useState(
-    Array.from({ length: 5 }).map((_, i) => ({
+    Array.from({ length: 5 }).map((_, _i) => ({
       value: "",
       label: "I am",
     }))
@@ -168,7 +165,7 @@ const Entries = ({
       );
     } else {
       setEntries(
-        Array.from({ length: 5 }).map((_, i) => ({
+        Array.from({ length: 5 }).map((_, _i) => ({
           value: "",
           label: "I am",
         }))
@@ -236,12 +233,11 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
   const handleFileInput = async (url: string, file: File) => {
     setImage(url);
     setLoading(true);
-    let filteData;
     const compressedFile = await handleImageCompress(file);
     const arrBuffer = await compressedFile.arrayBuffer();
     const buffer = Buffer.from(arrBuffer);
 
-    filteData = {
+    const filteData = {
       file: buffer,
       name: compressedFile?.name ?? new Date().getTime(),
       contentType: compressedFile?.type,
@@ -264,9 +260,7 @@ const FreeFlow = ({ value, onUpdate }: { value?: any; onUpdate: (data?: any) => 
       />
       <div className="flex w-full grid-cols-3 flex-col gap-8 sm:grid sm:h-[280px] sm:flex-row sm:items-start sm:justify-between">
         {image ? (
-          <div
-            className={cn("relative flex max-h-[270px] w-full gap-2.5 overflow-hidden rounded")}
-          >
+          <div className={cn("relative flex max-h-[270px] w-full gap-2.5 overflow-hidden rounded")}>
             {!loading && (
               <button
                 onClick={() => {

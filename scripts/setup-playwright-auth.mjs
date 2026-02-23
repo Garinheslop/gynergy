@@ -52,8 +52,14 @@ async function setup() {
   }
 
   console.log("  Sign in successful!");
-  console.log("  Access token (first 50 chars):", signInData.session.access_token.substring(0, 50) + "...");
-  console.log("  Refresh token (first 30 chars):", signInData.session.refresh_token.substring(0, 30) + "...");
+  console.log(
+    "  Access token (first 50 chars):",
+    signInData.session.access_token.substring(0, 50) + "..."
+  );
+  console.log(
+    "  Refresh token (first 30 chars):",
+    signInData.session.refresh_token.substring(0, 30) + "..."
+  );
   console.log("  Expires at:", signInData.session.expires_at);
 
   // Output the credentials for Playwright
