@@ -139,32 +139,12 @@ CREATE TABLE IF NOT EXISTS "moderation_queue" (
 );
 
 -- ============================================
--- Dashboard Metrics Cache
--- Pre-computed metrics for fast dashboard loading
--- ============================================
-CREATE TABLE IF NOT EXISTS "dashboard_metrics_cache" (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-
-  metric_key TEXT NOT NULL UNIQUE,
-  metric_value JSONB NOT NULL,
-
-  -- Cache management
-  computed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  expires_at TIMESTAMPTZ NOT NULL,
-
-  -- Metadata
-  query_hash TEXT,
-  computation_time_ms INTEGER
-);
-
--- ============================================
 -- Enable Row Level Security
 -- ============================================
 ALTER TABLE admin_audit_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE system_metrics ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_preferences ENABLE ROW LEVEL SECURITY;
 ALTER TABLE moderation_queue ENABLE ROW LEVEL SECURITY;
-ALTER TABLE dashboard_metrics_cache ENABLE ROW LEVEL SECURITY;
 
 -- ============================================
 -- RLS Policies
@@ -204,10 +184,6 @@ CREATE POLICY "Admins can read moderation queue" ON moderation_queue
 CREATE POLICY "Admins can update moderation queue" ON moderation_queue
   FOR UPDATE USING (is_admin(auth.uid()));
 
--- Dashboard cache: Admins can read
-CREATE POLICY "Admins can read dashboard cache" ON dashboard_metrics_cache
-  FOR SELECT USING (is_admin(auth.uid()));
-
 -- ============================================
 -- Indexes for Performance
 -- ============================================
@@ -225,9 +201,6 @@ CREATE INDEX idx_moderation_queue_status ON moderation_queue(status);
 CREATE INDEX idx_moderation_queue_priority ON moderation_queue(priority);
 CREATE INDEX idx_moderation_queue_content ON moderation_queue(content_type, content_id);
 CREATE INDEX idx_moderation_queue_created ON moderation_queue(created_at DESC);
-
-CREATE INDEX idx_dashboard_cache_key ON dashboard_metrics_cache(metric_key);
-CREATE INDEX idx_dashboard_cache_expires ON dashboard_metrics_cache(expires_at);
 
 -- ============================================
 -- Triggers for Updated At

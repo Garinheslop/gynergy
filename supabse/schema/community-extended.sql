@@ -77,58 +77,6 @@ CREATE TABLE IF NOT EXISTS "post_reactions" (
     UNIQUE(post_id, user_id)
 );
 
--- Comment reactions
-CREATE TABLE IF NOT EXISTS "comment_reactions" (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    comment_id UUID REFERENCES post_comments(id) ON DELETE CASCADE NOT NULL,
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    reaction_type TEXT NOT NULL CHECK (reaction_type IN ('heart', 'support')),
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(comment_id, user_id)
-);
-
--- ============================================================================
--- SOCIAL CONNECTIONS
--- ============================================================================
-
--- Social platform enum
-DO $$ BEGIN
-    CREATE TYPE social_platform AS ENUM (
-        'twitter',
-        'instagram',
-        'linkedin',
-        'facebook',
-        'tiktok'
-    );
-EXCEPTION
-    WHEN duplicate_object THEN null;
-END $$;
-
--- User social connections
-CREATE TABLE IF NOT EXISTS "social_connections" (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    platform social_platform NOT NULL,
-    platform_username TEXT NOT NULL,
-    platform_user_id TEXT,                    -- External platform's user ID
-    profile_url TEXT,
-    is_verified BOOLEAN DEFAULT FALSE,
-    is_public BOOLEAN DEFAULT TRUE,           -- Show on profile
-    connected_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(user_id, platform)
-);
-
--- Social shares tracking (when users share to social media)
-CREATE TABLE IF NOT EXISTS "social_shares" (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    post_id UUID REFERENCES community_posts(id) ON DELETE SET NULL,
-    share_type TEXT NOT NULL CHECK (share_type IN ('post', 'badge', 'streak', 'referral', 'journey')),
-    platform social_platform NOT NULL,
-    share_url TEXT,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);
-
 -- ============================================================================
 -- REFERRAL SYSTEM
 -- ============================================================================
@@ -178,60 +126,6 @@ CREATE TABLE IF NOT EXISTS "user_referral_milestones" (
 );
 
 -- ============================================================================
--- MEMBER PROFILES (Extended)
--- ============================================================================
-
--- Public profile settings
-CREATE TABLE IF NOT EXISTS "profile_settings" (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL UNIQUE,
-
-    -- Visibility
-    show_streak BOOLEAN DEFAULT TRUE,
-    show_points BOOLEAN DEFAULT TRUE,
-    show_badges BOOLEAN DEFAULT TRUE,
-    show_social_links BOOLEAN DEFAULT TRUE,
-    show_cohort BOOLEAN DEFAULT TRUE,
-
-    -- Bio
-    bio TEXT,
-    location TEXT,
-    timezone TEXT,
-
-    -- Preferences
-    allow_direct_messages BOOLEAN DEFAULT TRUE,
-    allow_encouragements BOOLEAN DEFAULT TRUE,
-    email_digest_frequency TEXT DEFAULT 'daily' CHECK (email_digest_frequency IN ('never', 'daily', 'weekly')),
-
-    updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);
-
--- ============================================================================
--- WEEKLY HIGHLIGHTS
--- ============================================================================
-
--- Weekly featured content
-CREATE TABLE IF NOT EXISTS "weekly_highlights" (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    cohort_id UUID REFERENCES cohorts(id) ON DELETE CASCADE,
-    week_start DATE NOT NULL,
-    week_end DATE NOT NULL,
-
-    -- Featured content
-    top_posts UUID[] DEFAULT '{}',            -- Array of post IDs
-    top_contributors UUID[] DEFAULT '{}',     -- Array of user IDs
-    total_journals_completed INTEGER DEFAULT 0,
-    total_wins_shared INTEGER DEFAULT 0,
-    community_streak INTEGER DEFAULT 0,       -- Days with active posts
-
-    -- AI-generated summary
-    weekly_summary TEXT,
-
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(cohort_id, week_start)
-);
-
--- ============================================================================
 -- INDEXES
 -- ============================================================================
 
@@ -245,9 +139,6 @@ CREATE INDEX IF NOT EXISTS idx_post_comments_post ON post_comments(post_id, crea
 CREATE INDEX IF NOT EXISTS idx_post_reactions_post ON post_reactions(post_id);
 CREATE INDEX IF NOT EXISTS idx_post_reactions_user ON post_reactions(user_id);
 
-CREATE INDEX IF NOT EXISTS idx_social_connections_user ON social_connections(user_id);
-CREATE INDEX IF NOT EXISTS idx_social_shares_user ON social_shares(user_id, created_at DESC);
-
 CREATE INDEX IF NOT EXISTS idx_referral_codes_code ON referral_codes(code);
 CREATE INDEX IF NOT EXISTS idx_referrals_referrer ON referrals(referrer_id);
 CREATE INDEX IF NOT EXISTS idx_referrals_referred ON referrals(referred_id);
@@ -259,13 +150,8 @@ CREATE INDEX IF NOT EXISTS idx_referrals_referred ON referrals(referred_id);
 ALTER TABLE community_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE post_comments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE post_reactions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE comment_reactions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE social_connections ENABLE ROW LEVEL SECURITY;
-ALTER TABLE social_shares ENABLE ROW LEVEL SECURITY;
 ALTER TABLE referral_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE referrals ENABLE ROW LEVEL SECURITY;
-ALTER TABLE profile_settings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE weekly_highlights ENABLE ROW LEVEL SECURITY;
 
 -- Community posts policies
 CREATE POLICY "Users can view public posts" ON community_posts
@@ -325,20 +211,6 @@ CREATE POLICY "Users can add reactions" ON post_reactions
 CREATE POLICY "Users can remove own reactions" ON post_reactions
     FOR DELETE USING (auth.uid() = user_id);
 
--- Social connections policies
-CREATE POLICY "Users can view public social connections" ON social_connections
-    FOR SELECT USING (is_public = TRUE OR user_id = auth.uid());
-
-CREATE POLICY "Users can manage own connections" ON social_connections
-    FOR ALL USING (auth.uid() = user_id);
-
--- Social shares policies
-CREATE POLICY "Users can view own shares" ON social_shares
-    FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can create shares" ON social_shares
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-
 -- Referral policies
 CREATE POLICY "Users can view own referral code" ON referral_codes
     FOR SELECT USING (auth.uid() = user_id);
@@ -348,24 +220,6 @@ CREATE POLICY "Anyone can view active referral codes" ON referral_codes
 
 CREATE POLICY "Users can view own referrals" ON referrals
     FOR SELECT USING (auth.uid() = referrer_id OR auth.uid() = referred_id);
-
--- Profile settings policies
-CREATE POLICY "Users can view public profile settings" ON profile_settings
-    FOR SELECT USING (TRUE);
-
-CREATE POLICY "Users can manage own settings" ON profile_settings
-    FOR ALL USING (auth.uid() = user_id);
-
--- Weekly highlights policies
-CREATE POLICY "Cohort members can view highlights" ON weekly_highlights
-    FOR SELECT USING (
-        cohort_id IS NULL OR
-        EXISTS (
-            SELECT 1 FROM cohort_memberships
-            WHERE cohort_memberships.cohort_id = weekly_highlights.cohort_id
-            AND cohort_memberships.user_id = auth.uid()
-        )
-    );
 
 -- ============================================================================
 -- FUNCTIONS
@@ -405,11 +259,6 @@ RETURNS TRIGGER AS $$
 BEGIN
     INSERT INTO referral_codes (user_id, code)
     VALUES (NEW.id, generate_referral_code(NEW.id))
-    ON CONFLICT (user_id) DO NOTHING;
-
-    -- Also create default profile settings
-    INSERT INTO profile_settings (user_id)
-    VALUES (NEW.id)
     ON CONFLICT (user_id) DO NOTHING;
 
     RETURN NEW;

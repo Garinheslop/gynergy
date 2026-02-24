@@ -66,37 +66,9 @@ CREATE TABLE IF NOT EXISTS "user_notifications" (
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
--- Push notification tokens table
-CREATE TABLE IF NOT EXISTS "push_tokens" (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    token TEXT NOT NULL,
-    platform TEXT NOT NULL CHECK (platform IN ('web', 'ios', 'android')),
-    device_name TEXT,
-    is_active BOOLEAN DEFAULT TRUE,
-    last_used_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(user_id, token)
-);
-
--- Scheduled notifications table (for reminder system)
-CREATE TABLE IF NOT EXISTS "scheduled_notifications" (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    notification_type TEXT NOT NULL,       -- 'morning_reminder', 'evening_reminder', 'streak_warning'
-    scheduled_for TIMESTAMPTZ NOT NULL,
-    payload JSONB NOT NULL,
-    status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'sent', 'failed', 'cancelled')),
-    sent_at TIMESTAMPTZ,
-    error_message TEXT,
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);
-
 -- Enable Row Level Security
 ALTER TABLE user_notification_preferences ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_notifications ENABLE ROW LEVEL SECURITY;
-ALTER TABLE push_tokens ENABLE ROW LEVEL SECURITY;
-ALTER TABLE scheduled_notifications ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for user_notification_preferences
 CREATE POLICY "Users can view own preferences" ON user_notification_preferences
@@ -121,32 +93,11 @@ CREATE POLICY "Users can update own notifications" ON user_notifications
 CREATE POLICY "Users can delete own notifications" ON user_notifications
     FOR DELETE USING (auth.uid() = user_id);
 
--- RLS Policies for push_tokens
-CREATE POLICY "Users can view own tokens" ON push_tokens
-    FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can create own tokens" ON push_tokens
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update own tokens" ON push_tokens
-    FOR UPDATE USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete own tokens" ON push_tokens
-    FOR DELETE USING (auth.uid() = user_id);
-
--- RLS Policies for scheduled_notifications
-CREATE POLICY "Users can view own scheduled notifications" ON scheduled_notifications
-    FOR SELECT USING (auth.uid() = user_id);
-
 -- Indexes for performance
 CREATE INDEX idx_user_notification_prefs_user ON user_notification_preferences(user_id);
 CREATE INDEX idx_user_notifications_user ON user_notifications(user_id, is_read, created_at DESC);
 CREATE INDEX idx_user_notifications_category ON user_notifications(user_id, category, created_at DESC);
 CREATE INDEX idx_user_notifications_unread ON user_notifications(user_id, is_read) WHERE is_read = FALSE;
-CREATE INDEX idx_push_tokens_user ON push_tokens(user_id, is_active);
-CREATE INDEX idx_push_tokens_platform ON push_tokens(platform, is_active);
-CREATE INDEX idx_scheduled_notifications_pending ON scheduled_notifications(status, scheduled_for) WHERE status = 'pending';
-CREATE INDEX idx_scheduled_notifications_user ON scheduled_notifications(user_id, status);
 
 -- Function to create default notification preferences on user creation
 CREATE OR REPLACE FUNCTION create_default_notification_preferences()

@@ -264,26 +264,6 @@ CREATE TABLE IF NOT EXISTS "content_tags" (
 );
 
 -- =============================================================================
--- CONTENT CATEGORIES - Hierarchical organization
--- =============================================================================
-CREATE TABLE IF NOT EXISTS "content_categories" (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-    name TEXT NOT NULL,
-    slug TEXT UNIQUE NOT NULL,
-    description TEXT,
-    parent_id UUID REFERENCES content_categories(id),
-    sort_order INTEGER DEFAULT 0,
-
-    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS "content_item_categories" (
-    content_id UUID REFERENCES content_items(id) ON DELETE CASCADE NOT NULL,
-    category_id UUID REFERENCES content_categories(id) ON DELETE CASCADE NOT NULL,
-    PRIMARY KEY (content_id, category_id)
-);
-
--- =============================================================================
 -- CONTENT BOOKMARKS - User saved content
 -- =============================================================================
 CREATE TABLE IF NOT EXISTS "content_bookmarks" (
