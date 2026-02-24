@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
 
@@ -34,18 +35,49 @@ export async function GET(request: NextRequest) {
     const thresholdDate = new Date();
     thresholdDate.setDate(thresholdDate.getDate() - INACTIVITY_THRESHOLD_DAYS);
 
-    // Get all users with challenge access
+    // Get all users with challenge access (capped at 100 for timeout safety)
     const { data: activeUsers, error: usersError } = await supabase
       .from("user_entitlements")
       .select("user_id, users:user_id(email)")
       .eq("entitlement_type", "challenge_access")
-      .eq("is_active", true);
+      .eq("is_active", true)
+      .limit(100);
 
     if (usersError || !activeUsers) {
       throw new Error(`Failed to fetch active users: ${usersError?.message}`);
     }
 
     results.checked = activeUsers.length;
+
+    const userIds = activeUsers.map((e) => e.user_id).filter(Boolean);
+    if (!userIds.length) {
+      return NextResponse.json({ success: true, timestamp: new Date().toISOString(), ...results });
+    }
+
+    // Batch fetch latest journal entries for all users (avoids N+1)
+    const { data: recentEntries } = await supabase
+      .from("journal_entries")
+      .select("user_id, created_at")
+      .in("user_id", userIds)
+      .order("created_at", { ascending: false });
+
+    // Build map: userId → most recent entry date
+    const lastEntryMap = new Map<string, Date>();
+    for (const entry of recentEntries || []) {
+      if (!lastEntryMap.has(entry.user_id)) {
+        lastEntryMap.set(entry.user_id, new Date(entry.created_at));
+      }
+    }
+
+    // Batch fetch profiles for personalization (avoids N+1)
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id, first_name")
+      .in("id", userIds);
+
+    const profileMap = new Map(
+      (profiles || []).map((p: { id: string; first_name: string }) => [p.id, p.first_name])
+    );
 
     for (const entitlement of activeUsers) {
       try {
@@ -55,41 +87,21 @@ export async function GET(request: NextRequest) {
 
         if (!email) continue;
 
-        // Check their most recent journal entry
-        const { data: lastEntry } = await supabase
-          .from("journal_entries")
-          .select("created_at")
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .single();
+        const lastActive = lastEntryMap.get(userId) || null;
 
-        // If no entries at all, or last entry is older than threshold
-        const lastActive = lastEntry?.created_at ? new Date(lastEntry.created_at) : null;
+        // Skip users who are still active
+        if (lastActive && lastActive > thresholdDate) continue;
 
-        if (lastActive && lastActive > thresholdDate) {
-          // User is still active, skip
-          continue;
-        }
-
-        // User is inactive — check if they have any entries at all
-        // (don't send win-back to users who never started)
-        if (!lastEntry) continue;
-
-        // Get first name for personalization
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("first_name")
-          .eq("id", userId)
-          .single();
+        // Skip users who never started (no entries at all)
+        if (!lastActive) continue;
 
         // Enroll in win-back drip (idempotent — won't duplicate)
         const result = await enrollInDrip(
           "user_inactive",
           email,
           {
-            firstName: profile?.first_name || undefined,
-            lastActiveDate: lastActive?.toISOString(),
+            firstName: profileMap.get(userId) || undefined,
+            lastActiveDate: lastActive.toISOString(),
           },
           userId
         );

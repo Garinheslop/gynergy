@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from "next/server";
 
@@ -46,7 +47,8 @@ export async function GET(request: NextRequest) {
         users!inner ( id, email, first_name )
       `
       )
-      .gt("morning_streak", 0);
+      .gt("morning_streak", 0)
+      .limit(200);
 
     if (enrollError) {
       // Table may not exist yet
