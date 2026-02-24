@@ -4,9 +4,10 @@
  * Manages contact sync between Gynergy/Supabase and GHL.
  * All operations are non-blocking and retryable.
  *
- * GHL API v1 Docs: https://highlevel.stoplight.io/docs/integrations
- * Base URL: https://rest.gohighlevel.com/v1
- * Auth: Authorization: Bearer <GHL_API_KEY>
+ * GHL API v2 Docs: https://highlevel.stoplight.io/docs/integrations
+ * Base URL: https://services.leadconnectorhq.com
+ * Auth: Authorization: Bearer <GHL_API_KEY> (Private Integration Token)
+ * Required: GHL_LOCATION_ID for all contact/custom-field operations
  */
 
 // ============================================================================
@@ -71,7 +72,8 @@ export type GHLTag =
 // Client (lazy initialization pattern from lib/stripe.ts)
 // ============================================================================
 
-const GHL_BASE_URL = "https://rest.gohighlevel.com/v1";
+const GHL_BASE_URL = "https://services.leadconnectorhq.com";
+const GHL_API_VERSION = "2021-07-28";
 
 function getApiKey(): string {
   const key = process.env.GHL_API_KEY;
@@ -81,12 +83,21 @@ function getApiKey(): string {
   return key;
 }
 
+function getLocationId(): string {
+  const id = process.env.GHL_LOCATION_ID;
+  if (!id) {
+    throw new Error("GHL_LOCATION_ID is not configured");
+  }
+  return id;
+}
+
 async function ghlFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${GHL_BASE_URL}${endpoint}`;
   const response = await fetch(url, {
     ...options,
     headers: {
       Authorization: `Bearer ${getApiKey()}`,
+      Version: GHL_API_VERSION,
       "Content-Type": "application/json",
       ...options.headers,
     },
@@ -106,13 +117,15 @@ async function ghlFetch<T>(endpoint: string, options: RequestInit = {}): Promise
 
 /**
  * Look up a GHL contact by email. Returns null if not found.
+ * v2: GET /contacts/ with query param + locationId
  */
 export async function lookupContactByEmail(
   email: string
 ): Promise<GHLContactResponse["contact"] | null> {
   try {
+    const locationId = getLocationId();
     const data = await ghlFetch<GHLLookupResponse>(
-      `/contacts/lookup?email=${encodeURIComponent(email)}`
+      `/contacts/?locationId=${locationId}&query=${encodeURIComponent(email)}&limit=1`
     );
     return data.contacts?.[0] ?? null;
   } catch {
@@ -122,12 +135,13 @@ export async function lookupContactByEmail(
 
 /**
  * Create a new contact in GHL.
+ * v2: POST /contacts/ with locationId in body
  */
 export async function createContact(contact: GHLContact): Promise<GHLSyncResult> {
   try {
     const data = await ghlFetch<GHLContactResponse>("/contacts/", {
       method: "POST",
-      body: JSON.stringify(contact),
+      body: JSON.stringify({ ...contact, locationId: getLocationId() }),
     });
     return { success: true, contactId: data.contact.id };
   } catch (error) {
@@ -179,10 +193,11 @@ export async function createOrUpdateGHLContact(contact: GHLContact): Promise<GHL
 
 /**
  * Add tags to a GHL contact.
+ * v2: POST /contacts/{id}/tags with tags array
  */
 export async function addTagsToContact(contactId: string, tags: GHLTag[]): Promise<GHLSyncResult> {
   try {
-    await ghlFetch(`/contacts/${contactId}/tags/`, {
+    await ghlFetch(`/contacts/${contactId}/tags`, {
       method: "POST",
       body: JSON.stringify({ tags }),
     });
@@ -196,13 +211,14 @@ export async function addTagsToContact(contactId: string, tags: GHLTag[]): Promi
 
 /**
  * Remove tags from a GHL contact.
+ * v2: DELETE /contacts/{id}/tags with tags array
  */
 export async function removeTagsFromContact(
   contactId: string,
   tags: GHLTag[]
 ): Promise<GHLSyncResult> {
   try {
-    await ghlFetch(`/contacts/${contactId}/tags/`, {
+    await ghlFetch(`/contacts/${contactId}/tags`, {
       method: "DELETE",
       body: JSON.stringify({ tags }),
     });
@@ -216,10 +232,11 @@ export async function removeTagsFromContact(
 
 /**
  * Add a note to a GHL contact.
+ * v2: POST /contacts/{id}/notes with body + userId
  */
 export async function addNoteToContact(contactId: string, body: string): Promise<GHLSyncResult> {
   try {
-    await ghlFetch(`/contacts/${contactId}/notes/`, {
+    await ghlFetch(`/contacts/${contactId}/notes`, {
       method: "POST",
       body: JSON.stringify({ body }),
     });
