@@ -38,6 +38,13 @@ export const STRIPE_PRODUCTS = {
     amount: 39900, // $399.00 (saves ~$80/year)
     name: "Digital Journal (Annual)",
   },
+  JOURNAL_LOYALTY: {
+    get priceId() {
+      return process.env.STRIPE_LOYALTY_JOURNAL_PRICE_ID || "";
+    },
+    amount: 1997, // $19.97 (founding member rate)
+    name: "Digital Journal (Founding Member)",
+  },
 } as const;
 
 export type ProductType = keyof typeof STRIPE_PRODUCTS;
@@ -331,5 +338,31 @@ export async function upgradeSubscriptionToAnnual(
     items: [{ id: currentItemId, price: STRIPE_PRODUCTS.JOURNAL_ANNUAL.priceId }],
     proration_behavior: "none",
     trial_end: subscription.trial_end || undefined,
+  });
+}
+
+/**
+ * Apply loyalty (founding member) rate to an existing subscription.
+ * Swaps the price from $39.95/mo to $19.97/mo. Preserves trial period.
+ * Called when a trialing user clicks the loyalty offer from a drip email.
+ */
+export async function applyLoyaltyRate(subscriptionId: string): Promise<Stripe.Subscription> {
+  const stripe = getStripe();
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const currentItemId = subscription.items.data[0]?.id;
+
+  if (!currentItemId) {
+    throw new Error("No subscription item found for loyalty rate");
+  }
+
+  return await stripe.subscriptions.update(subscriptionId, {
+    items: [{ id: currentItemId, price: STRIPE_PRODUCTS.JOURNAL_LOYALTY.priceId }],
+    proration_behavior: "none",
+    trial_end: subscription.trial_end || undefined,
+    metadata: {
+      ...subscription.metadata,
+      loyaltyApplied: "true",
+      loyaltyAppliedAt: new Date().toISOString(),
+    },
   });
 }

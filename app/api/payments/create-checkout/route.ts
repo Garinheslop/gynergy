@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { checkStrictRateLimit, getRateLimitHeaders } from "@lib/rate-limit";
 import {
+  applyLoyaltyRate,
   createChallengeCheckoutSession,
   createSubscriptionCheckoutSession,
   upgradeSubscriptionToAnnual,
@@ -118,6 +119,35 @@ export async function POST(request: NextRequest) {
         priceId: STRIPE_PRODUCTS.JOURNAL_ANNUAL.priceId,
         successUrl,
         cancelUrl,
+      });
+    } else if (productType === "apply_loyalty_rate") {
+      // Apply founding member rate ($19.97/mo) to existing trialing subscription
+      if (!user) {
+        return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+      }
+
+      const supabaseAdmin = createServiceClient();
+      const { data: existingSub } = await supabaseAdmin
+        .from("subscriptions")
+        .select("stripe_subscription_id, stripe_price_id")
+        .eq("user_id", user.id)
+        .in("status", ["trialing", "active"])
+        .limit(1)
+        .single();
+
+      if (!existingSub) {
+        return NextResponse.json({ error: "No active subscription found" }, { status: 404 });
+      }
+
+      // Already on loyalty rate
+      if (existingSub.stripe_price_id === STRIPE_PRODUCTS.JOURNAL_LOYALTY.priceId) {
+        return NextResponse.json({ applied: true, alreadyApplied: true });
+      }
+
+      const updated = await applyLoyaltyRate(existingSub.stripe_subscription_id);
+      return NextResponse.json({
+        applied: true,
+        subscriptionId: updated.id,
       });
     } else {
       return NextResponse.json({ error: "Invalid product type" }, { status: 400 });

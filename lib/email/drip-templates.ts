@@ -916,6 +916,134 @@ This isn't social media. Be honest. Be present.
 — Garin`,
   }),
 
+  // ============================
+  // TRIAL ENDING — LOYALTY OFFER
+  // ============================
+
+  trial_ending_notice: (meta) => ({
+    subject: "Your free trial ends in 15 days",
+    html: emailWrapper(`
+      <h1>A Quick Heads Up</h1>
+      <p>Hey ${meta.firstName || "there"},</p>
+      <p>Your 90-day free journal trial ends in <span class="highlight">15 days</span>. After that, your subscription will be <strong style="color: #fff;">$39.95/month</strong>.</p>
+      <p>You don't need to do anything — your subscription will continue automatically. But I wanted to make sure you know what's coming so there are no surprises.</p>
+      <div class="stat-box">
+        <div class="stat-value">${meta.journalDays || "75"}+</div>
+        <div class="stat-label">days of practice completed</div>
+      </div>
+      <p>If you want to cancel, you can do that anytime from your account settings. No hoops. No phone calls.</p>
+      <p>But if you've been showing up — and I hope you have — keep reading. I have something for you in a few days.</p>
+      <div style="text-align: center;">
+        <a href="${APP_URL}/date-zero-gratitude/journal" class="button">Open Today's Journal</a>
+      </div>
+      <div class="divider"></div>
+      <p style="color: #7dd3c0;">— Garin</p>
+    `),
+    text: `A Quick Heads Up
+
+Hey ${meta.firstName || "there"},
+
+Your 90-day free journal trial ends in 15 days. After that, your subscription will be $39.95/month.
+
+You don't need to do anything — it continues automatically. But I wanted to make sure you know.
+
+${meta.journalDays || "75"}+ days of practice completed.
+
+If you want to cancel, you can do that anytime from Account Settings. No hoops.
+
+But if you've been showing up — keep reading. I have something for you in a few days.
+
+Open Today's Journal: ${APP_URL}/date-zero-gratitude/journal
+
+— Garin`,
+  }),
+
+  trial_ending_loyalty_offer: (meta) => ({
+    subject: "You earned this: $19.97/mo (founding member rate)",
+    html: emailWrapper(`
+      <h1>You Earned Something Special</h1>
+      <p>Hey ${meta.firstName || "there"},</p>
+      <p>I told you I had something for you. Here it is.</p>
+      <p>You've been showing up. <span class="highlight">${meta.journalDays || "78"}+ days</span> of morning journals, evening reflections, and daily gratitude actions. That puts you in the top tier of men who've done this work.</p>
+      <p>Most people quit by Day 7. You didn't. And that deserves to be recognized.</p>
+      <div class="stat-box">
+        <div class="stat-value">$19.97</div>
+        <div class="stat-label">per month — founding member rate (50% off)</div>
+      </div>
+      <p>Your trial ends in <strong style="color: #fff;">12 days</strong>. Before it converts to $39.95/mo, I want to offer you our <span class="highlight">Founding Member Rate</span>:</p>
+      <p><strong style="color: #fff;">$19.97/month</strong> — locked in for as long as you stay subscribed. Less than $0.67/day for a personal AI-powered growth practice.</p>
+      <p>This rate is only for men who completed the challenge. It won't be available on the subscribe page. This link is yours.</p>
+      <div style="text-align: center;">
+        <a href="${APP_URL}/subscribe?offer=founding" class="button">Lock In $19.97/mo — Founding Member</a>
+      </div>
+      <div class="divider"></div>
+      <p>This offer expires in 7 days. After that, the standard $39.95/mo rate applies.</p>
+      <p style="color: #7dd3c0;">— Garin</p>
+    `),
+    text: `You Earned Something Special
+
+Hey ${meta.firstName || "there"},
+
+I told you I had something for you. Here it is.
+
+You've been showing up. ${meta.journalDays || "78"}+ days of practice. That puts you in the top tier.
+
+Most people quit by Day 7. You didn't. That deserves to be recognized.
+
+FOUNDING MEMBER RATE: $19.97/month (50% off)
+
+Your trial ends in 12 days. Before it converts to $39.95/mo, I want to offer you our Founding Member Rate:
+
+$19.97/month — locked in for as long as you stay subscribed. Less than $0.67/day.
+
+This rate is only for challenge graduates. This link is yours.
+
+Lock In $19.97/mo: ${APP_URL}/subscribe?offer=founding
+
+This offer expires in 7 days. After that, the standard $39.95/mo rate applies.
+
+— Garin`,
+  }),
+
+  trial_ending_final_reminder: (meta) => ({
+    subject: "Last chance: $19.97/mo expires soon",
+    html: emailWrapper(`
+      <h1>Last Call, ${meta.firstName || "Brother"}</h1>
+      <p>Hey ${meta.firstName || "there"},</p>
+      <p>Your founding member rate of <span class="highlight">$19.97/month</span> expires in a few days. After that, your subscription continues at the standard $39.95/mo.</p>
+      <p>Quick math:</p>
+      <div class="stat-box">
+        <div class="stat-value">$240</div>
+        <div class="stat-label">saved per year at the founding member rate</div>
+      </div>
+      <p>Same journal. Same AI coaching. Same streaks and growth tracking. Just <strong style="color: #fff;">half the price</strong> — because you did the work.</p>
+      <p>One click. Locked in forever.</p>
+      <div style="text-align: center;">
+        <a href="${APP_URL}/subscribe?offer=founding" class="button">Lock In $19.97/mo</a>
+      </div>
+      <p style="text-align: center; margin-top: 12px;">
+        <a href="${APP_URL}/account" style="color: #888; text-decoration: underline; font-size: 13px;">Or manage your subscription in Account Settings</a>
+      </p>
+      <div class="divider"></div>
+      <p style="color: #7dd3c0;">— Garin</p>
+    `),
+    text: `Last Call, ${meta.firstName || "Brother"}
+
+Your founding member rate of $19.97/month expires in a few days. After that, your subscription continues at the standard $39.95/mo.
+
+Quick math: $240 saved per year at the founding member rate.
+
+Same journal. Same AI coaching. Same streaks. Just half the price — because you did the work.
+
+One click. Locked in forever.
+
+Lock In $19.97/mo: ${APP_URL}/subscribe?offer=founding
+
+Or manage your subscription: ${APP_URL}/account
+
+— Garin`,
+  }),
+
   community_first_call: (meta) => ({
     subject: "Your first call is this week",
     html: emailWrapper(`
