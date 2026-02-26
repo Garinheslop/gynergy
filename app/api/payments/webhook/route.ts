@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 import { DEFAULT_BOOK_ID } from "@lib/constants";
-import { sendPurchaseConfirmationEmail } from "@lib/email";
+import { sendPurchaseConfirmationEmail, sendPaymentFailedEmail } from "@lib/email";
 import { enrollInDrip, cancelDrip } from "@lib/services/dripService";
 import { syncPurchaseCompleted, syncCartAbandoned } from "@lib/services/ghlService";
 import {
@@ -14,6 +14,7 @@ import {
   STRIPE_PRODUCTS,
   getOrCreateCustomer,
   createAutoSubscription,
+  getSubscription,
 } from "@lib/stripe";
 import { createServiceClient } from "@lib/supabase-server";
 
@@ -240,10 +241,10 @@ async function handleCheckoutCompleted(
         console.error("Failed to send purchase confirmation email:", err);
       });
 
-      // Auto-create journal subscription with 90-day trial (non-blocking)
+      // Auto-create journal subscription with 90-day trial
       // This is the monetization engine: Day 91 → first $39.95 charge
       if (userId) {
-        // P0-4: Check if user already has an active/trialing subscription (dedup)
+        // Dedup: Check if user already has an active/trialing subscription
         const { data: existingSub } = await supabase
           .from("subscriptions")
           .select("id, status")
@@ -257,34 +258,51 @@ async function handleCheckoutCompleted(
             `[webhook] Skip auto-sub: user ${userId} already has ${existingSub.status} sub ${existingSub.id}`
           );
         } else {
-          const customerId =
+          let resolvedCustomerId =
             typeof session.customer === "string" ? session.customer : session.customer?.id;
 
-          if (customerId) {
-            createAutoSubscription({
-              customerId,
-              userId,
-              trialDays: 90,
-            }).catch((err) => {
-              console.error("Auto-subscription creation error:", err);
-            });
-          } else {
-            // No customer ID from checkout — create one then subscribe
-            getOrCreateCustomer({
-              email: session.customer_email,
-              userId,
-              name: firstName !== "Friend" ? firstName : undefined,
-            })
-              .then((customer) =>
-                createAutoSubscription({
-                  customerId: customer.id,
-                  userId,
-                  trialDays: 90,
-                })
-              )
-              .catch((err) => {
-                console.error("Auto-subscription (with customer creation) error:", err);
+          // If no customer ID from checkout, create one first
+          if (!resolvedCustomerId && session.customer_email) {
+            try {
+              const customer = await getOrCreateCustomer({
+                email: session.customer_email,
+                userId,
+                name: firstName !== "Friend" ? firstName : undefined,
               });
+              resolvedCustomerId = customer.id;
+            } catch (err) {
+              console.error(`[webhook] Customer creation failed for user ${userId}:`, err);
+            }
+          }
+
+          if (resolvedCustomerId) {
+            try {
+              const autoSub = await createAutoSubscription({
+                customerId: resolvedCustomerId,
+                userId,
+                trialDays: 90,
+              });
+              console.log(`[webhook] Auto-sub created: ${autoSub.id} for user ${userId}`);
+              // Record success on purchase for admin traceability
+              await supabase
+                .from("purchases")
+                .update({
+                  metadata: { auto_subscription_id: autoSub.id },
+                })
+                .eq("stripe_checkout_session_id", session.id);
+            } catch (err) {
+              console.error(`[webhook] Auto-sub failed for user ${userId}:`, err);
+              // Record failure on purchase for admin visibility
+              await supabase
+                .from("purchases")
+                .update({
+                  metadata: {
+                    auto_subscription_error: err instanceof Error ? err.message : "Unknown",
+                    auto_subscription_failed_at: new Date().toISOString(),
+                  },
+                })
+                .eq("stripe_checkout_session_id", session.id);
+            }
           }
         }
       }
@@ -384,6 +402,23 @@ async function handleInvoicePaid(
     const priceId = lineItem?.price?.id || "";
     const interval = lineItem?.price?.recurring?.interval || "month";
 
+    // Fetch trial dates and actual status from Stripe
+    let trialStart: string | null = null;
+    let trialEnd: string | null = null;
+    let stripeStatus: string = "active";
+    try {
+      const stripeSub = await getSubscription(subscriptionId);
+      if (stripeSub.trial_start) {
+        trialStart = new Date(stripeSub.trial_start * 1000).toISOString();
+      }
+      if (stripeSub.trial_end) {
+        trialEnd = new Date(stripeSub.trial_end * 1000).toISOString();
+      }
+      stripeStatus = stripeSub.status;
+    } catch {
+      // Non-critical — proceed with defaults
+    }
+
     const { data: newSub } = await supabase
       .from("subscriptions")
       .insert({
@@ -391,7 +426,7 @@ async function handleInvoicePaid(
         stripe_subscription_id: subscriptionId,
         stripe_customer_id: customerId || "",
         stripe_price_id: priceId,
-        status: "active",
+        status: stripeStatus === "trialing" ? "trialing" : "active",
         amount_cents: invoice.amount_paid,
         currency: invoice.currency,
         interval: interval,
@@ -401,6 +436,8 @@ async function handleInvoicePaid(
         current_period_end: invoice.period_end
           ? new Date(invoice.period_end * 1000).toISOString()
           : null,
+        trial_start: trialStart,
+        trial_end: trialEnd,
       })
       .select("id")
       .single();
@@ -493,6 +530,33 @@ async function handleInvoicePaymentFailed(
       updated_at: new Date().toISOString(),
     })
     .eq("stripe_subscription_id", subscriptionId);
+
+  // Send payment failure notification email
+  const userId = invoice.subscription_details?.metadata?.userId;
+  if (userId) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("first_name")
+      .eq("id", userId)
+      .single();
+
+    const { data: authUser } = await supabase.auth.admin.getUserById(userId);
+    const email = authUser?.user?.email;
+
+    if (email) {
+      const amount = invoice.amount_paid
+        ? formatPrice(invoice.amount_paid)
+        : formatPrice(STRIPE_PRODUCTS.JOURNAL_MONTHLY.amount);
+
+      sendPaymentFailedEmail({
+        to: email,
+        firstName: profile?.first_name || "Friend",
+        amount,
+      }).catch((err) => {
+        console.error("Payment failure email error:", err);
+      });
+    }
+  }
 }
 
 async function handleSubscriptionUpdated(

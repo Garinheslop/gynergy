@@ -33,7 +33,8 @@ export type EmailType =
   | "purchase_confirmation"
   | "streak_reminder"
   | "password_reset"
-  | "friend_code";
+  | "friend_code"
+  | "payment_failed";
 
 export interface EmailAttachment {
   filename: string;
@@ -193,6 +194,27 @@ export async function sendFriendCodeRedeemedEmail(params: {
   return sendEmail({
     to,
     subject: `${redeemerFirstName} just joined using your friend code!`,
+    html,
+    text,
+  });
+}
+
+/**
+ * Send payment failure notification email
+ */
+export async function sendPaymentFailedEmail(params: {
+  to: string;
+  firstName: string;
+  amount: string;
+}): Promise<EmailResult> {
+  const { to, firstName, amount } = params;
+
+  const html = generatePaymentFailedHtml(firstName, amount);
+  const text = generatePaymentFailedText(firstName, amount);
+
+  return sendEmail({
+    to,
+    subject: `${firstName}, Action Required: Your Gynergy Payment Failed`,
     html,
     text,
   });
@@ -475,6 +497,42 @@ Consider reaching out to support them along the way — accountability partners 
 Visit the Community: ${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/community
 
 Thank you for spreading the gift of gratitude.
+
+— The Gynergy Team
+  `.trim();
+}
+
+function generatePaymentFailedHtml(firstName: string, amount: string): string {
+  return emailWrapper(`
+    <h1>Payment Update Needed, ${firstName}</h1>
+    <p>We were unable to process your <span class="highlight">${amount}</span> journal subscription payment. Your access may be interrupted until this is resolved.</p>
+    <div class="divider"></div>
+    <p><strong class="highlight">What to do:</strong></p>
+    <p>1. Update your payment method in Account Settings</p>
+    <p>2. We'll automatically retry the charge within the next few days</p>
+    <p>3. Once successful, your access continues uninterrupted</p>
+    <div style="text-align: center;">
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/account" class="button">Update Payment Method</a>
+    </div>
+    <div class="divider"></div>
+    <p style="font-size: 14px; color: #888;">If you believe this is an error or need help, reply to this email or contact support@gynergy.app.</p>
+  `);
+}
+
+function generatePaymentFailedText(firstName: string, amount: string): string {
+  return `
+Payment Update Needed, ${firstName}
+
+We were unable to process your ${amount} journal subscription payment. Your access may be interrupted until this is resolved.
+
+What to do:
+1. Update your payment method in Account Settings
+2. We'll automatically retry the charge within the next few days
+3. Once successful, your access continues uninterrupted
+
+Update Payment Method: ${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/account
+
+If you believe this is an error or need help, reply to this email or contact support@gynergy.app.
 
 — The Gynergy Team
   `.trim();

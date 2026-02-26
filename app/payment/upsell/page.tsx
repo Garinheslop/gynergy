@@ -16,11 +16,19 @@ function UpsellContent() {
       const response = await fetch("/api/payments/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productType: "journal_annual" }),
+        body: JSON.stringify({ productType: "upgrade_annual" }),
       });
       const data = await response.json();
-      if (data.checkoutUrl) {
+      if (data.upgraded) {
+        // Subscription was swapped to annual — go to success page
+        const successUrl = sessionId
+          ? `/payment/success?session_id=${sessionId}`
+          : "/payment/success";
+        router.push(successUrl);
+      } else if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
+      } else {
+        setLoading(false);
       }
     } catch {
       setLoading(false);
@@ -48,12 +56,12 @@ function UpsellContent() {
             Your journal subscription is included
           </p>
           <h1 className="mb-6 text-3xl leading-tight font-bold md:text-4xl">
-            Your Challenge Includes 3 Months Free Journal Access
+            Your Challenge Includes a 90-Day Free Journal Trial
           </h1>
 
           <p className="mb-6 text-lg leading-relaxed text-gray-300">
-            After your 45-day challenge + 30-day grace period, your journal subscription continues
-            at $39.95/mo. You can cancel anytime from your account settings.
+            Your digital journal subscription starts with a 90-day free trial. Your first charge of
+            $39.95/mo happens on Day 91. Cancel anytime from your account settings.
           </p>
 
           {/* What's included */}
@@ -64,7 +72,8 @@ function UpsellContent() {
                 <span className="text-teal-400">&#10003;</span> Morning &amp; evening journal
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-teal-400">&#10003;</span> Daily Gratitude Action
+                <span className="text-teal-400">&#10003;</span> AI-personalized Daily Gratitude
+                Actions
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-teal-400">&#10003;</span> AI coaching with Yesi &amp; Garin
@@ -122,8 +131,8 @@ function UpsellContent() {
 
           {/* Trust Signal */}
           <p className="mt-6 text-center text-sm text-gray-500">
-            Your 45-day challenge is fully paid. The journal subscription is on a 90-day free trial
-            — you won&apos;t be charged until Day 91. Cancel anytime.
+            Your 45-day challenge is fully paid. Your journal subscription has a 90-day free trial —
+            first charge is Day 91. Cancel anytime from Account Settings.
           </p>
         </div>
 

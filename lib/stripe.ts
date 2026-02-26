@@ -310,3 +310,26 @@ export async function createAutoSubscription({
 
   return subscription;
 }
+
+/**
+ * Upgrade an existing subscription to annual billing.
+ * Swaps the price on the current subscription item instead of creating
+ * a new subscription (which would result in a duplicate).
+ */
+export async function upgradeSubscriptionToAnnual(
+  subscriptionId: string
+): Promise<Stripe.Subscription> {
+  const stripe = getStripe();
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  const currentItemId = subscription.items.data[0]?.id;
+
+  if (!currentItemId) {
+    throw new Error("No subscription item found to upgrade");
+  }
+
+  return await stripe.subscriptions.update(subscriptionId, {
+    items: [{ id: currentItemId, price: STRIPE_PRODUCTS.JOURNAL_ANNUAL.priceId }],
+    proration_behavior: "none",
+    trial_end: subscription.trial_end || undefined,
+  });
+}
