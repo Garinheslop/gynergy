@@ -352,10 +352,12 @@ async function handleTrialEndingSoon(
   const windowEnd = new Date(now.getTime() + 16 * 24 * 60 * 60 * 1000).toISOString();
 
   // Find trialing subscriptions with trial_end in 14-16 days
+  // Exclude subs already set to cancel (user already churning — don't pitch them)
   const { data: endingSubs, error: queryError } = await supabase
     .from("subscriptions")
     .select("user_id, trial_end")
     .eq("status", "trialing")
+    .eq("cancel_at_period_end", false)
     .gte("trial_end", windowStart)
     .lt("trial_end", windowEnd);
 

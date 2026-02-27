@@ -347,6 +347,11 @@ export async function upgradeSubscriptionToAnnual(
  * Called when a trialing user clicks the loyalty offer from a drip email.
  */
 export async function applyLoyaltyRate(subscriptionId: string): Promise<Stripe.Subscription> {
+  const loyaltyPriceId = STRIPE_PRODUCTS.JOURNAL_LOYALTY.priceId;
+  if (!loyaltyPriceId) {
+    throw new Error("STRIPE_LOYALTY_JOURNAL_PRICE_ID is not configured");
+  }
+
   const stripe = getStripe();
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
   const currentItemId = subscription.items.data[0]?.id;
@@ -356,7 +361,7 @@ export async function applyLoyaltyRate(subscriptionId: string): Promise<Stripe.S
   }
 
   return await stripe.subscriptions.update(subscriptionId, {
-    items: [{ id: currentItemId, price: STRIPE_PRODUCTS.JOURNAL_LOYALTY.priceId }],
+    items: [{ id: currentItemId, price: loyaltyPriceId }],
     proration_behavior: "none",
     trial_end: subscription.trial_end || undefined,
     metadata: {

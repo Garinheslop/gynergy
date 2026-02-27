@@ -43,6 +43,11 @@ interface WebhookSubscription {
   current_period_start?: number;
   current_period_end?: number;
   metadata?: { userId?: string };
+  items?: {
+    data?: Array<{
+      price?: { id?: string; recurring?: { interval?: string } };
+    }>;
+  };
 }
 
 // Disable body parsing - we need raw body for signature verification
@@ -565,22 +570,33 @@ async function handleSubscriptionUpdated(
 ) {
   const status = mapStripeStatus(subscription.status);
 
+  // Extract price_id and interval from subscription items (syncs loyalty rate / annual upgrade)
+  const lineItem = subscription.items?.data?.[0];
+  const priceId = lineItem?.price?.id;
+  const interval = lineItem?.price?.recurring?.interval;
+
+  const updatePayload: Record<string, unknown> = {
+    status,
+    cancel_at_period_end: subscription.cancel_at_period_end,
+    canceled_at: subscription.canceled_at
+      ? new Date(subscription.canceled_at * 1000).toISOString()
+      : null,
+    current_period_start: subscription.current_period_start
+      ? new Date(subscription.current_period_start * 1000).toISOString()
+      : null,
+    current_period_end: subscription.current_period_end
+      ? new Date(subscription.current_period_end * 1000).toISOString()
+      : null,
+    updated_at: new Date().toISOString(),
+  };
+
+  // Sync price and interval when available (e.g., after loyalty rate or annual upgrade)
+  if (priceId) updatePayload.stripe_price_id = priceId;
+  if (interval) updatePayload.interval = interval;
+
   await supabase
     .from("subscriptions")
-    .update({
-      status,
-      cancel_at_period_end: subscription.cancel_at_period_end,
-      canceled_at: subscription.canceled_at
-        ? new Date(subscription.canceled_at * 1000).toISOString()
-        : null,
-      current_period_start: subscription.current_period_start
-        ? new Date(subscription.current_period_start * 1000).toISOString()
-        : null,
-      current_period_end: subscription.current_period_end
-        ? new Date(subscription.current_period_end * 1000).toISOString()
-        : null,
-      updated_at: new Date().toISOString(),
-    })
+    .update(updatePayload)
     .eq("stripe_subscription_id", subscription.id);
 }
 

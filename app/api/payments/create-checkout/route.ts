@@ -106,6 +106,17 @@ export async function POST(request: NextRequest) {
       if (existingSub) {
         // Swap existing subscription to annual price
         const upgraded = await upgradeSubscriptionToAnnual(existingSub.stripe_subscription_id);
+
+        // Sync price change to local DB immediately (don't wait for webhook)
+        await supabaseAdmin
+          .from("subscriptions")
+          .update({
+            stripe_price_id: STRIPE_PRODUCTS.JOURNAL_ANNUAL.priceId,
+            interval: "year",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("stripe_subscription_id", existingSub.stripe_subscription_id);
+
         return NextResponse.json({
           upgraded: true,
           subscriptionId: upgraded.id,
@@ -144,7 +155,25 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ applied: true, alreadyApplied: true });
       }
 
+      // Block loyalty rate for annual subscribers (would be a downgrade)
+      if (existingSub.stripe_price_id === STRIPE_PRODUCTS.JOURNAL_ANNUAL.priceId) {
+        return NextResponse.json(
+          { error: "Annual subscribers already have a better rate" },
+          { status: 409 }
+        );
+      }
+
       const updated = await applyLoyaltyRate(existingSub.stripe_subscription_id);
+
+      // Sync price change to local DB immediately (don't wait for webhook)
+      await supabaseAdmin
+        .from("subscriptions")
+        .update({
+          stripe_price_id: STRIPE_PRODUCTS.JOURNAL_LOYALTY.priceId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("stripe_subscription_id", existingSub.stripe_subscription_id);
+
       return NextResponse.json({
         applied: true,
         subscriptionId: updated.id,
