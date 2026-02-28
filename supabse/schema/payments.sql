@@ -1,5 +1,5 @@
 -- Payments & Subscriptions System Schema
--- Handles $997 challenge purchases, friend codes, and $19.97/month journal subscriptions
+-- Handles $997 challenge purchases, friend codes, and $39.95/month journal subscriptions
 
 -- Purchase status enum
 CREATE TYPE purchase_status AS ENUM ('pending', 'completed', 'failed', 'refunded');
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS "friend_codes" (
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
--- Subscriptions table (for $19.97/month journal)
+-- Subscriptions table (for $39.95/month journal)
 CREATE TABLE IF NOT EXISTS "subscriptions" (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
 
     -- Subscription details
     status subscription_status NOT NULL DEFAULT 'active',
-    amount_cents INTEGER NOT NULL,              -- 1997 for $19.97
+    amount_cents INTEGER NOT NULL,              -- 3995 for $39.95
     currency TEXT DEFAULT 'usd',
     interval TEXT DEFAULT 'month',              -- 'month' or 'year'
 

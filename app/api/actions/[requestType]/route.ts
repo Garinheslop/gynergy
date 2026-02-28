@@ -57,16 +57,16 @@ type _CreateActionLogHandler = (
   args: Partial<CreateActionLogArgs>
 ) => Promise<FetcherErrorResponse | Record<string, unknown>>;
 
-// Enrollment data type for proper typing (arrays due to Supabase join)
+// Enrollment data type for proper typing (objects due to many-to-one Supabase join)
 interface EnrollmentDataRow {
   enrollment_date: string;
-  session: Array<{
+  session: {
     id: string;
-    book: Array<{
+    book: {
       id: string;
       duration_days: number;
-    }>;
-  }>;
+    } | null;
+  } | null;
 }
 
 // Action log database record type - allows null for optional fields
@@ -243,11 +243,11 @@ const getUserActions = async ({
         .diff(dayjs(enrollmentData[0].enrollment_date).tz(timezone).startOf("d").add(7, "d"), "w") +
       1;
 
-    const enrollmentRow = enrollmentData[0] as EnrollmentDataRow;
-    const bookId = enrollmentRow.session[0]?.book[0]?.id;
+    const enrollmentRow = enrollmentData[0] as unknown as EnrollmentDataRow;
+    const bookId = enrollmentRow.session?.book?.id;
     if (!bookId) return { error: "no-book-found" };
 
-    const bookDurationDays = enrollmentRow.session[0]?.book[0]?.duration_days ?? 45;
+    const bookDurationDays = enrollmentRow.session?.book?.duration_days ?? 45;
 
     // Post-challenge: AI-generated DGA + cycled weekly challenge
     if (currentSessionDay > bookDurationDays) {

@@ -1,18 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { createBrowserClient } from "@supabase/ssr";
 
-export default function SubscribePage() {
+function SubscribeContent() {
   const router = useRouter();
-  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "annual">("annual");
+  const searchParams = useSearchParams();
+  const isLoyaltyOffer = searchParams.get("offer") === "founding";
+  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "annual" | "loyalty">(
+    isLoyaltyOffer ? "loyalty" : "annual"
+  );
   const [loading, setLoading] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loyaltyApplied, setLoyaltyApplied] = useState(false);
 
   useEffect(() => {
     const supabase = createBrowserClient(
@@ -33,7 +38,15 @@ export default function SubscribePage() {
     setLoading(true);
     setError(null);
     try {
-      const productType = selectedPlan === "annual" ? "journal_annual" : "journal_monthly";
+      let productType: string;
+      if (selectedPlan === "loyalty") {
+        productType = "apply_loyalty_rate";
+      } else if (selectedPlan === "annual") {
+        productType = "journal_annual";
+      } else {
+        productType = "journal_monthly";
+      }
+
       const response = await fetch("/api/payments/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -47,6 +60,12 @@ export default function SubscribePage() {
       }
 
       const data = await response.json();
+      if (data.applied) {
+        // Loyalty rate applied to existing subscription
+        setLoyaltyApplied(true);
+        setLoading(false);
+        return;
+      }
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else if (data.error) {
@@ -124,75 +143,139 @@ export default function SubscribePage() {
         </div>
       </section>
 
+      {/* Loyalty Applied Success */}
+      {loyaltyApplied && (
+        <section className="mx-auto max-w-3xl px-6 pb-12">
+          <div className="rounded-2xl border border-teal-500/30 bg-teal-500/10 p-8 text-center">
+            <div className="mb-4 text-4xl">&#10003;</div>
+            <h2 className="mb-2 text-2xl font-bold text-teal-400">
+              Founding Member Rate Locked In!
+            </h2>
+            <p className="mb-4 text-gray-300">
+              Your subscription has been updated to{" "}
+              <strong className="text-white">$19.97/month</strong> — the founding member rate. This
+              rate is locked in for as long as you stay subscribed.
+            </p>
+            <Link
+              href="/date-zero-gratitude"
+              className="inline-block rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 px-8 py-3 font-bold text-black transition-all hover:from-teal-400 hover:to-cyan-400"
+            >
+              Go to My Journal
+            </Link>
+          </div>
+        </section>
+      )}
+
       {/* Pricing */}
-      <section className="mx-auto max-w-3xl px-6 pb-20">
-        <h2 className="mb-8 text-center text-2xl font-bold">Continue Your Practice</h2>
+      {!loyaltyApplied && (
+        <section className="mx-auto max-w-3xl px-6 pb-20">
+          <h2 className="mb-8 text-center text-2xl font-bold">Continue Your Practice</h2>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {/* Monthly */}
-          <button
-            onClick={() => setSelectedPlan("monthly")}
-            className={`rounded-2xl border p-6 text-left transition-all ${
-              selectedPlan === "monthly"
-                ? "border-teal-500 bg-teal-500/10"
-                : "border-white/10 bg-white/5 hover:border-white/20"
-            }`}
-          >
-            <div className="mb-4">
-              <p className="text-sm font-medium text-gray-400">Monthly</p>
-              <p className="text-3xl font-bold">
-                $39.95<span className="text-lg font-normal text-gray-400">/mo</span>
+          {isLoyaltyOffer && (
+            <div className="mb-6 rounded-xl border border-teal-500/30 bg-teal-500/10 p-4 text-center">
+              <p className="text-sm font-semibold text-teal-400">
+                Founding Member Offer — Limited Time
+              </p>
+              <p className="text-sm text-gray-300">
+                As a challenge graduate, you qualify for our founding member rate.
               </p>
             </div>
-            <p className="text-sm text-gray-400">Cancel anytime. No commitments.</p>
-          </button>
+          )}
 
-          {/* Annual */}
-          <button
-            onClick={() => setSelectedPlan("annual")}
-            className={`relative rounded-2xl border p-6 text-left transition-all ${
-              selectedPlan === "annual"
-                ? "border-teal-500 bg-teal-500/10"
-                : "border-white/10 bg-white/5 hover:border-white/20"
-            }`}
-          >
-            <span className="absolute -top-3 right-4 rounded-full bg-teal-500 px-3 py-1 text-xs font-bold text-black">
-              SAVE $80
-            </span>
-            <div className="mb-4">
-              <p className="text-sm font-medium text-gray-400">Annual</p>
-              <p className="text-3xl font-bold">
-                $399<span className="text-lg font-normal text-gray-400">/yr</span>
-              </p>
-              <p className="text-sm text-teal-400">$33.25/mo — save $80/year</p>
-            </div>
-            <p className="text-sm text-gray-400">Best value. Commit to your growth.</p>
-          </button>
-        </div>
+          <div className={`grid gap-4 ${isLoyaltyOffer ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+            {/* Loyalty — only shown when ?offer=founding */}
+            {isLoyaltyOffer && (
+              <button
+                onClick={() => setSelectedPlan("loyalty")}
+                className={`relative rounded-2xl border p-6 text-left transition-all ${
+                  selectedPlan === "loyalty"
+                    ? "border-teal-500 bg-teal-500/10"
+                    : "border-white/10 bg-white/5 hover:border-white/20"
+                }`}
+              >
+                <span className="absolute -top-3 right-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-1 text-xs font-bold text-black">
+                  FOUNDING MEMBER
+                </span>
+                <div className="mb-4">
+                  <p className="text-sm font-medium text-gray-400">Monthly (Loyalty)</p>
+                  <p className="text-3xl font-bold">
+                    $19.97<span className="text-lg font-normal text-gray-400">/mo</span>
+                  </p>
+                  <p className="text-sm text-teal-400">50% off — locked in forever</p>
+                </div>
+                <p className="text-sm text-gray-400">Exclusive rate for challenge graduates.</p>
+              </button>
+            )}
 
-        {isAuthenticated === false ? (
-          <button
-            onClick={() => router.push("/login?redirect=/subscribe")}
-            className="mt-8 w-full rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 px-8 py-4 text-lg font-bold text-black transition-all hover:from-teal-400 hover:to-cyan-400"
-          >
-            Sign In to Continue
-          </button>
-        ) : (
-          <button
-            onClick={handleCheckout}
-            disabled={loading || isAuthenticated === null}
-            className="mt-8 w-full rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 px-8 py-4 text-lg font-bold text-black transition-all hover:from-teal-400 hover:to-cyan-400 disabled:opacity-50"
-          >
-            {loading ? "Redirecting..." : "Continue My Practice"}
-          </button>
-        )}
+            {/* Monthly */}
+            <button
+              onClick={() => setSelectedPlan("monthly")}
+              className={`rounded-2xl border p-6 text-left transition-all ${
+                selectedPlan === "monthly"
+                  ? "border-teal-500 bg-teal-500/10"
+                  : "border-white/10 bg-white/5 hover:border-white/20"
+              }`}
+            >
+              <div className="mb-4">
+                <p className="text-sm font-medium text-gray-400">Monthly</p>
+                <p className="text-3xl font-bold">
+                  $39.95<span className="text-lg font-normal text-gray-400">/mo</span>
+                </p>
+              </div>
+              <p className="text-sm text-gray-400">Cancel anytime. No commitments.</p>
+            </button>
 
-        {error && <p className="mt-3 text-center text-sm text-red-400">{error}</p>}
+            {/* Annual */}
+            <button
+              onClick={() => setSelectedPlan("annual")}
+              className={`relative rounded-2xl border p-6 text-left transition-all ${
+                selectedPlan === "annual"
+                  ? "border-teal-500 bg-teal-500/10"
+                  : "border-white/10 bg-white/5 hover:border-white/20"
+              }`}
+            >
+              <span className="absolute -top-3 right-4 rounded-full bg-teal-500 px-3 py-1 text-xs font-bold text-black">
+                SAVE $80
+              </span>
+              <div className="mb-4">
+                <p className="text-sm font-medium text-gray-400">Annual</p>
+                <p className="text-3xl font-bold">
+                  $399<span className="text-lg font-normal text-gray-400">/yr</span>
+                </p>
+                <p className="text-sm text-teal-400">$33.25/mo — save $80/year</p>
+              </div>
+              <p className="text-sm text-gray-400">Best value. Commit to your growth.</p>
+            </button>
+          </div>
 
-        <p className="mt-4 text-center text-sm text-gray-500">
-          Secure checkout powered by Stripe. Cancel anytime from your account settings.
-        </p>
-      </section>
+          {isAuthenticated === false ? (
+            <button
+              onClick={() => router.push("/login?redirect=/subscribe")}
+              className="mt-8 w-full rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 px-8 py-4 text-lg font-bold text-black transition-all hover:from-teal-400 hover:to-cyan-400"
+            >
+              Sign In to Continue
+            </button>
+          ) : (
+            <button
+              onClick={handleCheckout}
+              disabled={loading || isAuthenticated === null}
+              className="mt-8 w-full rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 px-8 py-4 text-lg font-bold text-black transition-all hover:from-teal-400 hover:to-cyan-400 disabled:opacity-50"
+            >
+              {loading
+                ? "Redirecting..."
+                : selectedPlan === "loyalty"
+                  ? "Lock In $19.97/mo — Founding Member Rate"
+                  : "Continue My Practice"}
+            </button>
+          )}
+
+          {error && <p className="mt-3 text-center text-sm text-red-400">{error}</p>}
+
+          <p className="mt-4 text-center text-sm text-gray-500">
+            Secure checkout powered by Stripe. Cancel anytime from your account settings.
+          </p>
+        </section>
+      )}
 
       {/* Back to Home */}
       <section className="pb-12 text-center">
@@ -204,5 +287,19 @@ export default function SubscribePage() {
         </Link>
       </section>
     </div>
+  );
+}
+
+export default function SubscribePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center bg-[#0a0a0a]">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-teal-400 border-t-transparent" />
+        </div>
+      }
+    >
+      <SubscribeContent />
+    </Suspense>
   );
 }

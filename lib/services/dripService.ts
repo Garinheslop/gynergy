@@ -21,7 +21,8 @@ export type TriggerEvent =
   | "friend_codes_issued"
   | "community_activated"
   | "challenge_completed_purchaser"
-  | "challenge_completed_friend_code";
+  | "challenge_completed_friend_code"
+  | "trial_ending_soon";
 
 export interface EnrollResult {
   success: boolean;

@@ -4,11 +4,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { checkStrictRateLimit, getRateLimitHeaders } from "@lib/rate-limit";
 import {
+  applyLoyaltyRate,
   createChallengeCheckoutSession,
   createSubscriptionCheckoutSession,
+  upgradeSubscriptionToAnnual,
   STRIPE_PRODUCTS,
 } from "@lib/stripe";
-import { createClient } from "@lib/supabase-server";
+import { createClient, createServiceClient } from "@lib/supabase-server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,31 +47,136 @@ export async function POST(request: NextRequest) {
         successUrl,
         cancelUrl,
       });
-    } else if (productType === "journal_monthly") {
+    } else if (productType === "journal_monthly" || productType === "journal_annual") {
       // Require authentication for subscription
       if (!user) {
         return NextResponse.json({ error: "Authentication required" }, { status: 401 });
       }
+
+      // Prevent double-subscription: check if user already has active/trialing sub
+      const supabaseAdmin = createServiceClient();
+      const { data: existingSub } = await supabaseAdmin
+        .from("subscriptions")
+        .select("id, status, stripe_price_id")
+        .eq("user_id", user.id)
+        .in("status", ["active", "trialing"])
+        .limit(1)
+        .single();
+
+      if (existingSub) {
+        return NextResponse.json(
+          {
+            error: "You already have an active subscription",
+            existingSubscription: {
+              status: existingSub.status,
+              isAnnual: existingSub.stripe_price_id === STRIPE_PRODUCTS.JOURNAL_ANNUAL.priceId,
+            },
+          },
+          { status: 409 }
+        );
+      }
+
+      const priceId =
+        productType === "journal_annual"
+          ? STRIPE_PRODUCTS.JOURNAL_ANNUAL.priceId
+          : STRIPE_PRODUCTS.JOURNAL_MONTHLY.priceId;
 
       session = await createSubscriptionCheckoutSession({
         userId: user.id,
         email: user.email,
-        priceId: STRIPE_PRODUCTS.JOURNAL_MONTHLY.priceId,
+        priceId,
         successUrl,
         cancelUrl,
       });
-    } else if (productType === "journal_annual") {
-      // Require authentication for subscription
+    } else if (productType === "upgrade_annual") {
+      // Upgrade existing monthly trial to annual billing (no new checkout needed)
       if (!user) {
         return NextResponse.json({ error: "Authentication required" }, { status: 401 });
       }
 
+      const supabaseAdmin = createServiceClient();
+      const { data: existingSub } = await supabaseAdmin
+        .from("subscriptions")
+        .select("stripe_subscription_id")
+        .eq("user_id", user.id)
+        .in("status", ["trialing", "active"])
+        .limit(1)
+        .single();
+
+      if (existingSub) {
+        // Swap existing subscription to annual price
+        const upgraded = await upgradeSubscriptionToAnnual(existingSub.stripe_subscription_id);
+
+        // Sync price change to local DB immediately (don't wait for webhook)
+        await supabaseAdmin
+          .from("subscriptions")
+          .update({
+            stripe_price_id: STRIPE_PRODUCTS.JOURNAL_ANNUAL.priceId,
+            interval: "year",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("stripe_subscription_id", existingSub.stripe_subscription_id);
+
+        return NextResponse.json({
+          upgraded: true,
+          subscriptionId: upgraded.id,
+        });
+      }
+
+      // No existing sub — create a new annual subscription checkout
       session = await createSubscriptionCheckoutSession({
         userId: user.id,
         email: user.email,
         priceId: STRIPE_PRODUCTS.JOURNAL_ANNUAL.priceId,
         successUrl,
         cancelUrl,
+      });
+    } else if (productType === "apply_loyalty_rate") {
+      // Apply founding member rate ($19.97/mo) to existing trialing subscription
+      if (!user) {
+        return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+      }
+
+      const supabaseAdmin = createServiceClient();
+      const { data: existingSub } = await supabaseAdmin
+        .from("subscriptions")
+        .select("stripe_subscription_id, stripe_price_id")
+        .eq("user_id", user.id)
+        .in("status", ["trialing", "active"])
+        .limit(1)
+        .single();
+
+      if (!existingSub) {
+        return NextResponse.json({ error: "No active subscription found" }, { status: 404 });
+      }
+
+      // Already on loyalty rate
+      if (existingSub.stripe_price_id === STRIPE_PRODUCTS.JOURNAL_LOYALTY.priceId) {
+        return NextResponse.json({ applied: true, alreadyApplied: true });
+      }
+
+      // Block loyalty rate for annual subscribers (would be a downgrade)
+      if (existingSub.stripe_price_id === STRIPE_PRODUCTS.JOURNAL_ANNUAL.priceId) {
+        return NextResponse.json(
+          { error: "Annual subscribers already have a better rate" },
+          { status: 409 }
+        );
+      }
+
+      const updated = await applyLoyaltyRate(existingSub.stripe_subscription_id);
+
+      // Sync price change to local DB immediately (don't wait for webhook)
+      await supabaseAdmin
+        .from("subscriptions")
+        .update({
+          stripe_price_id: STRIPE_PRODUCTS.JOURNAL_LOYALTY.priceId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("stripe_subscription_id", existingSub.stripe_subscription_id);
+
+      return NextResponse.json({
+        applied: true,
+        subscriptionId: updated.id,
       });
     } else {
       return NextResponse.json({ error: "Invalid product type" }, { status: 400 });

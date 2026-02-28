@@ -189,11 +189,18 @@ export async function apiCall(
   page: Page,
   baseUrl: string,
   path: string,
-  options: { method?: string; body?: Record<string, unknown> } = {}
+  options: {
+    method?: string;
+    body?: Record<string, unknown>;
+    headers?: Record<string, string>;
+  } = {}
 ): Promise<{ status: number; data: unknown }> {
   const response = await page.request.fetch(`${baseUrl}${path}`, {
     method: options.method || "GET",
-    headers: options.body ? { "Content-Type": "application/json" } : undefined,
+    headers: {
+      ...(options.body ? { "Content-Type": "application/json" } : undefined),
+      ...options.headers,
+    },
     data: options.body ? JSON.stringify(options.body) : undefined,
   });
   const data = await response.json().catch(() => null);

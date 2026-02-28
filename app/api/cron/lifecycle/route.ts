@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
     accessExpired: 0,
     dripEnrollments: 0,
     transitionsLogged: 0,
+    trialEndingEnrollments: 0,
     errors: [] as string[],
   };
 
@@ -62,6 +63,11 @@ export async function GET(request: NextRequest) {
     // 3. Upcoming sessions that should now be active
     // ================================================================
     await handleUpcomingToActive(supabase, now);
+
+    // ================================================================
+    // 4. Trial ending soon — enroll in loyalty offer drip
+    // ================================================================
+    await handleTrialEndingSoon(supabase, results);
 
     return NextResponse.json({
       success: true,
@@ -329,5 +335,68 @@ async function handleUpcomingToActive(
       .from("book_sessions")
       .update({ status: "active", updated_at: now })
       .in("id", sessionIds);
+  }
+}
+
+// ============================================================================
+// Section 4: Trial ending soon — enroll in loyalty offer drip
+// ============================================================================
+// Find trialing subscriptions where trial_end is 14-16 days from now
+// (window catches Day 75 of 90-day trial). Enroll in trial_ending_soon drip.
+async function handleTrialEndingSoon(
+  supabase: ReturnType<typeof createServiceClient>,
+  results: { trialEndingEnrollments: number; errors: string[] }
+) {
+  const now = new Date();
+  const windowStart = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString();
+  const windowEnd = new Date(now.getTime() + 16 * 24 * 60 * 60 * 1000).toISOString();
+
+  // Find trialing subscriptions with trial_end in 14-16 days
+  // Exclude subs already set to cancel (user already churning — don't pitch them)
+  const { data: endingSubs, error: queryError } = await supabase
+    .from("subscriptions")
+    .select("user_id, trial_end")
+    .eq("status", "trialing")
+    .eq("cancel_at_period_end", false)
+    .gte("trial_end", windowStart)
+    .lt("trial_end", windowEnd);
+
+  if (queryError) {
+    results.errors.push(`Trial ending query error: ${queryError.message}`);
+    return;
+  }
+
+  if (!endingSubs?.length) return;
+
+  const userIds = endingSubs.map((s) => s.user_id);
+
+  // Batch fetch user emails and profiles
+  const { data: users } = await supabase.from("users").select("id, email").in("id", userIds);
+  const { data: profiles } = await supabase
+    .from("profiles")
+    .select("id, first_name")
+    .in("id", userIds);
+
+  const emailMap = new Map(users?.map((u) => [u.id, u.email]) || []);
+  const profileMap = new Map(profiles?.map((p) => [p.id, p.first_name]) || []);
+
+  for (const sub of endingSubs) {
+    const email = emailMap.get(sub.user_id);
+    if (!email) continue;
+
+    const firstName = profileMap.get(sub.user_id) || undefined;
+    const trialEnd = sub.trial_end ? new Date(sub.trial_end) : null;
+    const daysLeft = trialEnd
+      ? Math.ceil((trialEnd.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+      : 15;
+
+    const dripResult = await enrollInDrip(
+      "trial_ending_soon",
+      email,
+      { firstName, daysLeft, journalDays: 90 - daysLeft },
+      sub.user_id
+    );
+
+    if (dripResult.success) results.trialEndingEnrollments++;
   }
 }
