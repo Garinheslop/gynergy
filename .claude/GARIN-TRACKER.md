@@ -1,19 +1,19 @@
 # Garin's Developer Tracker
 
 > **Purpose**: Personal tracking file for Garin. Claude Code reads this to understand current work, recent changes, and pending tasks. This file is ONLY modified during Garin's sessions.
-> **Last Updated**: 2026-02-19
+> **Last Updated**: 2026-02-28
 
 ---
 
 ## Current Session Status
 
-| Field                     | Value                                                             |
-| ------------------------- | ----------------------------------------------------------------- |
-| **Status**                | Active                                                            |
-| **Last Active**           | 2026-02-19                                                        |
-| **Current Branch**        | feature/garin-webinar-readiness                                   |
-| **Current Focus**         | Webinar readiness: UX/UI, funnels, assessments, sign-ups, hosting |
-| **Expected Next Session** | -                                                                 |
+| Field                     | Value                                                   |
+| ------------------------- | ------------------------------------------------------- |
+| **Status**                | Active                                                  |
+| **Last Active**           | 2026-02-28                                              |
+| **Current Branch**        | feature/garin-billing-hardening                         |
+| **Current Focus**         | Strategy: gynergy.com integration spec + SWOT analysis  |
+| **Expected Next Session** | Code: Begin building provision endpoint + pillar rename |
 
 ### Status Legend
 
@@ -27,23 +27,65 @@
 
 ### What I Am Currently Working On
 
-Webinar readiness — full audit and implementation across sign-ups, hosting/features, UX/UI, funnels, assessments, and post-webinar follow-up.
+gynergy.com ↔ gynergy.app integration — canonical spec finalized, both teams approved. Now executing the build queue.
 
-### Immediate Next Steps
+**Canonical Spec:** `scripts/strategy/gynergy-integration-response-FINAL.md`
 
-1. Verify password reset flow works end-to-end (real user test)
-2. Verify reset button renders correctly after deployment
-3. Consider error boundary around SettingsPageClient
-4. Review service worker files (sw.js, workbox) — may cache stale responses
-5. Add streak celebration email templates (`streak_7_congrats`, `streak_30_congrats`) to `drip-templates.ts`
+### Immediate Next Steps (Integration Build Queue — May 2026 Target)
+
+#### Sprint 1: Mid-March (Foundation)
+
+1. Build `POST /api/onboarding/provision` endpoint (staging mock)
+2. Build `POST /api/referral-credit/redeemed` endpoint
+3. Pillar rename across entire codebase: Growth → Mindset, Purpose → Legacy
+4. Add `gender` field to `users` table + gender-neutral UI language audit
+5. Create Facilitator role for Matthew Zuraw
+6. Exchange API keys with gynergy.com team (secure channel)
+
+#### Sprint 2: End of March (Credits + Drips)
+
+7. Remove friend code system (15+ files) — replace with referral credit display
+8. Build referral credit dashboard card (share link, copy, native share)
+9. Build 3-email credit sharing drip campaign
+10. Add `metadata.source = "portal"` to all create-checkout sessions
+
+#### Sprint 3: April (Curriculum + Bridge)
+
+11. Curriculum restructure: weekly pillar rotation → journey phases
+12. Post-program "Choose Your Path" routing (LVL 5 LIFE / Fit & Feminine)
+13. Bridge Month (Days 46-75): lighter daily practice, maintenance badges, preview content
+14. Day 66 "Habit Milestone" badge
+
+#### Sprint 4: Early May (Integration Testing)
+
+15. End-to-end integration testing with gynergy.com team
+16. Gender-neutral audit of all user-facing copy
+
+#### Backlog (Not May Launch)
+
+- GYNERGY.AI standalone product ($49-$197/mo)
+- DGA #44 copy-paste error fix
+- "95%" ghost statistic removal from landing page
+- Add female testimonials
 
 ### Blockers/Questions
 
-- None
+- Waiting on gynergy.com: LVL 5 LIFE / Fit & Feminine checkout URLs (April deliverable from them)
+- Waiting on gynergy.com: Exact Stripe Price IDs for acquisition products (to verify shared account)
 
 ---
 
 ## Recent Session Log
+
+### Session: 2026-02-28 - Strategy: gynergy.com Integration Spec + SWOT
+
+| Field             | Value                                                                      |
+| ----------------- | -------------------------------------------------------------------------- |
+| **Duration**      | ~3 hours (continued across context windows)                                |
+| **Branch**        | feature/garin-billing-hardening (strategy work on main)                    |
+| **Focus**         | Full SWOT of 45DA program, gynergy.com cross-team integration spec         |
+| **Deliverable**   | `scripts/strategy/gynergy-integration-response-FINAL.md` — canonical spec  |
+| **Key Decisions** | Option D handoff, dual-sales architecture, referral credits, pillar rename |
 
 ### Session: 2026-02-19 - Hotfix: Site Errors & Auth Fix
 
@@ -109,13 +151,19 @@ Webinar readiness — full audit and implementation across sign-ups, hosting/fea
 
 ### In Progress
 
-(None)
+- [ ] gynergy.com integration build — Sprint 1 (provision endpoint, pillar rename, gender field, facilitator role)
 
 ### Queued
 
-(None)
+- [ ] Sprint 2: Remove friend codes, build referral credit display + drip campaigns
+- [ ] Sprint 3: Curriculum restructure, Bridge Month, Choose Your Path
+- [ ] Sprint 4: Integration testing with gynergy.com
 
 ### Recently Completed
+
+- [x] Strategy: Full SWOT analysis of 45-Day Awakening Challenge (science-backed, 12-item evidence scorecard)
+- [x] Strategy: gynergy.com integration spec — canonical document approved by both teams
+- [x] Strategy: Dual-sales architecture argument — data-backed, gynergy.com confirmed
 
 - [x] Fix: Password reset PKCE code exchange (route through /auth/callback)
 - [x] Fix: Settings page infinite retry loop (added error checks to useEffects)
@@ -143,11 +191,14 @@ Webinar readiness — full audit and implementation across sign-ups, hosting/fea
 
 ### Things Bill Should Know
 
+- **MAJOR**: gynergy.com integration spec finalized — see `scripts/strategy/gynergy-integration-response-FINAL.md`
+- **Pillar rename coming**: Growth → Mindset, Purpose → Legacy (will touch many files)
+- **Friend codes being removed**: Replaced by referral credit system (gynergy.com owns generation)
+- **New endpoints coming**: `/api/onboarding/provision` and `/api/referral-credit/redeemed`
+- **Dual-sales architecture**: gynergy.app retains direct Stripe checkout for expansion sales
 - Password reset was broken due to PKCE flow — now routes through /auth/callback
 - Settings page had infinite API retry loop that froze the browser — now checks for errors
-- Community share endpoint was never created — now exists at /api/community/share
 - Service worker files (sw.js, workbox) are modified but uncommitted — review needed
-- All hotfix commits are on main, deployed to Vercel production
 
 ---
 
