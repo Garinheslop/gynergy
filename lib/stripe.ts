@@ -80,11 +80,13 @@ export async function createChallengeCheckoutSession({
     metadata: {
       userId: userId || "",
       productType: "challenge",
+      source: "portal",
     },
     payment_intent_data: {
       metadata: {
         userId: userId || "",
         productType: "challenge",
+        source: "portal",
       },
     },
   });
@@ -128,6 +130,7 @@ export async function createSubscriptionCheckoutSession({
     metadata: {
       userId,
       productType: "journal_subscription",
+      source: "portal",
     },
     subscription_data: {
       metadata: {
