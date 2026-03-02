@@ -74,14 +74,14 @@ export const PILLARS: PillarInfo[] = [
   },
   {
     number: "04",
-    name: "Growth",
+    name: "Mindset",
     description: "Leadership · Learning · Evolution",
     question: "Are you still being challenged, or coasting?",
   },
   {
     number: "05",
-    name: "Purpose",
-    description: "Service · Meaning · Legacy",
+    name: "Legacy",
+    description: "Service · Meaning · Impact",
     question: "Does your success mean something, or is it hollow?",
   },
 ];
@@ -267,12 +267,12 @@ export const PROBLEM_CONTENT = {
       { pillar: "Wealth", score: 9, isLow: false },
       { pillar: "Health", score: 8, isLow: false },
       { pillar: "Relationships", score: 3, isLow: true },
-      { pillar: "Growth", score: 7, isLow: false },
-      { pillar: "Purpose", score: 2, isLow: true },
+      { pillar: "Mindset", score: 7, isLow: false },
+      { pillar: "Legacy", score: 2, isLow: true },
     ],
     equation: "9 × 8 × 3 × 7 × 2 = fractured",
     insight:
-      'That "3" in relationships and "2" in purpose aren\'t just weaknesses — they\'re dividing everything else by a fraction. Your 9 in wealth means nothing when your purpose is a 2. Integration multiplies. Fragmentation destroys.',
+      'That "3" in relationships and "2" in legacy aren\'t just weaknesses — they\'re dividing everything else by a fraction. Your 9 in wealth means nothing when your legacy is a 2. Integration multiplies. Fragmentation destroys.',
   },
 };
 

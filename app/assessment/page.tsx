@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Five Pillar Self-Assessment | GYNERGY",
     description:
-      "5 questions. 2 minutes. Score your life across wealth, health, relationships, growth, and purpose.",
+      "5 questions. 2 minutes. Score your life across wealth, health, relationships, mindset, and legacy.",
     url: "https://www.gynergy.app/assessment",
     siteName: "GYNERGY",
     images: [

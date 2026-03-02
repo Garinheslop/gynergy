@@ -52,7 +52,7 @@ function GrowthIcon({ className }: { className?: string }) {
   );
 }
 
-function PurposeIcon({ className }: { className?: string }) {
+function LegacyIcon({ className }: { className?: string }) {
   return (
     <svg className={className} {...ICON_PROPS}>
       <circle cx="12" cy="12" r="10" />
@@ -111,8 +111,8 @@ const PILLAR_ICONS: Record<PriorityPillar, React.FC<{ className?: string }>> = {
   wealth: WealthIcon,
   health: HealthIcon,
   relationships: RelationshipsIcon,
-  growth: GrowthIcon,
-  purpose: PurposeIcon,
+  mindset: GrowthIcon,
+  legacy: LegacyIcon,
 };
 
 const SECTION_ICONS: Record<number, React.FC<{ className?: string }>> = {
@@ -137,8 +137,8 @@ const PILLARS: Array<{ id: PriorityPillar; name: string }> = [
   { id: "wealth", name: "Wealth" },
   { id: "health", name: "Health" },
   { id: "relationships", name: "Relationships" },
-  { id: "growth", name: "Growth" },
-  { id: "purpose", name: "Purpose" },
+  { id: "mindset", name: "Mindset" },
+  { id: "legacy", name: "Legacy" },
 ];
 
 const SECTIONS = [

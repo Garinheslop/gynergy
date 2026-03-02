@@ -11,7 +11,7 @@ import { AwakeningChallengePage } from "@modules/landing";
 export const metadata: Metadata = {
   title: "45-Day Awakening Challenge | Transform Your Life in 45 Days | GYNERGY",
   description:
-    "For successful men who built everything and feel nothing. 45 days to fix the multiplier across wealth, health, relationships, growth, and purpose. Limited to 15 seats.",
+    "For successful men who built everything and feel nothing. 45 days to fix the multiplier across wealth, health, relationships, mindset, and legacy. Limited to 15 seats.",
   keywords: [
     "mens transformation program",
     "45 day challenge",
@@ -61,7 +61,7 @@ const structuredData = {
   "@type": "Course",
   name: "The 45-Day Awakening Challenge",
   description:
-    "A 45-day transformation program for successful men across five life pillars: wealth, health, relationships, growth, and purpose.",
+    "A 45-day transformation program for successful men across five life pillars: wealth, health, relationships, mindset, and legacy.",
   provider: {
     "@type": "Organization",
     name: "GYNERGY",

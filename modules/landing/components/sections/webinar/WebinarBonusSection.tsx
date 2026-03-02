@@ -68,7 +68,7 @@ export default function WebinarBonusSection() {
 
               {/* Pillar Preview */}
               <div className="space-y-3">
-                {["Wealth", "Health", "Relationships", "Growth", "Purpose"].map((pillar) => (
+                {["Wealth", "Health", "Relationships", "Mindset", "Legacy"].map((pillar) => (
                   <div key={pillar} className="flex items-center gap-3">
                     <span className="font-oswald text-lp-gray w-24 text-xs">{pillar}</span>
                     <div className="bg-lp-border relative h-2 flex-1 overflow-hidden">

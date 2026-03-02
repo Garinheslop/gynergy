@@ -17,7 +17,7 @@ import { WebinarLandingPage } from "@modules/landing";
 export const metadata: Metadata = {
   title: "The 5 Pillars of Integrated Power | Free Live Training | GYNERGY",
   description:
-    "Free live training: Why successful men feel empty and the one equation that changes everything. Learn the 10-minute daily practice that transforms your life across wealth, health, relationships, growth, and purpose.",
+    "Free live training: Why successful men feel empty and the one equation that changes everything. Learn the 10-minute daily practice that transforms your life across wealth, health, relationships, mindset, and legacy.",
   keywords: [
     "free webinar",
     "mens transformation",

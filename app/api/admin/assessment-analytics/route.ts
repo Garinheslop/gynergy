@@ -141,8 +141,8 @@ export async function GET(request: NextRequest) {
       wealth: 0,
       health: 0,
       relationships: 0,
-      growth: 0,
-      purpose: 0,
+      mindset: 0,
+      legacy: 0,
     };
 
     assessmentList.forEach((a) => {
@@ -151,8 +151,8 @@ export async function GET(request: NextRequest) {
         (a.wealth_score || 0) +
         (a.health_score || 0) +
         (a.relationships_score || 0) +
-        (a.growth_score || 0) +
-        (a.purpose_score || 0);
+        (a.mindset_score || 0) +
+        (a.legacy_score || 0);
 
       if (score > 0) {
         totalScore += score;
@@ -171,8 +171,8 @@ export async function GET(request: NextRequest) {
         { name: "wealth", score: a.wealth_score || 0 },
         { name: "health", score: a.health_score || 0 },
         { name: "relationships", score: a.relationships_score || 0 },
-        { name: "growth", score: a.growth_score || 0 },
-        { name: "purpose", score: a.purpose_score || 0 },
+        { name: "mindset", score: a.mindset_score || 0 },
+        { name: "legacy", score: a.legacy_score || 0 },
       ];
       const lowest = pillars.reduce((a, b) => (a.score < b.score ? a : b));
       pillarCounts[lowest.name]++;
@@ -197,8 +197,8 @@ export async function GET(request: NextRequest) {
         (a.wealth_score || 0) +
         (a.health_score || 0) +
         (a.relationships_score || 0) +
-        (a.growth_score || 0) +
-        (a.purpose_score || 0);
+        (a.mindset_score || 0) +
+        (a.legacy_score || 0);
       return {
         email: a.email || "Unknown",
         score,

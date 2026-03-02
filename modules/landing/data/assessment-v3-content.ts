@@ -151,7 +151,7 @@ export type Readiness =
   | "ready_to_invest"
   | "desperate";
 
-export type PriorityPillar = "wealth" | "health" | "relationships" | "growth" | "purpose";
+export type PriorityPillar = "wealth" | "health" | "relationships" | "mindset" | "legacy";
 
 export type Interpretation = "elite" | "gap" | "critical";
 
@@ -779,12 +779,12 @@ export const ASSESSMENT_V3_QUESTIONS: AssessmentV3Question[] = [
   },
 
   // ============================================
-  // SECTION 3: GROWTH PILLAR (3 Questions)
+  // SECTION 3: MINDSET PILLAR (3 Questions)
   // ============================================
   {
     id: "growth_aliveness",
     section: 3,
-    pillar: "growth",
+    pillar: "mindset",
     type: "slider",
     question: "Are you being challenged in ways that make you feel ALIVE?",
     dynamicSubtext: (answers) => {
@@ -807,7 +807,7 @@ export const ASSESSMENT_V3_QUESTIONS: AssessmentV3Question[] = [
   {
     id: "challenge_level",
     section: 3,
-    pillar: "growth",
+    pillar: "mindset",
     type: "single_choice",
     question: "What's your relationship with challenge and discomfort?",
     dynamicSubtext: (answers) => {
@@ -843,7 +843,7 @@ export const ASSESSMENT_V3_QUESTIONS: AssessmentV3Question[] = [
   {
     id: "learning_mode",
     section: 3,
-    pillar: "growth",
+    pillar: "mindset",
     type: "single_choice",
     question: "How are you learning and evolving right now?",
     dynamicSubtext: (answers) => {
@@ -873,12 +873,12 @@ export const ASSESSMENT_V3_QUESTIONS: AssessmentV3Question[] = [
   },
 
   // ============================================
-  // SECTION 3: PURPOSE PILLAR (3 Questions)
+  // SECTION 3: LEGACY PILLAR (3 Questions)
   // ============================================
   {
     id: "purpose_clarity",
     section: 3,
-    pillar: "purpose",
+    pillar: "legacy",
     type: "slider",
     question: "If you removed your title, your revenue, your achievements — what remains?",
     dynamicSubtext: (answers) => {
@@ -901,7 +901,7 @@ export const ASSESSMENT_V3_QUESTIONS: AssessmentV3Question[] = [
   {
     id: "legacy_clarity",
     section: 3,
-    pillar: "purpose",
+    pillar: "legacy",
     type: "single_choice",
     question: "How clear are you on what you want your legacy to be?",
     dynamicSubtext: (answers) => {
@@ -928,7 +928,7 @@ export const ASSESSMENT_V3_QUESTIONS: AssessmentV3Question[] = [
   {
     id: "impact_feeling",
     section: 3,
-    pillar: "purpose",
+    pillar: "legacy",
     type: "single_choice",
     question: "Does your work feel meaningful beyond the money it generates?",
     dynamicSubtext: (answers) => {
@@ -972,8 +972,8 @@ export const ASSESSMENT_V3_QUESTIONS: AssessmentV3Question[] = [
     dynamicSubtext: (answers) => {
       // Pattern reveal based on pillar scores
       const lowestPillar = getLowestPillarFromAnswers(answers);
-      if (lowestPillar === "purpose") {
-        return "Your Purpose pillar scored lowest. No surprise — the 2am thoughts are about meaning.";
+      if (lowestPillar === "legacy") {
+        return "Your Legacy pillar scored lowest. No surprise — the 2am thoughts are about meaning.";
       }
       if (lowestPillar === "relationships") {
         return "Your Relationships pillar scored lowest. The loneliness shows up in the dark.";
@@ -1018,8 +1018,8 @@ export const ASSESSMENT_V3_QUESTIONS: AssessmentV3Question[] = [
           wealth: "Wealth",
           health: "Health",
           relationships: "Relationships",
-          growth: "Growth",
-          purpose: "Purpose",
+          mindset: "Mindset",
+          legacy: "Legacy",
         };
         patterns.push(`Your ${pillarNames[lowestPillar]} pillar needs the most attention`);
       }
@@ -1055,8 +1055,8 @@ export const ASSESSMENT_V3_QUESTIONS: AssessmentV3Question[] = [
           wealth: "Wealth",
           health: "Health",
           relationships: "Relationships",
-          growth: "Growth",
-          purpose: "Purpose",
+          mindset: "Mindset",
+          legacy: "Legacy",
         };
         return `Based on your answers, ${pillarNames[lowestPillar]} scored lowest. But sometimes the biggest leverage is elsewhere.`;
       }
@@ -1070,8 +1070,8 @@ export const ASSESSMENT_V3_QUESTIONS: AssessmentV3Question[] = [
         label: "Relationships",
         description: "Especially with partner/kids",
       },
-      { value: "growth", label: "Growth", description: "I need to feel alive again" },
-      { value: "purpose", label: "Purpose", description: "I need my success to mean something" },
+      { value: "mindset", label: "Mindset", description: "I need to feel alive again" },
+      { value: "legacy", label: "Legacy", description: "I need my success to mean something" },
     ],
   },
 ];
@@ -1085,8 +1085,8 @@ function getLowestPillarFromAnswers(answers: AssessmentV3Answers): PriorityPilla
     { pillar: "wealth", score: answers.wealth_freedom || 10 },
     { pillar: "health", score: answers.health_vitality || 10 },
     { pillar: "relationships", score: answers.relationships_depth || 10 },
-    { pillar: "growth", score: answers.growth_aliveness || 10 },
-    { pillar: "purpose", score: answers.purpose_clarity || 10 },
+    { pillar: "mindset", score: answers.growth_aliveness || 10 },
+    { pillar: "legacy", score: answers.purpose_clarity || 10 },
   ];
 
   const lowest = pillarScores.reduce((min, curr) => (curr.score < min.score ? curr : min));
@@ -1107,8 +1107,8 @@ export const PILLAR_SECTIONS = {
       { id: "wealth", name: "Wealth", icon: "💰", questions: 3 },
       { id: "health", name: "Health", icon: "❤️", questions: 3 },
       { id: "relationships", name: "Relationships", icon: "👥", questions: 3 },
-      { id: "growth", name: "Growth", icon: "🌱", questions: 3 },
-      { id: "purpose", name: "Purpose", icon: "🎯", questions: 3 },
+      { id: "mindset", name: "Mindset", icon: "🌱", questions: 3 },
+      { id: "legacy", name: "Legacy", icon: "🎯", questions: 3 },
     ],
   },
   4: { name: "Hidden Self", questionCount: 2 },
@@ -1474,21 +1474,21 @@ export const V3_PRIORITY_INSIGHTS: Record<
     rippleEffect:
       "When the people who matter actually SEE you again, everything changes. Your health improves because you have reasons to take care of yourself. Your purpose clarifies because you're not building alone. Connection is the multiplier.",
   },
-  growth: {
-    pillar: "Growth",
-    validation: "You chose Growth — because you need to feel alive again.",
+  mindset: {
+    pillar: "Mindset",
+    validation: "You chose Mindset — because you need to feel alive again.",
     whyFirst:
       "You've mastered the game you've been playing. And now you're bored, coasting, optimizing a life you've outgrown. The edge that made you successful has dulled. You need a new challenge that actually means something.",
     rippleEffect:
-      "When you're challenged again, everything wakes up. Energy returns because you have something worth getting up for. Relationships improve because you're interesting again. Purpose emerges from the growth itself.",
+      "When you're challenged again, everything wakes up. Energy returns because you have something worth getting up for. Relationships improve because you're interesting again. Legacy emerges from the growth itself.",
   },
-  purpose: {
-    pillar: "Purpose",
-    validation: "You chose Purpose — because your success needs to mean something.",
+  legacy: {
+    pillar: "Legacy",
+    validation: "You chose Legacy — because your success needs to mean something.",
     whyFirst:
-      "You can feel the hollowness. The achievement that was supposed to fill you left you empty. You've been asking 'what's the point?' and the answer keeps coming up short. This is the existential crisis successful men don't talk about.",
+      "You can feel the hollowness. The achievement that was supposed to fill you left you empty. You've been asking 'what's the point?' and the answer keeps coming up short. This is the existential crisis successful people don't talk about.",
     rippleEffect:
-      "When your success has meaning, the grind becomes a mission. Your relationships deepen because you're connected to something larger. Your health improves because you're not escaping — you're building. Purpose is the multiplier that changes everything.",
+      "When your success has meaning, the grind becomes a mission. Your relationships deepen because you're connected to something larger. Your health improves because you're not escaping — you're building. Legacy is the multiplier that changes everything.",
   },
 };
 

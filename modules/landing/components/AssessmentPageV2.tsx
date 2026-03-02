@@ -741,7 +741,7 @@ export default function AssessmentPageV2() {
               The Multiplier Equation
             </p>
             <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
-              {["wealth", "health", "relationships", "growth", "purpose"].map((pillar, index) => {
+              {["wealth", "health", "relationships", "mindset", "legacy"].map((pillar, index) => {
                 const score = answers[`${pillar}_score` as keyof AssessmentAnswers] as number;
                 const isLowest = lowestPillar?.pillar === pillar;
                 return (
@@ -779,7 +779,7 @@ export default function AssessmentPageV2() {
 
             {/* Pillar bars */}
             <div className="space-y-3">
-              {(["wealth", "health", "relationships", "growth", "purpose"] as const).map(
+              {(["wealth", "health", "relationships", "mindset", "legacy"] as const).map(
                 (pillar) => {
                   const score = answers[`${pillar}_score` as keyof AssessmentAnswers] as number;
                   const isLowest = lowestPillar?.pillar === pillar;
