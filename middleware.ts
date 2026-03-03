@@ -148,18 +148,17 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Check if route requires admin access
+  // Check if route requires admin access (admin or facilitator role)
   if (pathname.startsWith("/admin")) {
-    // Query user_roles to check for admin role
-    const { data: adminRole } = await supabase
+    const { data: elevatedRole } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
-      .eq("role", "admin")
+      .in("role", ["admin", "facilitator"])
+      .limit(1)
       .single();
 
-    // If not admin, redirect to home
-    if (!adminRole) {
+    if (!elevatedRole) {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
