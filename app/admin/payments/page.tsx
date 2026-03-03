@@ -18,12 +18,8 @@ interface PaymentMetrics {
   refundRate: number;
   challengePurchases: number;
   challengeRevenue: number;
-  friendCodeRedemptions: number;
   activeSubscriptions: number;
   subscriptionRevenue: number;
-  friendCodesCreated: number;
-  friendCodesUsed: number;
-  friendCodeConversionRate: number;
   revenueTrend: ChartDataPoint[];
   recentPurchases: Array<{
     id: string;
@@ -45,12 +41,8 @@ const defaultMetrics: PaymentMetrics = {
   refundRate: 0,
   challengePurchases: 0,
   challengeRevenue: 0,
-  friendCodeRedemptions: 0,
   activeSubscriptions: 0,
   subscriptionRevenue: 0,
-  friendCodesCreated: 0,
-  friendCodesUsed: 0,
-  friendCodeConversionRate: 0,
   revenueTrend: [],
   recentPurchases: [],
 };
@@ -163,11 +155,6 @@ export default function PaymentsPage() {
           icon="gng-check-circle"
         />
         <StatCard
-          title="Friend Code Redemptions"
-          value={metrics.friendCodeRedemptions}
-          icon="gng-share"
-        />
-        <StatCard
           title="Active Subscriptions"
           value={metrics.activeSubscriptions}
           icon="gng-users"
@@ -208,7 +195,7 @@ export default function PaymentsPage() {
       </div>
 
       {/* Sales Breakdown */}
-      <div className="mb-6 grid gap-6 lg:grid-cols-2">
+      <div className="mb-6">
         {/* Revenue Sources */}
         <div className="border-grey-800 bg-grey-900 rounded-xl border p-5">
           <h3 className="mb-4 font-semibold text-white">Revenue Breakdown</h3>
@@ -260,59 +247,6 @@ export default function PaymentsPage() {
               </p>
             </div>
           </div>
-        </div>
-
-        {/* Friend Code Performance */}
-        <div className="border-grey-800 bg-grey-900 rounded-xl border p-5">
-          <h3 className="mb-4 font-semibold text-white">Friend Code Performance</h3>
-          <div className="mb-6 flex items-center justify-between">
-            <div>
-              <p className="text-action-400 text-3xl font-bold">
-                {metrics.friendCodeConversionRate.toFixed(1)}%
-              </p>
-              <p className="text-grey-400 text-sm">Conversion Rate</p>
-            </div>
-            <div className="h-20 w-20">
-              <svg className="h-full w-full -rotate-90 transform">
-                <circle
-                  cx="40"
-                  cy="40"
-                  r="35"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="8"
-                  className="text-grey-800"
-                />
-                <circle
-                  cx="40"
-                  cy="40"
-                  r="35"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="8"
-                  strokeDasharray={`${(metrics.friendCodeConversionRate / 100) * 220} 220`}
-                  className="text-action-400"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-grey-800 rounded-lg p-4 text-center">
-              <p className="text-2xl font-bold text-white">{metrics.friendCodesCreated}</p>
-              <p className="text-grey-400 text-sm">Codes Created</p>
-            </div>
-            <div className="bg-grey-800 rounded-lg p-4 text-center">
-              <p className="text-action-400 text-2xl font-bold">{metrics.friendCodesUsed}</p>
-              <p className="text-grey-400 text-sm">Codes Redeemed</p>
-            </div>
-          </div>
-
-          <p className="text-grey-400 mt-4 text-sm">
-            {metrics.friendCodesCreated - metrics.friendCodesUsed} friend codes still available for
-            redemption.
-          </p>
         </div>
       </div>
 

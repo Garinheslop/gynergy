@@ -2,15 +2,14 @@
 
 export type PurchaseStatus = "pending" | "completed" | "failed" | "refunded";
 export type SubscriptionStatus = "active" | "past_due" | "canceled" | "unpaid" | "trialing";
-export type PurchaseType = "challenge" | "challenge_friend_code";
-export type ChallengeAccessType = "purchased" | "friend_code" | null;
+export type PurchaseType = "challenge";
+export type ChallengeAccessType = "purchased" | null;
 
 // Stripe product configuration
 export const STRIPE_PRODUCTS = {
   CHALLENGE: {
     name: "45-Day Awakening Challenge",
-    description:
-      "Transform your life with our guided 45-day journey. Includes 2 friend codes for your accountability trio.",
+    description: "Transform your life with our guided 45-day journey.",
     priceId: process.env.NEXT_PUBLIC_STRIPE_CHALLENGE_PRICE_ID,
     amount: 99700, // $997.00 in cents
   },
@@ -47,18 +46,6 @@ export interface Purchase {
   refundedAt: string | null;
   createdAt: string;
   updatedAt: string;
-}
-
-export interface FriendCode {
-  id: string;
-  code: string;
-  creatorId: string | null;
-  purchaseId: string | null;
-  usedById: string | null;
-  usedAt: string | null;
-  isActive: boolean;
-  expiresAt: string | null;
-  createdAt: string;
 }
 
 export interface Subscription {
@@ -108,19 +95,8 @@ export interface CreateCheckoutSessionResponse {
   sessionId: string;
 }
 
-export interface RedeemFriendCodeRequest {
-  code: string;
-}
-
-export interface RedeemFriendCodeResponse {
-  success: boolean;
-  message?: string;
-  error?: string;
-}
-
 export interface GetUserEntitlementsResponse {
   entitlements: UserEntitlements | null;
-  friendCodes: FriendCode[];
 }
 
 // Webhook event types
@@ -139,7 +115,7 @@ export interface PricingTier {
   description: string;
   features: string[];
   ctaText: string;
-  ctaAction: "checkout" | "subscribe" | "friend_code";
+  ctaAction: "checkout" | "subscribe";
   highlighted?: boolean;
   badge?: string;
 }
@@ -156,7 +132,7 @@ export const PRICING_TIERS: PricingTier[] = [
       "Daily Gratitude Actions",
       "Vision board & journey mapping",
       "Cohort community access",
-      "2 friend codes included (Accountability Trio)",
+      "Referral credit to share with a friend",
       "Gamification & badges",
       "Video call sessions",
       "AI companion support",
@@ -166,20 +142,6 @@ export const PRICING_TIERS: PricingTier[] = [
     ctaAction: "checkout",
     highlighted: true,
     badge: "Most Popular",
-  },
-  {
-    name: "Join as a Friend",
-    price: "FREE",
-    priceSubtext: "with friend code",
-    description: "Someone gifted you access! Enter your friend code to begin.",
-    features: [
-      "Full 45-day guided journey",
-      "All challenge features",
-      "Join your friend's accountability trio",
-      "Community access",
-    ],
-    ctaText: "Redeem Friend Code",
-    ctaAction: "friend_code",
   },
   {
     name: "Digital Journal",

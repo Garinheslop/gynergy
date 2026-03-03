@@ -24,7 +24,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "How does the Accountability Duo work?",
     answer:
-      "When you enroll, you receive 1 friend code to share with a man you trust. They get full access to the challenge at no cost. Research shows pairs have 85% higher completion rates than individuals. You'll hold each other accountable through the WhatsApp community.",
+      "When you enroll, you earn a referral credit — a personal link to share with a man you trust. They get a discount on the challenge. Research shows pairs have significantly higher completion rates than individuals. You'll hold each other accountable through the WhatsApp community.",
   },
   {
     question: "What happens after the 45 days?",
@@ -39,7 +39,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "Why does this cost $997?",
     answer:
-      "The price reflects the value and commitment required. You're getting 8 live coaching calls ($2,000 value), a structured transformation system, and a brotherhood of men at your level. Plus, your investment includes 1 friend code ($997 value) — so you're effectively paying $498.50 per person when you bring your Accountability Duo. The real question: what's another year of feeling disconnected worth?",
+      "The price reflects the value and commitment required. You're getting 8 live coaching calls ($2,000 value), a structured transformation system, and a brotherhood of men at your level. Plus, your investment includes a referral credit to share with someone you trust. The real question: what's another year of feeling disconnected worth?",
   },
   {
     question: "Who is this NOT for?",
@@ -54,6 +54,6 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "Can I do this challenge alone without friends?",
     answer:
-      "Absolutely. The friend codes are optional — many men complete the challenge solo and still experience profound transformation. You'll still have access to the full brotherhood community for support and accountability.",
+      "Absolutely. The referral credit is optional — many men complete the challenge solo and still experience profound transformation. You'll still have access to the full brotherhood community for support and accountability.",
   },
 ];

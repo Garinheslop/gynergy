@@ -2,7 +2,7 @@
 
 import { cn } from "@lib/utils/style";
 
-import { FRIEND_CONTENT } from "../../data/content";
+import { REFERRAL_CONTENT } from "../../data/content";
 import { SectionWrapper, SectionLabel, SectionTitle } from "../shared";
 
 export default function BringAFriendSection() {
@@ -11,7 +11,7 @@ export default function BringAFriendSection() {
       <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-14">
         {/* Left: Visual */}
         <div className="flex flex-wrap items-center justify-center gap-4 lg:gap-6">
-          {FRIEND_CONTENT.circles.map((circle, i) => (
+          {REFERRAL_CONTENT.circles.map((circle, i) => (
             <div key={circle.label} className="flex items-center gap-4">
               <div
                 className={cn(
@@ -26,7 +26,7 @@ export default function BringAFriendSection() {
                 </span>
                 <span className="font-bebas text-lp-gold-light text-xl">{circle.price}</span>
               </div>
-              {i < FRIEND_CONTENT.circles.length - 1 && (
+              {i < REFERRAL_CONTENT.circles.length - 1 && (
                 <span className="font-bebas text-lp-gold/25 text-3xl">+</span>
               )}
             </div>
@@ -35,16 +35,16 @@ export default function BringAFriendSection() {
 
         {/* Right: Text */}
         <div>
-          <SectionLabel>The Accountability Trio</SectionLabel>
+          <SectionLabel>Referral Credits</SectionLabel>
 
-          <SectionTitle>{FRIEND_CONTENT.headline}</SectionTitle>
+          <SectionTitle>{REFERRAL_CONTENT.headline}</SectionTitle>
 
-          {FRIEND_CONTENT.paragraphs.map((paragraph, i) => (
+          {REFERRAL_CONTENT.paragraphs.map((paragraph, i) => (
             <p
               key={i}
               className={cn(
                 "font-oswald text-lp-gray text-base leading-relaxed font-extralight",
-                i < FRIEND_CONTENT.paragraphs.length - 1 && "mb-5"
+                i < REFERRAL_CONTENT.paragraphs.length - 1 && "mb-5"
               )}
             >
               {paragraph}

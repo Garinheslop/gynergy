@@ -18,10 +18,10 @@ export type TriggerEvent =
   | "purchase_completed"
   | "cart_abandoned"
   | "user_inactive"
-  | "friend_codes_issued"
+  | "referral_credit_issued"
   | "community_activated"
   | "challenge_completed_purchaser"
-  | "challenge_completed_friend_code"
+  | "challenge_completed_referral"
   | "trial_ending_soon";
 
 export interface EnrollResult {

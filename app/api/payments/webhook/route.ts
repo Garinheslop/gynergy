@@ -203,9 +203,7 @@ async function handleCheckoutCompleted(
       throw purchaseError;
     }
 
-    // If user exists, the database trigger will automatically:
-    // 1. Create 1 friend code
-    // 2. Grant challenge access via user_entitlements
+    // If user exists, the database trigger will automatically grant challenge access via user_entitlements
 
     // Send purchase confirmation email
     if (session.customer_email) {
@@ -222,26 +220,12 @@ async function handleCheckoutCompleted(
         }
       }
 
-      // Get friend codes for this user (created by the database trigger)
-      let friendCodes: string[] = [];
-      if (userId) {
-        const { data: codes } = await supabase
-          .from("friend_codes")
-          .select("code")
-          .eq("owner_id", userId)
-          .eq("is_used", false);
-        if (codes) {
-          friendCodes = codes.map((c) => c.code);
-        }
-      }
-
       // Send confirmation email (non-blocking)
       sendPurchaseConfirmationEmail({
         to: session.customer_email,
         firstName,
         productName: STRIPE_PRODUCTS.CHALLENGE.name,
         amount: formatPrice(session.amount_total || STRIPE_PRODUCTS.CHALLENGE.amount),
-        friendCodes,
       }).catch((err) => {
         console.error("Failed to send purchase confirmation email:", err);
       });
@@ -329,11 +313,6 @@ async function handleCheckoutCompleted(
         productName: STRIPE_PRODUCTS.CHALLENGE.name,
         amount: formatPrice(session.amount_total || STRIPE_PRODUCTS.CHALLENGE.amount),
       }).catch((err) => console.error("[ghl] Purchase sync error:", err));
-
-      // Enroll in friend code referral reminders (non-blocking)
-      enrollInDrip("friend_codes_issued", session.customer_email, {
-        firstName,
-      }).catch((err) => console.error("Referral drip enrollment error:", err));
 
       // Enroll in community activation (non-blocking)
       enrollInDrip("community_activated", session.customer_email, {
@@ -668,10 +647,7 @@ async function handleChargeRefunded(
   if (!purchase.user_id) return;
 
   // Revoke challenge entitlements
-  if (
-    purchase.purchase_type === "challenge" ||
-    purchase.purchase_type === "challenge_friend_code"
-  ) {
+  if (purchase.purchase_type === "challenge") {
     await supabase
       .from("user_entitlements")
       .update({
@@ -680,13 +656,6 @@ async function handleChargeRefunded(
       })
       .eq("user_id", purchase.user_id);
   }
-
-  // Deactivate unused friend codes from this user's purchase
-  await supabase
-    .from("friend_codes")
-    .update({ is_active: false })
-    .eq("owner_id", purchase.user_id)
-    .is("used_by_id", null);
 }
 
 function mapStripeStatus(

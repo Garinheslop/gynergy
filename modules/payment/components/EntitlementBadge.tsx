@@ -238,8 +238,6 @@ function getAccessTypeLabel(accessType: ChallengeAccessType): string {
   switch (accessType) {
     case "purchased":
       return "Full access";
-    case "friend_code":
-      return "Friend code access";
     default:
       return "Access granted";
   }

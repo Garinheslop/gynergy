@@ -198,8 +198,8 @@ export default function AdminDashboard() {
         />
         <StatCard title="Avg. Streak" value={`${metrics.averageStreak} days`} icon="gng-fire" />
         <StatCard
-          title="Friend Code Conv."
-          value={metrics.friendCodeConversionRate || 0}
+          title="Referral Credit Conv."
+          value={metrics.referralCreditConversionRate || 0}
           format="percentage"
           icon="gng-share"
         />
@@ -256,9 +256,9 @@ export default function AdminDashboard() {
             <p className="mt-1 text-2xl font-bold text-white">{metrics.challengePurchases || 0}</p>
           </div>
           <div className="bg-grey-800 rounded-lg p-4">
-            <p className="text-grey-400 text-sm">Friend Code Redemptions</p>
+            <p className="text-grey-400 text-sm">Referral Credit Redemptions</p>
             <p className="mt-1 text-2xl font-bold text-white">
-              {metrics.friendCodeRedemptions || 0}
+              {metrics.referralCreditRedemptions || 0}
             </p>
           </div>
           <div className="bg-grey-800 rounded-lg p-4">

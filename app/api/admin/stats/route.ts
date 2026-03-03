@@ -46,8 +46,8 @@ export async function GET() {
       purchasesMonthResult,
       refundsResult,
       subscriptionsResult,
-      friendCodesResult,
-      friendCodesUsedResult,
+      referralCreditsResult,
+      referralCreditsRedeemedResult,
       journalResult,
       activeUsersResult,
       streaksResult,
@@ -90,14 +90,14 @@ export async function GET() {
         .select("amount_cents, interval, status")
         .eq("status", "active"),
 
-      // Friend codes created
-      serviceClient.from("friend_codes").select("id", { count: "exact", head: true }),
+      // Referral credits created
+      serviceClient.from("referral_credits").select("id", { count: "exact", head: true }),
 
-      // Friend codes used
+      // Referral credits redeemed
       serviceClient
-        .from("friend_codes")
+        .from("referral_credits")
         .select("id", { count: "exact", head: true })
-        .not("used_by_id", "is", null),
+        .eq("is_redeemed", true),
 
       // Journal entries
       serviceClient.from("journal_entries").select("id", { count: "exact", head: true }),
@@ -142,15 +142,15 @@ export async function GET() {
     const averageStreak =
       streaks.length > 0 ? streaks.reduce((a, b) => a + b, 0) / streaks.length : 0;
 
-    // Challenge purchases vs friend code redemptions
+    // Challenge purchases
     const challengePurchases =
       purchasesResult.data?.filter((p) => p.purchase_type === "challenge").length || 0;
 
-    // Friend code conversion rate
-    const friendCodesCreated = friendCodesResult.count || 0;
-    const friendCodesUsed = friendCodesUsedResult.count || 0;
-    const friendCodeConversionRate =
-      friendCodesCreated > 0 ? (friendCodesUsed / friendCodesCreated) * 100 : 0;
+    // Referral credit redemption rate
+    const referralCreditsCreated = referralCreditsResult.count || 0;
+    const referralCreditsRedeemed = referralCreditsRedeemedResult.count || 0;
+    const referralCreditRedemptionRate =
+      referralCreditsCreated > 0 ? (referralCreditsRedeemed / referralCreditsCreated) * 100 : 0;
 
     // Calculate completion rate (users with day 45 entries / users with challenge access)
     // Simplified: using journal entries as proxy
@@ -174,8 +174,9 @@ export async function GET() {
 
       // Sales breakdown
       challengePurchases,
-      friendCodeRedemptions: friendCodesUsed,
-      friendCodeConversionRate: Math.round(friendCodeConversionRate * 10) / 10,
+      referralCreditsCreated,
+      referralCreditsRedeemed,
+      referralCreditRedemptionRate: Math.round(referralCreditRedemptionRate * 10) / 10,
       activeSubscriptions: subscriptionsResult.data?.length || 0,
 
       // Engagement metrics

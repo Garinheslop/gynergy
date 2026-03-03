@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS drip_campaigns (
     'purchase_completed',
     'cart_abandoned',
     'user_inactive',
-    'friend_codes_issued',
+    'referral_credit_issued',
     'community_activated'
   )),
 
@@ -254,12 +254,12 @@ VALUES (
   'user_inactive'
 ) ON CONFLICT DO NOTHING;
 
--- Campaign 6: Friend Code Referral Reminders
+-- Campaign 6: Referral Credit Reminders
 INSERT INTO drip_campaigns (name, description, trigger_event)
 VALUES (
-  'Referral Reminders',
-  'Remind users to share their unused friend codes. Enrolled after purchase when codes are generated.',
-  'friend_codes_issued'
+  'Referral Credit Reminders',
+  'Remind users to share their referral credit link. Enrolled after purchase when credit is generated.',
+  'referral_credit_issued'
 ) ON CONFLICT DO NOTHING;
 
 -- Campaign 7: Community Activation
@@ -283,7 +283,7 @@ BEGIN
   SELECT id INTO v_winback_campaign_id
     FROM drip_campaigns WHERE trigger_event = 'user_inactive' LIMIT 1;
   SELECT id INTO v_referral_campaign_id
-    FROM drip_campaigns WHERE trigger_event = 'friend_codes_issued' LIMIT 1;
+    FROM drip_campaigns WHERE trigger_event = 'referral_credit_issued' LIMIT 1;
   SELECT id INTO v_community_campaign_id
     FROM drip_campaigns WHERE trigger_event = 'community_activated' LIMIT 1;
 
@@ -307,13 +307,13 @@ BEGIN
     ON CONFLICT (campaign_id, sequence_order) DO NOTHING;
   END IF;
 
-  -- Referral Reminders Drip (3 emails: 3d, 14d, 30d after codes issued)
+  -- Referral Credit Drip (3 emails: 3d, 14d, 30d after credit issued)
   IF v_referral_campaign_id IS NOT NULL THEN
     INSERT INTO drip_emails (campaign_id, sequence_order, delay_hours, subject, template_key)
     VALUES
-      (v_referral_campaign_id, 1, 72,  'Your friend codes are worth $1,994',              'referral_day3'),
+      (v_referral_campaign_id, 1, 72,  'You have a gift link worth real money',            'referral_day3'),
       (v_referral_campaign_id, 2, 336, 'The men who share finish stronger',                'referral_day14'),
-      (v_referral_campaign_id, 3, 720, 'Last reminder: 2 spots reserved for your people',  'referral_day30')
+      (v_referral_campaign_id, 3, 720, 'Last reminder: your referral credit is still waiting', 'referral_day30')
     ON CONFLICT (campaign_id, sequence_order) DO NOTHING;
   END IF;
 

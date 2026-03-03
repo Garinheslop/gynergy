@@ -29,16 +29,6 @@ export async function GET() {
       return NextResponse.json({ error: "Failed to fetch entitlements" }, { status: 500 });
     }
 
-    // Get user's friend codes
-    const { data: friendCodes, error: friendCodesError } = await supabase
-      .from("friend_codes")
-      .select("code, used_by_id, used_at, created_at")
-      .eq("creator_id", user.id);
-
-    if (friendCodesError) {
-      console.error("Error fetching friend codes:", friendCodesError);
-    }
-
     // Get active subscription if any
     let subscription = null;
     if (entitlements?.journal_subscription_id) {
@@ -68,16 +58,8 @@ export async function GET() {
         }
       : null;
 
-    const formattedFriendCodes = (friendCodes || []).map((fc) => ({
-      code: fc.code,
-      isUsed: !!fc.used_by_id,
-      usedAt: fc.used_at,
-      createdAt: fc.created_at,
-    }));
-
     return NextResponse.json({
       entitlements: formattedEntitlements,
-      friendCodes: formattedFriendCodes,
       subscription: subscription
         ? {
             id: subscription.id,

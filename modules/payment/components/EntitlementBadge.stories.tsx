@@ -83,12 +83,12 @@ export const ChallengeAccess: Story = {
   },
 };
 
-// Challenge Access (Friend Code)
-export const FriendCodeAccess: Story = {
+// Challenge Access (Referral)
+export const ReferralAccess: Story = {
   args: {
     entitlements: createEntitlements({
       hasChallengeAccess: true,
-      challengeAccessType: "friend_code",
+      challengeAccessType: "purchased",
       challengeAccessGrantedAt: new Date().toISOString(),
       challengeExpiresAt: futureDate(45),
       hasCommunityAccess: true,

@@ -205,7 +205,7 @@ async function enrollDripCampaigns(
       const dripTrigger =
         entitlement.challenge_access_type === "purchased"
           ? ("challenge_completed_purchaser" as const)
-          : ("challenge_completed_friend_code" as const);
+          : ("challenge_completed_referral" as const);
 
       const dripResult = await enrollInDrip(
         dripTrigger,
