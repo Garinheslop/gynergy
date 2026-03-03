@@ -25,7 +25,7 @@ const sectionTypes = {
   weekly: "weekly",
 };
 
-const Journals = () => {
+const Journals = ({ bridgeMode = false }: { bridgeMode?: boolean }) => {
   const dispatch = useDispatch();
   const router = useRouter();
   const userEnrollments = useSelector((state) => state.enrollments);
@@ -158,12 +158,17 @@ const Journals = () => {
     );
     router.push(`/${books.current?.slug}/${pagePaths.journalEditor}`);
   };
+  // In bridge mode, only show morning journal
+  const displayedDailyContents = bridgeMode
+    ? dailyJournalCardContents.filter((c: any) => c.journalType === journalTypes.morningJournal)
+    : dailyJournalCardContents;
+
   return (
     <>
       <Tasks
-        heading="Your Tasks Today"
+        heading={bridgeMode ? "Your Morning Practice" : "Your Tasks Today"}
         type={sectionTypes.daily}
-        journalCardContents={dailyJournalCardContents}
+        journalCardContents={displayedDailyContents}
         onJournalWrite={journalWriteHandler}
         isLoading={
           userEnrollments.loading ||
@@ -172,7 +177,7 @@ const Journals = () => {
           userEnrollments?.streak?.loading
         }
       />
-      {
+      {!bridgeMode && (
         <Tasks
           heading="Your Tasks This Week"
           type={sectionTypes.weekly}
@@ -186,7 +191,7 @@ const Journals = () => {
             userEnrollments?.streak?.loading
           }
         />
-      }
+      )}
     </>
   );
 };

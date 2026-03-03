@@ -58,8 +58,8 @@ interface PillarScores {
   Wealth: number;
   Health: number;
   Relationships: number;
-  Growth: number;
-  Purpose: number;
+  Mindset: number;
+  Legacy: number;
 }
 
 const STORAGE_KEY = "gynergy_assessment_result";
@@ -71,8 +71,8 @@ export default function AssessmentPage() {
     Wealth: 5,
     Health: 5,
     Relationships: 5,
-    Growth: 5,
-    Purpose: 5,
+    Mindset: 5,
+    Legacy: 5,
   });
   const [hasExistingResult, setHasExistingResult] = useState(false);
   const [existingScore, setExistingScore] = useState<number | null>(null);
@@ -130,8 +130,8 @@ export default function AssessmentPage() {
       Wealth: 5,
       Health: 5,
       Relationships: 5,
-      Growth: 5,
-      Purpose: 5,
+      Mindset: 5,
+      Legacy: 5,
     });
   }, []);
 

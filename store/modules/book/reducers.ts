@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
 import { BookSessionData } from "@resources/types/book";
 
 const _dayZeroBookData = {
@@ -95,6 +96,15 @@ interface bookData {
   farewell: string;
   cover: string;
   durationDays: number;
+  bridgeDurationDays?: number;
+  journeyPhases?: Array<{
+    order: number;
+    name: string;
+    subtitle: string;
+    start_day: number;
+    end_day: number;
+    description: string;
+  }>;
   dailyJournalPoints: number;
   weeklyJournalPoints: number;
   dailyActionPoints: number;

@@ -1073,6 +1073,165 @@ Check the Call Schedule: ${APP_URL}/community
 
 — Garin`,
   }),
+
+  // ============================
+  // BRIDGE MONTH — DAYS 46-75
+  // ============================
+
+  bridge_month_welcome: (meta) => ({
+    subject: "Your Bridge Month begins — lighter, intentional, powerful",
+    html: emailWrapper(`
+      <h1>Welcome to Your Bridge Month</h1>
+      <p>Hey ${meta.firstName || "there"},</p>
+      <p>You just completed the 45-Day Awakening Challenge. That alone puts you in rare company.</p>
+      <p>Now comes the <span class="highlight">Bridge Month</span> — 30 days of lighter practice designed to lock in what you've built.</p>
+      <p><strong style="color: #fff;">What changes:</strong></p>
+      <p>Morning journal only. No evening journal, no weekly challenges. Just the morning practice that started everything.</p>
+      <p><strong style="color: #fff;">Why it matters:</strong></p>
+      <p>Research shows it takes <span class="highlight">66 days</span> for a behavior to become automatic. You're on Day 46. Twenty more days of showing up and this becomes who you are — not something you do.</p>
+      <div style="text-align: center;">
+        <a href="${APP_URL}/dashboard" class="button">Open Your Morning Journal</a>
+      </div>
+      <div class="divider"></div>
+      <p>Keep showing up. The hardest part is done.</p>
+      <p style="color: #7dd3c0;">— Garin</p>
+    `),
+    text: `Welcome to Your Bridge Month
+
+Hey ${meta.firstName || "there"},
+
+You just completed the 45-Day Awakening Challenge. That alone puts you in rare company.
+
+Now comes the Bridge Month — 30 days of lighter practice designed to lock in what you've built.
+
+What changes: Morning journal only. No evening journal, no weekly challenges.
+
+Why it matters: Research shows it takes 66 days for a behavior to become automatic. You're on Day 46. Twenty more days and this becomes who you are.
+
+Open Your Morning Journal: ${APP_URL}/dashboard
+
+Keep showing up. The hardest part is done.
+
+— Garin`,
+  }),
+
+  bridge_day_55_midpoint: (meta) => ({
+    subject: "Day 55 — you're halfway through the Bridge",
+    html: emailWrapper(`
+      <h1>Halfway Through the Bridge</h1>
+      <p>Hey ${meta.firstName || "there"},</p>
+      <p>You're on <span class="highlight">Day 55</span>. Halfway through the Bridge Month and 11 days from the habit milestone.</p>
+      <div class="stat-box">
+        <div class="stat-value">55</div>
+        <div class="stat-label">days of practice</div>
+      </div>
+      <p>By now, the morning journal probably feels less like an assignment and more like clearing your throat before the day starts. That's the shift.</p>
+      <p>Keep going. You're building something that lasts.</p>
+      <div style="text-align: center;">
+        <a href="${APP_URL}/dashboard" class="button">Continue Your Practice</a>
+      </div>
+      <div class="divider"></div>
+      <p style="color: #7dd3c0;">— Garin</p>
+    `),
+    text: `Halfway Through the Bridge
+
+Hey ${meta.firstName || "there"},
+
+You're on Day 55. Halfway through the Bridge Month and 11 days from the habit milestone.
+
+55 days of practice.
+
+By now, the morning journal probably feels less like an assignment and more like clearing your throat before the day starts. That's the shift.
+
+Keep going. You're building something that lasts.
+
+Continue Your Practice: ${APP_URL}/dashboard
+
+— Garin`,
+  }),
+
+  bridge_day_66_habit: (meta) => ({
+    subject: "Day 66 — science says you're transformed",
+    html: emailWrapper(`
+      <h1>Day 66. It's Official.</h1>
+      <p>Hey ${meta.firstName || "there"},</p>
+      <p>According to the research (Lally et al., 2010), it takes an average of <span class="highlight">66 days</span> for a new behavior to become automatic.</p>
+      <p>Today is that day.</p>
+      <div class="stat-box">
+        <div class="stat-value">66</div>
+        <div class="stat-label">days — habit automaticity reached</div>
+      </div>
+      <p>What you've been doing every morning isn't discipline anymore. It's <strong style="color: #fff;">who you are</strong>. The gratitude practice, the intention-setting, the reflection — it's wired in.</p>
+      <p>You've also unlocked the <span class="highlight">Habit Master</span> badge — a legendary achievement that less than 10% of men who start this journey earn.</p>
+      <p>9 more days in the Bridge. Then you'll choose your next chapter.</p>
+      <div style="text-align: center;">
+        <a href="${APP_URL}/dashboard" class="button">See Your Habit Master Badge</a>
+      </div>
+      <div class="divider"></div>
+      <p style="color: #7dd3c0;">— Garin</p>
+    `),
+    text: `Day 66. It's Official.
+
+Hey ${meta.firstName || "there"},
+
+According to the research (Lally et al., 2010), it takes an average of 66 days for a new behavior to become automatic.
+
+Today is that day.
+
+66 days — habit automaticity reached.
+
+What you've been doing every morning isn't discipline anymore. It's who you are.
+
+You've also unlocked the Habit Master badge — a legendary achievement that less than 10% of men who start earn.
+
+9 more days in the Bridge. Then you'll choose your next chapter.
+
+See Your Habit Master Badge: ${APP_URL}/dashboard
+
+— Garin`,
+  }),
+
+  bridge_choose_path: (meta) => ({
+    subject: "Choose your next chapter",
+    html: emailWrapper(`
+      <h1>What Comes Next?</h1>
+      <p>Hey ${meta.firstName || "there"},</p>
+      <p>You've completed the 45-Day Challenge. You've locked in the habit through the Bridge Month. The gratitude practice is automatic now.</p>
+      <p>The question is: <span class="highlight">what do you do with the man you've become?</span></p>
+      <p>Two paths are open:</p>
+      <h2>LVL 5 LIFE — $97/mo</h2>
+      <p>The elite mastermind for men committed to mastery across all five pillars. Weekly coaching, brotherhood accountability, and advanced curriculum. Built for the man who's done the inner work and is ready to apply it.</p>
+      <h2>Continue Your Practice</h2>
+      <p>Keep your morning journal and AI coaching access. The foundation you built doesn't go away.</p>
+      <div style="text-align: center;">
+        <a href="${APP_URL}/dashboard" class="button">Explore Your Options</a>
+      </div>
+      <div class="divider"></div>
+      <p>No pressure. No expiring countdown. Just a decision about what the next chapter looks like.</p>
+      <p style="color: #7dd3c0;">— Garin</p>
+    `),
+    text: `What Comes Next?
+
+Hey ${meta.firstName || "there"},
+
+You've completed the 45-Day Challenge. You've locked in the habit through the Bridge Month. The gratitude practice is automatic now.
+
+The question is: what do you do with the man you've become?
+
+Two paths are open:
+
+LVL 5 LIFE — $97/mo
+The elite mastermind for men committed to mastery across all five pillars. Weekly coaching, brotherhood accountability, and advanced curriculum.
+
+Continue Your Practice
+Keep your morning journal and AI coaching access.
+
+Explore Your Options: ${APP_URL}/dashboard
+
+No pressure. No expiring countdown. Just a decision about what the next chapter looks like.
+
+— Garin`,
+  }),
 };
 
 // ============================================================================

@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 
 import { createClient } from "@lib/supabase-client";
 import useCheckEnrollmentSession from "@modules/book/hooks/useCheckEnrollmentSession";
-import { BookSessionData } from "@resources/types/book";
+import { BookSessionData, JourneyPhaseKey } from "@resources/types/book";
 import { useDispatch, useSelector } from "@store/hooks";
 import { getUserBookSessionData, updateUserStreak } from "@store/modules/enrollment";
 import { getUserProfile, signOutAndReset } from "@store/modules/profile";
@@ -25,6 +25,8 @@ export type SessionContextType = {
   bookSession: {
     isCompleted: boolean;
     latest: BookSessionData;
+    journeyPhase: JourneyPhaseKey;
+    dayInJourney: number;
   };
   authenticating: boolean;
   logout: () => void;
@@ -53,7 +55,8 @@ const UseSessionContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const currentBook = useSelector((state) => state.books.current);
   const enrollments = useSelector((state) => state.enrollments);
 
-  const { bookSessionCompleted, latestBookSession } = useCheckEnrollmentSession();
+  const { bookSessionCompleted, latestBookSession, journeyPhase, dayInJourney } =
+    useCheckEnrollmentSession();
 
   const [session, setSession] = useState<Session | null>(null);
   const [authenticating, setAuthenticating] = useState<boolean>(false);
@@ -151,6 +154,8 @@ const UseSessionContextProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         bookSession: {
           isCompleted: bookSessionCompleted,
           latest: latestBookSession,
+          journeyPhase,
+          dayInJourney,
         },
       }}
     >

@@ -67,7 +67,7 @@ function buildUserProfileSection(context: UserContextForAI): string {
   const { user } = context;
   const lines = [
     `Name: ${user.name}`,
-    `Day in Journey: ${user.dayInJourney} of 45`,
+    `Day in Journey: ${user.dayInJourney} of 75`,
     `Relationship Stage: ${context.relationshipStage}`,
     "",
     "Current Streaks:",
@@ -340,14 +340,14 @@ export async function fetchUserContext(userId: string): Promise<UserContextForAI
   });
 
   // Calculate next milestone
-  const milestonesDays = [7, 14, 21, 30, 45];
+  const milestonesDays = [7, 14, 21, 30, 45, 66, 75];
   const reachedMilestones = milestonesDays.filter((m) => dayInJourney >= m);
-  const nextMilestone = milestonesDays.find((m) => dayInJourney < m) || 45;
+  const nextMilestone = milestonesDays.find((m) => dayInJourney < m) || 75;
 
   return {
     user: {
       name: profile.full_name || profile.email?.split("@")[0] || "Friend",
-      dayInJourney: Math.min(dayInJourney, 45),
+      dayInJourney: Math.min(dayInJourney, 75),
       currentStreak: streaks,
     },
     recentJournals,
