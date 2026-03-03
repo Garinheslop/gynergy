@@ -41,7 +41,7 @@ const ChooseYourPath = () => {
     });
     if (profile?.email) params.set("email", profile.email);
     if (profile?.id) params.set("ref", profile.id);
-    return `https://gynergy.com/checkout/${slug}?${params.toString()}`;
+    return `https://lvl5life.com/payment?plan=${slug}&${params.toString()}`;
   };
 
   // Show both paths if gender not set; otherwise show matching first, then other
