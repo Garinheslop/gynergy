@@ -3,26 +3,18 @@
 import { Suspense, useEffect, useState } from "react";
 
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { useSession } from "@contexts/UseSession";
 import { cn } from "@lib/utils/style";
-import FriendCodeInput from "@modules/payment/components/FriendCodeInput";
-import FriendCodeShare from "@modules/payment/components/FriendCodeShare";
 import PricingCard from "@modules/payment/components/PricingCard";
 import icons from "@resources/icons";
 import { PRICING_TIERS } from "@resources/types/payment";
 import { useDispatch, useSelector } from "@store/hooks";
-import {
-  createCheckoutSession,
-  fetchEntitlements,
-  redeemFriendCode,
-  clearRedeemStatus,
-} from "@store/modules/payment";
+import { createCheckoutSession, fetchEntitlements } from "@store/modules/payment";
 
 function LandingPageContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { session, authenticating } = useSession();
   const dispatch = useDispatch();
 
@@ -30,16 +22,7 @@ function LandingPageContent() {
   const profile = useSelector((state) => state.profile);
 
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [showFriendCodeModal, setShowFriendCodeModal] = useState(false);
   const [hasCheckedAccess, setHasCheckedAccess] = useState(false);
-
-  // Check for friend code in URL
-  useEffect(() => {
-    const codeParam = searchParams.get("code");
-    if (codeParam) {
-      setShowFriendCodeModal(true);
-    }
-  }, [searchParams]);
 
   // Fetch entitlements when logged in
   useEffect(() => {
@@ -60,13 +43,6 @@ function LandingPageContent() {
     }
   }, [session, authenticating, payment.loading, payment.entitlements, profile.current, router]);
 
-  // Clear redeem status when modal closes
-  useEffect(() => {
-    if (!showFriendCodeModal) {
-      dispatch(clearRedeemStatus());
-    }
-  }, [showFriendCodeModal, dispatch]);
-
   const handleCheckout = async (
     productType: "challenge" | "journal_monthly" | "journal_annual"
   ) => {
@@ -78,18 +54,6 @@ function LandingPageContent() {
       console.error("Checkout error:", error);
       setCheckoutLoading(false);
     }
-  };
-
-  const handleRedeemCode = async (code: string) => {
-    if (!session) {
-      // Store code and redirect to login
-      sessionStorage.setItem("pendingFriendCode", code);
-      router.push(`/login?redirect=/&code=${code}`);
-      return { success: false, error: "Please sign in first" };
-    }
-
-    const result = await dispatch(redeemFriendCode(code));
-    return result;
   };
 
   // Show loading state while checking auth/entitlements
@@ -152,8 +116,7 @@ function LandingPageContent() {
           </h1>
           <p className="mx-auto mt-6 max-w-3xl text-xl text-gray-600">
             Join the Awakening Challenge and discover the power of daily gratitude, mindful
-            journaling, and community support. Start your journey with 2 friends for the ultimate
-            accountability trio.
+            journaling, and community support.
           </p>
 
           {/* Social proof */}
@@ -190,26 +153,11 @@ function LandingPageContent() {
                 >
                   Start Your Journey - $997
                 </button>
-                <button
-                  onClick={() => setShowFriendCodeModal(true)}
-                  className="rounded-lg border-2 border-indigo-600 px-8 py-4 text-lg font-bold text-indigo-600 hover:bg-indigo-50"
-                >
-                  Have a Friend Code?
-                </button>
               </>
             )}
           </div>
         </div>
       </section>
-
-      {/* Friend Codes Section (if user has them) */}
-      {hasChallengeAccess && payment.friendCodes.length > 0 && (
-        <section className="border-y border-gray-200 bg-white py-8">
-          <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
-            <FriendCodeShare friendCodes={payment.friendCodes} />
-          </div>
-        </section>
-      )}
 
       {/* Pricing Section */}
       <section className="py-16">
@@ -220,7 +168,7 @@ function LandingPageContent() {
             </h2>
             <p className="mt-4 text-lg text-gray-600">
               {hasChallengeAccess
-                ? "You have access to the 45-Day Challenge. Share your friend codes below!"
+                ? "You have access to the 45-Day Challenge."
                 : "Start your transformation journey today"}
             </p>
           </div>
@@ -237,7 +185,6 @@ function LandingPageContent() {
                     handleCheckout("journal_monthly");
                   }
                 }}
-                onFriendCode={() => setShowFriendCodeModal(true)}
                 isLoading={checkoutLoading}
               />
             ))}
@@ -272,9 +219,9 @@ function LandingPageContent() {
               },
               {
                 icon: "👥",
-                title: "Accountability Trio",
+                title: "Community Support",
                 description:
-                  "Get 2 friend codes to bring your support system along for the journey.",
+                  "Join a brotherhood of men committed to growth and hold each other accountable.",
               },
               {
                 icon: "🏆",
@@ -310,8 +257,8 @@ function LandingPageContent() {
           <div className="space-y-6">
             {[
               {
-                q: "What is the Accountability Trio?",
-                a: "When you purchase the challenge, you receive 2 friend codes to share. Research shows groups of 3 have the highest completion rates. Start the journey with friends for maximum accountability and support.",
+                q: "How does accountability work?",
+                a: "Every challenge participant joins a cohort community. Research shows groups have the highest completion rates. You'll have a brotherhood to share the journey with for maximum accountability and support.",
               },
               {
                 q: "What happens after the 45 days?",
@@ -319,7 +266,7 @@ function LandingPageContent() {
               },
               {
                 q: "Can I do the challenge alone?",
-                a: "Absolutely! While we recommend the Accountability Trio for best results, you can complete the challenge solo. You'll still have access to the cohort community for support.",
+                a: "Absolutely! While we recommend engaging with the community for best results, you can complete the challenge solo. You'll still have access to the cohort community for support.",
               },
               {
                 q: "What if I miss a day?",
@@ -371,24 +318,11 @@ function LandingPageContent() {
           <p>&copy; {new Date().getFullYear()} Gynergy. All rights reserved.</p>
         </div>
       </footer>
-
-      {/* Friend Code Modal */}
-      {showFriendCodeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <FriendCodeInput
-            onRedeem={handleRedeemCode}
-            isLoading={payment.redeemingCode}
-            error={payment.redeemError}
-            success={payment.redeemSuccess}
-            onClose={() => setShowFriendCodeModal(false)}
-          />
-        </div>
-      )}
     </div>
   );
 }
 
-// Wrap with Suspense for useSearchParams
+// Wrap with Suspense for client-side rendering
 export default function LandingPageClient() {
   return (
     <Suspense

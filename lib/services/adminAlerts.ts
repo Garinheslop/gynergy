@@ -168,49 +168,51 @@ export async function checkModerationBacklog(supabase: SupabaseClient): Promise<
   return null;
 }
 
-// Friend code performance
-export async function checkFriendCodePerformance(supabase: SupabaseClient): Promise<Alert | null> {
+// Referral credit performance
+export async function checkReferralCreditPerformance(
+  supabase: SupabaseClient
+): Promise<Alert | null> {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [createdResult, usedResult] = await Promise.all([
+  const [createdResult, redeemedResult] = await Promise.all([
     supabase
-      .from("friend_codes")
+      .from("referral_credits")
       .select("id", { count: "exact", head: true })
       .gte("created_at", thirtyDaysAgo),
     supabase
-      .from("friend_codes")
+      .from("referral_credits")
       .select("id", { count: "exact", head: true })
-      .gte("used_at", thirtyDaysAgo)
-      .not("used_by_id", "is", null),
+      .gte("redeemed_at", thirtyDaysAgo)
+      .eq("is_redeemed", true),
   ]);
 
   const created = createdResult.count || 0;
-  const used = usedResult.count || 0;
+  const redeemed = redeemedResult.count || 0;
 
   if (created > 10) {
-    const conversionRate = (used / created) * 100;
+    const conversionRate = (redeemed / created) * 100;
 
     if (conversionRate > 50) {
       return {
-        id: `friend-code-success-${new Date().toISOString().split("T")[0]}`,
+        id: `referral-credit-success-${new Date().toISOString().split("T")[0]}`,
         type: "success",
-        title: `Friend Codes Performing Well: ${conversionRate.toFixed(0)}% Conversion`,
-        description: `${used} of ${created} friend codes were redeemed this month. Your referral program is working!`,
+        title: `Referral Credits Performing Well: ${conversionRate.toFixed(0)}% Conversion`,
+        description: `${redeemed} of ${created} referral credits were redeemed this month. Your referral program is working!`,
         actionLabel: "View Details",
         actionHref: "/admin/analytics",
         createdAt: new Date().toISOString(),
-        metadata: { conversionRate, used, created },
+        metadata: { conversionRate, redeemed, created },
       };
     } else if (conversionRate < 20) {
       return {
-        id: `friend-code-low-${new Date().toISOString().split("T")[0]}`,
+        id: `referral-credit-low-${new Date().toISOString().split("T")[0]}`,
         type: "info",
-        title: `Friend Code Conversion: ${conversionRate.toFixed(0)}%`,
-        description: `Only ${used} of ${created} friend codes redeemed. Consider reminding users to share their codes.`,
+        title: `Referral Credit Conversion: ${conversionRate.toFixed(0)}%`,
+        description: `Only ${redeemed} of ${created} referral credits redeemed. Consider reminding users to share their codes.`,
         actionLabel: "View Analytics",
         actionHref: "/admin/analytics",
         createdAt: new Date().toISOString(),
-        metadata: { conversionRate, used, created },
+        metadata: { conversionRate, redeemed, created },
       };
     }
   }
@@ -225,7 +227,7 @@ export async function runAllAlertChecks(supabase: SupabaseClient): Promise<Alert
     checkRefundRate,
     checkSubscriptionChurn,
     checkModerationBacklog,
-    checkFriendCodePerformance,
+    checkReferralCreditPerformance,
   ];
 
   const results = await Promise.all(checks.map((check) => check(supabase)));

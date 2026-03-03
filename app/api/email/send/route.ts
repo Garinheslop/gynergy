@@ -13,7 +13,6 @@ import {
   sendWelcomeEmail,
   sendPurchaseConfirmationEmail,
   sendStreakReminderEmail,
-  sendFriendCodeEmail,
   EmailType,
 } from "@lib/email";
 import { createClient } from "@lib/supabase-server";
@@ -68,7 +67,6 @@ export async function POST(request: NextRequest) {
           firstName: params.firstName as string,
           productName: params.productName as string,
           amount: params.amount as string,
-          friendCodes: params.friendCodes as string[] | undefined,
         });
         break;
 
@@ -78,14 +76,6 @@ export async function POST(request: NextRequest) {
           firstName: params.firstName as string,
           currentStreak: params.currentStreak as number,
           dayNumber: params.dayNumber as number,
-        });
-        break;
-
-      case "friend_code":
-        result = await sendFriendCodeEmail({
-          to: params.to as string,
-          firstName: params.firstName as string,
-          friendCodes: params.friendCodes as string[],
         });
         break;
 

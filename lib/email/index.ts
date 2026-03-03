@@ -33,7 +33,6 @@ export type EmailType =
   | "purchase_confirmation"
   | "streak_reminder"
   | "password_reset"
-  | "friend_code"
   | "payment_failed";
 
 export interface EmailAttachment {
@@ -119,12 +118,11 @@ export async function sendPurchaseConfirmationEmail(params: {
   firstName: string;
   productName: string;
   amount: string;
-  friendCodes?: string[];
 }): Promise<EmailResult> {
-  const { to, firstName, productName, amount, friendCodes } = params;
+  const { to, firstName, productName, amount } = params;
 
-  const html = generatePurchaseConfirmationHtml(firstName, productName, amount, friendCodes);
-  const text = generatePurchaseConfirmationText(firstName, productName, amount, friendCodes);
+  const html = generatePurchaseConfirmationHtml(firstName, productName, amount);
+  const text = generatePurchaseConfirmationText(firstName, productName, amount);
 
   return sendEmail({
     to,
@@ -151,49 +149,6 @@ export async function sendStreakReminderEmail(params: {
   return sendEmail({
     to,
     subject: `${firstName}, Don't Break Your ${currentStreak}-Day Streak!`,
-    html,
-    text,
-  });
-}
-
-/**
- * Send friend code email
- */
-export async function sendFriendCodeEmail(params: {
-  to: string;
-  firstName: string;
-  friendCodes: string[];
-}): Promise<EmailResult> {
-  const { to, firstName, friendCodes } = params;
-
-  const html = generateFriendCodeHtml(firstName, friendCodes);
-  const text = generateFriendCodeText(firstName, friendCodes);
-
-  return sendEmail({
-    to,
-    subject: `${firstName}, Here Are Your Friend Codes!`,
-    html,
-    text,
-  });
-}
-
-/**
- * Send notification when a friend code is redeemed
- */
-export async function sendFriendCodeRedeemedEmail(params: {
-  to: string;
-  creatorFirstName: string;
-  redeemerFirstName: string;
-  code: string;
-}): Promise<EmailResult> {
-  const { to, creatorFirstName, redeemerFirstName, code } = params;
-
-  const html = generateFriendCodeRedeemedHtml(creatorFirstName, redeemerFirstName, code);
-  const text = generateFriendCodeRedeemedText(creatorFirstName, redeemerFirstName, code);
-
-  return sendEmail({
-    to,
-    subject: `${redeemerFirstName} just joined using your friend code!`,
     html,
     text,
   });
@@ -312,19 +267,8 @@ The Gynergy Effect
 function generatePurchaseConfirmationHtml(
   firstName: string,
   productName: string,
-  amount: string,
-  friendCodes?: string[]
+  amount: string
 ): string {
-  const friendCodesSection = friendCodes?.length
-    ? `
-    <div class="divider"></div>
-    <p><strong class="highlight">Your Friend Codes</strong></p>
-    <p>Share the gift of transformation! You have ${friendCodes.length} friend codes to give away:</p>
-    ${friendCodes.map((code) => `<div class="code-box"><span class="code">${code}</span></div>`).join("")}
-    <p style="font-size: 14px;">Each code gives a friend free access to the challenge. Share wisely!</p>
-  `
-    : "";
-
   return emailWrapper(`
     <h1>Thank You, ${firstName}!</h1>
     <p>Your purchase has been confirmed. Welcome to the inner circle.</p>
@@ -333,7 +277,6 @@ function generatePurchaseConfirmationHtml(
     <p>Product: <span class="highlight">${productName}</span></p>
     <p>Amount: <span class="highlight">${amount}</span></p>
     <p>Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</p>
-    ${friendCodesSection}
     <div class="divider"></div>
     <div style="text-align: center;">
       <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/date-zero-gratitude" class="button">Begin the Challenge</a>
@@ -345,17 +288,8 @@ function generatePurchaseConfirmationHtml(
 function generatePurchaseConfirmationText(
   firstName: string,
   productName: string,
-  amount: string,
-  friendCodes?: string[]
+  amount: string
 ): string {
-  const friendCodesSection = friendCodes?.length
-    ? `
-Your Friend Codes:
-${friendCodes.map((code) => `  ${code}`).join("\n")}
-Each code gives a friend free access to the challenge.
-`
-    : "";
-
   return `
 Thank You, ${firstName}!
 
@@ -365,7 +299,7 @@ Order Details:
 - Product: ${productName}
 - Amount: ${amount}
 - Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-${friendCodesSection}
+
 Begin the Challenge: ${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/date-zero-gratitude
 
 Your 45-day transformation awaits. Let's make it legendary.
@@ -415,88 +349,6 @@ Just 5 minutes of journaling can keep your streak alive and your transformation 
 Complete Today's Journal: ${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/date-zero-gratitude/journal
 
 Remember: Consistency beats perfection. Even a short entry counts.
-
-— The Gynergy Team
-  `.trim();
-}
-
-function generateFriendCodeHtml(firstName: string, friendCodes: string[]): string {
-  return emailWrapper(`
-    <h1>${firstName}, Share the Gift!</h1>
-    <p>You have <span class="highlight">${friendCodes.length} friend codes</span> to share with people you care about.</p>
-    <p>Each code gives someone free access to the 45-Day Awakening Challenge — a $997 value!</p>
-    ${friendCodes.map((code) => `<div class="code-box"><span class="code">${code}</span></div>`).join("")}
-    <div class="divider"></div>
-    <p><strong>How to share:</strong></p>
-    <p>1. Send a code to a friend via text or email</p>
-    <p>2. They visit <span class="highlight">gynergy.app/redeem</span></p>
-    <p>3. They enter the code and get instant access</p>
-    <div class="divider"></div>
-    <p style="font-size: 14px;">Tip: Choose people who are ready for transformation. These codes are precious — use them wisely!</p>
-  `);
-}
-
-function generateFriendCodeText(firstName: string, friendCodes: string[]): string {
-  return `
-${firstName}, Share the Gift!
-
-You have ${friendCodes.length} friend codes to share with people you care about.
-Each code gives someone free access to the 45-Day Awakening Challenge — a $997 value!
-
-Your Codes:
-${friendCodes.map((code) => `  ${code}`).join("\n")}
-
-How to share:
-1. Send a code to a friend via text or email
-2. They visit gynergy.app/redeem
-3. They enter the code and get instant access
-
-Tip: Choose people who are ready for transformation!
-
-— The Gynergy Team
-  `.trim();
-}
-
-function generateFriendCodeRedeemedHtml(
-  creatorFirstName: string,
-  redeemerFirstName: string,
-  code: string
-): string {
-  return emailWrapper(`
-    <h1>Great News, ${creatorFirstName}!</h1>
-    <p><span class="highlight">${redeemerFirstName}</span> just joined Gynergy using your friend code!</p>
-    <div class="code-box">
-      <span class="code">${code}</span>
-      <p style="margin-top: 8px; font-size: 14px; color: #888;">Code redeemed</p>
-    </div>
-    <div class="divider"></div>
-    <p>Your gift of transformation is already making a difference. ${redeemerFirstName} is now part of our community and ready to begin their 45-day journey.</p>
-    <p>Consider reaching out to support them along the way — accountability partners see <span class="highlight">3x better results!</span></p>
-    <div style="text-align: center;">
-      <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/community" class="button">Visit Community</a>
-    </div>
-    <div class="divider"></div>
-    <p style="font-size: 14px; color: #888;">Thank you for spreading the gift of gratitude.</p>
-  `);
-}
-
-function generateFriendCodeRedeemedText(
-  creatorFirstName: string,
-  redeemerFirstName: string,
-  code: string
-): string {
-  return `
-Great News, ${creatorFirstName}!
-
-${redeemerFirstName} just joined Gynergy using your friend code: ${code}
-
-Your gift of transformation is already making a difference. ${redeemerFirstName} is now part of our community and ready to begin their 45-day journey.
-
-Consider reaching out to support them along the way — accountability partners see 3x better results!
-
-Visit the Community: ${process.env.NEXT_PUBLIC_APP_URL || "https://gynergy.app"}/community
-
-Thank you for spreading the gift of gratitude.
 
 — The Gynergy Team
   `.trim();

@@ -6,22 +6,12 @@ import { PricingTier } from "@resources/types/payment";
 interface PricingCardProps {
   tier: PricingTier;
   onCheckout: () => void;
-  onFriendCode: () => void;
   isLoading?: boolean;
 }
 
-export default function PricingCard({
-  tier,
-  onCheckout,
-  onFriendCode,
-  isLoading,
-}: PricingCardProps) {
+export default function PricingCard({ tier, onCheckout, isLoading }: PricingCardProps) {
   const handleClick = () => {
-    if (tier.ctaAction === "friend_code") {
-      onFriendCode();
-    } else {
-      onCheckout();
-    }
+    onCheckout();
   };
 
   return (

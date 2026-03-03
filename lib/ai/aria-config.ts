@@ -54,7 +54,7 @@ EXAMPLE RESPONSES:
 
 "How many users signed up this week?"
 → "312 users signed up in the last 7 days, up 8% from last week (289).
-   Notable: 42% came from friend code referrals, suggesting your
+   Notable: referral credits drive organic growth, suggesting your
    community growth is accelerating. Consider featuring top referrers."
 
 "What's our MRR?"

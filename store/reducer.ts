@@ -114,7 +114,7 @@ const persistSessionConfig = {
 const persistPaymentConfig = {
   key: "payment",
   storage,
-  blacklist: ["loading", "redeemingCode", "redeemError", "redeemSuccess"],
+  blacklist: ["loading"],
 };
 
 const persistCommunityConfig = {

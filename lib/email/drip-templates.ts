@@ -786,35 +786,31 @@ Write One Entry: ${APP_URL}/date-zero-gratitude/journal/morning
   // ============================
 
   referral_day3: (meta) => ({
-    subject: "Your friend codes are worth $1,994",
+    subject: "You have a gift link worth real money",
     html: emailWrapper(`
-      <h1>You Have 2 Gift Codes Waiting</h1>
+      <h1>You Have a Referral Credit to Share</h1>
       <p>Hey ${meta.firstName || "there"},</p>
-      <p>When you enrolled in the challenge, you received <span class="highlight">2 friend codes</span>. Each one is worth $997 — full access to the entire 45-Day Awakening Challenge.</p>
-      <div class="stat-box">
-        <div class="stat-value">$1,994</div>
-        <div class="stat-label">in gift codes sitting unused</div>
-      </div>
+      <p>When you enrolled in the challenge, you earned a <span class="highlight">referral credit</span> — a personal link that gives a friend a discount on the 45-Day Awakening Challenge.</p>
       <p>Think of one person in your life who's built everything but doesn't feel any of it. The one who's "fine" when you ask. The one who'd never admit he's struggling.</p>
       <p><strong style="color: #fff;">He's the one who needs this.</strong></p>
-      <p>Men who complete the challenge with an accountability partner are <span class="highlight">95% more likely to finish</span>. This isn't just a gift for them — it's a force multiplier for you.</p>
+      <p>Men who complete the challenge with an accountability partner finish at a <span class="highlight">significantly higher rate</span>. This isn't just a gift for them — it's a force multiplier for you.</p>
       <div style="text-align: center;">
-        <a href="${APP_URL}/date-zero-gratitude" class="button">Find Your Friend Codes</a>
+        <a href="${APP_URL}/dashboard" class="button">Share Your Referral Link</a>
       </div>
       <div class="divider"></div>
       <p style="color: #7dd3c0;">— Garin</p>
     `),
-    text: `You Have 2 Gift Codes Waiting
+    text: `You Have a Referral Credit to Share
 
 Hey ${meta.firstName || "there"},
 
-You received 2 friend codes worth $997 each — $1,994 total.
+When you enrolled, you earned a referral credit — a personal link that gives a friend a discount on the 45-Day Awakening Challenge.
 
 Think of one person who's built everything but doesn't feel any of it. He's the one who needs this.
 
-Men who complete with an accountability partner are 95% more likely to finish.
+Men who complete with an accountability partner finish at a significantly higher rate.
 
-Find Your Friend Codes: ${APP_URL}/date-zero-gratitude
+Share Your Referral Link: ${APP_URL}/dashboard
 
 — Garin`,
   }),
@@ -825,11 +821,11 @@ Find Your Friend Codes: ${APP_URL}/date-zero-gratitude
       <h1>Accountability Changes Everything</h1>
       <p>Hey ${meta.firstName || "there"},</p>
       <p>You're 2 weeks in. You know this works. You've felt the shift.</p>
-      <p>Here's something you might not know: <span class="highlight">the men who share their friend codes complete at a 40% higher rate</span> than men who go it alone.</p>
+      <p>Here's something you might not know: <span class="highlight">the men who share their referral credit complete at a higher rate</span> than men who go it alone.</p>
       <p>It's not about altruism. It's about accountability. When someone you respect is doing this alongside you, you show up differently.</p>
-      <p>Your friend codes are still available. One text. One email. That's all it takes.</p>
+      <p>Your referral credit is still available. One text. One share. That's all it takes.</p>
       <div style="text-align: center;">
-        <a href="${APP_URL}/date-zero-gratitude" class="button">Share a Friend Code</a>
+        <a href="${APP_URL}/dashboard" class="button">Share Your Referral Link</a>
       </div>
       <div class="divider"></div>
       <p style="color: #7dd3c0;">— Garin</p>
@@ -840,39 +836,38 @@ Hey ${meta.firstName || "there"},
 
 You're 2 weeks in. You know this works.
 
-The men who share their friend codes complete at a 40% higher rate.
+The men who share their referral credit complete at a higher rate.
 
-Your friend codes are still available. One text. That's all it takes.
+Your referral credit is still available. One text. That's all it takes.
 
-Share a Friend Code: ${APP_URL}/date-zero-gratitude
+Share Your Referral Link: ${APP_URL}/dashboard
 
 — Garin`,
   }),
 
   referral_day30: (meta) => ({
-    subject: "Last reminder: 2 spots reserved for your people",
+    subject: "Last reminder: your referral credit is still waiting",
     html: emailWrapper(`
-      <h1>Your Codes Are Still Waiting</h1>
+      <h1>Your Referral Credit Is Still Waiting</h1>
       <p>Hey ${meta.firstName || "there"},</p>
-      <p>This is the last time I'll mention this. You have friend codes that haven't been used.</p>
-      <p>In 15 days, your challenge ends. When it does, those codes become someone else's starting line.</p>
-      <p>Think about who in your life could use 45 days of showing up for themselves. Text them. Send the code. Let them decide.</p>
+      <p>This is the last time I'll mention this. You have a referral credit that hasn't been shared.</p>
+      <p>In 15 days, your challenge ends. Think about who in your life could use 45 days of showing up for themselves. Text them. Share the link. Let them decide.</p>
       <p>The worst that happens? They say no. The best? You both finish this thing together.</p>
       <div style="text-align: center;">
-        <a href="${APP_URL}/date-zero-gratitude" class="button">Send Your Codes</a>
+        <a href="${APP_URL}/dashboard" class="button">Share Your Referral Link</a>
       </div>
       <div class="divider"></div>
       <p style="color: #7dd3c0;">— Garin</p>
     `),
-    text: `Your Codes Are Still Waiting
+    text: `Your Referral Credit Is Still Waiting
 
 Hey ${meta.firstName || "there"},
 
-This is the last time I'll mention this. You have friend codes that haven't been used.
+This is the last time I'll mention this. You have a referral credit that hasn't been shared.
 
-Think about who could use 45 days of showing up for themselves. Text them. Send the code.
+Think about who could use 45 days of showing up for themselves. Text them. Share the link.
 
-Send Your Codes: ${APP_URL}/date-zero-gratitude
+Share Your Referral Link: ${APP_URL}/dashboard
 
 — Garin`,
   }),

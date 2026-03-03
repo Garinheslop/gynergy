@@ -117,9 +117,9 @@ export const VALUE_STACK: ValueStackItem[] = [
   },
   {
     icon: "05",
-    name: "1 Free Friend Code (Accountability Duo)",
+    name: "Referral Credit",
     description:
-      "Research shows groups of three have 95% higher completion rates. Bring two men you trust — they get full challenge access at no cost. Hold each other accountable when motivation fades.",
+      "Share a personalized discount link with a friend. When they join, both of you benefit. Hold each other accountable when motivation fades.",
     value: "$997",
   },
 ];
@@ -175,7 +175,7 @@ export const PRICING_CONTENT: PricingContent = {
     { name: "8 Live Coaching Calls", value: "$2,000" },
     { name: "Brotherhood Community Access", value: "$500" },
     { name: "Five Pillar Assessment (x2)", value: "$500" },
-    { name: "1 Friend Code (Accountability Duo)", value: "$997" },
+    { name: "Referral Credit", value: "$997" },
   ],
   totalValue: "$4,294",
   wasPrice: "$3,297",
@@ -276,16 +276,16 @@ export const PROBLEM_CONTENT = {
   },
 };
 
-export const FRIEND_CONTENT = {
-  headline: "Bring a Friend.",
-  subheadline: "The Accountability Duo",
+export const REFERRAL_CONTENT = {
+  headline: "Share the Journey.",
+  subheadline: "Referral Credits",
   paragraphs: [
-    "Research shows pairs have the highest completion rates. That's why every Challenge enrollment includes 1 friend code.",
-    "Share it with one man you trust. Start the journey together. Hold each other accountable when motivation fades.",
+    "Research shows pairs have the highest completion rates. Share your personalized referral link with a friend and both of you benefit.",
+    "When your friend joins using your link, they get a discount on enrollment. The journey is better together.",
     "This isn't a solo mission. It's a brotherhood.",
   ],
   circles: [
     { label: "You", price: "$997" },
-    { label: "Friend", price: "FREE" },
+    { label: "Friend", price: "Discount" },
   ],
 };

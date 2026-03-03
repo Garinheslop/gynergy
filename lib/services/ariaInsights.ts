@@ -79,23 +79,22 @@ export async function generateInsights(supabase: SupabaseClient): Promise<Insigh
 
     // Revenue Insights
     if (revenueData) {
-      if (revenueData.friendCodeConversionRate > 30) {
+      if (revenueData.referralCreditConversionRate > 30) {
         insights.push({
-          id: `revenue-friendcode-${now.getTime()}`,
+          id: `revenue-referralcredit-${now.getTime()}`,
           type: "opportunity",
           priority: "medium",
-          title: "High Friend Code Performance",
-          summary: `Friend codes converting at ${revenueData.friendCodeConversionRate.toFixed(1)}%`,
-          details: `${revenueData.friendCodesUsed} out of ${revenueData.friendCodesCreated} friend codes have been redeemed. This is above typical referral benchmarks - your community is actively sharing.`,
+          title: "High Referral Credit Performance",
+          summary: `Referral credits converting at ${revenueData.referralCreditConversionRate.toFixed(1)}%`,
+          details: `${revenueData.referralCreditsRedeemed} out of ${revenueData.referralCreditsCreated} referral credits have been redeemed. This is above typical referral benchmarks - your community is actively sharing.`,
           metrics: {
-            conversionRate: `${revenueData.friendCodeConversionRate.toFixed(1)}%`,
-            codesCreated: revenueData.friendCodesCreated,
-            codesUsed: revenueData.friendCodesUsed,
+            conversionRate: `${revenueData.referralCreditConversionRate.toFixed(1)}%`,
+            creditsCreated: revenueData.referralCreditsCreated,
+            creditsRedeemed: revenueData.referralCreditsRedeemed,
           },
           suggestedActions: [
-            "Consider increasing friend codes per user",
             "Create referral rewards program",
-            "Feature top referrers in community",
+            "Highlight top referrers in community",
           ],
           generatedAt: now.toISOString(),
         });
@@ -251,28 +250,28 @@ async function analyzeUserGrowth(supabase: SupabaseClient) {
 }
 
 async function analyzeRevenue(supabase: SupabaseClient) {
-  const [purchases, refunds, friendCodes] = await Promise.all([
+  const [purchases, refunds, referralCredits] = await Promise.all([
     supabase.from("purchases").select("id, status").eq("status", "completed"),
     supabase.from("purchases").select("id").eq("status", "refunded"),
-    supabase.from("friend_codes").select("id, is_used"),
+    supabase.from("referral_credits").select("id, is_redeemed"),
   ]);
 
   const totalPurchases = purchases.data?.length || 0;
   const refundCount = refunds.data?.length || 0;
   const refundRate = totalPurchases > 0 ? (refundCount / totalPurchases) * 100 : 0;
 
-  const friendCodesCreated = friendCodes.data?.length || 0;
-  const friendCodesUsed = friendCodes.data?.filter((c) => c.is_used).length || 0;
-  const friendCodeConversionRate =
-    friendCodesCreated > 0 ? (friendCodesUsed / friendCodesCreated) * 100 : 0;
+  const referralCreditsCreated = referralCredits.data?.length || 0;
+  const referralCreditsRedeemed = referralCredits.data?.filter((c) => c.is_redeemed).length || 0;
+  const referralCreditConversionRate =
+    referralCreditsCreated > 0 ? (referralCreditsRedeemed / referralCreditsCreated) * 100 : 0;
 
   return {
     totalPurchases,
     refundCount,
     refundRate,
-    friendCodesCreated,
-    friendCodesUsed,
-    friendCodeConversionRate,
+    referralCreditsCreated,
+    referralCreditsRedeemed,
+    referralCreditConversionRate,
   };
 }
 

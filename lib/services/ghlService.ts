@@ -58,7 +58,7 @@ export type GHLTag =
   | "webinar-registered"
   | "assessment-completed"
   | "challenge-purchased"
-  | "friend-code-redeemed"
+  | "referral-credit-redeemed"
   | "journal-subscriber"
   | "community-member"
   | "challenge-completed"

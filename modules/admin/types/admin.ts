@@ -112,8 +112,8 @@ export interface DashboardMetrics {
 
   // Sales breakdown
   challengePurchases?: number;
-  friendCodeRedemptions?: number;
-  friendCodeConversionRate?: number;
+  referralCreditRedemptions?: number;
+  referralCreditConversionRate?: number;
   activeSubscriptions?: number;
 
   // Engagement metrics
@@ -146,17 +146,17 @@ export interface PaymentMetrics {
   // Sales breakdown
   challengePurchases: number;
   challengeRevenue: number;
-  friendCodeRedemptions: number;
+  referralCreditRedemptions: number;
   subscriptionRevenue: number;
 
   // Trends
   revenueTrend: ChartDataPoint[];
   purchasesByDay: ChartDataPoint[];
 
-  // Friend codes
-  friendCodesCreated: number;
-  friendCodesUsed: number;
-  friendCodeConversionRate: number;
+  // Referral credits
+  referralCreditsCreated: number;
+  referralCreditsRedeemed: number;
+  referralCreditConversionRate: number;
 }
 
 export interface PurchaseRecord {
@@ -164,7 +164,7 @@ export interface PurchaseRecord {
   userId?: string;
   userEmail?: string;
   userName?: string;
-  purchaseType: "challenge" | "challenge_friend_code";
+  purchaseType: "challenge";
   amountCents: number;
   currency: string;
   status: "pending" | "completed" | "failed" | "refunded";

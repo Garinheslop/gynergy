@@ -6,9 +6,8 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { useSession } from "@contexts/UseSession";
-import FriendCodeShare from "@modules/payment/components/FriendCodeShare";
 import icons from "@resources/icons";
-import { useDispatch, useSelector } from "@store/hooks";
+import { useDispatch } from "@store/hooks";
 import { fetchEntitlements } from "@store/modules/payment";
 
 // Confetti celebration component
@@ -63,18 +62,13 @@ function Confetti({ show }: Readonly<{ show: boolean }>) {
   );
 }
 
-type PollingStatus = "waiting" | "polling" | "success" | "timeout" | "error";
-
 function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { session } = useSession();
   const dispatch = useDispatch();
-  const payment = useSelector((state) => state.payment);
 
   const [loading, setLoading] = useState(true);
-  const [pollingStatus, setPollingStatus] = useState<PollingStatus>("waiting");
-  const [pollCount, setPollCount] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
 
   const _sessionId = searchParams.get("session_id");
@@ -84,56 +78,19 @@ function PaymentSuccessContent() {
     try {
       await dispatch(fetchEntitlements());
     } catch {
-      setPollingStatus("error");
+      // Entitlements fetch failed — non-critical on success page
     }
   }, [session, dispatch]);
-
-  const handleManualRetry = useCallback(() => {
-    setPollingStatus("polling");
-    setPollCount(0);
-    fetchWithRetry();
-  }, [fetchWithRetry]);
 
   useEffect(() => {
     // Give webhook more time to process (5s instead of 2s)
     const timer = setTimeout(() => {
       fetchWithRetry();
       setLoading(false);
-      setPollingStatus("polling");
     }, 5000);
 
     return () => clearTimeout(timer);
   }, [fetchWithRetry]);
-
-  // Refetch periodically until we have friend codes (60s instead of 30s)
-  useEffect(() => {
-    if (!loading && session && payment.friendCodes.length === 0 && pollingStatus === "polling") {
-      const interval = setInterval(() => {
-        setPollCount((prev) => prev + 1);
-        fetchWithRetry();
-      }, 3000);
-
-      // Stop after 60 seconds (20 attempts at 3s each)
-      const timeout = setTimeout(() => {
-        clearInterval(interval);
-        if (payment.friendCodes.length === 0) {
-          setPollingStatus("timeout");
-        }
-      }, 60000);
-
-      return () => {
-        clearInterval(interval);
-        clearTimeout(timeout);
-      };
-    }
-  }, [loading, session, payment.friendCodes.length, pollingStatus, fetchWithRetry]);
-
-  // Update status when friend codes arrive
-  useEffect(() => {
-    if (payment.friendCodes.length > 0) {
-      setPollingStatus("success");
-    }
-  }, [payment.friendCodes.length]);
 
   // Trigger confetti celebration when loading completes
   useEffect(() => {
@@ -214,74 +171,6 @@ function PaymentSuccessContent() {
           </p>
         </div>
 
-        {/* Friend Codes */}
-        {!loading && (
-          <div className="mb-12">
-            <FriendCodeShare friendCodes={payment.friendCodes} />
-
-            {payment.friendCodes.length === 0 && pollingStatus === "polling" && (
-              <div className="mt-4 text-center">
-                <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
-                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                      fill="none"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  <span>
-                    Generating your friend codes... {pollCount > 0 && `(attempt ${pollCount + 1})`}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {pollingStatus === "timeout" && (
-              <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-center">
-                <p className="mb-2 text-sm font-medium text-amber-800">
-                  Taking longer than expected...
-                </p>
-                <p className="mb-4 text-sm text-amber-700">
-                  Your purchase was successful! Your friend codes should arrive in your email
-                  shortly. You can also try refreshing.
-                </p>
-                <button
-                  onClick={handleManualRetry}
-                  className="rounded-md bg-amber-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-700"
-                >
-                  Try Again
-                </button>
-              </div>
-            )}
-
-            {pollingStatus === "error" && (
-              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4 text-center">
-                <p className="mb-2 text-sm font-medium text-red-800">Something went wrong</p>
-                <p className="mb-4 text-sm text-red-700">
-                  Don&apos;t worry - your purchase was successful. Your friend codes will be sent to
-                  your email. If you don&apos;t receive them within 10 minutes, please contact
-                  support.
-                </p>
-                <button
-                  onClick={handleManualRetry}
-                  className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
-                >
-                  Retry
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Next Steps */}
         {!loading && (
           <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6">
@@ -292,17 +181,6 @@ function PaymentSuccessContent() {
                   1
                 </span>
                 <div>
-                  <p className="font-medium text-gray-900">Share your friend code</p>
-                  <p className="text-sm text-gray-600">
-                    Invite 1 friend to form your Accountability Duo
-                  </p>
-                </div>
-              </li>
-              <li className="flex items-start gap-3">
-                <span className="bg-action-100 text-action-700 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold">
-                  2
-                </span>
-                <div>
                   <p className="font-medium text-gray-900">Set up your profile</p>
                   <p className="text-sm text-gray-600">
                     Complete your vision board and journey mapping
@@ -311,7 +189,7 @@ function PaymentSuccessContent() {
               </li>
               <li className="flex items-start gap-3">
                 <span className="bg-action-100 text-action-700 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold">
-                  3
+                  2
                 </span>
                 <div>
                   <p className="font-medium text-gray-900">Start Day 1</p>

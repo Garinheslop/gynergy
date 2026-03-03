@@ -444,7 +444,7 @@ export default function CohortsPage() {
                   className="bg-grey-800 border-grey-700 focus:border-action-500 w-full rounded-lg border px-3 py-2 text-sm text-white outline-none"
                 />
                 <p className="text-grey-500 mt-1 text-xs">
-                  Includes purchaser + friend code users (Trio model = 3 per purchase)
+                  Includes purchaser + referral credit users
                 </p>
               </div>
             </div>

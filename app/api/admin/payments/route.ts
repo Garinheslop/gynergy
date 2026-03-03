@@ -51,7 +51,6 @@ export async function GET(request: NextRequest) {
       purchasesRange,
       refunds,
       subscriptions,
-      friendCodes,
     ] = await Promise.all([
       // All completed purchases
       serviceClient
@@ -91,9 +90,6 @@ export async function GET(request: NextRequest) {
         .from("subscriptions")
         .select("id, user_id, amount_cents, interval, status, current_period_end, created_at")
         .eq("status", "active"),
-
-      // Friend codes
-      serviceClient.from("friend_codes").select("id, used_by_id, used_at, created_at"),
     ]);
 
     // Calculate totals
@@ -125,16 +121,10 @@ export async function GET(request: NextRequest) {
     const refundRate =
       completedCount > 0 ? (refundCount / (completedCount + refundCount)) * 100 : 0;
 
-    // Challenge vs friend code breakdown
+    // Challenge purchase breakdown
     const challengePurchases =
       allPurchases.data?.filter((p) => p.purchase_type === "challenge") || [];
     const challengeRevenue = challengePurchases.reduce((sum, p) => sum + (p.amount_cents || 0), 0);
-
-    // Friend code stats
-    const friendCodesCreated = friendCodes.data?.length || 0;
-    const friendCodesUsed = friendCodes.data?.filter((fc) => fc.used_by_id).length || 0;
-    const friendCodeConversionRate =
-      friendCodesCreated > 0 ? (friendCodesUsed / friendCodesCreated) * 100 : 0;
 
     // Generate revenue trend data
     const revenueTrend = generateRevenueTrend(purchasesRange.data || [], range);
@@ -166,14 +156,8 @@ export async function GET(request: NextRequest) {
       // Sales breakdown
       challengePurchases: challengePurchases.length,
       challengeRevenue: challengeRevenue / 100,
-      friendCodeRedemptions: friendCodesUsed,
       activeSubscriptions: subscriptions.data?.length || 0,
       subscriptionRevenue: mrr / 100,
-
-      // Friend codes
-      friendCodesCreated,
-      friendCodesUsed,
-      friendCodeConversionRate: Math.round(friendCodeConversionRate * 10) / 10,
 
       // Trends
       revenueTrend,
