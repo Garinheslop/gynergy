@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Five Pillar Self-Assessment | GYNERGY",
     description:
-      "5 questions. 2 minutes. Score your life across wealth, health, relationships, growth, and purpose.",
+      "23 questions. 12 minutes. Discover your Five Pillar Score and which pillar is silently bleeding. Personalized insights for successful men.",
     url: "https://www.gynergy.app/assessment",
     siteName: "GYNERGY",
     images: [
@@ -40,7 +40,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Five Pillar Self-Assessment | GYNERGY",
-    description: "5 questions. 2 minutes. Score your life across the five pillars.",
+    description:
+      "23 questions. 12 minutes. Discover your Five Pillar Score across wealth, health, relationships, mindset, and legacy.",
     images: ["https://www.gynergy.app/images/og-assessment.jpg"],
   },
   robots: {

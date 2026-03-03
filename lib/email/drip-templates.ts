@@ -180,6 +180,169 @@ See you there.
   }),
 
   // ============================
+  // POST-WEBINAR PITCH DRIP
+  // ============================
+
+  webinar_post_recap: (meta) => ({
+    subject: "The template is in your hands. Now what?",
+    html: emailWrapper(`
+      <h1>You Have the Template, ${meta.firstName || "Brother"}</h1>
+
+      <p>Yesterday you showed up. That matters.</p>
+
+      <p>You now have:</p>
+      <ul style="color: #a0a0a0; font-size: 16px; line-height: 2; padding-left: 20px;">
+        <li>The 10-Minute Morning Practice template</li>
+        <li>Your Five Pillar Score</li>
+        <li>The Emptiness Equation</li>
+      </ul>
+
+      <p>Here's what I didn't say during the training: <strong style="color: #ffffff;">the template alone isn't enough.</strong></p>
+
+      <p>I've watched hundreds of men download the template, do it for 3 days, and stop. Not because it didn't work — because nobody was watching.</p>
+
+      <p>The 45-Day Awakening Challenge is 15 men doing the practice together, every day, with live coaching calls, an AI accountability coach, and a brotherhood that won't let you quit.</p>
+
+      <div class="stat-box">
+        <div class="stat-value">92%</div>
+        <div class="stat-label">of men who join with a cohort complete the 45 days</div>
+      </div>
+
+      <p style="text-align: center;">
+        <a href="${APP_URL}/pricing" class="button">See the Full Challenge →</a>
+      </p>
+
+      <p style="font-size: 14px; color: #888;">$997 one-time. 15 seats per cohort. Next cohort starts soon.</p>
+    `),
+    text: `You Have the Template, ${meta.firstName || "Brother"}
+
+Yesterday you showed up. That matters.
+
+You now have:
+• The 10-Minute Morning Practice template
+• Your Five Pillar Score
+• The Emptiness Equation
+
+Here's what I didn't say during the training: the template alone isn't enough.
+
+I've watched hundreds of men download the template, do it for 3 days, and stop. Not because it didn't work — because nobody was watching.
+
+The 45-Day Awakening Challenge is 15 men doing the practice together, every day, with live coaching calls, an AI accountability coach, and a brotherhood that won't let you quit.
+
+92% of men who join with a cohort complete the 45 days.
+
+See the Full Challenge: ${APP_URL}/pricing
+
+$997 one-time. 15 seats per cohort. Next cohort starts soon.`,
+  }),
+
+  webinar_post_objection: (meta) => ({
+    subject: '"I can do this on my own"',
+    html: emailWrapper(`
+      <h1>The Lie That Keeps Men Stuck</h1>
+
+      <p>${meta.firstName || "Brother"}, I hear this every cohort:</p>
+
+      <div class="quote-box">
+        <p>"I don't need a program. I have the template. I'll just do it myself."</p>
+      </div>
+
+      <p>I thought the same thing. For 6 years. I read the books, downloaded the apps, bought the journals. Started Monday, quit Thursday. Every time.</p>
+
+      <p>Here's what finally changed: <strong style="color: #ffffff;">I did it with other men who refused to let me quit.</strong></p>
+
+      <p>The difference between knowing and doing is accountability. That's what the Challenge provides:</p>
+
+      <ul style="color: #a0a0a0; font-size: 16px; line-height: 2; padding-left: 20px;">
+        <li><strong style="color: #ffffff;">8 live coaching calls</strong> — not recorded webinars, actual coaching</li>
+        <li><strong style="color: #ffffff;">ARIA AI coach</strong> — available 24/7 when the 2am thoughts hit</li>
+        <li><strong style="color: #ffffff;">15-man brotherhood</strong> — men at your level who get it</li>
+        <li><strong style="color: #ffffff;">Daily streaks + badges</strong> — the gamification that makes consistency addictive</li>
+      </ul>
+
+      <div class="quote-box">
+        <p>"I thought I had it figured out. After one week in Gynergy, I realized I'd been lying to myself for years." — David, Challenge Graduate</p>
+      </div>
+
+      <p style="text-align: center;">
+        <a href="${APP_URL}/pricing" class="button">Join the Next Cohort →</a>
+      </p>
+    `),
+    text: `The Lie That Keeps Men Stuck
+
+${meta.firstName || "Brother"}, I hear this every cohort:
+
+"I don't need a program. I have the template. I'll just do it myself."
+
+I thought the same thing. For 6 years. I read the books, downloaded the apps, bought the journals. Started Monday, quit Thursday. Every time.
+
+Here's what finally changed: I did it with other men who refused to let me quit.
+
+The difference between knowing and doing is accountability. That's what the Challenge provides:
+
+• 8 live coaching calls — not recorded webinars, actual coaching
+• ARIA AI coach — available 24/7 when the 2am thoughts hit
+• 15-man brotherhood — men at your level who get it
+• Daily streaks + badges — the gamification that makes consistency addictive
+
+"I thought I had it figured out. After one week in Gynergy, I realized I'd been lying to myself for years." — David, Challenge Graduate
+
+Join the Next Cohort: ${APP_URL}/pricing`,
+  }),
+
+  webinar_post_final: (meta) => ({
+    subject: "Last call: your Five Pillar score is still the same",
+    html: emailWrapper(`
+      <h1>Your Score Hasn't Changed</h1>
+
+      <p>${meta.firstName || "Brother"}, it's been a few days since the training.</p>
+
+      <p>You know your Five Pillar Score. You have the template. You understand the Emptiness Equation.</p>
+
+      <p><strong style="color: #ffffff;">Has anything actually changed?</strong></p>
+
+      <p>This is the last email I'll send about the Challenge. Not because I'm trying to pressure you — because I respect your time and your intelligence.</p>
+
+      <p>The next cohort is filling. 15 seats. When they're gone, the next one isn't for another month.</p>
+
+      <p>If you're ready:</p>
+
+      <p style="text-align: center;">
+        <a href="${APP_URL}/pricing" class="button">Claim Your Spot — $997</a>
+      </p>
+
+      <p>If you're not ready, that's okay too. Your assessment score will be here when you are.</p>
+
+      <p>But if something in you is saying "this is it" — trust it. That voice is the one that brought you to the webinar in the first place.</p>
+
+      <div class="divider"></div>
+
+      <p style="font-size: 14px; color: #888;">Not ready for the full Challenge? Start with just the journal — $39.95/mo.</p>
+      <p style="text-align: center;">
+        <a href="${APP_URL}/subscribe" style="color: #7dd3c0; font-size: 14px;">Start with the Journal →</a>
+      </p>
+    `),
+    text: `Your Score Hasn't Changed
+
+${meta.firstName || "Brother"}, it's been a few days since the training.
+
+You know your Five Pillar Score. You have the template. You understand the Emptiness Equation.
+
+Has anything actually changed?
+
+This is the last email I'll send about the Challenge. Not because I'm trying to pressure you — because I respect your time and your intelligence.
+
+The next cohort is filling. 15 seats. When they're gone, the next one isn't for another month.
+
+If you're ready: ${APP_URL}/pricing ($997)
+
+If you're not ready, that's okay too. Your assessment score will be here when you are.
+
+Not ready for the full Challenge? Start with just the journal — $39.95/mo.
+Start with the Journal: ${APP_URL}/subscribe`,
+  }),
+
+  // ============================
   // ASSESSMENT DRIP
   // ============================
 
@@ -1075,6 +1238,127 @@ Check the Call Schedule: ${APP_URL}/community
   }),
 
   // ============================
+  // CHALLENGE COMPLETED — PURCHASER
+  // ============================
+
+  challenge_completed_purchaser: (meta) => ({
+    subject: "Day 45: You did it. Every single one.",
+    html: emailWrapper(`
+      <h1>You Did It, ${meta.firstName || "Brother"}.</h1>
+
+      <p>45 days. Every morning. Every evening. Every gratitude action.</p>
+
+      <p>You showed up when it was hard. You showed up when you didn't feel like it. You showed up when the voice in your head said "skip today."</p>
+
+      <div class="stat-box">
+        <div class="stat-value">45/45</div>
+        <div class="stat-label">Days Completed</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h2>What Happens Next</h2>
+
+      <p>Your challenge is complete — but your practice doesn't have to end. Starting tomorrow, you enter the <strong style="color: #ffffff;">Bridge Month</strong>: 30 days of lighter practice (morning journal only) while the habit cements itself.</p>
+
+      <p>At Day 66, science says the habit becomes automatic. You're 21 days away from that.</p>
+
+      <div class="divider"></div>
+
+      <h2>Keep Your Journal Going</h2>
+
+      <p>Your 90-day free journal trial is active. After Day 90, it continues at $39.95/mo — or lock in the <strong style="color: #7dd3c0;">founding member rate of $19.97/mo</strong> when you hit Day 75.</p>
+
+      <p>Retake your Five Pillar Assessment to see how far you've come:</p>
+
+      <p style="text-align: center;">
+        <a href="${APP_URL}/assessment" class="button">Retake Your Assessment</a>
+      </p>
+
+      <p style="color: #7dd3c0;">Proud of you.</p>
+      <p>— Garin</p>
+    `),
+    text: `You Did It, ${meta.firstName || "Brother"}.
+
+45 days. Every morning. Every evening. Every gratitude action.
+
+You showed up when it was hard. You showed up when you didn't feel like it.
+
+WHAT HAPPENS NEXT
+
+Your challenge is complete — but your practice doesn't have to end. Starting tomorrow, you enter the Bridge Month: 30 days of lighter practice (morning journal only) while the habit cements itself.
+
+At Day 66, science says the habit becomes automatic. You're 21 days away from that.
+
+KEEP YOUR JOURNAL GOING
+
+Your 90-day free journal trial is active. After Day 90, it continues at $39.95/mo — or lock in the founding member rate of $19.97/mo when you hit Day 75.
+
+Retake Your Assessment: ${APP_URL}/assessment
+
+Proud of you.
+— Garin`,
+  }),
+
+  // ============================
+  // CHALLENGE COMPLETED — FRIEND CODE
+  // ============================
+
+  challenge_completed_friend_code: (meta) => ({
+    subject: "Day 45: You showed them what's possible.",
+    html: emailWrapper(`
+      <h1>You Did It, ${meta.firstName || "Brother"}.</h1>
+
+      <p>45 days ago, someone believed in you enough to share their friend code. Today, you proved them right.</p>
+
+      <div class="stat-box">
+        <div class="stat-value">45/45</div>
+        <div class="stat-label">Days Completed</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h2>Your Bridge Month Begins</h2>
+
+      <p>Starting tomorrow, your practice gets lighter — morning journal only for 30 days while the habit locks in. At Day 66, science says it becomes automatic.</p>
+
+      <div class="divider"></div>
+
+      <h2>Want to Keep Going?</h2>
+
+      <p>Your friend code access covered the 45-day challenge. To continue with the full journal, AI coaching, community access, and Bridge Month support:</p>
+
+      <p style="text-align: center;">
+        <a href="${APP_URL}/subscribe" class="button">Continue with the Journal — $39.95/mo</a>
+      </p>
+
+      <p style="font-size: 14px; color: #888;">Or retake your Five Pillar Assessment to see your transformation:</p>
+      <p style="text-align: center;">
+        <a href="${APP_URL}/assessment" style="color: #7dd3c0; font-size: 14px;">Retake Assessment →</a>
+      </p>
+
+      <p style="color: #7dd3c0;">— Garin</p>
+    `),
+    text: `You Did It, ${meta.firstName || "Brother"}.
+
+45 days ago, someone believed in you enough to share their friend code. Today, you proved them right.
+
+YOUR BRIDGE MONTH BEGINS
+
+Starting tomorrow, your practice gets lighter — morning journal only for 30 days while the habit locks in. At Day 66, science says it becomes automatic.
+
+WANT TO KEEP GOING?
+
+Your friend code access covered the 45-day challenge. To continue with the full journal, AI coaching, community access, and Bridge Month support:
+
+Continue with the Journal: ${APP_URL}/subscribe ($39.95/mo)
+
+Or retake your assessment: ${APP_URL}/assessment
+
+— Garin`,
+  }),
+
+  // ============================
   // BRIDGE MONTH — DAYS 46-75
   // ============================
 
@@ -1251,7 +1535,23 @@ export function renderDripTemplate(
     console.error(`[drip-templates] Unknown template key: ${templateKey}`);
     return null;
   }
-  return renderer(metadata);
+  const result = renderer(metadata);
+
+  // Inject unsubscribe link into all drip emails (CAN-SPAM compliance)
+  const email = metadata.email || metadata.recipientEmail;
+  if (email && result.html) {
+    const encodedEmail = Buffer.from(email).toString("base64");
+    const unsubLink = `${APP_URL}/api/email/unsubscribe?email=${encodedEmail}&type=drip`;
+    const unsubHtml = `<p style="text-align:center;margin-top:16px;"><a href="${unsubLink}" style="color:#666;font-size:12px;text-decoration:underline;">Unsubscribe from these emails</a></p>`;
+    // Insert before closing </body> or append to footer
+    result.html = result.html.replace("</body>", `${unsubHtml}</body>`);
+  }
+  if (email && result.text) {
+    const encodedEmail = Buffer.from(email).toString("base64");
+    result.text += `\n\nUnsubscribe: ${APP_URL}/api/email/unsubscribe?email=${encodedEmail}&type=drip`;
+  }
+
+  return result;
 }
 
 /**

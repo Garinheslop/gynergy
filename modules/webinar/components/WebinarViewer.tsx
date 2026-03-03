@@ -661,7 +661,7 @@ export default function WebinarViewer({
               )}
             </div>
 
-            {/* Challenge CTA - visible during live webinar */}
+            {/* Challenge CTA - visible during and after live webinar */}
             {isLive && (
               <a
                 href="/pricing"
@@ -683,6 +683,36 @@ export default function WebinarViewer({
                   Learn More →
                 </span>
               </a>
+            )}
+
+            {/* Post-webinar CTA - visible after webinar ends */}
+            {!isLive && new Date(scheduledStart).getTime() < Date.now() && (
+              <div className="mt-4 space-y-4">
+                <div className="border-lp-gold/30 bg-lp-gold/5 border p-6 text-center">
+                  <p className="text-lp-gold mb-2 text-lg font-medium tracking-wide">
+                    Thanks for showing up.
+                  </p>
+                  <p className="text-lp-muted mb-4 text-sm leading-relaxed font-extralight">
+                    You now have the template. The question is: will you use it alone, or with 14
+                    other men who are done waiting?
+                  </p>
+                  <a
+                    href="/pricing"
+                    className="bg-lp-gold text-lp-bg inline-block px-8 py-3 text-sm font-semibold tracking-wider transition-opacity hover:opacity-90"
+                  >
+                    Join the 45-Day Awakening Challenge
+                  </a>
+                  <p className="text-lp-muted mt-3 text-xs font-extralight">
+                    Limited to 15 men per cohort · $997 one-time · Starts next month
+                  </p>
+                </div>
+                <a
+                  href="/assessment"
+                  className="text-lp-muted hover:text-lp-gold block text-center text-xs font-extralight transition-colors"
+                >
+                  Haven&apos;t taken the Five Pillar Assessment yet? Start here →
+                </a>
+              </div>
             )}
           </div>
 

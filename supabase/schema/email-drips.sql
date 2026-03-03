@@ -20,12 +20,17 @@ CREATE TABLE IF NOT EXISTS drip_campaigns (
   -- Trigger: what event starts this campaign
   trigger_event TEXT NOT NULL CHECK (trigger_event IN (
     'webinar_registered',
+    'webinar_attended',
     'assessment_completed',
     'purchase_completed',
     'cart_abandoned',
     'user_inactive',
     'friend_codes_issued',
-    'community_activated'
+    'community_activated',
+    'challenge_completed_purchaser',
+    'challenge_completed_friend_code',
+    'bridge_month_started',
+    'trial_ending_soon'
   )),
 
   -- Status
@@ -323,6 +328,35 @@ BEGIN
     VALUES
       (v_community_campaign_id, 1, 1,  'Welcome to the room',               'community_welcome'),
       (v_community_campaign_id, 2, 48, 'Your first call is this week',      'community_first_call')
+    ON CONFLICT (campaign_id, sequence_order) DO NOTHING;
+  END IF;
+END $$;
+
+-- ============================================
+-- POST-WEBINAR PITCH CAMPAIGN (Added 2026-03-02)
+-- ============================================
+-- 3-email sequence after webinar attendance: recap → objection handling → final scarcity
+
+INSERT INTO drip_campaigns (name, description, trigger_event)
+VALUES (
+  'Post-Webinar Pitch',
+  '3-email conversion sequence after attending a live webinar. Recap, objection handling, then final scarcity CTA.',
+  'webinar_attended'
+) ON CONFLICT DO NOTHING;
+
+DO $$
+DECLARE
+  v_webinar_pitch_id UUID;
+BEGIN
+  SELECT id INTO v_webinar_pitch_id
+    FROM drip_campaigns WHERE trigger_event = 'webinar_attended' LIMIT 1;
+
+  IF v_webinar_pitch_id IS NOT NULL THEN
+    INSERT INTO drip_emails (campaign_id, sequence_order, delay_hours, subject, template_key)
+    VALUES
+      (v_webinar_pitch_id, 1, 24, 'The template is in your hands. Now what?',                'webinar_post_recap'),
+      (v_webinar_pitch_id, 2, 48, '"I can do this on my own"',                                'webinar_post_objection'),
+      (v_webinar_pitch_id, 3, 72, 'Last call: your Five Pillar score is still the same',      'webinar_post_final')
     ON CONFLICT (campaign_id, sequence_order) DO NOTHING;
   END IF;
 END $$;

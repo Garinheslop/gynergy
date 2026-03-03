@@ -597,6 +597,14 @@ Unsubscribe: ${BASE_URL}/api/email/unsubscribe?email=${Buffer.from(to).toString(
     });
   } else {
     // Missed the webinar
+    const assessmentUrl = createTrackedUrl(
+      `${BASE_URL}/assessment`,
+      emailId,
+      to,
+      "take_assessment",
+      emailType
+    );
+
     const html = emailWrapper(
       `
       <h1>You Missed It, ${displayName}.</h1>
@@ -615,7 +623,7 @@ Unsubscribe: ${BASE_URL}/api/email/unsubscribe?email=${Buffer.from(to).toString(
       <p>In the meantime, your Five Pillar Assessment score is still waiting. Start there.</p>
 
       <div style="text-align: center; margin: 24px 0;">
-        <a href="${BASE_URL}/assessment" class="button">Take the Assessment</a>
+        <a href="${assessmentUrl}" class="button">Take the Assessment</a>
       </div>
 
       <p style="font-size: 14px; color: #666; text-align: center;">

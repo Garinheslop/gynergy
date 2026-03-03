@@ -344,58 +344,68 @@ const INTERPRETATION_DISPLAY: Record<Interpretation, { headline: string; message
 // ============================================
 
 const V3_VISION_DISPLAY: Record<string, { vision: string; reflection: string }> = {
-  freedom: {
+  financial_freedom: {
     vision: "True Freedom",
     reflection:
       "You didn't build success to stay trapped. The golden handcuffs are real — and recognizing them is the first step to unlocking them.",
   },
-  presence: {
-    vision: "Being Present",
+  time_sovereignty: {
+    vision: "Time Sovereignty",
+    reflection:
+      "You've traded time for money so long you forgot time was the point. Your calendar owns you. The goal isn't more hours — it's hours that actually feel like yours.",
+  },
+  deeper_relationships: {
+    vision: "Deeper Connection",
     reflection:
       "You've sacrificed presence for provision. The irony: you built everything for your family while becoming a stranger to them.",
   },
-  health: {
+  health_vitality: {
     vision: "Reclaiming Your Body",
     reflection:
       "Your body has been the casualty of your ambition. You know the cost is compounding. The body you have at 50 is built by the decisions you make now.",
   },
-  meaning: {
-    vision: "Finding Meaning",
+  meaningful_impact: {
+    vision: "Meaningful Impact",
     reflection:
-      "The success was supposed to mean something. It doesn't. Not yet. But that emptiness is a signal — it's pointing you somewhere.",
+      "The success was supposed to mean something. You've proven you can build. Now you need to prove it matters. That shift changes everything.",
   },
-  legacy: {
-    vision: "Building a Legacy",
+  inner_peace: {
+    vision: "Inner Peace",
     reflection:
-      "What will they say about you? Not the LinkedIn version. The real one. Legacy is built in daily presence, not in achievements.",
+      "The noise never stops. Not the external noise — the internal kind. The voice that says 'not enough' even when the evidence says otherwise. Silence is what you're really after.",
   },
 };
 
 const V3_MOTIVATION_DISPLAY: Record<string, { motivation: string; truth: string }> = {
-  fear_missing: {
-    motivation: "Fear of missing out on life",
+  escaping_current: {
+    motivation: "Escaping your current situation",
     truth:
-      "You're already missing it. That's not judgment — it's the truth you told us. The question is: how many more years will you let slip by?",
+      "Something has to give. You know it. The question is whether you'll leave the burning building or keep rearranging the furniture.",
   },
-  health_wake_up: {
-    motivation: "A health scare or warning sign",
+  proving_something: {
+    motivation: "Proving something — to yourself, to others, to the doubters",
     truth:
-      "Your body sent you a message. Most men ignore it until it's too late. You're listening. That matters.",
+      "The scoreboard you're playing to was set by someone else. You've been winning a game you never chose. The exhaustion isn't from the work — it's from the performance.",
   },
-  relationship_crisis: {
-    motivation: "A relationship reaching a breaking point",
+  family_legacy: {
+    motivation: "Your family and their future",
     truth:
-      "Someone who matters is about to give up on you. Or already has. The work you do now determines what happens next.",
+      "The best thing you can give your family isn't a bigger number. It's a father, a partner, a man who is actually present. That starts with 10 minutes a day.",
   },
-  emptiness: {
-    motivation: "Success feeling hollow",
+  personal_transformation: {
+    motivation: "Personal transformation",
     truth:
-      "You won the game and found out the trophy was empty. This is the most common starting point for transformation — because you can't outrun it anymore.",
+      "You've outgrown who you've been. The man you were built something real. But the man you're becoming requires different tools. You're in the right place.",
   },
-  something_more: {
-    motivation: "Knowing there must be something more",
+  making_difference: {
+    motivation: "Making a real difference in the world",
     truth:
-      "There is. The man you're becoming is waiting on the other side of this work. You've always known it.",
+      "Impact without integration is burnout. You can't pour from an empty cup — and your cup has been empty longer than you've admitted. Fill it first.",
+  },
+  finding_self: {
+    motivation: "Finding yourself again",
+    truth:
+      "You lost yourself somewhere between the first win and the last promotion. The man underneath has been waiting a long time to be seen. He's still there.",
   },
 };
 

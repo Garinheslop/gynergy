@@ -1129,7 +1129,7 @@ function ResultsSection({
             {readinessResponse.response}
           </p>
           <a
-            href="/webinar"
+            href={readinessResponse.ctaUrl}
             onClick={onCtaClick}
             className={cn(
               "flex w-full items-center justify-center gap-2",

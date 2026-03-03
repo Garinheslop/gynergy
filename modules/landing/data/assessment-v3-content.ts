@@ -1398,6 +1398,7 @@ export const V3_READINESS_RESPONSES: Record<
     response: string;
     cta: string;
     ctaVariant: "soft" | "medium" | "strong";
+    ctaUrl: string;
   }
 > = {
   just_curious: {
@@ -1406,6 +1407,7 @@ export const V3_READINESS_RESPONSES: Record<
       "That's honest. Most men start here. Curiosity is the crack in the armor. The fact that you completed this assessment means some part of you already knows. The training isn't a commitment. It's 90 minutes to understand the full picture.",
     cta: "Save Your Seat (No Obligation)",
     ctaVariant: "soft",
+    ctaUrl: "/webinar",
   },
   scared_but_know: {
     label: "Scared But Aware",
@@ -1413,6 +1415,7 @@ export const V3_READINESS_RESPONSES: Record<
       "Fear is appropriate. You built everything you have by not admitting fear. But this is different. This fear is the doorway. Every man who's transformed through this work felt exactly what you're feeling right now. The question isn't whether you're scared. It's whether you'll let the fear make your decision.",
     cta: "Face It — Save Your Seat",
     ctaVariant: "medium",
+    ctaUrl: "/webinar",
   },
   ready_to_explore: {
     label: "Ready to Explore",
@@ -1420,20 +1423,23 @@ export const V3_READINESS_RESPONSES: Record<
       "You want to see the path before you commit. Smart. That's exactly what the training provides: the complete methodology, laid out. You'll leave with the exact morning practice I've done for 500+ days straight. No obligation to buy anything. Just the map.",
     cta: "See the Path — Register Free",
     ctaVariant: "medium",
+    ctaUrl: "/webinar",
   },
   ready_to_invest: {
     label: "Ready to Invest",
     response:
-      "You're not shopping for a solution. You're ready to move. The 45-Day Awakening Challenge starts soon. $997. Join men who are done waiting and ready to transform. The training will give you everything you need to know. But if you already know, reply to the email report — let's talk directly.",
-    cta: "Register for Training (and Challenge Info)",
+      "You're not shopping for a solution. You're ready to move. The 45-Day Awakening Challenge starts soon. $997. Join men who are done waiting and ready to transform. But if you want to see the training first, save your seat. If you already know, reply to the email report — let's talk directly.",
+    cta: "See the Challenge — $997",
     ctaVariant: "strong",
+    ctaUrl: "/pricing",
   },
   desperate: {
     label: "Desperate",
     response:
-      "Something has to give. You know it. The men who come to this work from desperation often see the fastest transformation — because they've stopped negotiating with themselves. The training is the first step. But if you need to move faster, reply to your email report. We should talk.",
-    cta: "I Need This — Register Now",
+      "Something has to give. You know it. The men who come to this work from desperation often see the fastest transformation — because they've stopped negotiating with themselves. The Challenge is the fastest path. But if you need to move even faster, reply to your email report. We should talk.",
+    cta: "I Need This — Join the Challenge",
     ctaVariant: "strong",
+    ctaUrl: "/pricing",
   },
 };
 
