@@ -25,10 +25,10 @@ export const WEBINAR_DESCRIPTION =
   "Free Live Training: Why successful men feel empty and the 10-minute practice that changes everything.";
 
 /** Start time in ISO 8601 with timezone offset */
-export const WEBINAR_START_ISO = "2026-03-03T17:30:00-08:00";
+export const WEBINAR_START_ISO = "2026-03-11T17:30:00-07:00";
 
 /** End time in ISO 8601 with timezone offset */
-export const WEBINAR_END_ISO = "2026-03-03T19:00:00-08:00";
+export const WEBINAR_END_ISO = "2026-03-11T19:00:00-07:00";
 
 /** Duration in minutes */
 export const WEBINAR_DURATION_MINUTES = 90;

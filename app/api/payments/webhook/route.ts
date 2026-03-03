@@ -4,8 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 import Stripe from "stripe";
 
+import { WEBINAR_DURATION_MINUTES, WEBINAR_START_ISO, WEBINAR_TITLE } from "@lib/config/webinar";
 import { DEFAULT_BOOK_ID } from "@lib/constants";
 import { sendPurchaseConfirmationEmail, sendPaymentFailedEmail } from "@lib/email";
+import { sendWebinarConfirmationEmail } from "@lib/email/webinar";
 import { enrollInDrip, cancelDrip } from "@lib/services/dripService";
 import { syncPurchaseCompleted, syncCartAbandoned } from "@lib/services/ghlService";
 import {
@@ -354,6 +356,36 @@ async function handleCheckoutCompleted(
             console.error("Webinar conversion tracking error:", convError);
           }
         });
+    }
+  } else if (
+    productType === "webinar" ||
+    session.metadata?.type === "webinar" ||
+    session.metadata?.productId === "webinar"
+  ) {
+    // ----------------------------------------------------------------
+    // Webinar $27 payment — send confirmation, update registration
+    // ----------------------------------------------------------------
+    const email = session.customer_email;
+    if (email) {
+      // Mark registration as paid
+      await supabase
+        .from("webinar_registrations")
+        .update({ status: "paid", paid_at: new Date().toISOString() })
+        .eq("email", email.toLowerCase());
+
+      // Send confirmation email with webinar details (non-blocking)
+      const webinarDate = new Date(WEBINAR_START_ISO);
+      sendWebinarConfirmationEmail({
+        to: email,
+        firstName: session.metadata?.firstName || undefined,
+        webinarTitle: WEBINAR_TITLE,
+        webinarDate,
+        durationMinutes: WEBINAR_DURATION_MINUTES,
+      }).catch((err) => {
+        console.error("[webhook] Webinar confirmation email error:", err);
+      });
+
+      console.log(`[webhook] Webinar payment processed for ${email}`);
     }
   } else if (productType === "journal_subscription") {
     // Subscription is handled by invoice.paid event
