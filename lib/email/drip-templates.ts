@@ -797,7 +797,7 @@ Write One Entry: ${APP_URL}/date-zero-gratitude/journal/morning
       </div>
       <p>Think of one person in your life who's built everything but doesn't feel any of it. The one who's "fine" when you ask. The one who'd never admit he's struggling.</p>
       <p><strong style="color: #fff;">He's the one who needs this.</strong></p>
-      <p>Men who complete the challenge with an accountability partner are <span class="highlight">95% more likely to finish</span>. This isn't just a gift for them — it's a force multiplier for you.</p>
+      <p>Men who complete the challenge with an accountability partner are <span class="highlight">significantly more likely to finish</span>. This isn't just a gift for them — it's a force multiplier for you.</p>
       <div style="text-align: center;">
         <a href="${APP_URL}/date-zero-gratitude" class="button">Find Your Friend Codes</a>
       </div>
@@ -812,7 +812,7 @@ You received 2 friend codes worth $997 each — $1,994 total.
 
 Think of one person who's built everything but doesn't feel any of it. He's the one who needs this.
 
-Men who complete with an accountability partner are 95% more likely to finish.
+Men who complete with an accountability partner are significantly more likely to finish.
 
 Find Your Friend Codes: ${APP_URL}/date-zero-gratitude
 

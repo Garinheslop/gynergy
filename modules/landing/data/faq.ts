@@ -24,7 +24,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "How does the Accountability Duo work?",
     answer:
-      "When you enroll, you receive 1 friend code to share with a man you trust. They get full access to the challenge at no cost. Research shows pairs have 85% higher completion rates than individuals. You'll hold each other accountable through the WhatsApp community.",
+      "When you enroll, you receive 1 friend code to share with a man you trust. They get full access to the challenge at no cost. Having an accountability partner significantly increases your completion rate. You'll hold each other accountable through the WhatsApp community.",
   },
   {
     question: "What happens after the 45 days?",
