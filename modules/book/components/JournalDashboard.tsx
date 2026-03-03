@@ -11,6 +11,8 @@ import { useDispatch, useSelector } from "@store/hooks";
 import { setHideBookMessageState } from "@store/modules/global/states";
 
 import BookCompletion from "./BookCompletion";
+import BridgeMonthHeader from "./BridgeMonthHeader";
+import ChooseYourPath from "./ChooseYourPath";
 import Journals from "./Journals";
 import Visions from "./Visions";
 import Growth from "../../growth/components/Growth";
@@ -48,9 +50,23 @@ const JournalDashboard = () => {
     dispatch(setHideBookMessageState());
   };
 
+  const isBridgeMonth =
+    bookSession.journeyPhase === "bridge_integration" ||
+    bookSession.journeyPhase === "bridge_choose_path";
+
   return (
     <section className="flex flex-col gap-[60px]">
-      {bookSession.isCompleted && <BookCompletion latestSession={bookSession.latest} />}
+      {bookSession.journeyPhase === "completed" && (
+        <BookCompletion latestSession={bookSession.latest} />
+      )}
+
+      {isBridgeMonth && (
+        <BridgeMonthHeader
+          phase={bookSession.journeyPhase}
+          dayInJourney={bookSession.dayInJourney}
+        />
+      )}
+
       <Visions isStatic />
       {!globalStates.states.hideBookMessage && (
         <Card
@@ -71,7 +87,9 @@ const JournalDashboard = () => {
         </Card>
       )}
       <Visions />
-      <Journals />
+      <Journals bridgeMode={isBridgeMonth} />
+
+      {bookSession.journeyPhase === "bridge_choose_path" && <ChooseYourPath />}
       <Growth ref={growthSectionRef} />
       {isPersonalSession ? (
         <Card

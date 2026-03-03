@@ -30,6 +30,21 @@ export interface BookEnrollmentData {
   createdAt: string;
 }
 
+export type JourneyPhaseKey =
+  | "challenge"
+  | "bridge_integration"
+  | "bridge_choose_path"
+  | "completed";
+
+export interface JourneyPhase {
+  order: number;
+  name: string;
+  subtitle: string;
+  start_day: number;
+  end_day: number;
+  description: string;
+}
+
 export interface BookSessionData {
   id: string;
   bookId: string;

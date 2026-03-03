@@ -5,6 +5,7 @@ export interface User {
   lastName: string;
   email: string;
   profileImage: string;
+  gender?: "male" | "female" | "other" | "prefer_not_to_say";
 }
 export interface UserStats {
   totalPoints: string;
