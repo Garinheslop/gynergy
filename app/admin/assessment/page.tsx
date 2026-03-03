@@ -145,8 +145,8 @@ export default function AssessmentAnalyticsPage() {
           { name: "Wealth", value: 0 },
           { name: "Health", value: 0 },
           { name: "Relationships", value: 0 },
-          { name: "Growth", value: 0 },
-          { name: "Purpose", value: 0 },
+          { name: "Mindset", value: 0 },
+          { name: "Legacy", value: 0 },
         ];
 
   return (

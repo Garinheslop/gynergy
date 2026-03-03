@@ -280,19 +280,19 @@ const PRIORITY_INSIGHTS: Record<
     ripple:
       "When the people who matter actually SEE you again, everything changes. Your health improves because you have reasons to take care of yourself. Your purpose clarifies because you're not building alone. Connection is the multiplier.",
   },
-  growth: {
-    validation: "You chose Growth — because you need to feel alive again.",
+  mindset: {
+    validation: "You chose Mindset — because you need to feel alive again.",
     whyFirst:
       "You've mastered the game you've been playing. And now you're bored, coasting, optimizing a life you've outgrown. The edge that made you successful has dulled. You need a new challenge that actually means something.",
     ripple:
-      "When you're challenged again, everything wakes up. Energy returns because you have something worth getting up for. Relationships improve because you're interesting again. Purpose emerges from the growth itself.",
+      "When you're challenged again, everything wakes up. Energy returns because you have something worth getting up for. Relationships improve because you're interesting again. Legacy emerges from the growth itself.",
   },
-  purpose: {
-    validation: "You chose Purpose — because your success needs to mean something.",
+  legacy: {
+    validation: "You chose Legacy — because your success needs to mean something.",
     whyFirst:
       "You can feel the hollowness. The achievement that was supposed to fill you left you empty. You've been asking 'what's the point?' and the answer keeps coming up short. This is the existential crisis successful men don't talk about.",
     ripple:
-      "When your success has meaning, the grind becomes a mission. Your relationships deepen because you're connected to something larger. Your health improves because you're not escaping — you're building. Purpose is the multiplier that changes everything.",
+      "When your success has meaning, the grind becomes a mission. Your relationships deepen because you're connected to something larger. Your health improves because you're not escaping — you're building. Legacy is the multiplier that changes everything.",
   },
 };
 
@@ -455,8 +455,8 @@ function generateAssessmentReportHtml(
     wealth_score,
     health_score,
     relationships_score,
-    growth_score,
-    purpose_score,
+    mindset_score,
+    legacy_score,
     readiness,
     priority_pillar,
     lowestPillar,
@@ -783,9 +783,9 @@ function generateAssessmentReportHtml(
         <span style="color: #666; margin: 0 8px;">×</span>
         <span style="font-size: 24px; font-weight: bold; color: ${pillarColor(relationships_score)};">${relationships_score || "?"}</span>
         <span style="color: #666; margin: 0 8px;">×</span>
-        <span style="font-size: 24px; font-weight: bold; color: ${pillarColor(growth_score)};">${growth_score || "?"}</span>
+        <span style="font-size: 24px; font-weight: bold; color: ${pillarColor(mindset_score)};">${mindset_score || "?"}</span>
         <span style="color: #666; margin: 0 8px;">×</span>
-        <span style="font-size: 24px; font-weight: bold; color: ${pillarColor(purpose_score)};">${purpose_score || "?"}</span>
+        <span style="font-size: 24px; font-weight: bold; color: ${pillarColor(legacy_score)};">${legacy_score || "?"}</span>
         <span style="color: #666; margin: 0 16px;">=</span>
         <span style="font-size: 24px; font-weight: bold; color: ${
           interpretation === "critical"
@@ -827,22 +827,22 @@ function generateAssessmentReportHtml(
           <td style="padding: 8px 0; text-align: right; color: ${pillarColor(relationships_score)}; font-weight: bold; width: 40px;">${relationships_score || "?"}</td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; color: ${lowestPillar?.pillar === "growth" && (lowestPillar?.score || 0) <= 5 ? "#dc3545" : "#a0a0a0"};">Growth${lowestPillar?.pillar === "growth" && (lowestPillar?.score || 0) <= 5 ? " ←" : ""}</td>
+          <td style="padding: 8px 0; color: ${lowestPillar?.pillar === "mindset" && (lowestPillar?.score || 0) <= 5 ? "#dc3545" : "#a0a0a0"};">Mindset${lowestPillar?.pillar === "mindset" && (lowestPillar?.score || 0) <= 5 ? " ←" : ""}</td>
           <td style="padding: 8px 0;">
             <div style="background: #333; height: 8px; border-radius: 4px; overflow: hidden;">
-              <div style="background: ${pillarColor(growth_score)}; height: 100%; width: ${(growth_score || 0) * 10}%;"></div>
+              <div style="background: ${pillarColor(mindset_score)}; height: 100%; width: ${(mindset_score || 0) * 10}%;"></div>
             </div>
           </td>
-          <td style="padding: 8px 0; text-align: right; color: ${pillarColor(growth_score)}; font-weight: bold; width: 40px;">${growth_score || "?"}</td>
+          <td style="padding: 8px 0; text-align: right; color: ${pillarColor(mindset_score)}; font-weight: bold; width: 40px;">${mindset_score || "?"}</td>
         </tr>
         <tr>
-          <td style="padding: 8px 0; color: ${lowestPillar?.pillar === "purpose" && (lowestPillar?.score || 0) <= 5 ? "#dc3545" : "#a0a0a0"};">Purpose${lowestPillar?.pillar === "purpose" && (lowestPillar?.score || 0) <= 5 ? " ←" : ""}</td>
+          <td style="padding: 8px 0; color: ${lowestPillar?.pillar === "legacy" && (lowestPillar?.score || 0) <= 5 ? "#dc3545" : "#a0a0a0"};">Legacy${lowestPillar?.pillar === "legacy" && (lowestPillar?.score || 0) <= 5 ? " ←" : ""}</td>
           <td style="padding: 8px 0;">
             <div style="background: #333; height: 8px; border-radius: 4px; overflow: hidden;">
-              <div style="background: ${pillarColor(purpose_score)}; height: 100%; width: ${(purpose_score || 0) * 10}%;"></div>
+              <div style="background: ${pillarColor(legacy_score)}; height: 100%; width: ${(legacy_score || 0) * 10}%;"></div>
             </div>
           </td>
-          <td style="padding: 8px 0; text-align: right; color: ${pillarColor(purpose_score)}; font-weight: bold; width: 40px;">${purpose_score || "?"}</td>
+          <td style="padding: 8px 0; text-align: right; color: ${pillarColor(legacy_score)}; font-weight: bold; width: 40px;">${legacy_score || "?"}</td>
         </tr>
       </table>
 
@@ -957,8 +957,8 @@ function generateAssessmentReportText(data: AssessmentReportData, firstName: str
     wealth_score,
     health_score,
     relationships_score,
-    growth_score,
-    purpose_score,
+    mindset_score,
+    legacy_score,
     readiness,
     priority_pillar,
     lowestPillar,
@@ -1068,13 +1068,13 @@ ${reveal.insight}
 
 THE MULTIPLIER EQUATION
 
-${wealth_score || "?"} × ${health_score || "?"} × ${relationships_score || "?"} × ${growth_score || "?"} × ${purpose_score || "?"} = ${interpretation === "critical" ? "Fractured" : interpretation === "gap" ? "Divided" : "Multiplied"}
+${wealth_score || "?"} × ${health_score || "?"} × ${relationships_score || "?"} × ${mindset_score || "?"} × ${legacy_score || "?"} = ${interpretation === "critical" ? "Fractured" : interpretation === "gap" ? "Divided" : "Multiplied"}
 
 Wealth:        ${"█".repeat(wealth_score || 0)}${"░".repeat(10 - (wealth_score || 0))} ${wealth_score || "?"}/10
 Health:        ${"█".repeat(health_score || 0)}${"░".repeat(10 - (health_score || 0))} ${health_score || "?"}/10
 Relationships: ${"█".repeat(relationships_score || 0)}${"░".repeat(10 - (relationships_score || 0))} ${relationships_score || "?"}/10
-Growth:        ${"█".repeat(growth_score || 0)}${"░".repeat(10 - (growth_score || 0))} ${growth_score || "?"}/10
-Purpose:       ${"█".repeat(purpose_score || 0)}${"░".repeat(10 - (purpose_score || 0))} ${purpose_score || "?"}/10
+Mindset:       ${"█".repeat(mindset_score || 0)}${"░".repeat(10 - (mindset_score || 0))} ${mindset_score || "?"}/10
+Legacy:        ${"█".repeat(legacy_score || 0)}${"░".repeat(10 - (legacy_score || 0))} ${legacy_score || "?"}/10
 `;
 
   if (lowestPillar && (lowestPillar.score || 0) <= 5) {

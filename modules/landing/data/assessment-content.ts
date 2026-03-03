@@ -23,14 +23,14 @@ export const ASSESSMENT_QUESTIONS: AssessmentQuestion[] = [
     highLabel: "Growing closer",
   },
   {
-    pillar: "Growth",
+    pillar: "Mindset",
     question:
-      "Are you still being challenged and growing as a man, or have you plateaued and started coasting?",
+      "Are you still being challenged and growing, or have you plateaued and started coasting?",
     lowLabel: "Coasting",
     highLabel: "Actively growing",
   },
   {
-    pillar: "Purpose",
+    pillar: "Legacy",
     question: "Does your success mean something beyond your bank account, or is it hollow?",
     lowLabel: "Hollow success",
     highLabel: "Deep meaning",

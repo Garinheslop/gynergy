@@ -179,7 +179,7 @@ async function sendReminders(
     try {
       const { data: assessment } = await supabase
         .from("assessment_results")
-        .select("wealth_score, health_score, relationships_score, growth_score, purpose_score")
+        .select("wealth_score, health_score, relationships_score, mindset_score, legacy_score")
         .eq("email", reg.email)
         .single();
 
@@ -189,8 +189,8 @@ async function sendReminders(
           (assessment.wealth_score || 0) +
           (assessment.health_score || 0) +
           (assessment.relationships_score || 0) +
-          (assessment.growth_score || 0) +
-          (assessment.purpose_score || 0);
+          (assessment.mindset_score || 0) +
+          (assessment.legacy_score || 0);
       }
     } catch {
       // Assessment table might not exist or no result

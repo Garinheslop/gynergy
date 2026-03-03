@@ -97,8 +97,8 @@ export async function POST(request: Request) {
         wealth_score: wealth_freedom,
         health_score: health_vitality,
         relationships_score: relationships_depth,
-        growth_score: growth_aliveness,
-        purpose_score: purpose_clarity,
+        mindset_score: growth_aliveness,
+        legacy_score: purpose_clarity,
         // Section B (kept from V3)
         two_am_thought,
         two_am_thought_other,
@@ -159,8 +159,8 @@ export async function POST(request: Request) {
         wealth_score: wealth_freedom,
         health_score: health_vitality,
         relationships_score: relationships_depth,
-        growth_score: growth_aliveness,
-        purpose_score: purpose_clarity,
+        mindset_score: growth_aliveness,
+        legacy_score: purpose_clarity,
         // Calculated values
         totalScore,
         interpretation,
@@ -223,8 +223,8 @@ export async function POST(request: Request) {
       wealth_score,
       health_score,
       relationships_score,
-      growth_score,
-      purpose_score,
+      growth_score: mindset_score,
+      purpose_score: legacy_score,
     } = body;
 
     const { error } = await supabase.from("assessment_results").insert({
@@ -243,8 +243,8 @@ export async function POST(request: Request) {
       wealth_score,
       health_score,
       relationships_score,
-      growth_score,
-      purpose_score,
+      mindset_score,
+      legacy_score,
       readiness,
       priority_pillar,
       source,

@@ -4,7 +4,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "What exactly is the Date Zero methodology?",
     answer:
-      "Date Zero is a framework for integrating all five pillars of life — Wealth, Health, Relationships, Growth, and Purpose. It combines daily gratitude practice with structured reflection, accountability, and community support. The methodology was developed through years of work with high-performing men who had achieved external success but felt internally disconnected.",
+      "Date Zero is a framework for integrating all five pillars of life — Wealth, Health, Relationships, Mindset, and Legacy. It combines daily gratitude practice with structured reflection, accountability, and community support. The methodology was developed through years of work with high-performing men who had achieved external success but felt internally disconnected.",
   },
   {
     question: "How much time does this require daily?",

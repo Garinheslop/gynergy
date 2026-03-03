@@ -1,7 +1,7 @@
 // Landing Page Types
 
 export interface PillarScore {
-  pillar: "Wealth" | "Health" | "Relationships" | "Growth" | "Purpose";
+  pillar: "Wealth" | "Health" | "Relationships" | "Mindset" | "Legacy";
   score: number;
 }
 
@@ -181,7 +181,7 @@ export interface WebinarRegistration {
 // ASSESSMENT TYPES
 // ============================================
 
-export type PillarName = "Wealth" | "Health" | "Relationships" | "Growth" | "Purpose";
+export type PillarName = "Wealth" | "Health" | "Relationships" | "Mindset" | "Legacy";
 
 export interface AssessmentQuestion {
   pillar: PillarName;

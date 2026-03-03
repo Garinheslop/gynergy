@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS "cohort_memberships" (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     cohort_id UUID REFERENCES cohorts(id) ON DELETE CASCADE NOT NULL,
     user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-    role TEXT DEFAULT 'member' CHECK (role IN ('admin', 'moderator', 'member')),
+    role TEXT DEFAULT 'member' CHECK (role IN ('admin', 'facilitator', 'moderator', 'member')),
     joined_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(cohort_id, user_id)
 );

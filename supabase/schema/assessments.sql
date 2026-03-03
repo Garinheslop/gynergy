@@ -100,16 +100,16 @@ CREATE TABLE IF NOT EXISTS assessment_results (
   wealth_score INTEGER CHECK (wealth_score >= 1 AND wealth_score <= 10),
   health_score INTEGER CHECK (health_score >= 1 AND health_score <= 10),
   relationships_score INTEGER CHECK (relationships_score >= 1 AND relationships_score <= 10),
-  growth_score INTEGER CHECK (growth_score >= 1 AND growth_score <= 10),
-  purpose_score INTEGER CHECK (purpose_score >= 1 AND purpose_score <= 10),
+  mindset_score INTEGER CHECK (mindset_score >= 1 AND mindset_score <= 10),
+  legacy_score INTEGER CHECK (legacy_score >= 1 AND legacy_score <= 10),
 
   -- Calculated total (5-50)
   total_score INTEGER GENERATED ALWAYS AS (
     COALESCE(wealth_score, 0) +
     COALESCE(health_score, 0) +
     COALESCE(relationships_score, 0) +
-    COALESCE(growth_score, 0) +
-    COALESCE(purpose_score, 0)
+    COALESCE(mindset_score, 0) +
+    COALESCE(legacy_score, 0)
   ) STORED,
 
   -- ============================================
@@ -130,8 +130,8 @@ CREATE TABLE IF NOT EXISTS assessment_results (
     'wealth',
     'health',
     'relationships',
-    'growth',
-    'purpose'
+    'mindset',
+    'legacy'
   )),
 
   -- ============================================
@@ -142,11 +142,11 @@ CREATE TABLE IF NOT EXISTS assessment_results (
   interpretation TEXT GENERATED ALWAYS AS (
     CASE
       WHEN (COALESCE(wealth_score, 0) + COALESCE(health_score, 0) +
-            COALESCE(relationships_score, 0) + COALESCE(growth_score, 0) +
-            COALESCE(purpose_score, 0)) >= 40 THEN 'elite'
+            COALESCE(relationships_score, 0) + COALESCE(mindset_score, 0) +
+            COALESCE(legacy_score, 0)) >= 40 THEN 'elite'
       WHEN (COALESCE(wealth_score, 0) + COALESCE(health_score, 0) +
-            COALESCE(relationships_score, 0) + COALESCE(growth_score, 0) +
-            COALESCE(purpose_score, 0)) >= 25 THEN 'gap'
+            COALESCE(relationships_score, 0) + COALESCE(mindset_score, 0) +
+            COALESCE(legacy_score, 0)) >= 25 THEN 'gap'
       ELSE 'critical'
     END
   ) STORED,
@@ -180,12 +180,12 @@ CREATE TABLE IF NOT EXISTS assessment_results (
         COALESCE(wealth_score, 10),
         COALESCE(health_score, 10),
         COALESCE(relationships_score, 10),
-        COALESCE(growth_score, 10),
-        COALESCE(purpose_score, 10)
+        COALESCE(mindset_score, 10),
+        COALESCE(legacy_score, 10)
       ) <= 3 THEN 3
       WHEN (COALESCE(wealth_score, 0) + COALESCE(health_score, 0) +
-            COALESCE(relationships_score, 0) + COALESCE(growth_score, 0) +
-            COALESCE(purpose_score, 0)) <= 30 THEN 2
+            COALESCE(relationships_score, 0) + COALESCE(mindset_score, 0) +
+            COALESCE(legacy_score, 0)) <= 30 THEN 2
       ELSE 1
     END)
   ) STORED,
@@ -196,14 +196,14 @@ CREATE TABLE IF NOT EXISTS assessment_results (
       COALESCE(wealth_score, 10),
       COALESCE(health_score, 10),
       COALESCE(relationships_score, 10),
-      COALESCE(growth_score, 10),
-      COALESCE(purpose_score, 10)
+      COALESCE(mindset_score, 10),
+      COALESCE(legacy_score, 10)
     )
       WHEN COALESCE(wealth_score, 10) THEN 'wealth'
       WHEN COALESCE(health_score, 10) THEN 'health'
       WHEN COALESCE(relationships_score, 10) THEN 'relationships'
-      WHEN COALESCE(growth_score, 10) THEN 'growth'
-      ELSE 'purpose'
+      WHEN COALESCE(mindset_score, 10) THEN 'mindset'
+      ELSE 'legacy'
     END
   ) STORED,
 

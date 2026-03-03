@@ -1027,8 +1027,8 @@ function ResultsSection({
             { name: "Wealth", score: answers.wealth_freedom || 0 },
             { name: "Health", score: answers.health_vitality || 0 },
             { name: "Relationships", score: answers.relationships_depth || 0 },
-            { name: "Growth", score: answers.growth_aliveness || 0 },
-            { name: "Purpose", score: answers.purpose_clarity || 0 },
+            { name: "Mindset", score: answers.growth_aliveness || 0 },
+            { name: "Legacy", score: answers.purpose_clarity || 0 },
           ].map((pillar) => {
             const isLowest = lowestPillar?.pillar === pillar.name.toLowerCase();
             return (

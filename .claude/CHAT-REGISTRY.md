@@ -7,21 +7,22 @@
 
 ## Active Chats
 
-| Chat ID             | Developer | Branch                          | Focus                             | Type | Status | Files Owned | Last Sync  |
-| ------------------- | --------- | ------------------------------- | --------------------------------- | ---- | ------ | ----------- | ---------- |
-| chat-G-webinar-0219 | Garin     | feature/garin-webinar-readiness | Webinar readiness: UX/UI, funnels | Code | Active | TBD         | 2026-02-19 |
+| Chat ID              | Developer | Branch | Focus                                       | Type     | Status | Files Owned | Last Sync  |
+| -------------------- | --------- | ------ | ------------------------------------------- | -------- | ------ | ----------- | ---------- |
+| chat-G-strategy-0228 | Garin     | main   | SWOT analysis: 45-Day Awakening & Date Zero | Strategy | Active | N/A         | 2026-02-28 |
 
 ---
 
 ## Recently Closed Chats
 
-| Chat ID               | Developer | Branch | Focus                                    | Closed     | Reason    | Final Commit |
-| --------------------- | --------- | ------ | ---------------------------------------- | ---------- | --------- | ------------ |
-| chat-G-fixerrors-0219 | Garin     | main   | Hotfix: auth, settings, community share  | 2026-02-19 | Completed | `4fbc2dc`    |
-| chat-G-automate-0218  | Garin     | main   | Automation engine + drips + gamification | 2026-02-18 | Completed | `58aaaf0`    |
-| chat-G-ds-phase3-0217 | Garin     | main   | Design System Phase 3 cleanup            | 2026-02-17 | Completed | `81f7075`    |
-| chat-G-email-0217     | Garin     | main   | Email system production wiring           | 2026-02-17 | Completed | `d768bdc`    |
-| chat-G-appstore-0217  | Garin     | main   | Phase 4 TypeScript & Redux               | 2026-02-17 | Completed | `fabb952`    |
+| Chat ID               | Developer | Branch                          | Focus                                    | Closed     | Reason    | Final Commit |
+| --------------------- | --------- | ------------------------------- | ---------------------------------------- | ---------- | --------- | ------------ |
+| chat-G-webinar-0219   | Garin     | feature/garin-webinar-readiness | Webinar readiness: UX/UI, funnels        | 2026-02-28 | Abandoned | N/A          |
+| chat-G-fixerrors-0219 | Garin     | main                            | Hotfix: auth, settings, community share  | 2026-02-19 | Completed | `4fbc2dc`    |
+| chat-G-automate-0218  | Garin     | main                            | Automation engine + drips + gamification | 2026-02-18 | Completed | `58aaaf0`    |
+| chat-G-ds-phase3-0217 | Garin     | main                            | Design System Phase 3 cleanup            | 2026-02-17 | Completed | `81f7075`    |
+| chat-G-email-0217     | Garin     | main                            | Email system production wiring           | 2026-02-17 | Completed | `d768bdc`    |
+| chat-G-appstore-0217  | Garin     | main                            | Phase 4 TypeScript & Redux               | 2026-02-17 | Completed | `fabb952`    |
 
 ---
 

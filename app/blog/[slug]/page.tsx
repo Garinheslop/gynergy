@@ -22,7 +22,7 @@ const BLOG_CONTENT: Record<
     readTime: "7 min",
     content: `What if the five areas of your life don't add up — they multiply?
 
-That's the core insight behind the Five Pillar Framework: Wealth, Health, Relationships, Growth, and Purpose. Most men optimize for one or two pillars while ignoring the rest. They build a $10M business (Wealth: 9) but can't look their wife in the eye (Relationships: 3).
+That's the core insight behind the Five Pillar Framework: Wealth, Health, Relationships, Mindset, and Legacy. Most men optimize for one or two pillars while ignoring the rest. They build a $10M business (Wealth: 9) but can't look their wife in the eye (Relationships: 3).
 
 The math is brutal: 9 × 7 × 3 × 8 × 2 = a fractured life.
 
@@ -34,15 +34,15 @@ The math is brutal: 9 × 7 × 3 × 8 × 2 = a fractured life.
 
 **Relationships** — The quality of your connections. With your partner. Your children. Your friends. Not the quantity — the depth.
 
-**Growth** — Personal development, learning, intellectual stimulation. The sense that you're evolving, not just maintaining.
+**Mindset** — Personal development, learning, intellectual stimulation. The sense that you're evolving, not just maintaining.
 
-**Purpose** — The reason you get up that has nothing to do with money. Contribution. Legacy. The thing that makes the wins mean something.
+**Legacy** — The reason you get up that has nothing to do with money. Contribution. Impact. The thing that makes the wins mean something.
 
 ## Why Multiplication Matters
 
 Most self-improvement frameworks treat these areas as additive. Get better at health, add some points. Work on relationships, add more.
 
-The Five Pillar Framework recognizes that these areas **multiply**. A 9 in Wealth means nothing if you're a 2 in Purpose. The 2 collapses everything.
+The Five Pillar Framework recognizes that these areas **multiply**. A 9 in Wealth means nothing if you're a 2 in Legacy. The 2 collapses everything.
 
 This is why men who've "built everything" feel empty. Their total life score is dominated by their lowest pillar, not their highest.
 
@@ -102,7 +102,7 @@ The feeling doesn't go away because you ignore it. It goes away because you inte
     readTime: "8 min",
     content: `9 × 8 × 3 × 7 × 2.
 
-Write those numbers down. Rate yourself 1-10 in each of the Five Pillars: Wealth, Health, Relationships, Growth, Purpose. Then multiply them together.
+Write those numbers down. Rate yourself 1-10 in each of the Five Pillars: Wealth, Health, Relationships, Mindset, Legacy. Then multiply them together.
 
 That number? That's your Integration Score. And for most successful men, it's devastatingly low.
 
@@ -120,8 +120,8 @@ Consider a man who:
 - Closes a $2M deal (Wealth: 9)
 - Works out 5x/week (Health: 7)
 - Hasn't had a real conversation with his wife in weeks (Relationships: 3)
-- Reads 2 books/month (Growth: 8)
-- Can't remember why any of it matters (Purpose: 2)
+- Reads 2 books/month (Mindset: 8)
+- Can't remember why any of it matters (Legacy: 2)
 
 His Integration Score: 9 × 7 × 3 × 8 × 2 = 3,024 out of 100,000 possible. That's 3%.
 
@@ -131,7 +131,7 @@ He's winning at 3% of his potential. Not because he's lazy or broken — because
 
 Here's the good news: if a low score in one pillar collapses everything, then even a modest improvement creates exponential gains.
 
-Take that same man. If he moves his Relationships from 3 to 6 and his Purpose from 2 to 5: 9 × 7 × 6 × 8 × 5 = 15,120. That's a **5x improvement** in total life integration — from two moderate changes.
+Take that same man. If he moves his Relationships from 3 to 6 and his Legacy from 2 to 5: 9 × 7 × 6 × 8 × 5 = 15,120. That's a **5x improvement** in total life integration — from two moderate changes.
 
 This is why the 45-Day Awakening Challenge focuses on all five pillars simultaneously. You don't need to become a 10 in everything. You need to eliminate the 2s and 3s. The multiplication handles the rest.`,
   },
@@ -214,15 +214,15 @@ Here's what that looks like in practice:
 
 **Integrated Relationships:** You're present at dinner. Not checking your phone. Not mentally replaying the deal. Actually there.
 
-**Integrated Growth:** You learn for the sake of evolution, not just competitive advantage.
+**Integrated Mindset:** You learn for the sake of evolution, not just competitive advantage.
 
-**Integrated Purpose:** You know WHY you build, beyond the number.
+**Integrated Legacy:** You know WHY you build, beyond the number.
 
 ## The Multiplication Principle
 
 When these areas multiply instead of compete, something remarkable happens: the energy from one pillar fuels the others.
 
-A strong morning practice (Growth) gives you clarity in meetings (Wealth). Present evenings with family (Relationships) give you purpose-driven energy the next day (Purpose). Physical vitality (Health) sustains all of it.
+A strong morning practice (Mindset) gives you clarity in meetings (Wealth). Present evenings with family (Relationships) give you legacy-driven energy the next day (Legacy). Physical vitality (Health) sustains all of it.
 
 This is the Integration Multiplier in action. Not balance. Multiplication.
 
