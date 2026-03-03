@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 
 import toast from "react-hot-toast";
 
+import { trackPixelEvent } from "@lib/utils/analytics";
 import { cn } from "@lib/utils/style";
 import { SectionErrorBoundary } from "@modules/common/components/ErrorBoundary";
 
@@ -101,6 +102,12 @@ function WebinarLandingPageContent() {
         toast.success(
           "Seat saved! Confirmation email sent — check your inbox for calendar details."
         );
+
+        // Fire pixel Lead event (Meta + Google)
+        trackPixelEvent("Lead", {
+          content_name: "Webinar Registration",
+          content_category: "webinar",
+        });
       }
 
       // Redirect to assessment

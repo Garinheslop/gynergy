@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 
-import { track } from "@lib/utils/analytics";
+import { track, trackPixelEvent } from "@lib/utils/analytics";
 import { cn } from "@lib/utils/style";
 
 import { CTAButton, PillarProgressBar } from "./shared";
@@ -343,6 +343,13 @@ export default function AssessmentPageV3() {
           total_time_minutes: Math.round(totalTime / 60000),
           priority_pillar: answers.priority_pillar || null,
           readiness: answers.readiness || null,
+        });
+
+        // Fire pixel conversion event (Meta + Google)
+        trackPixelEvent("CompleteRegistration", {
+          content_name: "Five Pillar Assessment",
+          value: totalScore,
+          currency: "USD",
         });
 
         // Clear progress, save result

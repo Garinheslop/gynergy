@@ -127,12 +127,17 @@ export default function HeroSection({
         {/* Urgency Bar */}
         <div className="mt-6 flex flex-wrap items-center justify-center gap-4 md:gap-8">
           <CountdownTimer targetDate={HERO_CONTENT.cohortDate} compact />
-          <div className="border-lp-gold-dim bg-lp-gold-glow flex flex-col items-center border px-4 py-2">
+          <div
+            className={cn(
+              "border-lp-gold-dim bg-lp-gold-glow flex flex-col items-center border px-4 py-2",
+              seatsRemaining <= 5 && "border-lp-gold/60 animate-pulse"
+            )}
+          >
             <span className="font-bebas text-lp-gold-light text-xl leading-none">
               {seatsRemaining}
             </span>
             <span className="font-oswald text-lp-muted mt-0.5 text-[10px] font-extralight tracking-widest uppercase">
-              Seats Left
+              {seatsRemaining <= 5 ? "Seats Left!" : "Seats Left"}
             </span>
           </div>
         </div>

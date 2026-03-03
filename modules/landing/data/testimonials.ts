@@ -12,6 +12,8 @@ export const TESTIMONIALS: Testimonial[] = [
       { pillar: "Purpose", before: 3, after: 8 },
       { pillar: "Relationships", before: 4, after: 7 },
     ],
+    // Video testimonial — replace with actual URL when uploaded
+    videoUrl: undefined,
   },
   {
     id: "2",
@@ -48,6 +50,8 @@ export const TESTIMONIALS: Testimonial[] = [
       { pillar: "Relationships", before: 4, after: 9 },
       { pillar: "Health", before: 5, after: 8 },
     ],
+    // Video testimonial — replace with actual URL when uploaded
+    videoUrl: undefined,
   },
   {
     id: "5",

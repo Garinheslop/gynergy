@@ -4,6 +4,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 
 import { sendWebinarFollowUpEmail } from "@lib/email/webinar";
+import { enrollInDrip } from "@lib/services/dripService";
 import { createServiceClient } from "@lib/supabase-server";
 
 /**
@@ -123,10 +124,19 @@ export async function GET(request: NextRequest) {
           });
 
           if (result.success) {
+            const dripMeta = {
+              webinarTitle: webinar.title,
+              firstName: reg.first_name || undefined,
+            };
+
             if (attended) {
               results.attendedEmails++;
+              // Enroll attendees in post-webinar pitch drip (3-email conversion sequence)
+              await enrollInDrip("webinar_attended", reg.email, dripMeta);
             } else {
               results.missedEmails++;
+              // Enroll no-shows in replay + nurture drip (3-email recovery sequence)
+              await enrollInDrip("webinar_missed", reg.email, dripMeta);
             }
           } else {
             results.errors.push(`Failed to send to ${reg.email}: ${result.error}`);

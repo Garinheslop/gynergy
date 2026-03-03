@@ -9,9 +9,16 @@ import { SectionWrapper, SectionLabel, SectionTitle, CTAButton } from "../shared
 interface PricingSectionProps {
   cta: CTAContent;
   isLoading?: boolean;
+  isFull?: boolean;
+  onJoinWaitlist?: () => void;
 }
 
-export default function PricingSection({ cta, isLoading = false }: PricingSectionProps) {
+export default function PricingSection({
+  cta,
+  isLoading = false,
+  isFull = false,
+  onJoinWaitlist,
+}: PricingSectionProps) {
   return (
     <SectionWrapper id="pricing">
       <div className="text-center">
@@ -99,18 +106,29 @@ export default function PricingSection({ cta, isLoading = false }: PricingSectio
             </div>
           </div>
 
-          {/* CTA */}
+          {/* CTA or Waitlist */}
           <div className="pt-4 pb-2 text-center">
-            <CTAButton
-              onClick={cta.action}
-              variant={cta.variant === "secondary" ? "secondary" : "primary"}
-              size="large"
-              isLoading={isLoading}
-              disabled={cta.disabled}
-              className="w-full md:w-auto"
-            >
-              {cta.text}
-            </CTAButton>
+            {isFull && onJoinWaitlist ? (
+              <CTAButton
+                onClick={onJoinWaitlist}
+                variant="primary"
+                size="large"
+                className="w-full md:w-auto"
+              >
+                Join the Waitlist
+              </CTAButton>
+            ) : (
+              <CTAButton
+                onClick={cta.action}
+                variant={cta.variant === "secondary" ? "secondary" : "primary"}
+                size="large"
+                isLoading={isLoading}
+                disabled={cta.disabled}
+                className="w-full md:w-auto"
+              >
+                {cta.text}
+              </CTAButton>
+            )}
           </div>
 
           {/* Trust Indicators */}

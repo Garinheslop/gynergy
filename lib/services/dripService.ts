@@ -14,6 +14,8 @@ import { createServiceClient } from "@lib/supabase-server";
 
 export type TriggerEvent =
   | "webinar_registered"
+  | "webinar_attended"
+  | "webinar_missed"
   | "assessment_completed"
   | "purchase_completed"
   | "cart_abandoned"

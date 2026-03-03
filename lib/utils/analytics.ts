@@ -592,3 +592,134 @@ export function trackEvent<K extends keyof typeof EventNames>(
 ): void {
   analytics.track(EventNames[eventKey], properties);
 }
+
+// ============================================================================
+// PIXEL TRACKING (Meta + Google)
+// ============================================================================
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+declare global {
+  interface Window {
+    fbq?: (...args: any[]) => void;
+    gtag?: (...args: any[]) => void;
+  }
+}
+
+/**
+ * Track a conversion event across Meta Pixel and Google Analytics.
+ * Falls back gracefully if either pixel is not loaded.
+ */
+export function trackPixelEvent(eventName: string, params?: Record<string, any>): void {
+  // Meta Pixel
+  if (typeof window !== "undefined" && window.fbq) {
+    try {
+      window.fbq("track", eventName, params);
+    } catch {
+      // Silently fail
+    }
+  }
+
+  // Google Analytics
+  if (typeof window !== "undefined" && window.gtag) {
+    try {
+      window.gtag("event", eventName, params);
+    } catch {
+      // Silently fail
+    }
+  }
+}
+
+/**
+ * Meta Pixel analytics provider
+ */
+export function createMetaPixelProvider(pixelId: string): AnalyticsProvider {
+  // Load Meta Pixel script (standard fbq snippet adapted for TS)
+  if (typeof window !== "undefined" && !window.fbq) {
+    const w = window as any;
+    const n: any = (w.fbq = function (...args: any[]) {
+      n.callMethod ? n.callMethod(...args) : n.queue.push(args);
+    });
+    if (!w._fbq) w._fbq = n;
+    n.push = n;
+    n.loaded = true;
+    n.version = "2.0";
+    n.queue = [];
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = "https://connect.facebook.net/en_US/fbevents.js";
+    const firstScript = document.getElementsByTagName("script")[0];
+    firstScript?.parentNode?.insertBefore(script, firstScript);
+    w.fbq("init", pixelId);
+    w.fbq("track", "PageView");
+  }
+
+  return {
+    name: "meta_pixel",
+    track: (event) => {
+      if (window.fbq) {
+        window.fbq("trackCustom", event.name, event.properties);
+      }
+    },
+    page: () => {
+      if (window.fbq) {
+        window.fbq("track", "PageView");
+      }
+    },
+    identify: () => {
+      // Meta Pixel identifies via cookies, not explicit identify
+    },
+    reset: () => {
+      // No reset needed for pixel
+    },
+  };
+}
+
+/**
+ * Google Analytics (gtag) provider
+ */
+export function createGoogleAnalyticsProvider(measurementId: string): AnalyticsProvider {
+  // Load gtag script
+  if (typeof window !== "undefined" && !window.gtag) {
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+    document.head.appendChild(script);
+
+    (window as any).dataLayer = (window as any).dataLayer || [];
+    window.gtag = function (...args: any[]) {
+      (window as any).dataLayer.push(args);
+    };
+    window.gtag("js", new Date());
+    window.gtag("config", measurementId);
+  }
+
+  return {
+    name: "google_analytics",
+    track: (event) => {
+      if (window.gtag) {
+        window.gtag("event", event.name, {
+          ...event.properties,
+          session_id: event.sessionId,
+        });
+      }
+    },
+    page: (pageView) => {
+      if (window.gtag) {
+        window.gtag("event", "page_view", {
+          page_path: pageView.path,
+          page_title: pageView.title,
+          page_referrer: pageView.referrer,
+        });
+      }
+    },
+    identify: (userId) => {
+      if (window.gtag) {
+        window.gtag("set", { user_id: userId });
+      }
+    },
+    reset: () => {
+      // GA resets via new session
+    },
+  };
+}
