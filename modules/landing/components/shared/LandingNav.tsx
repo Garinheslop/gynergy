@@ -10,12 +10,14 @@ interface LandingNavProps {
   seatsRemaining?: number;
   onEnrollClick: () => void;
   isLoading?: boolean;
+  ctaText?: string;
 }
 
 export default function LandingNav({
   seatsRemaining = 7,
   onEnrollClick,
   isLoading = false,
+  ctaText = "Enroll Now",
 }: LandingNavProps) {
   const [scrolled, setScrolled] = useState(false);
 
@@ -78,7 +80,7 @@ export default function LandingNav({
             "disabled:cursor-not-allowed disabled:opacity-60"
           )}
         >
-          {isLoading ? "Loading..." : "Enroll Now"}
+          {isLoading ? "Loading..." : ctaText}
         </button>
       </div>
     </nav>

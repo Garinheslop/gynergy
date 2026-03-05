@@ -129,10 +129,26 @@ function WebinarLandingPageContent() {
   }, []);
 
   const handleScrollToRegister = useCallback(() => {
-    const registerSection = document.getElementById("register");
-    if (registerSection) {
-      registerSection.scrollIntoView({ behavior: "smooth" });
-    }
+    const scrollToTarget = () => {
+      const registerSection = document.getElementById("register");
+      if (registerSection) {
+        registerSection.scrollIntoView({ behavior: "smooth" });
+        return true;
+      }
+      return false;
+    };
+
+    // Try immediately
+    if (scrollToTarget()) return;
+
+    // If dynamic section hasn't mounted yet, retry briefly
+    let attempts = 0;
+    const retryInterval = setInterval(() => {
+      attempts++;
+      if (scrollToTarget() || attempts >= 10) {
+        clearInterval(retryInterval);
+      }
+    }, 200);
   }, []);
 
   return (
@@ -156,6 +172,7 @@ function WebinarLandingPageContent() {
         seatsRemaining={seatsData.seatsRemaining}
         onEnrollClick={handleScrollToRegister}
         isLoading={registrationLoading}
+        ctaText="Save My Seat"
       />
 
       {/* Hero Section - Critical */}
