@@ -80,8 +80,8 @@ function WebinarLandingPageContent() {
     };
 
     fetchSeats();
-    // Refresh every 30 seconds for real-time urgency
-    const interval = setInterval(fetchSeats, 30000);
+    // Refresh every 2 minutes (balances urgency vs server load at scale)
+    const interval = setInterval(fetchSeats, 120000);
     return () => clearInterval(interval);
   }, []);
 

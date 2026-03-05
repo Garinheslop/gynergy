@@ -215,6 +215,7 @@ export default function WebinarVideo({
       {state === "playing" && videoId && (
         <>
           <iframe
+            key={isMuted ? "muted" : "unmuted"}
             src={getEmbedUrl()}
             className="absolute inset-0 h-full w-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

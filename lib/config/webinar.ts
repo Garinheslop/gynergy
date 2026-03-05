@@ -62,9 +62,11 @@ export const WEBINAR_TIME_DISPLAY = WEBINAR_START_DATE.toLocaleTimeString("en-US
   timeZoneName: "short",
 });
 
-/** Short date for copy: "March 3rd" */
+/** Short date for copy: "March 18th" */
 export const WEBINAR_DATE_SHORT = (() => {
-  const day = WEBINAR_START_DATE.getDate();
+  // Parse day from ISO string to avoid UTC timezone shift on Vercel
+  // (e.g., March 18 5:30 PM PST = March 19 00:30 UTC → getDate() returns 19)
+  const day = Number.parseInt(WEBINAR_DATE_ONLY.split("-")[2], 10);
   const month = WEBINAR_START_DATE.toLocaleDateString("en-US", {
     month: "long",
     timeZone: "America/Los_Angeles",

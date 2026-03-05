@@ -41,12 +41,14 @@ export default function WebinarFinalCTASection({
     month: "long",
     day: "numeric",
     year: "numeric",
+    timeZone: "America/Los_Angeles",
   });
 
   const formattedTime = WEBINAR_HERO_CONTENT.eventDate.toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
     timeZoneName: "short",
+    timeZone: "America/Los_Angeles",
   });
 
   return (
