@@ -1,8 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useState } from "react";
-
-import dynamic from "next/dynamic";
+import { useCallback, useEffect, useState } from "react";
 
 import toast from "react-hot-toast";
 
@@ -13,7 +11,15 @@ import { SectionErrorBoundary } from "@modules/common/components/ErrorBoundary";
 import { LandingNav, ExitIntentPopup } from "./shared";
 import { WEBINAR_HERO_CONTENT } from "../data/webinar-content";
 import { useExitIntent } from "../hooks/useExitIntent";
-import { WebinarHeroSection } from "./sections/webinar";
+import {
+  WebinarHeroSection,
+  WebinarLearnSection,
+  WebinarValueStackSection,
+  WebinarProofSection,
+  WebinarBonusSection,
+  WebinarRegisterSection,
+  WebinarFinalCTASection,
+} from "./sections/webinar";
 
 interface SeatsData {
   seatsRemaining: number;
@@ -21,28 +27,7 @@ interface SeatsData {
   isFull: boolean;
 }
 
-// Dynamic imports for below-fold sections
-const WebinarLearnSection = dynamic(() => import("./sections/webinar/WebinarLearnSection"), {
-  ssr: true,
-});
-const WebinarValueStackSection = dynamic(
-  () => import("./sections/webinar/WebinarValueStackSection"),
-  { ssr: true }
-);
-const WebinarProofSection = dynamic(() => import("./sections/webinar/WebinarProofSection"), {
-  ssr: true,
-});
-const WebinarBonusSection = dynamic(() => import("./sections/webinar/WebinarBonusSection"), {
-  ssr: true,
-});
-const WebinarRegisterSection = dynamic(() => import("./sections/webinar/WebinarRegisterSection"), {
-  ssr: true,
-});
-const WebinarFinalCTASection = dynamic(() => import("./sections/webinar/WebinarFinalCTASection"), {
-  ssr: true,
-});
-
-function WebinarLandingPageContent() {
+export default function WebinarLandingPage() {
   const [registrationLoading, setRegistrationLoading] = useState(false);
   const [seatsData, setSeatsData] = useState<SeatsData>({
     seatsRemaining: WEBINAR_HERO_CONTENT.seatsRemaining,
@@ -129,26 +114,10 @@ function WebinarLandingPageContent() {
   }, []);
 
   const handleScrollToRegister = useCallback(() => {
-    const scrollToTarget = () => {
-      const registerSection = document.getElementById("register");
-      if (registerSection) {
-        registerSection.scrollIntoView({ behavior: "smooth" });
-        return true;
-      }
-      return false;
-    };
-
-    // Try immediately
-    if (scrollToTarget()) return;
-
-    // If dynamic section hasn't mounted yet, retry briefly
-    let attempts = 0;
-    const retryInterval = setInterval(() => {
-      attempts++;
-      if (scrollToTarget() || attempts >= 10) {
-        clearInterval(retryInterval);
-      }
-    }, 200);
+    const registerSection = document.getElementById("register");
+    if (registerSection) {
+      registerSection.scrollIntoView({ behavior: "smooth" });
+    }
   }, []);
 
   return (
@@ -239,19 +208,5 @@ function WebinarLandingPageContent() {
         redirectOnSubmit="/assessment"
       />
     </div>
-  );
-}
-
-export default function WebinarLandingPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="bg-lp-dark flex min-h-screen items-center justify-center">
-          <div className="border-lp-gold h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
-        </div>
-      }
-    >
-      <WebinarLandingPageContent />
-    </Suspense>
   );
 }
