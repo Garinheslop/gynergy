@@ -23,6 +23,7 @@ export default function WebinarFinalCTASection({
   seatsRemaining,
 }: WebinarFinalCTASectionProps) {
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [honeypot, setHoneypot] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,7 +33,7 @@ export default function WebinarFinalCTASection({
     // Honeypot check
     if (honeypot) return;
 
-    await onRegister(email);
+    await onRegister(email, firstName || undefined);
   };
 
   const formattedDate = WEBINAR_HERO_CONTENT.eventDate.toLocaleDateString("en-US", {
@@ -94,25 +95,43 @@ export default function WebinarFinalCTASection({
             </div>
           </div>
 
-          {/* Email form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              required
-              aria-label="Email address"
-              className={cn(
-                "flex-1",
-                "font-oswald text-sm font-light",
-                "px-4 py-3",
-                "border-lp-border bg-lp-input border",
-                "text-lp-white placeholder:text-lp-gray",
-                "outline-none",
-                "focus:border-lp-gold focus:ring-lp-gold/30 transition-all focus:ring-1"
-              )}
-            />
+          {/* Registration form */}
+          <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <input
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="First name (optional)"
+                aria-label="First name (optional)"
+                className={cn(
+                  "flex-1 sm:max-w-[160px]",
+                  "font-oswald text-sm font-light",
+                  "px-4 py-3",
+                  "border-lp-border bg-lp-input border",
+                  "text-lp-white placeholder:text-lp-gray",
+                  "outline-none",
+                  "focus:border-lp-gold focus:ring-lp-gold/30 transition-all focus:ring-1"
+                )}
+              />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+                aria-label="Email address"
+                className={cn(
+                  "flex-1",
+                  "font-oswald text-sm font-light",
+                  "px-4 py-3",
+                  "border-lp-border bg-lp-input border",
+                  "text-lp-white placeholder:text-lp-gray",
+                  "outline-none",
+                  "focus:border-lp-gold focus:ring-lp-gold/30 transition-all focus:ring-1"
+                )}
+              />
+            </div>
 
             {/* Honeypot field */}
             <input
@@ -128,11 +147,12 @@ export default function WebinarFinalCTASection({
             <CTAButton
               type="submit"
               variant="primary"
-              size="default"
+              size="large"
               isLoading={isLoading}
               disabled={!email || isLoading}
+              className="w-full"
             >
-              Claim My Free Seat
+              Save My Seat
             </CTAButton>
           </form>
 

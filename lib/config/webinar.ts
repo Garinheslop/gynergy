@@ -15,7 +15,7 @@
 // ============================================
 
 /** Webinar slug — must match the database seed in webinars table */
-export const WEBINAR_SLUG = "five-pillars-march-2026";
+export const WEBINAR_SLUG = "five-pillars-march-18-2026";
 
 /** Webinar title — used in emails, landing page, schema.org */
 export const WEBINAR_TITLE = "The 5 Pillars of Integrated Power";
@@ -25,10 +25,10 @@ export const WEBINAR_DESCRIPTION =
   "Free Live Training: Why successful men feel empty and the 10-minute practice that changes everything.";
 
 /** Start time in ISO 8601 with timezone offset */
-export const WEBINAR_START_ISO = "2026-03-11T17:30:00-07:00";
+export const WEBINAR_START_ISO = "2026-03-18T17:30:00-07:00";
 
 /** End time in ISO 8601 with timezone offset */
-export const WEBINAR_END_ISO = "2026-03-11T19:00:00-07:00";
+export const WEBINAR_END_ISO = "2026-03-18T19:00:00-07:00";
 
 /** Duration in minutes */
 export const WEBINAR_DURATION_MINUTES = 90;

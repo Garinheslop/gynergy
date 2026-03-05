@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 
-import { WEBINAR_DATE_ONLY, WEBINAR_TITLE } from "@lib/config/webinar";
+import { WEBINAR_DATE_ONLY, WEBINAR_MAX_SEATS, WEBINAR_TITLE } from "@lib/config/webinar";
 import { sendWebinarConfirmationEmail } from "@lib/email/webinar";
 import { enrollInDrip } from "@lib/services/dripService";
 import { syncWebinarRegistration } from "@lib/services/ghlService";
@@ -40,6 +40,22 @@ export async function POST(request: Request) {
     }
 
     const supabase = await createClient();
+
+    // Check seat capacity before registering
+    const { count } = await supabase
+      .from("webinar_registrations")
+      .select("*", { count: "exact", head: true })
+      .eq("webinar_date", eventDate.toISOString().split("T")[0]);
+
+    if (count !== null && count >= WEBINAR_MAX_SEATS) {
+      return NextResponse.json(
+        {
+          error: "Webinar is full",
+          message: "This webinar has reached capacity. Join the waitlist for the next one.",
+        },
+        { status: 409 }
+      );
+    }
 
     // Insert without select - anon role doesn't have SELECT permission
     const { error } = await supabase.from("webinar_registrations").insert({

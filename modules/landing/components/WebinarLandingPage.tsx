@@ -51,6 +51,14 @@ function WebinarLandingPageContent() {
   });
   const { showPopup, closePopup } = useExitIntent({ threshold: 0, delay: 100 });
 
+  // Track page view on mount
+  useEffect(() => {
+    trackPixelEvent("ViewContent", {
+      content_name: "Webinar Landing Page",
+      content_category: "webinar",
+    });
+  }, []);
+
   // Fetch dynamic seat count on mount
   useEffect(() => {
     const fetchSeats = async () => {

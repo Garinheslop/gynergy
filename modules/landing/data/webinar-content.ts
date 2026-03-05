@@ -62,7 +62,6 @@ export const WEBINAR_TESTIMONIALS = [
     author: "James K.",
     role: "CEO, Tech Startup",
     result: "Saved his marriage",
-    avatar: "/images/testimonials/james.jpg",
   },
   {
     quote:
@@ -70,7 +69,6 @@ export const WEBINAR_TESTIMONIALS = [
     author: "David R.",
     role: "Private Equity Partner",
     result: "Purpose score: 6 → 9",
-    avatar: "/images/testimonials/david.jpg",
   },
   {
     quote:
@@ -78,7 +76,6 @@ export const WEBINAR_TESTIMONIALS = [
     author: "Michael T.",
     role: "Real Estate Developer",
     result: "$50K coaching couldn't match it",
-    avatar: "/images/testimonials/michael.jpg",
   },
   {
     quote:
@@ -86,7 +83,6 @@ export const WEBINAR_TESTIMONIALS = [
     author: "Chris B.",
     role: "Agency Owner, 8-Figure Exit",
     result: "Present with his kids again",
-    avatar: "/images/testimonials/chris.jpg",
   },
   {
     quote:
@@ -94,7 +90,6 @@ export const WEBINAR_TESTIMONIALS = [
     author: "Andrew M.",
     role: "Serial Entrepreneur",
     result: "Score: 23 → 41 in 45 days",
-    avatar: "/images/testimonials/andrew.jpg",
   },
 ];
 
