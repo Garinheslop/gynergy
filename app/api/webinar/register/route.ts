@@ -9,10 +9,10 @@ import { syncWebinarRegistration } from "@lib/services/ghlService";
 import { createClient } from "@lib/supabase-server";
 import { checkRateLimit, getClientIP, rateLimitHeaders } from "@lib/utils/rate-limit";
 
-// Rate limit: 5 registrations per 60 seconds per IP
+// Rate limit: 2 registrations per 5 minutes per IP
 const REGISTRATION_RATE_LIMIT = {
-  limit: 5,
-  windowSeconds: 60,
+  limit: 2,
+  windowSeconds: 300,
   prefix: "webinar-register",
 } as const;
 
@@ -125,7 +125,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { email, firstName, webinarDate, source = "landing_page" } = body;
 
-    if (!email || typeof email !== "string" || !email.includes("@")) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || typeof email !== "string" || !emailRegex.test(email)) {
       return NextResponse.json(
         { error: "Invalid email address", message: "Please enter a valid email" },
         { status: 400 }

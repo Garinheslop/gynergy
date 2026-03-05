@@ -22,7 +22,7 @@ export const WEBINAR_TITLE = "The 5 Pillars of Integrated Power";
 
 /** Webinar description */
 export const WEBINAR_DESCRIPTION =
-  "Free Live Training: Why successful men feel empty and the 10-minute practice that changes everything.";
+  "Free Live Training: Why successful people feel empty and the 10-minute practice that changes everything.";
 
 /** Start time in ISO 8601 with timezone offset */
 export const WEBINAR_START_ISO = "2026-03-18T17:30:00-07:00";
@@ -43,10 +43,10 @@ export const WEBINAR_MAX_SEATS = 100;
 /** Start date as Date object */
 export const WEBINAR_START_DATE = new Date(WEBINAR_START_ISO);
 
-/** Just the date portion: "2026-03-03" */
+/** Just the date portion: "2026-03-18" */
 export const WEBINAR_DATE_ONLY = WEBINAR_START_ISO.split("T")[0];
 
-/** Human-readable date: "March 3, 2026" */
+/** Human-readable date: "March 18, 2026" */
 export const WEBINAR_DATE_DISPLAY = WEBINAR_START_DATE.toLocaleDateString("en-US", {
   month: "long",
   day: "numeric",
@@ -82,5 +82,5 @@ export const WEBINAR_DATE_SHORT = (() => {
   return `${month} ${day}${suffix}`;
 })();
 
-/** Full display: "March 3, 2026 @ 5:30pm PST" */
+/** Full display: "March 18, 2026 @ 5:30 PM PDT" */
 export const WEBINAR_FULL_DISPLAY = `${WEBINAR_DATE_DISPLAY} @ ${WEBINAR_TIME_DISPLAY}`;

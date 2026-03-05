@@ -9,7 +9,7 @@ import { authenticatePage, AGENT_PRIMARY } from "./helpers/auth";
 // Complements webinar.spec.ts which covers landing + registration.
 
 const SCREENSHOT_DIR = "test-results/webinar-flows";
-const TEST_SLUG = "five-pillars-march-2026";
+const TEST_SLUG = "five-pillars-march-18-2026";
 const NONEXISTENT_SLUG = "nonexistent-webinar-xyz-999";
 
 // Helper: wait until the page has meaningful content (not just a spinner)

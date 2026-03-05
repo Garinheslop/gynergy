@@ -70,48 +70,56 @@ export default function WebinarLandingPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleRegister = useCallback(async (email: string, firstName?: string) => {
-    setRegistrationLoading(true);
-    try {
-      const response = await fetch("/api/webinar/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          firstName,
-          webinarDate: WEBINAR_HERO_CONTENT.eventDate.toISOString(),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
+  const handleRegister = useCallback(
+    async (email: string, firstName?: string) => {
+      if (seatsData.isFull) {
+        toast.error("This webinar has reached capacity. Join the waitlist for the next one.");
+        return;
       }
 
-      if (data.alreadyRegistered) {
-        toast.success("You're already registered! Check your inbox for the confirmation email.");
-      } else {
-        toast.success(
-          "Seat saved! Confirmation email sent — check your inbox for calendar details."
-        );
-
-        // Fire pixel Lead event (Meta + Google)
-        trackPixelEvent("Lead", {
-          content_name: "Webinar Registration",
-          content_category: "webinar",
+      setRegistrationLoading(true);
+      try {
+        const response = await fetch("/api/webinar/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            firstName,
+            webinarDate: WEBINAR_HERO_CONTENT.eventDate.toISOString(),
+          }),
         });
-      }
 
-      // Redirect to assessment
-      globalThis.location.href = "/assessment";
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Registration failed. Please try again.";
-      toast.error(message);
-      setRegistrationLoading(false);
-    }
-  }, []);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Registration failed");
+        }
+
+        if (data.alreadyRegistered) {
+          toast.success("You're already registered! Check your inbox for the confirmation email.");
+        } else {
+          toast.success(
+            "Seat saved! Confirmation email sent — check your inbox for calendar details."
+          );
+
+          // Fire pixel Lead event (Meta + Google)
+          trackPixelEvent("Lead", {
+            content_name: "Webinar Registration",
+            content_category: "webinar",
+          });
+        }
+
+        // Redirect to assessment
+        globalThis.location.href = "/assessment";
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Registration failed. Please try again.";
+        toast.error(message);
+        setRegistrationLoading(false);
+      }
+    },
+    [seatsData.isFull]
+  );
 
   const handleScrollToRegister = useCallback(() => {
     const registerSection = document.getElementById("register");
@@ -197,14 +205,11 @@ export default function WebinarLandingPage() {
         </p>
       </footer>
 
-      {/* Exit Intent Popup - Webinar variant */}
+      {/* Exit Intent Popup — redirects to assessment (no email required) */}
       <ExitIntentPopup
         variant="webinar"
         isOpen={showPopup}
         onClose={closePopup}
-        onSubmit={async (email) => {
-          await handleRegister(email);
-        }}
         redirectOnSubmit="/assessment"
       />
     </div>

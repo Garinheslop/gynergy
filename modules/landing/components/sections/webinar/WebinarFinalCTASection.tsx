@@ -118,6 +118,8 @@ export default function WebinarFinalCTASection({
               />
               <input
                 type="email"
+                inputMode="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
@@ -144,6 +146,7 @@ export default function WebinarFinalCTASection({
               className="hidden"
               tabIndex={-1}
               autoComplete="off"
+              aria-hidden="true"
             />
 
             <CTAButton
