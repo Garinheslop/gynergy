@@ -10,12 +10,14 @@ interface LandingNavProps {
   seatsRemaining?: number;
   onEnrollClick: () => void;
   isLoading?: boolean;
+  ctaText?: string;
 }
 
 export default function LandingNav({
   seatsRemaining = 7,
   onEnrollClick,
   isLoading = false,
+  ctaText = "Enroll Now",
 }: LandingNavProps) {
   const [scrolled, setScrolled] = useState(false);
 
@@ -65,20 +67,21 @@ export default function LandingNav({
           Sign In
         </Link>
 
-        {/* CTA Button */}
+        {/* CTA Button — min 44px touch target for mobile */}
         <button
           onClick={onEnrollClick}
           disabled={isLoading}
+          aria-busy={isLoading || undefined}
           className={cn(
             "font-oswald text-xs font-medium tracking-widest uppercase",
-            "px-4 py-2.5 md:px-6 md:py-3",
+            "min-h-[44px] px-5 py-3 md:px-6 md:py-3",
             "bg-lp-gold text-lp-black",
             "transition-all duration-300",
             "hover:bg-lp-gold-light",
             "disabled:cursor-not-allowed disabled:opacity-60"
           )}
         >
-          {isLoading ? "Loading..." : "Enroll Now"}
+          {isLoading ? "Loading..." : ctaText}
         </button>
       </div>
     </nav>

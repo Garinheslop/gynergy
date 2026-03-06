@@ -341,7 +341,7 @@ test.describe("Webinar Assessment Integration", () => {
 test.describe("Webinar Join Flow", () => {
   test("17 - Join page redirects without valid registration", async ({ page }) => {
     // Attempt to access a webinar join page directly
-    const response = await page.goto("/webinar/join/five-pillars-march-2026");
+    const response = await page.goto("/webinar/join/five-pillars-march-18-2026");
 
     await page.waitForTimeout(2000);
     await page.screenshot({

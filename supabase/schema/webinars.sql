@@ -374,7 +374,60 @@ ALTER PUBLICATION supabase_realtime ADD TABLE webinar_chat;
 ALTER PUBLICATION supabase_realtime ADD TABLE webinar_qa;
 
 -- ============================================
--- SEED DATA (March 3rd Webinar)
+-- RPC: Atomic seat registration (prevents race condition)
+-- ============================================
+-- Uses advisory lock keyed on webinar date to serialize
+-- concurrent registrations and enforce seat capacity.
+
+CREATE OR REPLACE FUNCTION register_webinar_seat(
+  p_email TEXT,
+  p_first_name TEXT,
+  p_webinar_date DATE,
+  p_source TEXT DEFAULT 'landing_page',
+  p_max_seats INTEGER DEFAULT 100
+)
+RETURNS JSONB AS $$
+DECLARE
+  v_count INTEGER;
+  v_existing_id UUID;
+  v_new_id UUID;
+  v_lock_key BIGINT;
+BEGIN
+  -- Generate a lock key from the webinar date
+  v_lock_key := hashtext(p_webinar_date::TEXT);
+
+  -- Check for existing registration (no lock needed)
+  SELECT id INTO v_existing_id
+  FROM webinar_registrations
+  WHERE email = p_email AND webinar_date = p_webinar_date;
+
+  IF v_existing_id IS NOT NULL THEN
+    RETURN jsonb_build_object('id', v_existing_id, 'already_registered', true, 'is_full', false);
+  END IF;
+
+  -- Acquire advisory lock for this webinar date (released at txn end)
+  PERFORM pg_advisory_xact_lock(v_lock_key);
+
+  -- Count current registrations (serialized by lock)
+  SELECT COUNT(*) INTO v_count
+  FROM webinar_registrations
+  WHERE webinar_date = p_webinar_date;
+
+  IF v_count >= p_max_seats THEN
+    RETURN jsonb_build_object('id', NULL, 'already_registered', false, 'is_full', true);
+  END IF;
+
+  -- Insert new registration
+  INSERT INTO webinar_registrations (email, first_name, webinar_date, source, registered_at)
+  VALUES (p_email, p_first_name, p_webinar_date, p_source, NOW())
+  RETURNING id INTO v_new_id;
+
+  RETURN jsonb_build_object('id', v_new_id, 'already_registered', false, 'is_full', false);
+END;
+$$ LANGUAGE plpgsql;
+
+-- ============================================
+-- SEED DATA (March 18th Webinar)
 -- ============================================
 
 INSERT INTO webinars (
@@ -392,9 +445,9 @@ INSERT INTO webinars (
 ) VALUES (
   'The 5 Pillars of Integrated Power',
   'Free Live Training: Why successful men feel empty and the 10-minute practice that changes everything.',
-  'five-pillars-march-2026',
-  '2026-03-03 17:30:00-08',
-  '2026-03-03 19:00:00-08',
+  'five-pillars-march-18-2026',
+  '2026-03-18 17:30:00-07',
+  '2026-03-18 19:00:00-07',
   'scheduled',
   500,
   true,

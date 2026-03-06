@@ -189,7 +189,7 @@ export default function WebinarVideo({
 
                 {/* Pillar indicators */}
                 <div className="mt-6 flex items-center gap-3">
-                  {["Wealth", "Health", "Relationships", "Growth", "Purpose"].map((pillar) => (
+                  {["Health", "Relationships", "Wealth", "Mindset", "Legacy"].map((pillar) => (
                     <div key={pillar} className="group/pillar flex flex-col items-center">
                       <PillarIcon className="text-lp-gold/40 group-hover/pillar:text-lp-gold h-4 w-4 transition-colors" />
                       <span className="font-oswald text-lp-muted mt-1 text-[8px] font-extralight tracking-wider uppercase opacity-0 transition-opacity group-hover/pillar:opacity-100">
@@ -215,6 +215,7 @@ export default function WebinarVideo({
       {state === "playing" && videoId && (
         <>
           <iframe
+            key={isMuted ? "muted" : "unmuted"}
             src={getEmbedUrl()}
             className="absolute inset-0 h-full w-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

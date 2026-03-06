@@ -117,6 +117,20 @@ export async function POST(request: Request) {
         time_to_complete_seconds,
       };
 
+      // Check for previous assessment to mark as retake
+      const { data: previousAssessment } = await supabase
+        .from("assessment_results")
+        .select("id")
+        .eq("email", normalizedEmail)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (previousAssessment) {
+        (insertData as Record<string, unknown>).is_retake = true;
+        (insertData as Record<string, unknown>).previous_assessment_id = previousAssessment.id;
+      }
+
       const { error } = await supabase.from("assessment_results").insert(insertData);
 
       if (error) {

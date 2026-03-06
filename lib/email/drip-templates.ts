@@ -1191,6 +1191,318 @@ See Your Habit Master Badge: ${APP_URL}/dashboard
 — Garin`,
   }),
 
+  // ============================
+  // ASSESSMENT LONG NURTURE (PR 2)
+  // ============================
+
+  assessment_case_study: (meta) => {
+    const lowestPillar = meta.lowest_pillar || "their weakest area";
+
+    return {
+      subject: `He scored a 3.2 on ${lowestPillar}. Here's what happened.`,
+      html: emailWrapper(`
+        <h1>From 3.2 to 7.8 in 45 Days</h1>
+        <p>Hey${meta.firstName ? ` ${meta.firstName}` : ""},</p>
+        <p>A month ago, a man named Marcus took the same Five Pillar Assessment you did.</p>
+        <p>His <span class="highlight">${lowestPillar}</span> score was a 3.2. He was successful by every external measure — but that one pillar was dragging everything else down.</p>
+        <p>He joined the 45-Day Awakening Challenge. By Day 21, his ${lowestPillar} score had jumped to 5.9. By Day 45, it was 7.8.</p>
+        <div class="quote-box">
+          <p>"I didn't realize how much one weak pillar was costing me in every other area. When ${lowestPillar} came up, everything changed." — Marcus R.</p>
+        </div>
+        <p>Your assessment results are still saved. Want to see how your journey could look?</p>
+        <div style="text-align: center;">
+          <a href="${APP_URL}/pricing" class="button">See the Challenge</a>
+        </div>
+        <div class="divider"></div>
+        <p style="color: #7dd3c0;">— Garin</p>
+      `),
+      text: `From 3.2 to 7.8 in 45 Days
+
+Hey${meta.firstName ? ` ${meta.firstName}` : ""},
+
+A man named Marcus took the same Five Pillar Assessment you did. His ${lowestPillar} score was a 3.2.
+
+He joined the 45-Day Awakening Challenge. By Day 21, his score jumped to 5.9. By Day 45, it was 7.8.
+
+"I didn't realize how much one weak pillar was costing me in every other area." — Marcus R.
+
+Your assessment results are still saved.
+
+See the Challenge: ${APP_URL}/pricing
+
+— Garin`,
+    };
+  },
+
+  assessment_pillar_deep_dive: (meta) => {
+    const lowestPillar = meta.lowest_pillar || "your lowest area";
+
+    return {
+      subject: `Why your ${lowestPillar} score matters more than you think`,
+      html: emailWrapper(`
+        <h1>The Multiplier You're Missing</h1>
+        <p>Hey${meta.firstName ? ` ${meta.firstName}` : ""},</p>
+        <p>You scored well on most pillars. But your <span class="highlight">${capitalize(lowestPillar)}</span> score? That's the one that's dividing everything else.</p>
+        <p>Here's how multiplication works in life:</p>
+        <div class="stat-box">
+          <div class="stat-value">9 × 8 × 3 × 7 × 2</div>
+          <div class="stat-label">A "3" doesn't subtract. It divides.</div>
+        </div>
+        <p>You can be a 9 in Wealth and an 8 in Health. But if ${capitalize(lowestPillar)} is a 3, your life quality doesn't average out — it fractures.</p>
+        <p>The 45-Day Challenge targets all five pillars systematically. Morning and evening. With accountability.</p>
+        <div style="text-align: center;">
+          <a href="${APP_URL}/pricing" class="button">Fix the Multiplier</a>
+        </div>
+        <div class="divider"></div>
+        <p style="color: #7dd3c0;">— Garin</p>
+      `),
+      text: `The Multiplier You're Missing
+
+Hey${meta.firstName ? ` ${meta.firstName}` : ""},
+
+You scored well on most pillars. But your ${capitalize(lowestPillar)} score? That's the one that's dividing everything else.
+
+9 × 8 × 3 × 7 × 2 — A "3" doesn't subtract. It divides.
+
+The 45-Day Challenge targets all five pillars systematically.
+
+Fix the Multiplier: ${APP_URL}/pricing
+
+— Garin`,
+    };
+  },
+
+  assessment_webinar_invite: (meta) => ({
+    subject: "I'm hosting a live training this month",
+    html: emailWrapper(`
+      <h1>Free Live Training</h1>
+      <p>Hey${meta.firstName ? ` ${meta.firstName}` : ""},</p>
+      <p>You took the Five Pillar Assessment. You saw where you stand.</p>
+      <p>Now I want to show you <span class="highlight">the exact framework</span> I use to help men close the gap between where they are and where they want to be.</p>
+      <p>I'm hosting a free live training: <strong style="color: #fff;">The 5 Pillars of Integrated Power</strong></p>
+      <p>In 90 minutes, I'll walk through:</p>
+      <p>• Why successful men feel empty (and what the research actually says)<br>
+      • The Five Pillar multiplication effect (and why one low score ruins everything)<br>
+      • The 10-minute daily practice that changes the trajectory</p>
+      <div style="text-align: center;">
+        <a href="${APP_URL}/webinar" class="button">Reserve Your Seat</a>
+      </div>
+      <p style="font-size: 14px; color: #666;">100 seats. No replay for non-attendees.</p>
+      <div class="divider"></div>
+      <p style="color: #7dd3c0;">— Garin</p>
+    `),
+    text: `Free Live Training
+
+Hey${meta.firstName ? ` ${meta.firstName}` : ""},
+
+You took the Five Pillar Assessment. Now I want to show you the exact framework I use to help men close the gap.
+
+I'm hosting a free live training: The 5 Pillars of Integrated Power
+
+In 90 minutes, I'll walk through:
+- Why successful men feel empty
+- The Five Pillar multiplication effect
+- The 10-minute daily practice that changes the trajectory
+
+Reserve Your Seat: ${APP_URL}/webinar
+
+100 seats. No replay for non-attendees.
+
+— Garin`,
+  }),
+
+  assessment_retake_cta: (meta) => ({
+    subject: "Has your score changed?",
+    html: emailWrapper(`
+      <h1>Time for a Re-Check</h1>
+      <p>Hey${meta.firstName ? ` ${meta.firstName}` : ""},</p>
+      <p>It's been a couple of weeks since you took the Five Pillar Assessment.</p>
+      <p>A lot can shift in that time — conversations with your partner, decisions at work, moments of clarity at 2am.</p>
+      <p>Your original score was <span class="highlight">${meta.score || "saved"}</span>. Want to see if anything's moved?</p>
+      <div style="text-align: center;">
+        <a href="${APP_URL}/assessment" class="button">Retake the Assessment</a>
+      </div>
+      <p style="font-size: 14px; color: #888;">Takes 2 minutes. We'll show you a side-by-side comparison.</p>
+      <div class="divider"></div>
+      <p style="color: #7dd3c0;">— Garin</p>
+    `),
+    text: `Time for a Re-Check
+
+Hey${meta.firstName ? ` ${meta.firstName}` : ""},
+
+It's been a couple of weeks since you took the Five Pillar Assessment.
+
+Your original score was ${meta.score || "saved"}. Want to see if anything's moved?
+
+Retake the Assessment: ${APP_URL}/assessment
+
+Takes 2 minutes. We'll show you a side-by-side comparison.
+
+— Garin`,
+  }),
+
+  assessment_final_offer: (meta) => ({
+    subject: "The next cohort starts soon. 3 spots left.",
+    html: emailWrapper(`
+      <h1>This Is the Last Email</h1>
+      <p>Hey${meta.firstName ? ` ${meta.firstName}` : ""},</p>
+      <p>You took the Five Pillar Assessment three weeks ago. Your score was <span class="highlight">${meta.score || "clear"}</span>.</p>
+      <p>Since then, the next cohort of the 45-Day Awakening Challenge has been filling up.</p>
+      <div class="stat-box">
+        <div class="stat-value">3</div>
+        <div class="stat-label">spots remaining in the next cohort</div>
+      </div>
+      <p>I'm not going to pressure you. You already know what you need to know:</p>
+      <p>• Your assessment showed you the gaps<br>
+      • The challenge addresses all five pillars systematically<br>
+      • 15 men per cohort, maximum</p>
+      <p>If you're ready, the seat is yours. If not, no hard feelings — your assessment results will always be there when you are.</p>
+      <div style="text-align: center;">
+        <a href="${APP_URL}/pricing" class="button">Claim Your Seat — $997</a>
+      </div>
+      <div class="divider"></div>
+      <p style="color: #7dd3c0;">— Garin</p>
+    `),
+    text: `This Is the Last Email
+
+Hey${meta.firstName ? ` ${meta.firstName}` : ""},
+
+You took the Five Pillar Assessment three weeks ago. Your score was ${meta.score || "clear"}.
+
+The next cohort of the 45-Day Awakening Challenge has been filling up. 3 spots remaining.
+
+Your assessment showed you the gaps. The challenge addresses all five pillars. 15 men per cohort, maximum.
+
+If you're ready, the seat is yours.
+
+Claim Your Seat — $997: ${APP_URL}/pricing
+
+— Garin`,
+  }),
+
+  // ============================
+  // WEBINAR MISSED / NO-SHOW DRIP (PR 3)
+  // ============================
+
+  webinar_missed_replay: (meta) => ({
+    subject: "Watch the replay before it expires",
+    html: emailWrapper(`
+      <h1>You Missed It. But Not Entirely.</h1>
+      <p>Hey${meta.firstName ? ` ${meta.firstName}` : ""},</p>
+      <p>You registered for <span class="highlight">${meta.webinarTitle || "The 5 Pillars of Integrated Power"}</span> but weren't able to make it live.</p>
+      <p>I get it. Life happens. But the content doesn't wait.</p>
+      <p>I'm keeping the replay available for <strong style="color: #fff;">48 hours only</strong>. After that, it's gone — no YouTube upload, no podcast version.</p>
+      <p>Here's what you'll learn in 90 minutes:</p>
+      <p>• Why successful men feel empty — and what the science says<br>
+      • The Five Pillar multiplication effect<br>
+      • The 10-minute practice that changes everything</p>
+      <div style="text-align: center;">
+        <a href="${APP_URL}/webinar/replay" class="button">Watch the Replay</a>
+      </div>
+      <p style="font-size: 14px; color: #666;">Expires in 48 hours. No extensions.</p>
+      <div class="divider"></div>
+      <p style="color: #7dd3c0;">— Garin</p>
+    `),
+    text: `You Missed It. But Not Entirely.
+
+Hey${meta.firstName ? ` ${meta.firstName}` : ""},
+
+You registered for ${meta.webinarTitle || "The 5 Pillars of Integrated Power"} but weren't able to make it live.
+
+I'm keeping the replay available for 48 hours only.
+
+What you'll learn:
+- Why successful men feel empty
+- The Five Pillar multiplication effect
+- The 10-minute practice that changes everything
+
+Watch the Replay: ${APP_URL}/webinar/replay
+
+Expires in 48 hours. No extensions.
+
+— Garin`,
+  }),
+
+  webinar_missed_key_takeaway: (meta) => ({
+    subject: "The one thing every man in the room realized",
+    html: emailWrapper(`
+      <h1>What the Room Realized</h1>
+      <p>Hey${meta.firstName ? ` ${meta.firstName}` : ""},</p>
+      <p>During <span class="highlight">${meta.webinarTitle || "yesterday's training"}</span>, there was a moment where the whole room went quiet.</p>
+      <p>I showed them the multiplication equation:</p>
+      <div class="stat-box">
+        <div class="stat-value">9 × 8 × 3 × 7 × 2</div>
+        <div class="stat-label">One low pillar divides everything</div>
+      </div>
+      <p>Every man realized the same thing: <strong style="color: #fff;">their success isn't adding up because one area is dividing everything.</strong></p>
+      <p>It's not a motivation problem. It's a multiplication problem. And it has a specific fix.</p>
+      <div style="text-align: center;">
+        <a href="${APP_URL}/assessment" class="button">Find Your Multiplier</a>
+      </div>
+      <p style="font-size: 14px; color: #888;">Take the 2-minute Five Pillar Assessment and see which number is holding you back.</p>
+      <div class="divider"></div>
+      <p style="color: #7dd3c0;">— Garin</p>
+    `),
+    text: `What the Room Realized
+
+Hey${meta.firstName ? ` ${meta.firstName}` : ""},
+
+During ${meta.webinarTitle || "yesterday's training"}, there was a moment where the room went quiet.
+
+I showed them the multiplication equation: 9 × 8 × 3 × 7 × 2
+
+Every man realized: their success isn't adding up because one area is dividing everything.
+
+It's not a motivation problem. It's a multiplication problem.
+
+Find Your Multiplier: ${APP_URL}/assessment
+
+Take the 2-minute Five Pillar Assessment.
+
+— Garin`,
+  }),
+
+  webinar_missed_next_training: (meta) => ({
+    subject: "Next live training — don't miss this one",
+    html: emailWrapper(`
+      <h1>Another Chance</h1>
+      <p>Hey${meta.firstName ? ` ${meta.firstName}` : ""},</p>
+      <p>You missed <span class="highlight">${meta.webinarTitle || "the last training"}</span>. That's okay — but I don't want you to miss the next one.</p>
+      <p>I'm hosting another live session soon. Same format:</p>
+      <p>• 90 minutes, live with Q&A<br>
+      • The Five Pillar framework explained<br>
+      • Real case studies from the last cohort<br>
+      • How to know if the Challenge is right for you</p>
+      <p>100 seats only. Last time filled up 3 days early.</p>
+      <div style="text-align: center;">
+        <a href="${APP_URL}/webinar" class="button">Save Your Seat</a>
+      </div>
+      <div class="divider"></div>
+      <p>If you've already decided and want to skip the training:</p>
+      <p style="text-align: center;"><a href="${APP_URL}/pricing" style="color: #7dd3c0; text-decoration: underline;">Go straight to enrollment →</a></p>
+      <div class="divider"></div>
+      <p style="color: #7dd3c0;">— Garin</p>
+    `),
+    text: `Another Chance
+
+Hey${meta.firstName ? ` ${meta.firstName}` : ""},
+
+You missed ${meta.webinarTitle || "the last training"}. I don't want you to miss the next one.
+
+Another live session is coming:
+- 90 minutes, live with Q&A
+- The Five Pillar framework explained
+- Real case studies from the last cohort
+
+100 seats only.
+
+Save Your Seat: ${APP_URL}/webinar
+
+Already decided? Go straight to enrollment: ${APP_URL}/pricing
+
+— Garin`,
+  }),
+
   bridge_choose_path: (meta) => ({
     subject: "Choose your next chapter",
     html: emailWrapper(`

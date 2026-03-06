@@ -68,13 +68,19 @@ export default function WebinarBonusSection() {
 
               {/* Pillar Preview */}
               <div className="space-y-3">
-                {["Wealth", "Health", "Relationships", "Growth", "Purpose"].map((pillar) => (
-                  <div key={pillar} className="flex items-center gap-3">
-                    <span className="font-oswald text-lp-gray w-24 text-xs">{pillar}</span>
+                {[
+                  { name: "Health", width: 65 },
+                  { name: "Relationships", width: 40 },
+                  { name: "Wealth", width: 55 },
+                  { name: "Mindset", width: 30 },
+                  { name: "Legacy", width: 70 },
+                ].map((pillar) => (
+                  <div key={pillar.name} className="flex items-center gap-3">
+                    <span className="font-oswald text-lp-gray w-24 text-xs">{pillar.name}</span>
                     <div className="bg-lp-border relative h-2 flex-1 overflow-hidden">
                       <div
                         className="bg-lp-gold/40 absolute top-0 left-0 h-full"
-                        style={{ width: `${Math.random() * 60 + 20}%` }}
+                        style={{ width: `${pillar.width}%` }}
                       />
                     </div>
                     <span className="font-bebas text-lp-gold w-4 text-right text-sm">?</span>

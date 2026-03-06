@@ -80,6 +80,8 @@ export default function WebinarRegisterSection({
             />
             <input
               type="email"
+              inputMode="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
@@ -106,6 +108,7 @@ export default function WebinarRegisterSection({
             className="hidden"
             tabIndex={-1}
             autoComplete="off"
+            aria-hidden="true"
           />
 
           <CTAButton

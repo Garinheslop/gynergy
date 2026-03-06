@@ -32,7 +32,7 @@ export const WEBINAR_LEARN_CONTENT: WebinarLearnContent = {
     {
       title: "Your Five Pillar Score",
       description:
-        "The brutal self-audit that shows you exactly which pillar is bleeding. Most men are shocked by their number.",
+        "The brutal self-audit that shows you exactly which pillar is bleeding. Most people are shocked by their number.",
     },
     {
       title: "The Emptiness Equation",
@@ -62,7 +62,6 @@ export const WEBINAR_TESTIMONIALS = [
     author: "James K.",
     role: "CEO, Tech Startup",
     result: "Saved his marriage",
-    avatar: "/images/testimonials/james.jpg",
   },
   {
     quote:
@@ -70,7 +69,6 @@ export const WEBINAR_TESTIMONIALS = [
     author: "David R.",
     role: "Private Equity Partner",
     result: "Purpose score: 6 → 9",
-    avatar: "/images/testimonials/david.jpg",
   },
   {
     quote:
@@ -78,7 +76,6 @@ export const WEBINAR_TESTIMONIALS = [
     author: "Michael T.",
     role: "Real Estate Developer",
     result: "$50K coaching couldn't match it",
-    avatar: "/images/testimonials/michael.jpg",
   },
   {
     quote:
@@ -86,7 +83,6 @@ export const WEBINAR_TESTIMONIALS = [
     author: "Chris B.",
     role: "Agency Owner, 8-Figure Exit",
     result: "Present with his kids again",
-    avatar: "/images/testimonials/chris.jpg",
   },
   {
     quote:
@@ -94,7 +90,6 @@ export const WEBINAR_TESTIMONIALS = [
     author: "Andrew M.",
     role: "Serial Entrepreneur",
     result: "Score: 23 → 41 in 45 days",
-    avatar: "/images/testimonials/andrew.jpg",
   },
 ];
 
@@ -108,12 +103,12 @@ export const WEBINAR_SCARCITY_CONTENT: WebinarScarcityContent = {
 export const WEBINAR_ASSESSMENT_BONUS = {
   headline: "INSTANT BONUS",
   title: "The Five Pillar Self-Assessment",
-  subtitle: "The Brutal Self-Audit That Made Grown Men Question Everything",
+  subtitle: "The Brutal Self-Audit That Made High Achievers Question Everything",
   description:
     "The moment you register, you'll take the same 5-question assessment that every member completes before Day 1. It takes 2 minutes. The number will haunt you until the webinar.",
   features: [
     "Know your exact score before we meet",
-    "See which pillar is bleeding (most men guess wrong)",
+    "See which pillar is bleeding (most people guess wrong)",
     "Bring your number to the live training",
   ],
   cta: "Your score is waiting",
@@ -122,7 +117,7 @@ export const WEBINAR_ASSESSMENT_BONUS = {
 // Dream outcome section
 export const WEBINAR_DREAM_OUTCOME = {
   headline: "Stop Building Empires That Feel Like Prisons",
-  subheadline: "This Webinar Is For Men Who:",
+  subheadline: "This Webinar Is For People Who:",
   outcomes: [
     "Built everything and feel nothing",
     "Win in public but feel empty in private",

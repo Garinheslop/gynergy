@@ -211,11 +211,13 @@ export async function sendWebinarConfirmationEmail(params: {
     year: "numeric",
     month: "long",
     day: "numeric",
+    timeZone: "America/Los_Angeles",
   };
   const timeOptions: Intl.DateTimeFormatOptions = {
     hour: "numeric",
     minute: "2-digit",
     timeZoneName: "short",
+    timeZone: "America/Los_Angeles",
   };
 
   const formattedDate = webinarDate.toLocaleDateString("en-US", dateOptions);
@@ -403,6 +405,7 @@ export async function sendWebinarReminderEmail(params: {
     hour: "numeric",
     minute: "2-digit",
     timeZoneName: "short",
+    timeZone: "America/Los_Angeles",
   };
   const formattedTime = webinarDate.toLocaleTimeString("en-US", timeOptions);
 

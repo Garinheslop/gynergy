@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     siteName: "GYNERGY",
     images: [
       {
-        url: "https://www.gynergy.app/images/og-webinar.jpg",
+        url: "https://www.gynergy.app/images/meta-image.jpg",
         width: 1200,
         height: 630,
         alt: "The 5 Pillars of Integrated Power - Free Live Training",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     title: "The 5 Pillars of Integrated Power | Free Live Training",
     description:
       "Why successful men feel empty — and the one equation that changes everything. Free live training.",
-    images: ["https://www.gynergy.app/images/og-webinar.jpg"],
+    images: ["https://www.gynergy.app/images/meta-image.jpg"],
   },
   robots: {
     index: true,
@@ -93,7 +93,7 @@ const eventSchema = {
     availability: "https://schema.org/LimitedAvailability",
     validFrom: "2026-01-01T00:00:00-08:00",
   },
-  image: "https://www.gynergy.app/images/og-webinar.jpg",
+  image: "https://www.gynergy.app/images/meta-image.jpg",
 };
 
 export default function WebinarPage() {

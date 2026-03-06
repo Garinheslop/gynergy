@@ -72,7 +72,7 @@ async function deployWebinarSchema() {
     const webinar = await sql`
       SELECT id, title, slug, scheduled_start, status
       FROM webinars
-      WHERE slug = 'five-pillars-march-2026'
+      WHERE slug = 'five-pillars-march-18-2026'
       LIMIT 1
     `;
 

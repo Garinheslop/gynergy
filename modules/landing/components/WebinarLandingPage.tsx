@@ -1,18 +1,25 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useState } from "react";
-
-import dynamic from "next/dynamic";
+import { useCallback, useEffect, useState } from "react";
 
 import toast from "react-hot-toast";
 
+import { trackPixelEvent } from "@lib/utils/analytics";
 import { cn } from "@lib/utils/style";
 import { SectionErrorBoundary } from "@modules/common/components/ErrorBoundary";
 
 import { LandingNav, ExitIntentPopup } from "./shared";
 import { WEBINAR_HERO_CONTENT } from "../data/webinar-content";
 import { useExitIntent } from "../hooks/useExitIntent";
-import { WebinarHeroSection } from "./sections/webinar";
+import {
+  WebinarHeroSection,
+  WebinarLearnSection,
+  WebinarValueStackSection,
+  WebinarProofSection,
+  WebinarBonusSection,
+  WebinarRegisterSection,
+  WebinarFinalCTASection,
+} from "./sections/webinar";
 
 interface SeatsData {
   seatsRemaining: number;
@@ -20,28 +27,7 @@ interface SeatsData {
   isFull: boolean;
 }
 
-// Dynamic imports for below-fold sections
-const WebinarLearnSection = dynamic(() => import("./sections/webinar/WebinarLearnSection"), {
-  ssr: true,
-});
-const WebinarValueStackSection = dynamic(
-  () => import("./sections/webinar/WebinarValueStackSection"),
-  { ssr: true }
-);
-const WebinarProofSection = dynamic(() => import("./sections/webinar/WebinarProofSection"), {
-  ssr: true,
-});
-const WebinarBonusSection = dynamic(() => import("./sections/webinar/WebinarBonusSection"), {
-  ssr: true,
-});
-const WebinarRegisterSection = dynamic(() => import("./sections/webinar/WebinarRegisterSection"), {
-  ssr: true,
-});
-const WebinarFinalCTASection = dynamic(() => import("./sections/webinar/WebinarFinalCTASection"), {
-  ssr: true,
-});
-
-function WebinarLandingPageContent() {
+export default function WebinarLandingPage() {
   const [registrationLoading, setRegistrationLoading] = useState(false);
   const [seatsData, setSeatsData] = useState<SeatsData>({
     seatsRemaining: WEBINAR_HERO_CONTENT.seatsRemaining,
@@ -49,6 +35,14 @@ function WebinarLandingPageContent() {
     isFull: false,
   });
   const { showPopup, closePopup } = useExitIntent({ threshold: 0, delay: 100 });
+
+  // Track page view on mount
+  useEffect(() => {
+    trackPixelEvent("ViewContent", {
+      content_name: "Webinar Landing Page",
+      content_category: "webinar",
+    });
+  }, []);
 
   // Fetch dynamic seat count on mount
   useEffect(() => {
@@ -71,47 +65,61 @@ function WebinarLandingPageContent() {
     };
 
     fetchSeats();
-    // Refresh every 30 seconds for real-time urgency
-    const interval = setInterval(fetchSeats, 30000);
+    // Refresh every 2 minutes (balances urgency vs server load at scale)
+    const interval = setInterval(fetchSeats, 120000);
     return () => clearInterval(interval);
   }, []);
 
-  const handleRegister = useCallback(async (email: string, firstName?: string) => {
-    setRegistrationLoading(true);
-    try {
-      const response = await fetch("/api/webinar/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          firstName,
-          webinarDate: WEBINAR_HERO_CONTENT.eventDate.toISOString(),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
+  const handleRegister = useCallback(
+    async (email: string, firstName?: string) => {
+      if (seatsData.isFull) {
+        toast.error("This webinar has reached capacity. Join the waitlist for the next one.");
+        return;
       }
 
-      if (data.alreadyRegistered) {
-        toast.success("You're already registered! Check your inbox for the confirmation email.");
-      } else {
-        toast.success(
-          "Seat saved! Confirmation email sent — check your inbox for calendar details."
-        );
-      }
+      setRegistrationLoading(true);
+      try {
+        const response = await fetch("/api/webinar/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            firstName,
+            webinarDate: WEBINAR_HERO_CONTENT.eventDate.toISOString(),
+          }),
+        });
 
-      // Redirect to assessment
-      globalThis.location.href = "/assessment";
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Registration failed. Please try again.";
-      toast.error(message);
-      setRegistrationLoading(false);
-    }
-  }, []);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Registration failed");
+        }
+
+        if (data.alreadyRegistered) {
+          toast.success("You're already registered! Check your inbox for the confirmation email.");
+        } else {
+          toast.success(
+            "Seat saved! Confirmation email sent — check your inbox for calendar details."
+          );
+
+          // Fire pixel Lead event (Meta + Google)
+          trackPixelEvent("Lead", {
+            content_name: "Webinar Registration",
+            content_category: "webinar",
+          });
+        }
+
+        // Redirect to assessment
+        globalThis.location.href = "/assessment";
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Registration failed. Please try again.";
+        toast.error(message);
+        setRegistrationLoading(false);
+      }
+    },
+    [seatsData.isFull]
+  );
 
   const handleScrollToRegister = useCallback(() => {
     const registerSection = document.getElementById("register");
@@ -141,6 +149,7 @@ function WebinarLandingPageContent() {
         seatsRemaining={seatsData.seatsRemaining}
         onEnrollClick={handleScrollToRegister}
         isLoading={registrationLoading}
+        ctaText="Save My Seat"
       />
 
       {/* Hero Section - Critical */}
@@ -196,30 +205,13 @@ function WebinarLandingPageContent() {
         </p>
       </footer>
 
-      {/* Exit Intent Popup - Webinar variant */}
+      {/* Exit Intent Popup — redirects to assessment (no email required) */}
       <ExitIntentPopup
         variant="webinar"
         isOpen={showPopup}
         onClose={closePopup}
-        onSubmit={async (email) => {
-          await handleRegister(email);
-        }}
         redirectOnSubmit="/assessment"
       />
     </div>
-  );
-}
-
-export default function WebinarLandingPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="bg-lp-dark flex min-h-screen items-center justify-center">
-          <div className="border-lp-gold h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
-        </div>
-      }
-    >
-      <WebinarLandingPageContent />
-    </Suspense>
   );
 }

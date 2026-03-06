@@ -55,10 +55,10 @@ export default function CTAButton({
       onClick={onClick}
       disabled={disabled || isLoading}
       className={cn(
-        "relative inline-flex items-center justify-center gap-3",
+        "group relative inline-flex items-center justify-center gap-3",
         "font-oswald font-medium tracking-widest uppercase",
         "cursor-pointer border-none",
-        "transition-all duration-400",
+        "transition-all duration-300",
         "overflow-hidden",
         variantStyles[variant],
         sizeStyles[size],
@@ -73,7 +73,7 @@ export default function CTAButton({
           "absolute inset-0",
           "bg-gradient-to-r from-transparent via-white/20 to-transparent",
           "translate-x-[-100%]",
-          "transition-transform duration-600",
+          "transition-transform duration-500",
           "group-hover:translate-x-[100%]"
         )}
       />

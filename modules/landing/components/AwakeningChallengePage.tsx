@@ -15,6 +15,7 @@ import { createCheckoutSession, fetchEntitlements } from "@store/modules/payment
 // Critical path components - loaded eagerly
 import { HeroSection, PricingSection, FinalCTASection } from "./sections";
 import { LandingNav, StickyMobileCTA, ExitIntentPopup } from "./shared";
+import WaitlistModal from "./WaitlistModal";
 import { HERO_CONTENT } from "../data/content";
 import { useExitIntent } from "../hooks/useExitIntent";
 import type { CTAContent } from "../types";
@@ -50,6 +51,12 @@ const FAQSection = dynamic(() => import("./sections/FAQSection"), {
   ssr: true,
 });
 
+interface SeatsData {
+  seatsRemaining: number;
+  isAlmostFull: boolean;
+  isFull: boolean;
+}
+
 function AwakeningChallengePageContent() {
   const router = useRouter();
   const { session, authenticating } = useSession();
@@ -60,12 +67,46 @@ function AwakeningChallengePageContent() {
 
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [hasCheckedAccess, setHasCheckedAccess] = useState(false);
+  const [seatsData, setSeatsData] = useState<SeatsData>({
+    seatsRemaining: HERO_CONTENT.seatsRemaining,
+    isAlmostFull: false,
+    isFull: false,
+  });
+
+  // Waitlist modal (shown when cohort is full)
+  const [showWaitlist, setShowWaitlist] = useState(false);
 
   // Exit intent popup
   const { showPopup, closePopup } = useExitIntent({
     threshold: 0,
     delay: 100,
   });
+
+  // Fetch live seat count on mount
+  useEffect(() => {
+    const fetchSeats = async () => {
+      try {
+        const response = await fetch("/api/challenge/seats");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success) {
+            setSeatsData({
+              seatsRemaining: data.data.seatsRemaining,
+              isAlmostFull: data.data.isAlmostFull,
+              isFull: data.data.isFull,
+            });
+          }
+        }
+      } catch {
+        // Silently fail — use hardcoded fallback
+      }
+    };
+
+    fetchSeats();
+    // Refresh every 60 seconds for real-time urgency
+    const interval = setInterval(fetchSeats, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Fetch entitlements when logged in
   useEffect(() => {
@@ -197,7 +238,7 @@ function AwakeningChallengePageContent() {
 
       {/* Navigation */}
       <LandingNav
-        seatsRemaining={HERO_CONTENT.seatsRemaining}
+        seatsRemaining={seatsData.seatsRemaining}
         onEnrollClick={hasChallengeAccess ? handleContinue : handleScrollToPricing}
         isLoading={checkoutLoading}
       />
@@ -206,7 +247,7 @@ function AwakeningChallengePageContent() {
       <HeroSection
         cta={ctaContent}
         isLoading={checkoutLoading}
-        seatsRemaining={HERO_CONTENT.seatsRemaining}
+        seatsRemaining={seatsData.seatsRemaining}
       />
 
       {/* Below-fold sections with error boundaries */}
@@ -255,7 +296,12 @@ function AwakeningChallengePageContent() {
       </SectionErrorBoundary>
 
       {/* Pricing - Critical */}
-      <PricingSection cta={ctaContent} isLoading={checkoutLoading} />
+      <PricingSection
+        cta={ctaContent}
+        isLoading={checkoutLoading}
+        isFull={seatsData.isFull}
+        onJoinWaitlist={() => setShowWaitlist(true)}
+      />
 
       <SectionErrorBoundary sectionName="Guarantee">
         <GuaranteeSection />
@@ -289,6 +335,9 @@ function AwakeningChallengePageContent() {
       {!hasChallengeAccess && (
         <ExitIntentPopup isOpen={showPopup} onClose={closePopup} onSubmit={handleEmailCapture} />
       )}
+
+      {/* Waitlist Modal (shown when cohort is full) */}
+      <WaitlistModal isOpen={showWaitlist} onClose={() => setShowWaitlist(false)} />
     </div>
   );
 }

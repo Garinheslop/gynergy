@@ -9,6 +9,7 @@ interface CountdownTimerProps {
   onExpire?: () => void;
   className?: string;
   compact?: boolean;
+  expiredMessage?: string;
 }
 
 interface TimeBoxProps {
@@ -50,6 +51,7 @@ export default function CountdownTimer({
   onExpire,
   className,
   compact = false,
+  expiredMessage = "Event Has Ended",
 }: CountdownTimerProps) {
   const timeLeft = useCountdown(targetDate, { onExpire });
 
@@ -62,7 +64,7 @@ export default function CountdownTimer({
           className
         )}
       >
-        Challenge Has Started
+        {expiredMessage}
       </div>
     );
   }

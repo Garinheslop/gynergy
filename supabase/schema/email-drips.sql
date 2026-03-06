@@ -20,12 +20,18 @@ CREATE TABLE IF NOT EXISTS drip_campaigns (
   -- Trigger: what event starts this campaign
   trigger_event TEXT NOT NULL CHECK (trigger_event IN (
     'webinar_registered',
+    'webinar_attended',
+    'webinar_missed',
     'assessment_completed',
     'purchase_completed',
     'cart_abandoned',
     'user_inactive',
     'friend_codes_issued',
-    'community_activated'
+    'community_activated',
+    'challenge_completed_purchaser',
+    'challenge_completed_friend_code',
+    'bridge_month_started',
+    'trial_ending_soon'
   )),
 
   -- Status
@@ -323,6 +329,86 @@ BEGIN
     VALUES
       (v_community_campaign_id, 1, 1,  'Welcome to the room',               'community_welcome'),
       (v_community_campaign_id, 2, 48, 'Your first call is this week',      'community_first_call')
+    ON CONFLICT (campaign_id, sequence_order) DO NOTHING;
+  END IF;
+END $$;
+
+-- ============================================
+-- POST-WEBINAR PITCH CAMPAIGN (Added 2026-03-03)
+-- ============================================
+
+INSERT INTO drip_campaigns (name, description, trigger_event)
+VALUES (
+  'Post-Webinar Pitch',
+  '3-email conversion sequence after attending a live webinar. Recap, objection handling, then final scarcity CTA.',
+  'webinar_attended'
+) ON CONFLICT DO NOTHING;
+
+DO $$
+DECLARE
+  v_webinar_pitch_id UUID;
+BEGIN
+  SELECT id INTO v_webinar_pitch_id
+    FROM drip_campaigns WHERE trigger_event = 'webinar_attended' LIMIT 1;
+
+  IF v_webinar_pitch_id IS NOT NULL THEN
+    INSERT INTO drip_emails (campaign_id, sequence_order, delay_hours, subject, template_key)
+    VALUES
+      (v_webinar_pitch_id, 1, 24, 'The template is in your hands. Now what?',                'webinar_post_recap'),
+      (v_webinar_pitch_id, 2, 48, '"I can do this on my own"',                                'webinar_post_objection'),
+      (v_webinar_pitch_id, 3, 72, 'Last call: your Five Pillar score is still the same',      'webinar_post_final')
+    ON CONFLICT (campaign_id, sequence_order) DO NOTHING;
+  END IF;
+END $$;
+
+-- ============================================
+-- WEBINAR NO-SHOW RECOVERY CAMPAIGN (Added 2026-03-03)
+-- ============================================
+
+INSERT INTO drip_campaigns (name, description, trigger_event)
+VALUES (
+  'Webinar No-Show Recovery',
+  '3-email recovery sequence for registrants who did not attend. Replay, key takeaway, next training.',
+  'webinar_missed'
+) ON CONFLICT DO NOTHING;
+
+DO $$
+DECLARE
+  v_webinar_missed_id UUID;
+BEGIN
+  SELECT id INTO v_webinar_missed_id
+    FROM drip_campaigns WHERE trigger_event = 'webinar_missed' LIMIT 1;
+
+  IF v_webinar_missed_id IS NOT NULL THEN
+    INSERT INTO drip_emails (campaign_id, sequence_order, delay_hours, subject, template_key)
+    VALUES
+      (v_webinar_missed_id, 1, 2,  'Watch the replay before it expires',          'webinar_missed_replay'),
+      (v_webinar_missed_id, 2, 24, 'The one thing every man in the room realized', 'webinar_missed_key_takeaway'),
+      (v_webinar_missed_id, 3, 72, 'Next live training — don''t miss this one',   'webinar_missed_next_training')
+    ON CONFLICT (campaign_id, sequence_order) DO NOTHING;
+  END IF;
+END $$;
+
+-- ============================================
+-- EXTENDED ASSESSMENT NURTURE (Added 2026-03-03)
+-- ============================================
+-- Extends the existing assessment_completed drip from 2 emails (Day 4) to 7 emails (Day 21)
+
+DO $$
+DECLARE
+  v_assessment_id UUID;
+BEGIN
+  SELECT id INTO v_assessment_id
+    FROM drip_campaigns WHERE trigger_event = 'assessment_completed' LIMIT 1;
+
+  IF v_assessment_id IS NOT NULL THEN
+    INSERT INTO drip_emails (campaign_id, sequence_order, delay_hours, subject, template_key)
+    VALUES
+      (v_assessment_id, 3, 168, 'He scored a 3.2 on his weakest pillar. Here''s what happened.', 'assessment_case_study'),
+      (v_assessment_id, 4, 240, 'Why your lowest score matters more than you think',             'assessment_pillar_deep_dive'),
+      (v_assessment_id, 5, 336, 'I''m hosting a live training this month',                       'assessment_webinar_invite'),
+      (v_assessment_id, 6, 432, 'Has your score changed?',                                       'assessment_retake_cta'),
+      (v_assessment_id, 7, 504, 'The next cohort starts soon. 3 spots left.',                    'assessment_final_offer')
     ON CONFLICT (campaign_id, sequence_order) DO NOTHING;
   END IF;
 END $$;

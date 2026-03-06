@@ -23,6 +23,21 @@ export default function SocialProofSection() {
       <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {TESTIMONIALS.map((testimonial) => (
           <div key={testimonial.id} className="bg-lp-card border-lp-border relative border p-6">
+            {/* Video testimonial */}
+            {testimonial.videoUrl && (
+              <div className="border-lp-border -mx-6 -mt-6 mb-6 border-b">
+                <div className="relative aspect-video">
+                  <video
+                    src={testimonial.videoUrl}
+                    controls
+                    preload="none"
+                    poster={`${testimonial.videoUrl}#t=0.5`}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Quote mark */}
             <div className="font-bebas text-lp-gold absolute top-4 right-5 text-5xl leading-none opacity-15">
               &ldquo;

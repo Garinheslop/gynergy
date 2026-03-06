@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { useSession } from "@contexts/UseSession";
+import { trackPixelEvent } from "@lib/utils/analytics";
 import FriendCodeShare from "@modules/payment/components/FriendCodeShare";
 import icons from "@resources/icons";
 import { useDispatch, useSelector } from "@store/hooks";
@@ -134,6 +135,19 @@ function PaymentSuccessContent() {
       setPollingStatus("success");
     }
   }, [payment.friendCodes.length]);
+
+  // Fire pixel Purchase event once on mount (deduped via sessionStorage)
+  useEffect(() => {
+    const key = `purchase_tracked_${_sessionId}`;
+    if (_sessionId && !sessionStorage.getItem(key)) {
+      trackPixelEvent("Purchase", {
+        content_name: "45-Day Awakening Challenge",
+        value: 997,
+        currency: "USD",
+      });
+      sessionStorage.setItem(key, "true");
+    }
+  }, [_sessionId]);
 
   // Trigger confetti celebration when loading completes
   useEffect(() => {

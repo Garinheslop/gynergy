@@ -21,6 +21,7 @@ const navItems: AdminNavItem[] = [
   { label: "Community", href: "/admin/community", icon: "gng-community" },
   { label: "Payments", href: "/admin/payments", icon: "gng-credit-card" },
   { label: "Analytics", href: "/admin/analytics", icon: "gng-stats" },
+  { label: "Funnel", href: "/admin/funnel", icon: "gng-stats" },
   { label: "Gamification", href: "/admin/gamification", icon: "gng-trophy" },
   { label: "System", href: "/admin/system", icon: "gng-settings" },
 ];

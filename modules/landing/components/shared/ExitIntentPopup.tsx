@@ -55,23 +55,27 @@ export default function ExitIntentPopup({
   const [error, setError] = useState<string | null>(null);
 
   const emailInputRef = useRef<HTMLInputElement>(null);
+  const ctaButtonRef = useRef<HTMLButtonElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
-  // Focus management: Focus input when opened, restore focus when closed
+  const isDirectRedirect = variant === "webinar" && redirectOnSubmit;
+
+  // Focus management: Focus input or CTA when opened, restore focus when closed
   useEffect(() => {
     if (isOpen) {
-      // Store the currently focused element
       previousActiveElement.current = document.activeElement as HTMLElement;
-      // Focus the email input after a brief delay for animation
       const timer = setTimeout(() => {
-        emailInputRef.current?.focus();
+        if (isDirectRedirect) {
+          ctaButtonRef.current?.focus();
+        } else {
+          emailInputRef.current?.focus();
+        }
       }, 100);
       return () => clearTimeout(timer);
     } else {
-      // Restore focus to previous element when closing
       previousActiveElement.current?.focus();
     }
-  }, [isOpen]);
+  }, [isOpen, isDirectRedirect]);
 
   // Handle Escape key to close popup
   useEffect(() => {
@@ -108,6 +112,12 @@ export default function ExitIntentPopup({
       setError("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDirectRedirect = () => {
+    if (redirectOnSubmit) {
+      globalThis.location.href = redirectOnSubmit;
     }
   };
 
@@ -169,42 +179,65 @@ export default function ExitIntentPopup({
               {content.subheadline}
             </p>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
-              <input
-                ref={emailInputRef}
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                required
-                aria-label="Email address"
-                className={cn(
-                  "flex-1",
-                  "font-oswald text-sm font-light",
-                  "px-4 py-3",
-                  "bg-lp-black border-lp-border border",
-                  "text-lp-white placeholder:text-lp-muted",
-                  "outline-none",
-                  "focus:border-lp-gold focus:ring-lp-gold transition-colors focus:ring-1"
-                )}
-              />
+            {isDirectRedirect ? (
+              /* Webinar variant: direct CTA button, no email required */
               <button
-                type="submit"
-                disabled={isSubmitting}
+                ref={ctaButtonRef}
+                onClick={handleDirectRedirect}
                 className={cn(
-                  "font-oswald text-xs font-medium tracking-widest uppercase",
-                  "px-6 py-3",
+                  "font-oswald text-sm font-medium tracking-widest uppercase",
+                  "w-full px-6 py-4",
                   "bg-lp-gold text-lp-black",
                   "cursor-pointer border-none",
                   "transition-all duration-300",
-                  "hover:bg-lp-gold-light",
-                  "disabled:cursor-not-allowed disabled:opacity-60",
+                  "hover:bg-lp-gold-light hover:-translate-y-0.5",
+                  "hover:shadow-[0_8px_40px_rgba(184,148,62,0.3)]",
                   "focus-visible:ring-lp-gold-light focus-visible:ring-offset-lp-card focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                 )}
               >
-                {isSubmitting ? "..." : content.buttonText}
+                {content.buttonText} →
               </button>
-            </form>
+            ) : (
+              /* Challenge variant: email capture form */
+              <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
+                <input
+                  ref={emailInputRef}
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                  aria-label="Email address"
+                  className={cn(
+                    "flex-1",
+                    "font-oswald text-sm font-light",
+                    "px-4 py-3",
+                    "bg-lp-black border-lp-border border",
+                    "text-lp-white placeholder:text-lp-muted",
+                    "outline-none",
+                    "focus:border-lp-gold focus:ring-lp-gold transition-colors focus:ring-1"
+                  )}
+                />
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={cn(
+                    "font-oswald text-xs font-medium tracking-widest uppercase",
+                    "px-6 py-3",
+                    "bg-lp-gold text-lp-black",
+                    "cursor-pointer border-none",
+                    "transition-all duration-300",
+                    "hover:bg-lp-gold-light",
+                    "disabled:cursor-not-allowed disabled:opacity-60",
+                    "focus-visible:ring-lp-gold-light focus-visible:ring-offset-lp-card focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                  )}
+                >
+                  {isSubmitting ? "..." : content.buttonText}
+                </button>
+              </form>
+            )}
 
             {error && (
               <p className="font-oswald mt-3 text-xs font-light text-red-400" role="alert">
@@ -212,9 +245,11 @@ export default function ExitIntentPopup({
               </p>
             )}
 
-            <p className="font-oswald text-lp-muted mt-4 text-xs font-light">
-              No spam. Unsubscribe anytime.
-            </p>
+            {!isDirectRedirect && (
+              <p className="font-oswald text-lp-muted mt-4 text-xs font-light">
+                No spam. Unsubscribe anytime.
+              </p>
+            )}
           </>
         )}
       </div>

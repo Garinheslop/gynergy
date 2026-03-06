@@ -15,20 +15,20 @@
 // ============================================
 
 /** Webinar slug — must match the database seed in webinars table */
-export const WEBINAR_SLUG = "five-pillars-march-2026";
+export const WEBINAR_SLUG = "five-pillars-march-18-2026";
 
 /** Webinar title — used in emails, landing page, schema.org */
 export const WEBINAR_TITLE = "The 5 Pillars of Integrated Power";
 
 /** Webinar description */
 export const WEBINAR_DESCRIPTION =
-  "Free Live Training: Why successful men feel empty and the 10-minute practice that changes everything.";
+  "Free Live Training: Why successful people feel empty and the 10-minute practice that changes everything.";
 
 /** Start time in ISO 8601 with timezone offset */
-export const WEBINAR_START_ISO = "2026-03-11T17:30:00-07:00";
+export const WEBINAR_START_ISO = "2026-03-18T17:30:00-07:00";
 
 /** End time in ISO 8601 with timezone offset */
-export const WEBINAR_END_ISO = "2026-03-11T19:00:00-07:00";
+export const WEBINAR_END_ISO = "2026-03-18T19:00:00-07:00";
 
 /** Duration in minutes */
 export const WEBINAR_DURATION_MINUTES = 90;
@@ -43,10 +43,10 @@ export const WEBINAR_MAX_SEATS = 100;
 /** Start date as Date object */
 export const WEBINAR_START_DATE = new Date(WEBINAR_START_ISO);
 
-/** Just the date portion: "2026-03-03" */
+/** Just the date portion: "2026-03-18" */
 export const WEBINAR_DATE_ONLY = WEBINAR_START_ISO.split("T")[0];
 
-/** Human-readable date: "March 3, 2026" */
+/** Human-readable date: "March 18, 2026" */
 export const WEBINAR_DATE_DISPLAY = WEBINAR_START_DATE.toLocaleDateString("en-US", {
   month: "long",
   day: "numeric",
@@ -62,9 +62,11 @@ export const WEBINAR_TIME_DISPLAY = WEBINAR_START_DATE.toLocaleTimeString("en-US
   timeZoneName: "short",
 });
 
-/** Short date for copy: "March 3rd" */
+/** Short date for copy: "March 18th" */
 export const WEBINAR_DATE_SHORT = (() => {
-  const day = WEBINAR_START_DATE.getDate();
+  // Parse day from ISO string to avoid UTC timezone shift on Vercel
+  // (e.g., March 18 5:30 PM PST = March 19 00:30 UTC → getDate() returns 19)
+  const day = Number.parseInt(WEBINAR_DATE_ONLY.split("-")[2], 10);
   const month = WEBINAR_START_DATE.toLocaleDateString("en-US", {
     month: "long",
     timeZone: "America/Los_Angeles",
@@ -80,5 +82,5 @@ export const WEBINAR_DATE_SHORT = (() => {
   return `${month} ${day}${suffix}`;
 })();
 
-/** Full display: "March 3, 2026 @ 5:30pm PST" */
+/** Full display: "March 18, 2026 @ 5:30 PM PDT" */
 export const WEBINAR_FULL_DISPLAY = `${WEBINAR_DATE_DISPLAY} @ ${WEBINAR_TIME_DISPLAY}`;
