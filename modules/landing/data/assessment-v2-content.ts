@@ -80,7 +80,7 @@ export type Readiness =
 
 export type PriorCoaching = "never" | "free_content" | "under_1k" | "1k_5k" | "5k_15k" | "15k_plus";
 
-export type PriorityPillar = "wealth" | "health" | "relationships" | "growth" | "purpose";
+export type PriorityPillar = "wealth" | "health" | "relationships" | "mindset" | "legacy";
 
 export type Interpretation = "elite" | "gap" | "critical";
 
@@ -397,7 +397,7 @@ export const ASSESSMENT_V2_QUESTIONS: AssessmentQuestion[] = [
     id: "growth_score",
     phase: "C",
     type: "slider",
-    pillar: "growth",
+    pillar: "mindset",
     question:
       "Are you still being challenged in ways that make you feel ALIVE, or are you optimizing a life you've outgrown?",
     sliderConfig: {
@@ -412,7 +412,7 @@ export const ASSESSMENT_V2_QUESTIONS: AssessmentQuestion[] = [
     id: "purpose_score",
     phase: "C",
     type: "slider",
-    pillar: "purpose",
+    pillar: "legacy",
     question:
       "If you removed your title, your revenue, your achievements — what remains that gives your life meaning?",
     sliderConfig: {
@@ -482,13 +482,13 @@ export const ASSESSMENT_V2_QUESTIONS: AssessmentQuestion[] = [
         description: "Especially with partner/kids",
       },
       {
-        value: "growth",
-        label: "Growth",
+        value: "mindset",
+        label: "Mindset",
         description: "I need to feel alive again",
       },
       {
-        value: "purpose",
-        label: "Purpose",
+        value: "legacy",
+        label: "Legacy",
         description: "I need my success to mean something",
       },
     ],
@@ -769,21 +769,21 @@ export const PRIORITY_INSIGHTS: Record<
     rippleEffect:
       "When the people who matter actually SEE you again, everything changes. Your health improves because you have reasons to take care of yourself. Your purpose clarifies because you're not building alone. Connection is the multiplier.",
   },
-  growth: {
-    pillar: "Growth",
-    validation: "You chose Growth — because you need to feel alive again.",
+  mindset: {
+    pillar: "Mindset",
+    validation: "You chose Mindset — because you need to feel alive again.",
     whyFirst:
       "You've mastered the game you've been playing. And now you're bored, coasting, optimizing a life you've outgrown. The edge that made you successful has dulled. You need a new challenge that actually means something.",
     rippleEffect:
-      "When you're challenged again, everything wakes up. Energy returns because you have something worth getting up for. Relationships improve because you're interesting again. Purpose emerges from the growth itself.",
+      "When you're challenged again, everything wakes up. Energy returns because you have something worth getting up for. Relationships improve because you're interesting again. Legacy emerges from the growth itself.",
   },
-  purpose: {
-    pillar: "Purpose",
-    validation: "You chose Purpose — because your success needs to mean something.",
+  legacy: {
+    pillar: "Legacy",
+    validation: "You chose Legacy — because your success needs to mean something.",
     whyFirst:
-      "You can feel the hollowness. The achievement that was supposed to fill you left you empty. You've been asking 'what's the point?' and the answer keeps coming up short. This is the existential crisis successful men don't talk about.",
+      "You can feel the hollowness. The achievement that was supposed to fill you left you empty. You've been asking 'what's the point?' and the answer keeps coming up short. This is the existential crisis successful people don't talk about.",
     rippleEffect:
-      "When your success has meaning, the grind becomes a mission. Your relationships deepen because you're connected to something larger. Your health improves because you're not escaping — you're building. Purpose is the multiplier that changes everything.",
+      "When your success has meaning, the grind becomes a mission. Your relationships deepen because you're connected to something larger. Your health improves because you're not escaping — you're building. Legacy is the multiplier that changes everything.",
   },
 };
 
@@ -856,8 +856,8 @@ export function getLowestPillar(
     { pillar: "wealth", score: answers.wealth_score || 10 },
     { pillar: "health", score: answers.health_score || 10 },
     { pillar: "relationships", score: answers.relationships_score || 10 },
-    { pillar: "growth", score: answers.growth_score || 10 },
-    { pillar: "purpose", score: answers.purpose_score || 10 },
+    { pillar: "mindset", score: answers.growth_score || 10 },
+    { pillar: "legacy", score: answers.purpose_score || 10 },
   ];
 
   return pillars.reduce((lowest, current) => (current.score < lowest.score ? current : lowest));

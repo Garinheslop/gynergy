@@ -233,7 +233,7 @@ test.describe("Assessment - Question Flow", () => {
 
     // Also check for section names
     const sectionIndicator = assessmentPage.locator(
-      "text=/section|pillar|dream|reality|wealth|health|relationship|growth|purpose/i"
+      "text=/section|pillar|dream|reality|wealth|health|relationship|mindset|legacy/i"
     );
     const sectionCount = await sectionIndicator.count();
 

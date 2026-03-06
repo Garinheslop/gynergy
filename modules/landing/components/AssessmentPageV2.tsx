@@ -741,11 +741,19 @@ export default function AssessmentPageV2() {
               The Multiplier Equation
             </p>
             <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
-              {["wealth", "health", "relationships", "growth", "purpose"].map((pillar, index) => {
-                const score = answers[`${pillar}_score` as keyof AssessmentAnswers] as number;
-                const isLowest = lowestPillar?.pillar === pillar;
+              {(
+                [
+                  { id: "wealth", scoreKey: "wealth_score" },
+                  { id: "health", scoreKey: "health_score" },
+                  { id: "relationships", scoreKey: "relationships_score" },
+                  { id: "mindset", scoreKey: "growth_score" },
+                  { id: "legacy", scoreKey: "purpose_score" },
+                ] as const
+              ).map(({ id, scoreKey }, index) => {
+                const score = answers[scoreKey as keyof AssessmentAnswers] as number;
+                const isLowest = lowestPillar?.pillar === id;
                 return (
-                  <span key={pillar}>
+                  <span key={id}>
                     <span
                       className={cn(
                         "font-bebas text-2xl",
@@ -779,44 +787,50 @@ export default function AssessmentPageV2() {
 
             {/* Pillar bars */}
             <div className="space-y-3">
-              {(["wealth", "health", "relationships", "growth", "purpose"] as const).map(
-                (pillar) => {
-                  const score = answers[`${pillar}_score` as keyof AssessmentAnswers] as number;
-                  const isLowest = lowestPillar?.pillar === pillar;
-                  return (
-                    <div key={pillar} className="flex items-center gap-4">
-                      <span
+              {(
+                [
+                  { id: "wealth", name: "Wealth", scoreKey: "wealth_score" },
+                  { id: "health", name: "Health", scoreKey: "health_score" },
+                  { id: "relationships", name: "Relationships", scoreKey: "relationships_score" },
+                  { id: "mindset", name: "Mindset", scoreKey: "growth_score" },
+                  { id: "legacy", name: "Legacy", scoreKey: "purpose_score" },
+                ] as const
+              ).map(({ id, name, scoreKey }) => {
+                const score = answers[scoreKey as keyof AssessmentAnswers] as number;
+                const isLowest = lowestPillar?.pillar === id;
+                return (
+                  <div key={id} className="flex items-center gap-4">
+                    <span
+                      className={cn(
+                        "font-oswald w-28 text-left text-sm",
+                        isLowest && score <= 5 ? "text-red-400" : "text-lp-gray"
+                      )}
+                    >
+                      {name}
+                      {isLowest && score <= 5 && " ←"}
+                    </span>
+                    <div className="bg-lp-border relative h-2 flex-1 overflow-hidden">
+                      <div
                         className={cn(
-                          "font-oswald w-28 text-left text-sm capitalize",
-                          isLowest && score <= 5 ? "text-red-400" : "text-lp-gray"
+                          "absolute top-0 left-0 h-full transition-all",
+                          score >= 7 && "bg-lp-gold",
+                          score >= 4 && score < 7 && "bg-lp-gold/60",
+                          score < 4 && "bg-red-500/60"
                         )}
-                      >
-                        {pillar}
-                        {isLowest && score <= 5 && " ←"}
-                      </span>
-                      <div className="bg-lp-border relative h-2 flex-1 overflow-hidden">
-                        <div
-                          className={cn(
-                            "absolute top-0 left-0 h-full transition-all",
-                            score >= 7 && "bg-lp-gold",
-                            score >= 4 && score < 7 && "bg-lp-gold/60",
-                            score < 4 && "bg-red-500/60"
-                          )}
-                          style={{ width: `${(score || 0) * 10}%` }}
-                        />
-                      </div>
-                      <span
-                        className={cn(
-                          "font-bebas w-6 text-right text-lg",
-                          isLowest && score <= 5 ? "text-red-400" : "text-lp-gold"
-                        )}
-                      >
-                        {score || "?"}
-                      </span>
+                        style={{ width: `${(score || 0) * 10}%` }}
+                      />
                     </div>
-                  );
-                }
-              )}
+                    <span
+                      className={cn(
+                        "font-bebas w-6 text-right text-lg",
+                        isLowest && score <= 5 ? "text-red-400" : "text-lp-gold"
+                      )}
+                    >
+                      {score || "?"}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
