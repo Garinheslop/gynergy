@@ -130,8 +130,8 @@ CREATE TABLE IF NOT EXISTS assessment_results (
     'wealth',
     'health',
     'relationships',
-    'growth',
-    'purpose'
+    'mindset',
+    'legacy'
   )),
 
   -- ============================================
@@ -202,8 +202,8 @@ CREATE TABLE IF NOT EXISTS assessment_results (
       WHEN COALESCE(wealth_score, 10) THEN 'wealth'
       WHEN COALESCE(health_score, 10) THEN 'health'
       WHEN COALESCE(relationships_score, 10) THEN 'relationships'
-      WHEN COALESCE(growth_score, 10) THEN 'growth'
-      ELSE 'purpose'
+      WHEN COALESCE(growth_score, 10) THEN 'mindset'
+      ELSE 'legacy'
     END
   ) STORED,
 
